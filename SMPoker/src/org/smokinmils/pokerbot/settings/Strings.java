@@ -210,8 +210,8 @@ public final class Strings {
 	public static final String CheckCreditMsg =  "%b%c04%sender%c12: %user %c12currently has %c04%creds%c12 chips on the active profile(%c04%active%c12)";
 	public static final String CheckCreditSelfMsg =  "%b%c04%sender%c12: You %c12currently have %c04%creds%c12 chips on the active profile(%c04%active%c12)";
 	public static final String CreditsOtherProfiles = "%c04%name%c12(%c04%amount%c12)";
-	public static final String NoCredits = "%b%c04%sender%c12: %user %c12currently has %c04%creds%c12%sender: %user %c12currently has %c04no%c12 available chips.";
-	public static final String NoCreditsSelf = "%b%c04%sender%c12: You %c12currently have %c04%creds%c12%sender: %user %c12currently has %c04no%c12 available chips.";
+	public static final String NoCredits = "%b%c04%sender: %user %c12currently has %c04no%c12 available chips.";
+	public static final String NoCreditsSelf = "%b%c04%sender%c12: %c04You %c12currently has %c04no%c12 available chips.";
 	
 	/**
 	 * This string is used when a user asks for all tables
@@ -480,7 +480,7 @@ public final class Strings {
 	 * %actor - The person who failed to act
 	 * %secs - The number of seconds they have left to act
 	 */
-	public static final String NoActionWarning = "%b%c12(%c04#%hID%c12)has %c04%secs%c12 seconds to act.";
+	public static final String NoActionWarning = "%b%c12(%c04#%hID%c12) %c04%actor%c12 has %c04%secs%c12 seconds to act.";
 	
 	/**
 	 * A message for when someone fails to act

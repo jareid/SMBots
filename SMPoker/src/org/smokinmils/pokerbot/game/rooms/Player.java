@@ -302,7 +302,7 @@ public class Player {
                 raises++;
                 break;
             case RAISE:
-                currentBet += minBet;
+                //currentBet += minBet;
                 betIncrement = currentBet - bet;
                 if (betIncrement > chips) {
                     betIncrement = chips;

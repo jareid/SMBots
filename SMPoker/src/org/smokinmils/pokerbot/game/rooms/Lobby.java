@@ -308,6 +308,11 @@ public class Lobby extends Room {
 			}
 			profile_id = Database.getInstance().getProfileID(profile);
 			
+			if (profile.compareToIgnoreCase("play") != 0) {
+				ircClient.sendIRCMessage(ircChannel, "%b%c12Poker is disabled for all profiles but play chips");
+				return;
+			}
+			
 			Integer stake = Utils.tryParse( msg[0] );
 			Integer buy_in = Utils.tryParse( msg[1] );
 			Integer max_players = Utils.tryParse( msg[2] );

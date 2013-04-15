@@ -15,13 +15,13 @@ package org.smokinmils.pokerbot.settings;
  */
 public class DBSettings {
 	/** The Server name of the database */
-	public static final String  DBServer =			"localhost";
+	public static final String  DBServer =			"66.147.232.16";
 	
 	/** The port number of the database (MySQL is typically 3306) */
 	public static final int 	DBPort =			3306;
 	
 	/** The database name of the database */
-	public static final String  DBName =			"live";
+	public static final String  DBName =			"test";
 	
 	/** The username of the database */
 	public static final String  DBUser =			"smbot";
