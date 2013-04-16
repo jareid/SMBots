@@ -30,6 +30,7 @@ import org.smokinmils.pokerbot.game.Card;
 import org.smokinmils.pokerbot.game.Deck;
 import org.smokinmils.pokerbot.game.Hand;
 import org.smokinmils.pokerbot.game.HandValue;
+import org.smokinmils.pokerbot.game.SidePot;
 import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
@@ -132,6 +133,9 @@ public class Table extends Room {
 	/** Boolean used for when a hand was cancelled due to a disconnect */
 	private boolean disconnected;
 	
+	/** Side pots */
+	private List<SidePot> sidePots;
+	
 	/** Rounds */
 	private static final int PREFLOP = 0;
 	private static final int FLOP 	 = 1;
@@ -159,6 +163,8 @@ public class Table extends Room {
 		activePlayers = new ArrayList<Player>();
 		satOutPlayers = new ArrayList<Player>();
         board = new ArrayList<Card>();
+
+		sidePots = new ArrayList<SidePot>();
         
         try {
 	        deck = null;
@@ -853,8 +859,12 @@ public class Table extends Room {
 				}
 			}
 			
-			if (found != null) {playerLeaves(found, is_active);}
-			// TODO add error + logging
+			if (found != null) { 
+				playerLeaves(found, is_active);
+			} else {
+				EventLog.log(sender + "failed to leave as they should not have been voiced.", "Table", "onLeave");
+				ircClient.deVoice(ircChannel, sender);
+			}
 		} else {
 			invalidArguments( sender, CommandType.LEAVE.getFormat() );
 		}
@@ -1101,7 +1111,40 @@ public class Table extends Room {
 	            	System.exit(1);	            	
 	            }
                 pot += actor.getBetIncrement();
+                
+                // Handle existing side pots
+                int less_than_pot = -1;
+                int last_sp_bet = 0;
+                for (SidePot pot: sidePots) {
+                	less_than_pot++;
+                	last_sp_bet = pot.getBet();
+                	if (!pot.hasPlayer(actor) && actor.getBet() >= last_sp_bet) {
+                		pot.call(actor);
+                	} else if (actor.getBet() < last_sp_bet) {
+                		break;
+                	}
+                }
 	            
+	            // If user is all in, announce it and side up a new side pot if needed
+	            if (actor.isBroke()) {
+	                if (actor.getBet() > last_sp_bet) {
+	                	SidePot pot = new SidePot(actor.getBet());
+	                	pot.call(actor);
+	                	for (Player callee: activePlayers) {
+	                		if (callee.getBet() > actor.getBet()) {
+	                			pot.call(callee);
+	                		}
+	                	}
+	                	
+	                	sidePots.add(less_than_pot+1, pot);                	
+	                }
+	                	                
+	                String out = Strings.PlayerAllIn.replaceAll("%hID", Integer.toString(handID));
+	                out = out.replaceAll("%actor", actor.getName());
+	                ircClient.sendIRCMessage( ircChannel, out );
+	            }
+	            
+	            // TODO: add side pot output
 	            String out = Strings.TableAction.replaceAll("%hID", Integer.toString(handID));
 	            out = out.replaceAll("%actor", actor.getName());
 	            out = out.replaceAll("%action", action.getText());
@@ -1109,15 +1152,6 @@ public class Table extends Room {
 	            out = out.replaceAll("%chips", Integer.toString(actor.getChips()) );
 	            out = out.replaceAll("%pot", Integer.toString(pot));
 	            ircClient.sendIRCMessage( ircChannel, out );
-	            
-	            // If user is all in, set there pot
-	            if (actor.isBroke()) {
-	                actor.setAllInPot(pot);
-	                
-	                out = Strings.PlayerAllIn.replaceAll("%hID", Integer.toString(handID));
-	                out = out.replaceAll("%actor", actor.getName());
-	                ircClient.sendIRCMessage( ircChannel, out );
-	            }
 
                 if (action == ActionType.FOLD && activePlayers.size() == 1) {
                     // The player left wins.
@@ -1209,110 +1243,113 @@ public class Table extends Room {
     
     /**
      * Performs the Showdown.
-     * TODO: move output to Strings class
-     * TODO: handle split pots/rake correctly (currently this doesn't quite work)
      */
-    private void doShowdown() {
-    	// Rake
-		// None if only the blinds are in
-		// Otherwise Minimum or RakePercent whichever is greater 
-		int rake = 0;
-		if ( pot > (bigBlind*2) ) {
-			rake = Variables.MinimumRake;
-			int perc = (int)Math.round(pot * (Variables.RakePercentage / 100.0));
-			if (perc < Variables.MinimumRake)
-				rake = Variables.MinimumRake;
-			else if (perc > Variables.MaximumRake)
-				rake = Variables.MaximumRake;
-			else
-				rake = perc;
-		}
-    	pot = pot - rake;
+    private void doShowdown() {    	
+    	// Add final pot to side pots
+    	SidePot mainpot = new SidePot();
+    	for (Player left: activePlayers) {
+    		if (!left.isBroke()) {
+    			if (mainpot.getBet() == 0) {
+    				mainpot.setBet( left.getBet() );
+    				mainpot.call( left );
+    			}
+    		}
+    	}
+    	if (mainpot.getPlayers().size() > 0) {
+    		sidePots.add(mainpot);
+    	}
     	
-        // Look at each hand value, sorted from highest to lowest.
-        Map<HandValue, List<Player>> rankedPlayers = getRankedPlayers();
-        for (HandValue handValue : rankedPlayers.keySet()) {
-            // Get players with winning hand value.
-            List<Player> winners = rankedPlayers.get(handValue);
-            if (winners.size() == 1) {
-                // Single winner.
-                Player winner = winners.get(0);
-                int potShare = winner.getAllInPot();
-                if (potShare != 0) {
-                	winner.win(potShare);
-                	pot -= potShare;
-                    
-                    ircClient.sendIRCMessage( ircChannel,
-                    		String.format("%s wins %d chips with %s\n", winner.getName(), potShare, handValue.toString() ) );
-                    if (pot == 0) {
+    	// Process each pot separately
+    	int totalpot = 0;
+    	int totalrake = 0;
+    	String potname = "";
+    	int i = 0;
+    	for (SidePot side: sidePots) {
+    		if (i == 0) potname = "Main Pot";
+    		else potname = "Side Pot " + Integer.toString(i);
+    		
+    		// More than one player so decide the winner
+    		if (side.getPlayers().size() > 1) {
+        		// Take the rake
+        		int rake = 0;
+        		if ( pot > (bigBlind*2) ) {
+        			rake = side.rake();
+        		}
+        		int potsize = side.getPot() - totalpot;
+        		
+                // Look at each hand value, sorted from highest to lowest.
+                Map<HandValue, List<Player>> rankedPlayers = getRankedPlayers( side.getPlayers() );
+                for (HandValue handValue : rankedPlayers.keySet()) {
+                    // Get players with winning hand value.
+                    List<Player> winners = rankedPlayers.get(handValue);
+                    if (winners.size() == 1) {
+                        // Single winner.
+                        Player winner = winners.get(0);
+                    	winner.win( potsize );
+                    	String out = Strings.PotWinner.replaceAll("%winner", winner.getName());
+                    	out = out.replaceAll("%hand", handValue.toString());
+                    	out = out.replaceAll("%pot", potname);
+                    	out = out.replaceAll("%amount", Integer.toString(potsize));
+                    	ircClient.sendIRCMessage( ircChannel, out );
+                        break;
+                    } else {                    
+                        // Tie; share the pot amongst winners.
+                        int remainder = potsize % winners.size();
+                        if (remainder != 0) {
+                        	potsize -= remainder;
+                        	rake += remainder;
+                        }
+                        int potShare = potsize / winners.size();
+                        
+                        for (Player winner : winners) {                        
+                            // Give the player his share of the pot.
+                            winner.win(potShare);
+                            
+                            // Announce
+                        	String out = Strings.PotWinner.replaceAll("%winner", winner.getName());
+                        	out = out.replaceAll("%hand", handValue.toString());
+                        	out = out.replaceAll("%pot", potname);
+                        	out = out.replaceAll("%amount", Integer.toString(potShare));
+                        	ircClient.sendIRCMessage( ircChannel, out );
+                        }
                         break;
                     }
-                } else {
-                	winner.win(pot);
-                	ircClient.sendIRCMessage( ircChannel,
-                    		String.format("%s wins %d chips with %s\n", winner.getName(), pot, handValue.toString() ) );
-                    break;
                 }
-            } else {
-            	// Add the remainder of a shared pot to rake
-                rake += pot % winners.size();
-                
-                // Tie; share the pot amongst winners.
-                int tempPot = pot;
-                
-                StringBuilder sb = new StringBuilder("Tie: ");
-                for (Player player : winners) {                	
-                    // Determine the player's share of the pot.
-                    int potShare = player.getAllInPot();
-                    if (potShare == 0) {
-                        // Player is not all-in, so he competes for the whole pot.
-                        potShare = pot / winners.size();
-                    } else {
-                        // Player is not all-in, so he competes for his pot.
-                    	int temp = potShare - (rake/winners.size()) / winners.size();
-                    	rake = temp % winners.size();
-                    	potShare = (potShare - rake) / winners.size();
-                    }
-                    
-                    // Give the player his share of the pot.
-                    player.win(potShare);
-                    tempPot -= potShare;
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
-                    
-                    sb.append(String.format("%s wins %d with %s\n", player.getName(), potShare, handValue.toString()));
-                    
-                    // If there is no more pot to divide, we're done.
-                    if (tempPot == 0) {
-                        break;
-                    } else {
-                    	// TODO: if this is uneven chips that couldn't be divided, add to rake not next player
-                    	pot = tempPot;
-                    }
-                }
+                // Add this pot's rake to the total rake
+        		totalrake += rake;
+	    	} else {
+	    		// Only one player, pot is returned.
+	    		Player returnee = side.getPlayers().get(0);
+	    		returnee.win(side.getPot());
+	    		
+            	String out = Strings.PotReturned.replaceAll("%winner", returnee.getName());
+            	out = out.replaceAll("%amount", Integer.toString(side.getPot()));
+            	ircClient.sendIRCMessage( ircChannel, out );
+	    	}
 
-                ircClient.sendIRCMessage( ircChannel, sb.toString() );
-                
-                if (tempPot > 0) {
-                	rake += tempPot;
-                    EventLog.info("Rake was had to clear the remains of the pot as rake", "Table", "doShowdown");
-                }
-                break;
-            }
-        }
-        ircClient.sendIRCMessage( ircChannel, "Rake: " + Integer.toString(rake) );
+    		// Each side pot contains the previous pot's total, so remove it
+    		totalpot = side.getPot();
+    		
+    		// Increase pot number
+    		i++;
+    	}
+    	
+    	// Announce rake
+    	String out = Strings.RakeTaken.replaceAll("%rake", Integer.toString(totalrake));
+        ircClient.sendIRCMessage( ircChannel, out );
         nextHand();
     }
 	
     /**
      * Returns the active players mapped and sorted by their hand value.
      * 
+     * @param player_list The list of players to compare
+     * 
      * @return The active players mapped by their hand value (sorted). 
      */
-    private Map<HandValue, List<Player>> getRankedPlayers() {
+    private Map<HandValue, List<Player>> getRankedPlayers(List<Player> player_list) {
 		Map<HandValue, List<Player>> winners = new TreeMap<HandValue, List<Player>>();
-		for (Player player : activePlayers) {
+		for (Player player : player_list) {
 	            // Create a hand with the community cards and the player's hole cards.
 	            Hand hand = null;
 	            try {
@@ -1532,6 +1569,8 @@ public class Table extends Room {
         currentRound = 0;
         handActive = false;
         List<Player> remove_list = new ArrayList<Player>();
+
+		sidePots.clear();
         
         activePlayers.clear();
         for (Player player : players) {

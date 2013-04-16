@@ -622,4 +622,31 @@ public final class Strings {
 	 * %cmd
 	 */
 	public static final String AllowedActionString = "%c04%action%c12%cmd%n";
+
+
+	/**
+	 * This is used for formatting the message when a player wins (part of) a pot
+	 * 
+	 * %pot		- The pot name
+	 * %winner	- The winner's name
+	 * %amount	- The amount won
+	 * %hand	- The winning hand
+	 */
+	public static final String PotWinner = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%winner%c12 wins %c04%amount%c12 chips from %c04%pot%c12 with %c04%hand%c12";
+
+	/**
+	 * This is used for formatting the message for the amount of rake taken.
+	 * 
+	 * %rake	- The amount of rake
+	 */
+	public static final String RakeTaken = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Rake: %c04%rake%c12";
+	
+	/**
+	 * This is used for formatting the message for a pot returned as there is only a single player
+	 * 
+	 * %winner	- The winner's name
+	 * %amount	- The amount returned
+	 */
+	public static final String PotReturned = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%winner%c12 has been returned %c04%amount%c12 chips as there was no callers.";
+
 }

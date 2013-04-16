@@ -186,12 +186,13 @@ public class Client extends PircBot {
 					   String login, String hostname) {
 		if ( quiter.compareToIgnoreCase( this.getNick() ) == 0 ) {
 			try {
-				//TODO: change to reconnect timer
 				this.reconnect();
 			} catch (NickAlreadyInUseException e) {
-				EventLog.log(e, "Client", "onQuit");
+				EventLog.fatal(e, "Client", "onQuit");
+				System.exit(1);
 			} catch (IOException | IrcException e) {
-				EventLog.log(e, "Client", "onQuit");
+				EventLog.fatal(e, "Client", "onQuit");
+				System.exit(1);
 			}
 		} else {
 			// Notify the correct room if required

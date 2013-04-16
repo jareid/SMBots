@@ -944,7 +944,6 @@ public class Database {
 			   				  + "(" +  getUserIDSQL(username) + "), "
 					   		  + "(" +   Integer.toString(amount) + "), "
 			   				  + "'" + Integer.toString(profile_id) + "') ";
-	   // TODO: insert profile_id
 	   
 	   try {
 		   conn = getConnection();
