@@ -944,4 +944,43 @@ public class Accounts {
 		
 		return id;
 	}
+	
+	
+	/**
+	 * Adds a new user to the system
+	 * @param  profile in string form,
+	 */
+	public void addUser(String username)
+	{
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		try{
+			conn = getConnection();
+			stmt = conn.createStatement();
+			
+			System.out.println("Adding new user.");
+			stmt.executeUpdate("INSERT INTO users (username, active_profile) VALUES('" + username + "', 3);");
+			//System.out.println("Adding new user's profile");
+		}
+		catch(SQLException e2)
+		{
+			System.out.println("Error in SQL query INSERTING NEW USER");
+			System.out.println(e2.getMessage());
+			
+		}
+		finally
+		{
+			try{
+				if (rs!=null) rs.close();
+				if (stmt!=null) stmt.close();
+				if (conn!=null) conn.close();
+			}
+			catch (SQLException e)
+			{
+				System.out.println("Error Adding new user");
+			}
+		}
+	}
 }

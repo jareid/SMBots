@@ -13,7 +13,7 @@ public class Settings {
 	public static String BOTNAME = "SM_BOT_TEST";
 	public static String DBHOST = "66.147.232.16";
 	public static String DBNAME = "test";
-	*/
+	/*/
 	
 	
 	// LIVE DATA

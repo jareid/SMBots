@@ -54,8 +54,8 @@ public class Bot extends ListenerAdapter implements Listener
 		games.add(new DiceDuel("#smokin_dice"));
 		/*
 		// test config
-		games.add(new Roulette(5, "#testeroo", bot));
-		games.add(new DiceDuel("#testeroo"));
+		//games.add(new Roulette(5, "#testeroo", bot));
+		//games.add(new DiceDuel("#testeroo"));
 		games.add(new OverUnder("#testeroo"));
 		*/
 		
@@ -178,6 +178,14 @@ public class Bot extends ListenerAdapter implements Listener
 					}
 				
 			}
+			
+			// at this point we have a user who is regged with nickserv
+			if(!Accounts.getInstance().isValidUser(e.getUser().getNick()))
+			{
+				// this user is registered with nickserv, but not on our systems, 
+				Accounts.getInstance().addUser(e.getUser().getNick());
+				// then proceed to carry on
+			}
 			String[] words = e.getMessage().split("!")[1].split(" ");
 			// if info, do that, else check if it's an accounting command, else check game commands
 			String command = words[0];
@@ -269,7 +277,7 @@ public class Bot extends ListenerAdapter implements Listener
 				else if(command.equalsIgnoreCase("chips"))
 				{
 					System.out.println(this.getUserLevel(sender, chan, e.getUser()));
-					if(this.getUserLevel(sender, chan, e.getUser()) > 0)
+					if(this.getUserLevel(sender, chan, e.getUser()) > 1)
 					{
 						if(words.length > 3)
 						{
