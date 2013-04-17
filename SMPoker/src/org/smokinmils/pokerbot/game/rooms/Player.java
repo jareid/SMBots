@@ -39,11 +39,11 @@ public class Player {
     /** Current bet. */
     private int bet;
     
+    /** Current bet (in this hand) */
+    private int totalBet;
+    
     /** Number of bets and raises in the current betting round. */
     private int raises;
-    
-    /** Pot when all-in. */
-    private int allInPot;
     
     /** Last action performed. */
     private ActionType action;
@@ -106,6 +106,7 @@ public class Player {
      */
     public void resetHand() {
     	chips += rebuy;
+    	totalBet = 0;
     	rebuy = 0;
         hand.removeAllCards();
         hasCards = false;
@@ -119,7 +120,6 @@ public class Player {
         bet = 0;
         action = null;
         raises = 0;
-        allInPot = 0;
         betIncrement = 0;
     }
     
@@ -131,7 +131,6 @@ public class Player {
         bet = 0;
         action = null;
         raises = 0;
-        allInPot = 0;
         betIncrement = 0;
     }
     
@@ -198,6 +197,13 @@ public class Player {
     public int getBet() { return bet; }
     
     /**
+     * Returns the player's current bet for this hand
+     *
+     * @return The current bet.
+     */
+    public int getTotalBet() { return totalBet; }
+    
+    /**
      * Returns the number of raises the player has performed in this betting round.
      * 
      * @return The number of raises.
@@ -234,6 +240,7 @@ public class Player {
         action = ActionType.SMALL_BLIND;
         chips -= blind;
         bet += blind;
+        totalBet += blind;
     }
     
     /**
@@ -245,22 +252,8 @@ public class Player {
         action = ActionType.BIG_BLIND;
         chips -= blind;
         bet += blind;
+        totalBet += blind;
     }
-    
-    /**
-     * Returns the part of the pot this player has a stake in when all-in.
-     *  
-     * @return The all-in pot.
-     */
-    public int getAllInPot() { return allInPot; }
-    
-    /**
-     * Sets the part of the pot this player has a stake in when all-in.
-     * 
-     * @param allInPot
-     *            The all-in pot.
-     */
-    public void setAllInPot(int pot) { allInPot = pot; }
 	
     /**
      * Player has won the pot
@@ -291,6 +284,7 @@ public class Player {
                 }
                 chips -= betIncrement;
                 bet += betIncrement;
+                totalBet += betIncrement;
                 break;
             case BET:
                 betIncrement += minBet;
@@ -299,6 +293,7 @@ public class Player {
                 }
                 chips -= betIncrement;
                 bet += betIncrement;
+                totalBet += betIncrement;
                 raises++;
                 break;
             case RAISE:
@@ -309,6 +304,7 @@ public class Player {
                 }
                 chips -= betIncrement;
                 bet += betIncrement;
+                totalBet += betIncrement;
                 raises++;
                 break;
             case FOLD:

@@ -139,6 +139,10 @@ public final class Strings {
 	public static final String FoldCommand_Format = "%b%c12" + FoldCommand + "";
 	public static final String[] FoldCommand_Alternatives = {"!fold"};
 	
+	public static final String TblChipsCommand = CommandChar + "chips";
+	public static final String TblChipsCommand_Desc = "%b%c12Check the amount of chips you have on the table";
+	public static final String TblChipsCommand_Format = TblChipsCommand + "";
+	
 	public static final String RebuyCommand = CommandChar + "rebuy";
 	public static final String RebuyCommand_Desc = "%b%c12Rebuys chips for this table\n"
 												 + "%b%c12You are only allowed to re-purchase chips if you have less than the table maximum"
@@ -198,6 +202,10 @@ public final class Strings {
 	
 	public static final String GiveChips = "%b%c04%sender:%c12 Added %c04%amount%c12 chips to the %c04%profile%c12 account of %c04%who%c12";
 	public static final String GiveChipsPM = "%b%c12You have had %c04%amount%c12 chips deposited into your account by %c04%sender%c12";
+	
+
+	public static final String CheckChips =  "%b%c12[Table %c04%id%c12] You currently have %c04%creds%c12 chips on the table";
+	public static final String CheckChipsFailed =  "%b%c12[Table %c04%id%c12] You are not currently seated on the table";
 	
 	/**
 	 * This string is used to specify the message sent when a user checks their credit in the system
@@ -438,6 +446,14 @@ public final class Strings {
 	public static final String InvalidActor = "%b%c12(%c04#%hID%c12) %c04%user%c12 acted out of turn, %c04%actor%c12 to act...";
 	
 	/**
+	 * This setting is used for the message when a player acts outside of a game
+	 * 
+	 * %hID - the handID
+	 * %user - The user who tried to act
+	 */
+	public static final String InvalidActTime = "%b%c04%user%c12 acted without a game/hand running...";
+	
+	/**
 	 * This setting is used for the message when a player acts out of turn
 	 * 
 	 * %hID - the handID
@@ -574,6 +590,15 @@ public final class Strings {
 	 * Rebuy successful message
 	 * 
 	 * %id - table id
+	 * %maxbuy - the maximum allowed buy in
+	 * %total - the user's total chips
+	 */
+	public static final String RebuyFailure = "%b%c12[Table %c04%id%c12] You can not rebuy more than %maxbuy. You have %total chips.";
+	
+	/**
+	 * Rebuy successful message
+	 * 
+	 * %id - table id
 	 * %user - The player
 	 * %new - new chips total
 	 * %total - the user's total chips
@@ -622,7 +647,7 @@ public final class Strings {
 	 * %action
 	 * %cmd
 	 */
-	public static final String AllowedActionString = "%c04%action - %cmd %c12";
+	public static final String AllowedActionString = "%action - %cmd";
 
 
 	/**

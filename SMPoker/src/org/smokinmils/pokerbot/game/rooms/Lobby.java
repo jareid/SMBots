@@ -140,7 +140,7 @@ public class Lobby extends Room {
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
 			sendFormat(sender, CommandType.INFO.getCommandText(), CommandType.INFO.getFormat());
 			for (String line: Strings.InfoMessage.split("\n")) {
-				ircClient.sendIRCMessage( sender, line );
+				ircClient.sendIRCNotice( sender, line );
 			}
 		} else if (msg.length == 1){
 			CommandType infocmd = CommandType.fromString( Strings.CommandChar + msg[0] );
@@ -148,22 +148,22 @@ public class Lobby extends Room {
 				sendFullCommand(sender, infocmd);
 			} else if ( msg[0].compareToIgnoreCase("table") == 0 ) {
 				CommandType[] table_cmds = {CommandType.CHECK, CommandType.RAISE, CommandType.FOLD,
-										CommandType.REBUY, CommandType.LEAVE,
-										CommandType.SITDOWN, CommandType.SITOUT};
+						 					CommandType.TBLCHIPS, CommandType.REBUY, CommandType.LEAVE,
+						 					CommandType.SITDOWN, CommandType.SITOUT};
 				for (CommandType item: table_cmds) {
 					sendFullCommand(sender, item);
 				}
 			} else if ( msg[0].compareToIgnoreCase("lobby") == 0 ) {
 				CommandType[] lobby_cmds = {CommandType.INFO, CommandType.CHIPS, CommandType.TABLES,
-										CommandType.NEWTABLE, CommandType.WATCHTBL, 
-										CommandType.JOIN, CommandType.PROMOS,
-										CommandType.GIVE, CommandType.PROFILE, CommandType.PROFILES};
+											CommandType.NEWTABLE, CommandType.WATCHTBL, 
+											CommandType.JOIN, CommandType.PROMOS,
+											CommandType.GIVE, CommandType.PROFILE, CommandType.PROFILES};
 				for (CommandType item: lobby_cmds) {
 					sendFullCommand(sender, item);
-					ircClient.sendIRCMessage(sender,"%b%c15-----");
+					ircClient.sendIRCNotice(sender,"%b%c15-----");
 				}
 			} else {
-				ircClient.sendIRCMessage(sender, Strings.InvalidInfoArgs.replaceAll("%invalid", msg[0]));
+				ircClient.sendIRCNotice(sender, Strings.InvalidInfoArgs.replaceAll("%invalid", msg[0]));
 			}
 		} else {
 			invalidArguments( sender, CommandType.INFO.getFormat() );
@@ -238,7 +238,7 @@ public class Lobby extends Room {
 		String[] msg = message.split(" ");
 		Map<Integer, Integer> tables = new HashMap<Integer, Integer>(Table.getTables());
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			ircClient.sendIRCMessage(sender,
+			ircClient.sendIRCNotice(sender,
 						Strings.AllTablesMsg.replaceAll("%count", Integer.toString(tables.size())));
 			for (Entry<Integer, Integer> table: tables.entrySet()) {
 				String out = Strings.TableInfoMsg.replaceAll("%id", Integer.toString(table.getKey()));
@@ -248,7 +248,7 @@ public class Lobby extends Room {
 				out = out.replaceAll("%maxP", Integer.toString(tbl.getMaxPlayers()) );
 				out = out.replaceAll("%curP", Integer.toString(tbl.getNoOfPlayers()) );
 				out = out.replaceAll("%profile", tbl.getProfile() );
-				ircClient.sendIRCMessage(sender, out);
+				ircClient.sendIRCNotice(sender, out);
 			}
 		} else if (msg.length == 1){
 			Vector<Integer> table_ids = new Vector<Integer>();
@@ -263,13 +263,13 @@ public class Lobby extends Room {
 			}
 			
 			if ( table_ids.size() == 0 ) {
-				ircClient.sendIRCMessage(sender, Strings.NoTablesMsg.replaceAll("%bb", msg[0]));
+				ircClient.sendIRCNotice(sender, Strings.NoTablesMsg.replaceAll("%bb", msg[0]));
 			} else {
 				String out = Strings.FoundTablesMsg.replaceAll("%bb", msg[0]);
 				out = out.replaceAll("%count", Integer.toString(table_ids.size()) );
 				out = out.replaceAll("%tables", table_ids.toString() );
 				
-				ircClient.sendIRCMessage(sender, out);
+				ircClient.sendIRCNotice(sender, out);
 				
 				for (Integer id: table_ids) {
 					out = Strings.TableInfoMsg.replaceAll("%id", Integer.toString(id));
@@ -279,7 +279,7 @@ public class Lobby extends Room {
 					out = out.replaceAll("%maxP", Integer.toString(tbl.getMaxPlayers()) );
 					out = out.replaceAll("%curP", Integer.toString(tbl.getNoOfPlayers()) );
 					out = out.replaceAll("%profile", tbl.getProfile() );
-					ircClient.sendIRCMessage(sender, out);
+					ircClient.sendIRCNotice(sender, out);
 				}					
 			}
 		} else {
@@ -324,26 +324,26 @@ public class Lobby extends Room {
 					
 					if ( profile_id == -1 ) {
 						List<String> profiles = Database.getInstance().getProfileTypes();
-						ircClient.sendIRCMessage(sender, Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()));
+						ircClient.sendIRCNotice(sender, Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()));
 					} else if ( !validPlayers(max_players) ) {
 						String out = Strings.InvalidTableSizeMsg.replaceAll("%size", Integer.toString(max_players));
 						out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedTableSizes));
-						ircClient.sendIRCMessage( sender, out );
+						ircClient.sendIRCNotice( sender, out );
 					} else if ( !validStake(stake) ) {
 						String out = Strings.InvalidTableBBMsg.replaceAll("%bb", Integer.toString(stake));
 						out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedBigBlinds));
-						ircClient.sendIRCMessage(sender, out  );
+						ircClient.sendIRCNotice(sender, out  );
 					} else if ( buy_in < minbuy || buy_in > maxbuy) {
 						String out = Strings.IncorrectBuyInMsg.replaceAll("%buyin", Integer.toString(buy_in) );
 						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
 						out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
 						out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
 						out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
-						ircClient.sendIRCMessage( sender, out );
+						ircClient.sendIRCNotice( sender, out );
 					} else if (!ircClient.userHasCredits( sender, buy_in, profile ) ) {
 						String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
 						out = out.replaceAll( "%profile", profile );
-						ircClient.sendIRCMessage(sender, out);
+						ircClient.sendIRCNotice(sender, out);
 					} else {
 						ircClient.newTable( stake, max_players, profile_id, true);		
 					}
@@ -373,7 +373,7 @@ public class Lobby extends Room {
 				if (table != null && table.canWatch( sender )) {
 					ircClient.newObserver( sender, id );
 				} else {
-					ircClient.sendIRCMessage( sender, Strings.AlreadyWatchingMsg.replaceAll("%id", Integer.toString(id)) );
+					ircClient.sendIRCNotice( sender, Strings.AlreadyWatchingMsg.replaceAll("%id", Integer.toString(id)) );
 				}
 			} else {
 				ircClient.sendIRCMessage(ircChannel, Strings.NoTableIDMsg.replaceAll("%id", id.toString()));
@@ -428,19 +428,19 @@ public class Lobby extends Room {
 					out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
 					out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
 					out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
-					ircClient.sendIRCMessage( sender, out );
+					ircClient.sendIRCNotice( sender, out );
 				} else if ( ircClient.tableIsFull( table_id ) ) {
-					ircClient.sendIRCMessage( sender, Strings.TableFullMsg.replaceAll("%id",
+					ircClient.sendIRCNotice( sender, Strings.TableFullMsg.replaceAll("%id",
 																						Integer.toString(table_id)) );								
 				} else if (!ircClient.userHasCredits( sender, buy_in, profile ) ) {
 					String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
 					out = out.replaceAll( "%profile", profile );
-					ircClient.sendIRCMessage(sender, out);
+					ircClient.sendIRCNotice(sender, out);
 				} else {
 					if (table != null && table.canPlay( sender )) {
 						ircClient.newPlayer( sender, table_id, buy_in );	
 					} else {
-						ircClient.sendIRCMessage( sender, 
+						ircClient.sendIRCNotice( sender, 
 								Strings.AlreadyPlayingMsg.replaceAll("%id", Integer.toString(table_id)) );
 					}												
 				}
@@ -503,7 +503,7 @@ public class Lobby extends Room {
 							out = out.replaceAll("%who", user);
 							out = out.replaceAll("%sender", sender);
 							out = out.replaceAll("%profile", profile);
-							ircClient.sendIRCMessage(user, out);
+							ircClient.sendIRCNotice(user, out);
 						} else {
 							EventLog.log(sender + " attempted to give someone chips and the database failed", "Lobby", "onGive");
 						}

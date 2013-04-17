@@ -13,7 +13,7 @@ public class Variables {
 	
 	public static final String 	FingerMsg = 		"";
 	 
-	public static final String 	LobbyChan = 		"#SM_Poker";
+	public static final String 	LobbyChan = 		"#smokin_dice";
 	public static final String 	TableChan = 		"#SM_Poker";
 	
 	public static final String 	Server = 			"irc.swiftirc.net";

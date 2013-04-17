@@ -38,6 +38,7 @@ public enum CommandType {
 	 		 Strings.BetCommand_Alternatives),
 	FOLD 	(Strings.FoldCommand,    Strings.FoldCommand_Desc,    Strings.FoldCommand_Format,
 			 Strings.FoldCommand_Alternatives),
+	TBLCHIPS(Strings.TblChipsCommand,Strings.TblChipsCommand_Desc,Strings.TblChipsCommand_Format),
 	REBUY	(Strings.RebuyCommand,   Strings.RebuyCommand_Desc,   Strings.RebuyCommand_Format),
 	SITDOWN (Strings.SitDownCommand, Strings.SitDownCommand_Desc, Strings.SitDownCommand_Format),
 	SITOUT	(Strings.SitOutCommand,  Strings.SitOutCommand_Desc,  Strings.SitOutCommand_Format),

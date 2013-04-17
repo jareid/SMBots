@@ -116,11 +116,15 @@ public class Room extends Thread {
             		PrintWriter pw = new PrintWriter(sw);
             		e.printStackTrace(pw);
             		EventLog.log(sw.toString(), "Room", "run");
+            		try {
+						Thread.sleep(10);
+					} catch (InterruptedException inte) {
+					}
             		System.exit(1);
             	}
             }
         	try {
-        		Thread.sleep(50);
+        		Thread.sleep(75);
         	} catch (InterruptedException e) {
         		interuptted = true;
         	}
@@ -257,8 +261,8 @@ public class Room extends Thread {
      * @param format	The command format
      */
     protected void invalidArguments(String who, String format) {
-		ircClient.sendIRCMessage(who, Strings.InvalidArgs);
-		ircClient.sendIRCMessage(who, format);		
+		ircClient.sendIRCNotice(who, Strings.InvalidArgs);
+		ircClient.sendIRCNotice(who, format);		
 	}
     
     /**
@@ -269,7 +273,7 @@ public class Room extends Thread {
      * @param format	The command format
      */
     protected void sendFormat(String who, String cmd, String format) {
-		ircClient.sendIRCMessage(who,"%b%c04 " + cmd + "%c12 - Format:" + format);		
+		ircClient.sendIRCNotice(who,"%b%c04 " + cmd + "%c12 - Format:" + format);		
 	}
     
     /**
@@ -280,7 +284,7 @@ public class Room extends Thread {
      */
     protected void sendFullCommand(String who, CommandType cmd) {
 		sendFormat( who, cmd.getCommandText(), cmd.getFormat() );
-		ircClient.sendIRCMessage(who, cmd.getDescription());
+		ircClient.sendIRCNotice(who, cmd.getDescription());
 	}
     
     /**

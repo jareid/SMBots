@@ -497,6 +497,27 @@ public class Client extends PircBot {
 	}
 	
 	/**
+	 * Used to send a notice to the target replacing formatting variables correctly
+	 * Also allows the sending of multiple lines separate by \n character
+	 * 
+	 * @param target The place where the message is being sent
+	 * @param in The message to send with formatting variables
+	 */	
+	public void sendIRCNotice(String target, String in) {
+		String out = in;
+		
+		out = out.replaceAll("%c", "\u0003");
+		out = out.replaceAll("%b", Colors.BOLD);
+		out = out.replaceAll("%i", Colors.REVERSE);
+		out = out.replaceAll("%u", Colors.UNDERLINE);
+		out = out.replaceAll("%n", Colors.NORMAL);
+
+		for (String line: out.split("\n")) {
+			this.sendNotice(target, line);
+		}
+	}
+	
+	/**
 	 * Used to send a message to the target replacing formatting variables correctly
 	 * Also allows the sending of multiple lines separate by \n character
 	 * 
@@ -539,7 +560,7 @@ public class Client extends PircBot {
 			this.sendMessage(lobbyChan, line);
 		}
 	}
-
+	
 	/**
 	 * Retrieves the reconnection timer
 	 * 
