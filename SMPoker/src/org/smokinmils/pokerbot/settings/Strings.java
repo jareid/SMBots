@@ -181,7 +181,7 @@ public final class Strings {
 	 * %watching - The number of people watching
 	 * %hID - The id of the currently playing hand
 	 */
-	public static final String TableTopic = "%b%c12Welcome to the SM Poker Table %c04%id%c12 - SB: %c04%sb%c12 / BB: %c04%bb%c12 (Buy In: %c04%min%c12-%c04%max%c12) - Players: %c04%Pcur%c12 of %c04%Pmax%c12 - HandID: %c04%hID%c12";
+	public static final String TableTopic = "%b%c12Welcome to the SM Poker Table %c04%id%c12 for the %c04%profile%c12 profile - SB: %c04%sb%c12 / BB: %c04%bb%c12 (Buy In: %c04%min%c12-%c04%max%c12) - Players: %c04%Pcur%c12 of %c04%Pmax%c12 - HandID: %c04%hID%c12";
 	
 	
 	public static final String InfoMessage = "%b%c12For more information, please supply " + InfoCommand + " with one of the following options:\n" +
@@ -230,7 +230,7 @@ public final class Strings {
 	 * %curP - The current number of players seated
 	 * %profile - The name of the profile this table's chips are for.
 	 */
-	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%curP%c12 (Min: %c04%minP%c12 / Max: %c04%maxP%c12) | Profile: %c04%profile";
+	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%curP%c12 (Min: %c04%minP%c12 / Max: %c04%maxP%c12) | Profile: %c04%profile%c12 - To join type %c04!join %id <buyin amount>";
 	
 	/**
 	 * This string is used to specify the message sent when a user searches for tables and:
@@ -339,6 +339,7 @@ public final class Strings {
 	 * %maxP - maximum number of players on the table
 	 * %seatedP - number of players currently sat down
 	 */
+	public static final int MaxWaitCount = 20;
 	public static final int WaitingForPlayersSecs = 15;
 	public static final String WaitingForPlayersMsg = "%b%c12We are currently waiting for %need more players (%c04%seated%c12 of %c04%max%c12 seated) [Min: %c04%min%c12]";
 	
@@ -511,7 +512,7 @@ public final class Strings {
 	 * %min - Minimum BuyIn
 	 * %max - Maximum BuyIn
 	 */
-	public static final String NewTable = "%b%c12Table %c04%id%c12 has been created for %c04%Pmin%c12 to %c04%Pmax%c12 players with a BB of %c04%bb%c12 (SB: %c04%sb%c12) [Buy In: %c04%min%c12 to %c04%max%c12]";
+	public static final String NewTable = "%b%c12Table %c04%id%c12 has been created for the %c04%profile%c12 profile with %c04%Pmin%c12 to %c04%Pmax%c12 players with a BB of %c04%bb%c12 (SB: %c04%sb%c12) [Buy In: %c04%min%c12 to %c04%max%c12]";
 	
 	/**
 	 * Message when a table is closed
@@ -621,7 +622,7 @@ public final class Strings {
 	 * %action
 	 * %cmd
 	 */
-	public static final String AllowedActionString = "%c04%action%c12%cmd%n";
+	public static final String AllowedActionString = "%c04%action - %cmd %c12";
 
 
 	/**

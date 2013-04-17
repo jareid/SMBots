@@ -152,6 +152,19 @@ public class Client extends PircBot {
 		// (Re-)Check the user's status with NickServ
 		if (joinee.compareToIgnoreCase( getNick() ) != 0) {
 			sendStatusRequest( joinee );
+		} else {
+			if (channel.compareToIgnoreCase(lobbyChan) == 0) {
+				/* TODO: change to loops
+				newTable(2, 8, 1, false);
+				newTable(6, 8, 1, false);
+				newTable(10, 8, 1, false);
+				newTable(2, 8, 2, false);
+				newTable(6, 8, 2, false);
+				newTable(10, 8, 2, false);*/
+				newTable(2, 8, 3, false);
+				newTable(6, 8, 3, false);
+				newTable(10, 8, 3, false);
+			}
 		}
 		
 		// Notify the correct room if required
@@ -350,12 +363,12 @@ public class Client extends PircBot {
      * @param stake the big blind for this table
      * @param players the maximum number of players for this table
      */
-	public int newTable(int stake, int players, int profile_id) {
+	public int newTable(int stake, int players, int profile_id, boolean manual) {
 		EventLog.info("Creating new table...", "Client", "newTable");
 		
 		Integer tableid = Table.getNextID();
 		String chan = Variables.TableChan + tableid;
-		Table table = new Table(chan.toLowerCase(), this, tableid, stake, players, profile_id);
+		Table table = new Table(chan.toLowerCase(), this, tableid, stake, players, profile_id, manual);
 		table.start();
 		validChannels.put( chan.toLowerCase(), table );
 		validTables.put( tableid, chan.toLowerCase() );

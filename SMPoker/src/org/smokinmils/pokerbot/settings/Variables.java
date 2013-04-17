@@ -12,9 +12,9 @@ public class Variables {
 	public static final String 	NickServPassword =	"smokinmilsdev";
 	
 	public static final String 	FingerMsg = 		"";
-	
+	 
 	public static final String 	LobbyChan = 		"#SM_Poker";
-	public static final String 	TableChan = 		"#SM_Table";
+	public static final String 	TableChan = 		"#SM_Poker";
 	
 	public static final String 	Server = 			"irc.swiftirc.net";
 	public static final int 	Port =				6667;
