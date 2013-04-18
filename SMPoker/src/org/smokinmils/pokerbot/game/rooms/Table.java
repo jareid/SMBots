@@ -152,7 +152,7 @@ public class Table extends Room {
 	private int currentRound;
 	
 	/** Number of players left to act */
-	private int playersToAct;
+	private volatile int playersToAct;
 	
 	/** Number of players left to act */
 	private boolean createdManually;
@@ -242,7 +242,7 @@ public class Table extends Room {
 			ircClient.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
 			System.exit(1);
 		}
-	} 
+	}
 	
 	/** 
 	 * Returns the table ID
@@ -1161,9 +1161,9 @@ public class Table extends Room {
 		            ircClient.sendIRCMessage( ircChannel, out );
 	
 	                if (action == ActionType.FOLD && activePlayers.size() == 1) {
+	                    playersToAct = 0;
 	                    // The player left wins.
 	                    playerWins(activePlayers.get(0));
-	                    playersToAct = 0;
 	                } else {
 	    	            // Continue play
 	    	            actionReceived(false);
@@ -1458,7 +1458,7 @@ public class Table extends Room {
             do {
                 actorPosition = (actorPosition + 1) % players.size();
                 actor = players.get(actorPosition);
-            } while (!activePlayers.contains(actor) || actor.isBroke());
+            } while (!activePlayers.contains(actor));
         } else {
             // Should never happen.
             throw new IllegalStateException("No active players left");

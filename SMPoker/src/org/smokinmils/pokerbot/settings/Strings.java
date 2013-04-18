@@ -58,6 +58,12 @@ public final class Strings {
 	public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
 	
 	/**
+	 * This string is output the poker announcement
+	 */
+	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands";
+	
+	
+	/**
 	 * The following list of settings are the commands for the lobby in the following order
 	 * Info command
 	 * Chips command
@@ -65,7 +71,7 @@ public final class Strings {
 	 * Join command
 	 * Promotions command
 	 */
-	public static final String InfoCommand = CommandChar + "info";
+	public static final String InfoCommand = CommandChar + "poker";
 	public static final String InfoCommand_Desc = "%b%c12Receive help on the available commands";
 	public static final String InfoCommand_Format = "%b%c12" + InfoCommand + " ?command|lobby|table?";
 	

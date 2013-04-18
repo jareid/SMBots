@@ -195,9 +195,9 @@ public class Client extends PircBot {
 	 * (non-Javadoc)
 	 * @see org.jibble.pircbot.PircBot#onQuit(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	protected void onQuit(String channel, String quiter, 
-					   String login, String hostname) {
-		if ( quiter.compareToIgnoreCase( this.getNick() ) == 0 ) {
+	protected void onQuit(String nick, String login, 
+					   String hostname, String reason) {
+		if ( nick.compareToIgnoreCase( this.getNick() ) == 0 ) {
 			try {
 				this.reconnect();
 			} catch (NickAlreadyInUseException e) {
@@ -209,9 +209,8 @@ public class Client extends PircBot {
 			}
 		} else {
 			// Notify the correct room if required
-			Room room = validChannels.get( channel.toLowerCase() );
-			if ( room != null ) {
-				room.addEvent( quiter, login, hostname, "", EventType.PART );
+			for (Room room: validChannels.values()) {
+				room.addEvent( nick, login, hostname, "", EventType.PART );
 			}
 		}
 	}

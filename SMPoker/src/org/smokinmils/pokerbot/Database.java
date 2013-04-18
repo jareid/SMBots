@@ -552,9 +552,9 @@ public class Database {
 		   rs = stmt.executeQuery(sql);
 		   
 		   while ( rs.next() ) {
-			   updsql = updsql.replaceAll("%amount", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_Amount) ) );
-			   updsql = updsql.replaceAll("%user_id", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_UserID) ) );
-			   updsql = updsql.replaceAll("%type_id", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_ProfileID) ) );
+			   String updsql_inst = updsql.replaceAll("%amount", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_Amount) ) );
+			   updsql_inst = updsql_inst.replaceAll("%user_id", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_UserID) ) );
+			   updsql_inst = updsql_inst.replaceAll("%type_id", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_ProfileID) ) );
 			   updstmt.executeUpdate(updsql);
 		   }
 		   updstmt.executeUpdate(delsql);

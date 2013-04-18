@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import org.smokinmils.pokerbot.Client;
@@ -25,10 +27,22 @@ import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
 
 public class Lobby extends Room {
+	/* A timer to announce poker to the channel */
+	Timer announceTimer;
+	class AnnounceTask extends TimerTask {
+		public void run() {
+			ircClient.sendMessage(ircChannel, Strings.PokerAnnounce);
+		    announceTimer.schedule(new AnnounceTask(), Variables.AnnounceMins*60*1000);
+		}
+	}	
+	
 	public Lobby(String channel, Client irc) {
 		super(channel, irc, RoomType.LOBBY);
 		roomTopic = Strings.LobbyTopic;
+		announceTimer = new Timer();
+	    announceTimer.schedule(new AnnounceTask(), 250);
 	}
+	
 
     /**
      * This method is called whenever a message is sent to this channel.
@@ -52,10 +66,10 @@ public class Lobby extends Room {
 			case INFO:
 				onInfo(sender, login, hostname, message);
 				break;
-			case CHIPS:
+			//case CHIPS:
 				//disabled
 				//onChips(sender, login, hostname, message);
-				break;
+				//break;
 			case NEWTABLE:
 				onNewTable(sender, login, hostname, message);
 				break;
@@ -71,10 +85,10 @@ public class Lobby extends Room {
 			case PROMOS:
 				onPromotions(sender, login, hostname, message);
 				break;
-			case GIVE:
+			//case GIVE:
 				//disabled
 				//onGive(sender, login, hostname, message);
-				break;
+				//break;
 			case PROFILE:
 				onProfile(sender, login, hostname, message);
 				break;
@@ -154,10 +168,10 @@ public class Lobby extends Room {
 					sendFullCommand(sender, item);
 				}
 			} else if ( msg[0].compareToIgnoreCase("lobby") == 0 ) {
-				CommandType[] lobby_cmds = {CommandType.INFO, CommandType.CHIPS, CommandType.TABLES,
+				CommandType[] lobby_cmds = {CommandType.INFO, /*CommandType.CHIPS,*/ CommandType.TABLES,
 											CommandType.NEWTABLE, CommandType.WATCHTBL, 
 											CommandType.JOIN, CommandType.PROMOS,
-											CommandType.GIVE, CommandType.PROFILE, CommandType.PROFILES};
+											/*CommandType.GIVE,*/ CommandType.PROFILE, CommandType.PROFILES};
 				for (CommandType item: lobby_cmds) {
 					sendFullCommand(sender, item);
 					ircClient.sendIRCNotice(sender,"%b%c15-----");
@@ -177,7 +191,7 @@ public class Lobby extends Room {
      * @param login The login of the person who sent the message.
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
-	 */	
+	 *
 	@SuppressWarnings("unused")
 	private void onChips(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
@@ -224,7 +238,7 @@ public class Lobby extends Room {
 		} else {
 			invalidArguments( sender, CommandType.CHIPS.getFormat() );
 		}
-	}
+	}*/
 	
 	/**
 	 * This method handles the new table command
@@ -476,8 +490,6 @@ public class Lobby extends Room {
      * @param login The login of the person who sent the message.
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
-	 */	
-	@SuppressWarnings("unused")
 	private void onGive(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 
@@ -519,7 +531,7 @@ public class Lobby extends Room {
 		} else {
 			EventLog.info(sender + " attempted to give someone chips", "Lobby", "onGive");
 		}
-	}
+	}*/
 	
 	/**
 	 * This method handles the profile command
