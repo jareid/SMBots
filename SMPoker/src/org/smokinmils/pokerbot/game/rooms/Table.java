@@ -471,8 +471,11 @@ public class Table extends Room {
     	}
     	
     	// Cash out
-		Database.getInstance().cashOut( name, chips, profileID );
-		Database.getInstance().addPokerTableCount(player.getName(), tableID, profileID, 0);
+    	if (!player.isBroke()) {
+    		player.cashOut();
+    		Database.getInstance().cashOut( name, chips, profileID );
+    		Database.getInstance().addPokerTableCount(player.getName(), tableID, profileID, 0);
+    	}
     	
     	// Remove from our player list
     	if (sat_out) {
@@ -516,22 +519,21 @@ public class Table extends Room {
     private synchronized void playerSitsOut(Player player) {
     	// Cancel timer
 		player.scheduleSitOut(this);
-		
-		// Switch the player lists
-    	players.remove(player);
-    	satOutPlayers.add(player); 
     	
 		// handle current hands
-		if (player == actor && handActive) 
+		if (player == actor) {
 	    	onAction(ActionType.FOLD, "", true);
-		else if (activePlayers.contains(player)) {
+		} else if (activePlayers.contains(player)) {
 			playersToAct--;
 	    	activePlayers.remove(player);
 			if (activePlayers.size() == 1) {
 				playerWins(activePlayers.get(0));
 			}
-		}   	
-
+		} 
+		
+		// Switch the player lists
+    	players.remove(player);
+    	satOutPlayers.add(player); 
 		player.setSatOut(true);
     	
     	// Announce
@@ -791,7 +793,7 @@ public class Table extends Room {
 	*/	
 	private synchronized void onChips(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
-		if ((msg.length == 1 && msg[0].compareTo("") == 0)) {		
+		if ((msg.length == 0 || msg[0].compareTo("") == 0)) {		
 			Player found = findPlayer( sender );
 				
 			if (found != null) {
@@ -803,7 +805,7 @@ public class Table extends Room {
 				ircClient.sendIRCMessage( ircChannel, out );
 			}
 		} else {
-			invalidArguments( sender, CommandType.REBUY.getFormat() );
+			invalidArguments( sender, CommandType.TBLCHIPS.getFormat() );
 		}
 	}
 	
@@ -833,7 +835,7 @@ public class Table extends Room {
 					int total = buy_in + found.getRebuy() + found.getChips();
 					int diff = maxbuy - total;
 					
-					if ( total >= maxbuy ) {
+					if ( total > maxbuy ) {
 						String out = Strings.RebuyFailure.replaceAll( "%id", Integer.toString(tableID) );
 						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
 						out = out.replaceAll( "%total", Integer.toString(found.getChips() + found.getRebuy()) );		
@@ -886,6 +888,7 @@ public class Table extends Room {
 			boolean is_active = (found != null ? players.contains(found) : false);
 
 			if (found != null) { 
+				if (found.getSittingOutTimer() != null) found.getSittingOutTimer().cancel();
 				playerLeaves(found, is_active);
 			} else {
 				EventLog.log(sender + "failed to leave as they should not have been voiced.", "Table", "onLeave");
@@ -1211,10 +1214,7 @@ public class Table extends Room {
         } else {
             // Otherwise, player left of dealer starts, no initial bet.
             bet = 0;
-            if (players.size() == 2)
-            	actorPosition = (dealerPosition + 1) % activePlayers.size();
-            else
-            	actorPosition = dealerPosition;
+            actorPosition = dealerPosition;
         }
         
         actionReceived(true);
@@ -1300,6 +1300,12 @@ public class Table extends Room {
                         // Single winner.
                         Player winner = winners.get(0);
                     	winner.win( potsize );
+                        // Add to DB
+                    	if (i == 0) {
+                            Database.getInstance().setHandWinner(handID, winner.getName(), potsize);
+                    	} else {
+                            Database.getInstance().addHandWinner(handID, winner.getName(), potsize);                    		
+                    	}
                     	String out = Strings.PotWinner.replaceAll("%winner", winner.getName());
                     	out = out.replaceAll("%hand", handValue.toString());
                     	out = out.replaceAll("%pot", potname);
@@ -1318,17 +1324,27 @@ public class Table extends Room {
                         }
                         int potShare = potsize / winners.size();
                         
-                        for (Player winner : winners) {                        
+                        int y = 0;
+                        for (Player winner : winners) {
                             // Give the player his share of the pot.
                             winner.win(potShare);
+                            
+                            // Add to db
+                            if (i == 0 && y == 0) {
+                                Database.getInstance().setHandWinner(handID, winner.getName(), potShare);
+                        	} else {
+                                Database.getInstance().addHandWinner(handID, winner.getName(), potShare);                    		
+                        	}
                             
                             // Announce
                         	String out = Strings.PotWinner.replaceAll("%winner", winner.getName());
                         	out = out.replaceAll("%hand", handValue.toString());
                         	out = out.replaceAll("%pot", potname);
                         	out = out.replaceAll("%amount", Integer.toString(potShare));
+                        	out = out.replaceAll("%id", Integer.toString(tableID));
                         	out = out.replaceAll("%hID", Integer.toString(handID));
-                        	ircClient.sendIRCMessage( ircChannel, out );
+                        	ircClient.sendIRCMessage( ircChannel, out );   
+                        	y++;
                         }
                         break;
                     }
@@ -1425,6 +1441,9 @@ public class Table extends Room {
     	pot = pot - rake;
     	
         player.win(pot);
+        
+        // Add to DB
+        Database.getInstance().setHandWinner(handID, player.getName(), pot);
         
         // Announce
         String out = Strings.PlayerWins.replaceAll("%hID", Integer.toString(handID));
@@ -1641,7 +1660,7 @@ public class Table extends Room {
         		actorPosition = (dealerPosition + 1) % activePlayers.size();
         	}
         	actor = activePlayers.get(actorPosition);
-        	int bbPosition = (actorPosition + 1) % players.size();
+        	int bbPosition = (actorPosition + 1) % activePlayers.size();
         
 	        minBet = bigBlind;
 	        bet = minBet;

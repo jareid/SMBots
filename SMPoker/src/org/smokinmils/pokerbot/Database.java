@@ -555,7 +555,7 @@ public class Database {
 			   String updsql_inst = updsql.replaceAll("%amount", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_Amount) ) );
 			   updsql_inst = updsql_inst.replaceAll("%user_id", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_UserID) ) );
 			   updsql_inst = updsql_inst.replaceAll("%type_id", Integer.toString( rs.getInt(DBSettings.Col_PokerBets_ProfileID) ) );
-			   updstmt.executeUpdate(updsql);
+			   updstmt.executeUpdate(updsql_inst);
 		   }
 		   updstmt.executeUpdate(delsql);
 	   } catch (SQLException e) {
@@ -905,6 +905,38 @@ public class Database {
 				    "SET " + DBSettings.Col_Hands_WinnerID + " = (" + getUserIDSQL(username) + ")"
 				           + DBSettings.Col_Hands_Amount + " = " + Integer.toString(pot) + " " +
 	   				"WHERE " + DBSettings.Col_Hands_ID + " = " + Integer.toString(hand_id);
+	   
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   stmt.executeUpdate(sql);
+	   } catch (SQLException e) {
+			   EventLog.log( e, "Database", "setHandWinner");
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+			   EventLog.log( e, "Database", "setHandWinner");
+		   }
+	   }
+   }
+   
+   /**
+    * Updates the hand table with the hand winner and pot size
+    * 
+    * @param hand_id	The ID
+    * @param username	The winner
+    * @param pot		The pot size
+    */
+   public void addHandWinner(int hand_id, String username, int pot) {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   String sql = "INSERT INTO " + DBSettings.Table_Hands + "("
+			   						+ DBSettings.Col_Hands_WinnerID + ", "
+			   						+ DBSettings.Col_Hands_Amount + ", "
+			   						+ DBSettings.Col_Hands_ID + ") VALUES( " 
+			   						+ "(" + getUserIDSQL(username) + "),'" + Integer.toString(pot) + "','" + Integer.toString(hand_id) + "')";
 	   
 	   try {
 		   conn = getConnection();

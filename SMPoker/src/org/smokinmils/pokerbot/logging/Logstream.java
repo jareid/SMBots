@@ -90,13 +90,13 @@ public class Logstream implements Runnable {
         if(dayOfMonthHasChanged(calendar)) {
 
             StringBuilder pathBuilder = new StringBuilder();
-            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yy");
+            SimpleDateFormat df = new SimpleDateFormat("H_mm.dd-MMM-yy");
             Date date = new Date();
 
             _dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 
             pathBuilder.append(_path);
-            pathBuilder.append(df.format(date)).append("_");
+            pathBuilder.append(df.format(date));
             pathBuilder.append(".log");
 
             _cachedPath = pathBuilder.toString();       

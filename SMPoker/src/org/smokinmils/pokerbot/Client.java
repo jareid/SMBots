@@ -154,13 +154,13 @@ public class Client extends PircBot {
 			sendStatusRequest( joinee );
 		} else {
 			if (channel.compareToIgnoreCase(lobbyChan) == 0) {
-				/* TODO: change to loops
+				/* TODO: change to loops */
 				newTable(2, 8, 1, false);
-				newTable(6, 8, 1, false);
-				newTable(10, 8, 1, false);
+				//newTable(6, 8, 1, false);
+				//newTable(10, 8, 1, false);
 				newTable(2, 8, 2, false);
-				newTable(6, 8, 2, false);
-				newTable(10, 8, 2, false);*/
+				//newTable(6, 8, 2, false);
+				//newTable(10, 8, 2, false);
 				newTable(2, 8, 3, false);
 				newTable(6, 8, 3, false);
 				newTable(10, 8, 3, false);

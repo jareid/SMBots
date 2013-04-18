@@ -102,6 +102,11 @@ public class Player {
     public void rebuy(int amount) { rebuy = amount; }
     
     /**
+     * Removes all chips
+     */
+    public void cashOut() { chips = 0; rebuy = 0; }
+    
+    /**
      * Prepares the player for another hand.
      */
     public void resetHand() {
