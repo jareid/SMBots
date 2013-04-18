@@ -31,7 +31,7 @@ public class Lobby extends Room {
 	Timer announceTimer;
 	class AnnounceTask extends TimerTask {
 		public void run() {
-			ircClient.sendMessage(ircChannel, Strings.PokerAnnounce);
+			ircClient.sendIRCMessage(ircChannel, Strings.PokerAnnounce);
 		    announceTimer.schedule(new AnnounceTask(), Variables.AnnounceMins*60*1000);
 		}
 	}	
