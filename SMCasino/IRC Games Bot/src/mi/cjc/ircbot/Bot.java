@@ -46,18 +46,18 @@ public class Bot extends ListenerAdapter implements Listener
 		games = new ArrayList<IRCGame>();
 		validUsers = new ArrayList<String>();
 		badUsers = new ArrayList<String>();
-		
+		/*
 		// Live configuration
 		games.add(new Roulette(5, "#smokin_dice", bot));
 		games.add(new Roulette(1, "#sm_roulette", bot));
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
-		/*
+		/*/
 		// test config
-		//games.add(new Roulette(5, "#testeroo", bot));
+		games.add(new Roulette(1, "#testeroo", bot));
 		//games.add(new DiceDuel("#testeroo"));
-		games.add(new OverUnder("#testeroo"));
-		*/
+		//games.add(new OverUnder("#testeroo"));
+		
 		
 		// initialize timing events
 		
@@ -73,9 +73,18 @@ public class Bot extends ListenerAdapter implements Listener
 			{
 				for (Map.Entry<Integer, Integer> entry : g.getTimedTasks().entrySet())
 				{
-					Timer timer = new Timer();
-					timer.schedule(new gameTrigger(entry.getKey(), g, bot, g.getChannel()), entry.getValue() * 60 * 1000, entry.getValue() * 60 * 1000);
-					events.add(timer);
+					if (entry.getValue() < 0)
+					{
+						Timer timer = new Timer();
+						timer.schedule(new gameTrigger(entry.getKey(),g, bot,g.getChannel()), (-entry.getValue() * 60 * 1000)-10000, -entry.getValue() * 60 * 1000);
+						events.add(timer);
+					}
+					else
+					{
+						Timer timer = new Timer();
+						timer.schedule(new gameTrigger(entry.getKey(), g, bot, g.getChannel()), entry.getValue() * 60 * 1000, entry.getValue() * 60 * 1000);
+						events.add(timer);
+					}
 				}
 			}
 		}
@@ -431,8 +440,8 @@ public class Bot extends ListenerAdapter implements Listener
 			
 			bot.connect("irc.swiftirc.net");
 			//bot.joinChannel("#testeroo");
-			bot.joinChannel("#sm_hosts");
-			bot.identify("5w807");
+			//bot.joinChannel("#sm_hosts");
+			//bot.identify("5w807");
 		}
 		catch(Exception e)
 		{

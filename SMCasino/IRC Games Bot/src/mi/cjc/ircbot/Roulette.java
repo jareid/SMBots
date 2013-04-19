@@ -29,6 +29,10 @@ public class Roulette implements IRCGame {
 	private int delay;
 	private String channel;
 	
+	public final int OPEN = 0;
+	public final int CLOSE = 1;
+	public int state;
+	
 	public Roulette(int delay, String channel, PircBotX bot)
 	{
 		//TODO add in stuff for ranks, and loading stuff from file :)
@@ -52,6 +56,7 @@ public class Roulette implements IRCGame {
 		// assign channel
 		this.channel = channel;
 		
+		this.state = OPEN;
 	}
 	
 	@Override
@@ -68,6 +73,9 @@ public class Roulette implements IRCGame {
 		
 		if(command.equalsIgnoreCase("bet"))
 		{
+			// if we are not accepting bets
+			if(this.state == CLOSE)
+				return (List<String>) Arrays.asList(BLD +MSG + "Bets are now closed, please wait for the next round!" );
 			if(commands.length < 3) // if they have done "!bet" with nothing else
 				return s_invalidBetString;
 			
@@ -401,6 +409,9 @@ public class Roulette implements IRCGame {
 		retList.add(BLD+MSG+"A new roulette game is starting! Type "+VAR+"!info "+MSG+"for instructions on how to play.");
 		retList.addAll(this.printBoard());
 		retList.add(BLD+MSG+"Place your bets now!");
+		
+		this.state = OPEN;
+		
 		return retList;
 
 	}
@@ -412,6 +423,11 @@ public class Roulette implements IRCGame {
 		{
 			return this.endGame(this.bot);
 		}
+		if(taskId == 2)
+		{
+			this.state = CLOSE;
+			return (List<String>) Arrays.asList(BLD +MSG + "Bets closed! No more bets. Spinning..." );
+		}
 		// dirty
 		return new ArrayList<String>();
 	}
@@ -421,6 +437,7 @@ public class Roulette implements IRCGame {
 		// task id / minutes between running it
 		HashMap<Integer,Integer> retList = new HashMap<Integer,Integer>();
 		retList.put(1, this.delay); // 1 is for ending game / starting a new game
+		retList.put(2, -this.delay);
 		return retList;
 	}
 
