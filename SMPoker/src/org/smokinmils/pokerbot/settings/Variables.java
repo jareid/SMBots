@@ -7,19 +7,19 @@ package org.smokinmils.pokerbot.settings;
  */
 public class Variables {
 	public static final String 	Nick = 				"SM_Poker";
-	public static final String 	AltNick = 			"SM_Poker";
+	public static final String 	AltNick = 			"SM_Poker2";
 	public static final String 	Login = 			"smokinmils";
 	public static final String 	NickServPassword =	"smokinmilsdev";
 	
 	public static final String 	FingerMsg = 		"";
-	
-	public static final String 	LobbyChan = 		"#SM_Poker";
+	 
+	public static final String 	LobbyChan = 		"#smokin_dice";
 	public static final String 	TableChan = 		"#SM_Poker";
 	
 	public static final String 	Server = 			"irc.swiftirc.net";
 	public static final int 	Port =				6667;
 	
-	public static final int 	MessageDelayMS = 	2;
+	public static final int 	MessageDelayMS = 	0;
 	public static final int		ReconnectMS	=		2500;
 	
 	public static final int MinPlayers = 2;
@@ -36,6 +36,8 @@ public class Variables {
 	public static final int ActionWarningTimeSecs = 10;
 	
 	public static final int MaxSitOutMins = 5;
+	
+	public static final int AnnounceMins = 5;
 	
 	public static final int MinimumRake = 1;
 	public static final int MaximumRake = 100;

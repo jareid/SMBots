@@ -159,13 +159,15 @@ public class Card implements Comparable<Card> {
     public int compareTo(Card card) {
         int value = hashCode();
         int other = card.hashCode();
+        
+        int ret = 0;
         if (value < other) {
-            return -1;
+            ret = -1;
         } else if (value > other) {
-            return 1;
-        } else {
-            return 0;
+            ret = 1;
         }
+        
+        return ret;
     }
     
 	/**

@@ -58,6 +58,12 @@ public final class Strings {
 	public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
 	
 	/**
+	 * This string is output the poker announcement
+	 */
+	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands";
+	
+	
+	/**
 	 * The following list of settings are the commands for the lobby in the following order
 	 * Info command
 	 * Chips command
@@ -65,7 +71,7 @@ public final class Strings {
 	 * Join command
 	 * Promotions command
 	 */
-	public static final String InfoCommand = CommandChar + "info";
+	public static final String InfoCommand = CommandChar + "poker";
 	public static final String InfoCommand_Desc = "%b%c12Receive help on the available commands";
 	public static final String InfoCommand_Format = "%b%c12" + InfoCommand + " ?command|lobby|table?";
 	
@@ -139,6 +145,10 @@ public final class Strings {
 	public static final String FoldCommand_Format = "%b%c12" + FoldCommand + "";
 	public static final String[] FoldCommand_Alternatives = {"!fold"};
 	
+	public static final String TblChipsCommand = CommandChar + "chips";
+	public static final String TblChipsCommand_Desc = "%b%c12Check the amount of chips you have on the table";
+	public static final String TblChipsCommand_Format = TblChipsCommand + "";
+	
 	public static final String RebuyCommand = CommandChar + "rebuy";
 	public static final String RebuyCommand_Desc = "%b%c12Rebuys chips for this table\n"
 												 + "%b%c12You are only allowed to re-purchase chips if you have less than the table maximum"
@@ -181,7 +191,7 @@ public final class Strings {
 	 * %watching - The number of people watching
 	 * %hID - The id of the currently playing hand
 	 */
-	public static final String TableTopic = "%b%c12Welcome to the SM Poker Table %c04%id%c12 - SB: %c04%sb%c12 / BB: %c04%bb%c12 (Buy In: %c04%min%c12-%c04%max%c12) - Players: %c04%Pcur%c12 of %c04%Pmax%c12 - HandID: %c04%hID%c12";
+	public static final String TableTopic = "%b%c12Welcome to the SM Poker Table %c04%id%c12 for the %c04%profile%c12 profile - SB: %c04%sb%c12 / BB: %c04%bb%c12 (Buy In: %c04%min%c12-%c04%max%c12) - Players: %c04%Pcur%c12 of %c04%Pmax%c12 - HandID: %c04%hID%c12";
 	
 	
 	public static final String InfoMessage = "%b%c12For more information, please supply " + InfoCommand + " with one of the following options:\n" +
@@ -199,6 +209,10 @@ public final class Strings {
 	public static final String GiveChips = "%b%c04%sender:%c12 Added %c04%amount%c12 chips to the %c04%profile%c12 account of %c04%who%c12";
 	public static final String GiveChipsPM = "%b%c12You have had %c04%amount%c12 chips deposited into your account by %c04%sender%c12";
 	
+
+	public static final String CheckChips =  "%b%c12[Table %c04%id%c12] You currently have %c04%creds%c12 chips on the table";
+	public static final String CheckChipsFailed =  "%b%c12[Table %c04%id%c12] You are not currently seated on the table";
+	
 	/**
 	 * This string is used to specify the message sent when a user checks their credit in the system
 	 * 
@@ -210,8 +224,8 @@ public final class Strings {
 	public static final String CheckCreditMsg =  "%b%c04%sender%c12: %user %c12currently has %c04%creds%c12 chips on the active profile(%c04%active%c12)";
 	public static final String CheckCreditSelfMsg =  "%b%c04%sender%c12: You %c12currently have %c04%creds%c12 chips on the active profile(%c04%active%c12)";
 	public static final String CreditsOtherProfiles = "%c04%name%c12(%c04%amount%c12)";
-	public static final String NoCredits = "%b%c04%sender%c12: %user %c12currently has %c04%creds%c12%sender: %user %c12currently has %c04no%c12 available chips.";
-	public static final String NoCreditsSelf = "%b%c04%sender%c12: You %c12currently have %c04%creds%c12%sender: %user %c12currently has %c04no%c12 available chips.";
+	public static final String NoCredits = "%b%c04%sender: %user %c12currently has %c04no%c12 available chips.";
+	public static final String NoCreditsSelf = "%b%c04%sender%c12: %c04You %c12currently has %c04no%c12 available chips.";
 	
 	/**
 	 * This string is used when a user asks for all tables
@@ -230,7 +244,7 @@ public final class Strings {
 	 * %curP - The current number of players seated
 	 * %profile - The name of the profile this table's chips are for.
 	 */
-	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%curP%c12 (Min: %c04%minP%c12 / Max: %c04%maxP%c12) | Profile: %c04%profile";
+	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%curP%c12 (Min: %c04%minP%c12 / Max: %c04%maxP%c12) | Profile: %c04%profile%c12 - To join type %c04!join %id <buyin amount>";
 	
 	/**
 	 * This string is used to specify the message sent when a user searches for tables and:
@@ -339,6 +353,7 @@ public final class Strings {
 	 * %maxP - maximum number of players on the table
 	 * %seatedP - number of players currently sat down
 	 */
+	public static final int MaxWaitCount = 20;
 	public static final int WaitingForPlayersSecs = 15;
 	public static final String WaitingForPlayersMsg = "%b%c12We are currently waiting for %need more players (%c04%seated%c12 of %c04%max%c12 seated) [Min: %c04%min%c12]";
 	
@@ -437,6 +452,14 @@ public final class Strings {
 	public static final String InvalidActor = "%b%c12(%c04#%hID%c12) %c04%user%c12 acted out of turn, %c04%actor%c12 to act...";
 	
 	/**
+	 * This setting is used for the message when a player acts outside of a game
+	 * 
+	 * %hID - the handID
+	 * %user - The user who tried to act
+	 */
+	public static final String InvalidActTime = "%b%c04%user%c12 acted without a game/hand running...";
+	
+	/**
 	 * This setting is used for the message when a player acts out of turn
 	 * 
 	 * %hID - the handID
@@ -480,7 +503,7 @@ public final class Strings {
 	 * %actor - The person who failed to act
 	 * %secs - The number of seconds they have left to act
 	 */
-	public static final String NoActionWarning = "%b%c12(%c04#%hID%c12)has %c04%secs%c12 seconds to act.";
+	public static final String NoActionWarning = "%b%c12(%c04#%hID%c12) %c04%actor%c12 has %c04%secs%c12 seconds to act.";
 	
 	/**
 	 * A message for when someone fails to act
@@ -511,7 +534,7 @@ public final class Strings {
 	 * %min - Minimum BuyIn
 	 * %max - Maximum BuyIn
 	 */
-	public static final String NewTable = "%b%c12Table %c04%id%c12 has been created for %c04%Pmin%c12 to %c04%Pmax%c12 players with a BB of %c04%bb%c12 (SB: %c04%sb%c12) [Buy In: %c04%min%c12 to %c04%max%c12]";
+	public static final String NewTable = "%b%c12Table %c04%id%c12 has been created for the %c04%profile%c12 profile with %c04%Pmin%c12 to %c04%Pmax%c12 players with a BB of %c04%bb%c12 (SB: %c04%sb%c12) [Buy In: %c04%min%c12 to %c04%max%c12]";
 	
 	/**
 	 * Message when a table is closed
@@ -573,6 +596,15 @@ public final class Strings {
 	 * Rebuy successful message
 	 * 
 	 * %id - table id
+	 * %maxbuy - the maximum allowed buy in
+	 * %total - the user's total chips
+	 */
+	public static final String RebuyFailure = "%b%c12[Table %c04%id%c12] You can not rebuy more than %maxbuy. You have %total chips.";
+	
+	/**
+	 * Rebuy successful message
+	 * 
+	 * %id - table id
 	 * %user - The player
 	 * %new - new chips total
 	 * %total - the user's total chips
@@ -621,5 +653,32 @@ public final class Strings {
 	 * %action
 	 * %cmd
 	 */
-	public static final String AllowedActionString = "%c04%action%c12%cmd%n";
+	public static final String AllowedActionString = "%action - %cmd";
+
+
+	/**
+	 * This is used for formatting the message when a player wins (part of) a pot
+	 * 
+	 * %pot		- The pot name
+	 * %winner	- The winner's name
+	 * %amount	- The amount won
+	 * %hand	- The winning hand
+	 */
+	public static final String PotWinner = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%winner%c12 wins %c04%amount%c12 chips from %c04%pot%c12 with %c04%hand%c12";
+
+	/**
+	 * This is used for formatting the message for the amount of rake taken.
+	 * 
+	 * %rake	- The amount of rake
+	 */
+	public static final String RakeTaken = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Rake: %c04%rake%c12";
+	
+	/**
+	 * This is used for formatting the message for a pot returned as there is only a single player
+	 * 
+	 * %winner	- The winner's name
+	 * %amount	- The amount returned
+	 */
+	public static final String PotReturned = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%winner%c12 has been returned %c04%amount%c12 chips as there was no callers.";
+
 }

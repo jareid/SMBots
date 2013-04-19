@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import org.smokinmils.pokerbot.Client;
@@ -25,10 +27,22 @@ import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
 
 public class Lobby extends Room {
+	/* A timer to announce poker to the channel */
+	Timer announceTimer;
+	class AnnounceTask extends TimerTask {
+		public void run() {
+			ircClient.sendIRCMessage(ircChannel, Strings.PokerAnnounce);
+		    announceTimer.schedule(new AnnounceTask(), Variables.AnnounceMins*60*1000);
+		}
+	}	
+	
 	public Lobby(String channel, Client irc) {
 		super(channel, irc, RoomType.LOBBY);
 		roomTopic = Strings.LobbyTopic;
+		announceTimer = new Timer();
+	    announceTimer.schedule(new AnnounceTask(), 250);
 	}
+	
 
     /**
      * This method is called whenever a message is sent to this channel.
@@ -52,9 +66,10 @@ public class Lobby extends Room {
 			case INFO:
 				onInfo(sender, login, hostname, message);
 				break;
-			case CHIPS:
-				onChips(sender, login, hostname, message);
-				break;
+			//case CHIPS:
+				//disabled
+				//onChips(sender, login, hostname, message);
+				//break;
 			case NEWTABLE:
 				onNewTable(sender, login, hostname, message);
 				break;
@@ -70,9 +85,10 @@ public class Lobby extends Room {
 			case PROMOS:
 				onPromotions(sender, login, hostname, message);
 				break;
-			case GIVE:
-				onGive(sender, login, hostname, message);
-				break;
+			//case GIVE:
+				//disabled
+				//onGive(sender, login, hostname, message);
+				//break;
 			case PROFILE:
 				onProfile(sender, login, hostname, message);
 				break;
@@ -103,11 +119,7 @@ public class Lobby extends Room {
      * @param login The login of the user who joined the channel.
      * @param hostname The hostname of the user who joined the channel.
      */
-	protected void onJoin(String sender, String login, String hostname) {
-    	if ( sender.compareToIgnoreCase( ircClient.getNick() ) == 0) {
-    		setTopic( roomTopic );
-    	}
-    }    
+	protected void onJoin(String sender, String login, String hostname) { }    
     
     /**
      * This method is called whenever someone parts this channel which we are on.
@@ -142,7 +154,7 @@ public class Lobby extends Room {
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
 			sendFormat(sender, CommandType.INFO.getCommandText(), CommandType.INFO.getFormat());
 			for (String line: Strings.InfoMessage.split("\n")) {
-				ircClient.sendIRCMessage( sender, line );
+				ircClient.sendIRCNotice( sender, line );
 			}
 		} else if (msg.length == 1){
 			CommandType infocmd = CommandType.fromString( Strings.CommandChar + msg[0] );
@@ -150,22 +162,22 @@ public class Lobby extends Room {
 				sendFullCommand(sender, infocmd);
 			} else if ( msg[0].compareToIgnoreCase("table") == 0 ) {
 				CommandType[] table_cmds = {CommandType.CHECK, CommandType.RAISE, CommandType.FOLD,
-										CommandType.REBUY, CommandType.LEAVE,
-										CommandType.SITDOWN, CommandType.SITOUT};
+						 					CommandType.TBLCHIPS, CommandType.REBUY, CommandType.LEAVE,
+						 					CommandType.SITDOWN, CommandType.SITOUT};
 				for (CommandType item: table_cmds) {
 					sendFullCommand(sender, item);
 				}
 			} else if ( msg[0].compareToIgnoreCase("lobby") == 0 ) {
-				CommandType[] lobby_cmds = {CommandType.INFO, CommandType.CHIPS, CommandType.TABLES,
-										CommandType.NEWTABLE, CommandType.WATCHTBL, 
-										CommandType.JOIN, CommandType.PROMOS,
-										CommandType.GIVE, CommandType.PROFILE, CommandType.PROFILES};
+				CommandType[] lobby_cmds = {CommandType.INFO, /*CommandType.CHIPS,*/ CommandType.TABLES,
+											CommandType.NEWTABLE, CommandType.WATCHTBL, 
+											CommandType.JOIN, CommandType.PROMOS,
+											/*CommandType.GIVE,*/ CommandType.PROFILE, CommandType.PROFILES};
 				for (CommandType item: lobby_cmds) {
 					sendFullCommand(sender, item);
-					ircClient.sendIRCMessage(sender,"%b%c15-----");
+					ircClient.sendIRCNotice(sender,"%b%c15-----");
 				}
 			} else {
-				ircClient.sendIRCMessage(sender, Strings.InvalidInfoArgs.replaceAll("%invalid", msg[0]));
+				ircClient.sendIRCNotice(sender, Strings.InvalidInfoArgs.replaceAll("%invalid", msg[0]));
 			}
 		} else {
 			invalidArguments( sender, CommandType.INFO.getFormat() );
@@ -179,7 +191,8 @@ public class Lobby extends Room {
      * @param login The login of the person who sent the message.
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
-	 */	
+	 *
+	@SuppressWarnings("unused")
 	private void onChips(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		String user;
@@ -225,7 +238,7 @@ public class Lobby extends Room {
 		} else {
 			invalidArguments( sender, CommandType.CHIPS.getFormat() );
 		}
-	}
+	}*/
 	
 	/**
 	 * This method handles the new table command
@@ -239,7 +252,7 @@ public class Lobby extends Room {
 		String[] msg = message.split(" ");
 		Map<Integer, Integer> tables = new HashMap<Integer, Integer>(Table.getTables());
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			ircClient.sendIRCMessage(sender,
+			ircClient.sendIRCNotice(sender,
 						Strings.AllTablesMsg.replaceAll("%count", Integer.toString(tables.size())));
 			for (Entry<Integer, Integer> table: tables.entrySet()) {
 				String out = Strings.TableInfoMsg.replaceAll("%id", Integer.toString(table.getKey()));
@@ -249,7 +262,7 @@ public class Lobby extends Room {
 				out = out.replaceAll("%maxP", Integer.toString(tbl.getMaxPlayers()) );
 				out = out.replaceAll("%curP", Integer.toString(tbl.getNoOfPlayers()) );
 				out = out.replaceAll("%profile", tbl.getProfile() );
-				ircClient.sendIRCMessage(sender, out);
+				ircClient.sendIRCNotice(sender, out);
 			}
 		} else if (msg.length == 1){
 			Vector<Integer> table_ids = new Vector<Integer>();
@@ -264,13 +277,13 @@ public class Lobby extends Room {
 			}
 			
 			if ( table_ids.size() == 0 ) {
-				ircClient.sendIRCMessage(sender, Strings.NoTablesMsg.replaceAll("%bb", msg[0]));
+				ircClient.sendIRCNotice(sender, Strings.NoTablesMsg.replaceAll("%bb", msg[0]));
 			} else {
 				String out = Strings.FoundTablesMsg.replaceAll("%bb", msg[0]);
 				out = out.replaceAll("%count", Integer.toString(table_ids.size()) );
 				out = out.replaceAll("%tables", table_ids.toString() );
 				
-				ircClient.sendIRCMessage(sender, out);
+				ircClient.sendIRCNotice(sender, out);
 				
 				for (Integer id: table_ids) {
 					out = Strings.TableInfoMsg.replaceAll("%id", Integer.toString(id));
@@ -280,7 +293,7 @@ public class Lobby extends Room {
 					out = out.replaceAll("%maxP", Integer.toString(tbl.getMaxPlayers()) );
 					out = out.replaceAll("%curP", Integer.toString(tbl.getNoOfPlayers()) );
 					out = out.replaceAll("%profile", tbl.getProfile() );
-					ircClient.sendIRCMessage(sender, out);
+					ircClient.sendIRCNotice(sender, out);
 				}					
 			}
 		} else {
@@ -298,55 +311,56 @@ public class Lobby extends Room {
 	 */	
 	private void onNewTable(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
-		if (msg.length == 3 || msg.length == 4) {
-			String profile;
-			int profile_id = -1;
-			if (msg.length == 4) {
-				profile = msg[3];
-			} else  {
-				profile = Database.getInstance().getActiveProfile(sender);
-			}
-			profile_id = Database.getInstance().getProfileID(profile);
-			
-			Integer stake = Utils.tryParse( msg[0] );
-			Integer buy_in = Utils.tryParse( msg[1] );
-			Integer max_players = Utils.tryParse( msg[2] );
-			if (stake != null && buy_in != null && max_players != null && !profile.isEmpty())  {
-				// Verify stake is between correct buy-in levels
-				int maxbuy = (stake*Variables.MaxBuyIn);
-				int minbuy = (stake*Variables.MinBuyIn);
+		if (ircClient.isHost(sender, ircChannel)) {
+			if (msg.length == 3 || msg.length == 4) {
+				String profile;
+				int profile_id = -1;
+				if (msg.length == 4) {
+					profile = msg[3];
+				} else  {
+					profile = Database.getInstance().getActiveProfile(sender);
+				}
+				profile_id = Database.getInstance().getProfileID(profile);
 				
-				if ( profile_id == -1 ) {
-					List<String> profiles = Database.getInstance().getProfileTypes();
-					ircClient.sendIRCMessage(sender, Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()));
-				} else if ( !validPlayers(max_players) ) {
-					String out = Strings.InvalidTableSizeMsg.replaceAll("%size", Integer.toString(max_players));
-					out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedTableSizes));
-					ircClient.sendIRCMessage( sender, out );
-				} else if ( !validStake(stake) ) {
-					String out = Strings.InvalidTableBBMsg.replaceAll("%bb", Integer.toString(stake));
-					out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedBigBlinds));
-					ircClient.sendIRCMessage(sender, out  );
-				} else if ( buy_in < minbuy || buy_in > maxbuy) {
-					String out = Strings.IncorrectBuyInMsg.replaceAll("%buyin", Integer.toString(buy_in) );
-					out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
-					out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
-					out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
-					out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
-					ircClient.sendIRCMessage( sender, out );
-				} else if (!ircClient.userHasCredits( sender, buy_in, profile ) ) {
-					String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
-					out = out.replaceAll( "%profile", profile );
-					ircClient.sendIRCMessage(sender, out);
+				Integer stake = Utils.tryParse( msg[0] );
+				Integer buy_in = Utils.tryParse( msg[1] );
+				Integer max_players = Utils.tryParse( msg[2] );
+				if (stake != null && buy_in != null && max_players != null && !profile.isEmpty())  {
+					// Verify stake is between correct buy-in levels
+					int maxbuy = (stake*Variables.MaxBuyIn);
+					int minbuy = (stake*Variables.MinBuyIn);
+					
+					if ( profile_id == -1 ) {
+						List<String> profiles = Database.getInstance().getProfileTypes();
+						ircClient.sendIRCNotice(sender, Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()));
+					} else if ( !validPlayers(max_players) ) {
+						String out = Strings.InvalidTableSizeMsg.replaceAll("%size", Integer.toString(max_players));
+						out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedTableSizes));
+						ircClient.sendIRCNotice( sender, out );
+					} else if ( !validStake(stake) ) {
+						String out = Strings.InvalidTableBBMsg.replaceAll("%bb", Integer.toString(stake));
+						out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedBigBlinds));
+						ircClient.sendIRCNotice(sender, out  );
+					} else if ( buy_in < minbuy || buy_in > maxbuy) {
+						String out = Strings.IncorrectBuyInMsg.replaceAll("%buyin", Integer.toString(buy_in) );
+						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
+						out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
+						out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
+						out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
+						ircClient.sendIRCNotice( sender, out );
+					} else if (!ircClient.userHasCredits( sender, buy_in, profile ) ) {
+						String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
+						out = out.replaceAll( "%profile", profile );
+						ircClient.sendIRCNotice(sender, out);
+					} else {
+						ircClient.newTable( stake, max_players, profile_id, true);		
+					}
 				} else {
-					int id = ircClient.newTable( stake, max_players, profile_id );
-					ircClient.newPlayer( sender, id, buy_in );								
+					invalidArguments( sender, CommandType.NEWTABLE.getFormat() );
 				}
 			} else {
 				invalidArguments( sender, CommandType.NEWTABLE.getFormat() );
 			}
-		} else {
-			invalidArguments( sender, CommandType.NEWTABLE.getFormat() );
 		}
 	}
 	
@@ -367,7 +381,7 @@ public class Lobby extends Room {
 				if (table != null && table.canWatch( sender )) {
 					ircClient.newObserver( sender, id );
 				} else {
-					ircClient.sendIRCMessage( sender, Strings.AlreadyWatchingMsg.replaceAll("%id", Integer.toString(id)) );
+					ircClient.sendIRCNotice( sender, Strings.AlreadyWatchingMsg.replaceAll("%id", Integer.toString(id)) );
 				}
 			} else {
 				ircClient.sendIRCMessage(ircChannel, Strings.NoTableIDMsg.replaceAll("%id", id.toString()));
@@ -422,19 +436,19 @@ public class Lobby extends Room {
 					out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
 					out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
 					out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
-					ircClient.sendIRCMessage( sender, out );
+					ircClient.sendIRCNotice( sender, out );
 				} else if ( ircClient.tableIsFull( table_id ) ) {
-					ircClient.sendIRCMessage( sender, Strings.TableFullMsg.replaceAll("%id",
+					ircClient.sendIRCNotice( sender, Strings.TableFullMsg.replaceAll("%id",
 																						Integer.toString(table_id)) );								
 				} else if (!ircClient.userHasCredits( sender, buy_in, profile ) ) {
 					String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
 					out = out.replaceAll( "%profile", profile );
-					ircClient.sendIRCMessage(sender, out);
+					ircClient.sendIRCNotice(sender, out);
 				} else {
 					if (table != null && table.canPlay( sender )) {
 						ircClient.newPlayer( sender, table_id, buy_in );	
 					} else {
-						ircClient.sendIRCMessage( sender, 
+						ircClient.sendIRCNotice( sender, 
 								Strings.AlreadyPlayingMsg.replaceAll("%id", Integer.toString(table_id)) );
 					}												
 				}
@@ -470,7 +484,6 @@ public class Lobby extends Room {
      * @param login The login of the person who sent the message.
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
-	 */	
 	private void onGive(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 
@@ -496,7 +509,7 @@ public class Lobby extends Room {
 							out = out.replaceAll("%who", user);
 							out = out.replaceAll("%sender", sender);
 							out = out.replaceAll("%profile", profile);
-							ircClient.sendIRCMessage(user, out);
+							ircClient.sendIRCNotice(user, out);
 						} else {
 							EventLog.log(sender + " attempted to give someone chips and the database failed", "Lobby", "onGive");
 						}
@@ -512,7 +525,7 @@ public class Lobby extends Room {
 		} else {
 			EventLog.info(sender + " attempted to give someone chips", "Lobby", "onGive");
 		}
-	}
+	}*/
 	
 	/**
 	 * This method handles the profile command

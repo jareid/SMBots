@@ -21,13 +21,13 @@ import org.smokinmils.pokerbot.settings.Strings;
 public enum CommandType {
 	/** Lobby commands*/
 	INFO	(Strings.InfoCommand, 	 Strings.InfoCommand_Desc, 	  Strings.InfoCommand_Format),
-	CHIPS	(Strings.ChipsCommand,	 Strings.ChipsCommand_Desc,   Strings.ChipsCommand_Format),
+	/*CHIPS	(Strings.ChipsCommand,	 Strings.ChipsCommand_Desc,   Strings.ChipsCommand_Format),*/
 	NEWTABLE(Strings.NewTablCommand, Strings.NewTablCommand_Desc, Strings.NewTablCommand_Format),
 	WATCHTBL(Strings.WatchTlCommand, Strings.WatchTlCommand_Desc, Strings.WatchTlCommand_Format),
 	TABLES	(Strings.TablesCommand,  Strings.TablesCommand_Desc,  Strings.TablesCommand_Format),
 	JOIN	(Strings.JoinCommand, 	 Strings.JoinCommand_Desc,    Strings.JoinCommand_Format),
 	PROMOS	(Strings.PromosCommand,  Strings.PromosCommand_Desc,  Strings.PromosCommand_Format),
-	GIVE	(Strings.GiveCommand,	 Strings.GiveCommand_Desc,	  Strings.GiveCommand_Format),
+	/*GIVE	(Strings.GiveCommand,	 Strings.GiveCommand_Desc,	  Strings.GiveCommand_Format),*/
 	PROFILE	(Strings.ProfileCommand, Strings.ProfileCommand_Desc, Strings.ProfileCommand_Format),
 	PROFILES(Strings.ProfilesCommand,Strings.ProfilesCommand_Desc,Strings.ProfileCommand_Format),
 	
@@ -38,6 +38,7 @@ public enum CommandType {
 	 		 Strings.BetCommand_Alternatives),
 	FOLD 	(Strings.FoldCommand,    Strings.FoldCommand_Desc,    Strings.FoldCommand_Format,
 			 Strings.FoldCommand_Alternatives),
+	TBLCHIPS(Strings.TblChipsCommand,Strings.TblChipsCommand_Desc,Strings.TblChipsCommand_Format),
 	REBUY	(Strings.RebuyCommand,   Strings.RebuyCommand_Desc,   Strings.RebuyCommand_Format),
 	SITDOWN (Strings.SitDownCommand, Strings.SitDownCommand_Desc, Strings.SitDownCommand_Format),
 	SITOUT	(Strings.SitOutCommand,  Strings.SitOutCommand_Desc,  Strings.SitOutCommand_Format),

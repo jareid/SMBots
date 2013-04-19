@@ -9,11 +9,13 @@
 package org.smokinmils.pokerbot.game.rooms;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeMap;
@@ -30,6 +32,7 @@ import org.smokinmils.pokerbot.game.Card;
 import org.smokinmils.pokerbot.game.Deck;
 import org.smokinmils.pokerbot.game.Hand;
 import org.smokinmils.pokerbot.game.HandValue;
+import org.smokinmils.pokerbot.game.SidePot;
 import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
@@ -119,6 +122,7 @@ public class Table extends Room {
 	
     /** Timer to handle waiting for enough players */
 	private Timer waitForPlayersTimer;
+	private int waitedCount;
 	
 	/** Timer to start a game */
 	private Timer startGameTimer;
@@ -132,6 +136,12 @@ public class Table extends Room {
 	/** Boolean used for when a hand was cancelled due to a disconnect */
 	private boolean disconnected;
 	
+	/** Side pots */
+	private List<SidePot> sidePots;
+	
+	/** Player bets */
+	private Map<Player,Integer> playerBets;
+	
 	/** Rounds */
 	private static final int PREFLOP = 0;
 	private static final int FLOP 	 = 1;
@@ -142,7 +152,10 @@ public class Table extends Room {
 	private int currentRound;
 	
 	/** Number of players left to act */
-	private int playersToAct;
+	private volatile int playersToAct;
+	
+	/** Number of players left to act */
+	private boolean createdManually;
 	
     /**
      * Constructor.
@@ -151,14 +164,18 @@ public class Table extends Room {
      * @param irc	   The IRC client
      * @param bb	   The size of the big blind.
      * @param max	   Maximum allowed players on the table
+     * @param profile  The profile ID this table is for
+     * @param manual   Whether the table was created auto or manually
      */
-	public Table(String channel, Client irc, int id, int bb, int max, int profile) {
+	public Table(String channel, Client irc, int id, int bb, int max, int profile, boolean manual) {
     	super(channel, irc, RoomType.TABLE);	
     	boolean failed = false;
 		players = new ArrayList<Player>();
 		activePlayers = new ArrayList<Player>();
 		satOutPlayers = new ArrayList<Player>();
         board = new ArrayList<Card>();
+
+		sidePots = new ArrayList<SidePot>();
         
         try {
 	        deck = null;
@@ -171,8 +188,11 @@ public class Table extends Room {
 		startGameTimer = null;
 		actionTimer = null;
 		waitForPlayersTimer = null;
+		waitedCount = 0;
 		handActive = false;
 		disconnected = false;
+		
+		createdManually = manual;
 		
 		CurrentID++;
 		tableID = id;
@@ -222,7 +242,7 @@ public class Table extends Room {
 			ircClient.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
 			System.exit(1);
 		}
-	} 
+	}
 	
 	/** 
 	 * Returns the table ID
@@ -358,23 +378,7 @@ public class Table extends Room {
 	 * @return true if the user is not already playing
 	 */
 	public boolean canPlay(String user) {
-		Player found = null;
-		for (Player plyr: players) {
-			if (plyr.getName().compareToIgnoreCase( user ) == 0) {
-				found = plyr;
-				break;
-			}
-		}
-		
-		if (found == null) {
-			for (Player plyr: satOutPlayers) {
-				if (plyr.getName().compareToIgnoreCase( user ) == 0) {
-					found = plyr;
-					break;
-				}
-			}
-		}
-		
+		Player found = findPlayer(user);
 		return (found == null ? true : false);
 	}
 
@@ -401,6 +405,7 @@ public class Table extends Room {
 		in = in.replaceAll( "%seats", Integer.toString(seats) );
 		in = in.replaceAll( "%watching", Integer.toString(observers.size())  );
 		in = in.replaceAll( "%hID", Integer.toString(handID) );
+		in = in.replaceAll( "%profile", profileName );
     	return in;
     }
    
@@ -412,10 +417,22 @@ public class Table extends Room {
      */
 	public synchronized void playerJoins(String sender, Integer buy_in) {
 		Player player = new Player(sender, buy_in);
-		satOutPlayers.add(player);
-		
-    	// Add Timer
-		player.scheduleSitOut(this);
+		boolean found = false;
+		User[] users = ircClient.getUsers(ircChannel);
+		for (int i = 0; i < users.length; i++) {
+			String nick = users[i].getNick();
+			if (nick.compareTo(sender) == 0) {
+				found = true;
+			}
+		}
+			
+    	if (found) {
+    		players.add(player);
+    	} else {
+    		// Add Timer
+    		satOutPlayers.add(player);
+    		player.scheduleSitOut(this);
+    	}
 		
 		// Remove chips from db
 		Database.getInstance().buyIn(sender, buy_in, profileID);
@@ -447,11 +464,18 @@ public class Table extends Room {
     	int chips = player.getChips() + player.getRebuy();
     	
     	// Ensure user has left the table
-    	ircClient.kick( ircChannel, name );
+    	if (createdManually) {
+    		ircClient.kick( ircChannel, name );
+    	} else {
+    		ircClient.deVoice( ircChannel, name );
+    	}
     	
     	// Cash out
-		Database.getInstance().cashOut( name, chips, profileID );
-		Database.getInstance().addPokerTableCount(player.getName(), tableID, profileID, 0);
+    	if (!player.isBroke()) {
+    		player.cashOut();
+    		Database.getInstance().cashOut( name, chips, profileID );
+    		Database.getInstance().addPokerTableCount(player.getName(), tableID, profileID, 0);
+    	}
     	
     	// Remove from our player list
     	if (sat_out) {
@@ -467,7 +491,7 @@ public class Table extends Room {
 		out = out.replaceAll( "%player", name );
 		out = out.replaceAll( "%chips",Integer.toString(chips) );		
 		ircClient.sendIRCMessage( ircChannel, out);
-		ircClient.sendIRCMessage( player.getName(),
+		ircClient.sendIRCNotice( player.getName(),
 						Strings.PlayerLeavesPM.replaceAll("%id", Integer.toString(tableID)) );
 		setTopic();
     }
@@ -495,22 +519,21 @@ public class Table extends Room {
     private synchronized void playerSitsOut(Player player) {
     	// Cancel timer
 		player.scheduleSitOut(this);
-		
-		// Switch the player lists
-    	players.remove(player);
-    	satOutPlayers.add(player); 
     	
 		// handle current hands
-		if (player == actor && handActive) 
+		if (player == actor) {
 	    	onAction(ActionType.FOLD, "", true);
-		else if (activePlayers.contains(player)) {
+		} else if (activePlayers.contains(player)) {
 			playersToAct--;
 	    	activePlayers.remove(player);
 			if (activePlayers.size() == 1) {
 				playerWins(activePlayers.get(0));
 			}
-		}   	
-
+		} 
+		
+		// Switch the player lists
+    	players.remove(player);
+    	satOutPlayers.add(player); 
 		player.setSatOut(true);
     	
     	// Announce
@@ -569,6 +592,8 @@ public class Table extends Room {
 					invalidArguments( sender, cmd.getFormat() );
 				}
 				break;
+			case TBLCHIPS:
+				onChips(sender, login, hostname, restofmsg);
 			case REBUY:
 				onRebuy(sender, login, hostname, restofmsg);
 				break;
@@ -724,8 +749,13 @@ public class Table extends Room {
 		   if (waitForPlayersTimer != null) waitForPlayersTimer.cancel();
 			// Do we need players at the table?
 			if (getNoOfPlayers() == 0) {
-				closeTable( );
+				if (createdManually && waitedCount > Strings.MaxWaitCount) closeTable();
+				else {
+					waitedCount++;					
+					scheduleWaitForPlayers();
+				}
 			} else if ( players.size() < minPlayers ) {
+				waitedCount = 0;
 				// Continue waiting
 				int need = minPlayers - players.size();
 				String out = Strings.WaitingForPlayersMsg.replaceAll("%need", Integer.toString(need) );
@@ -741,6 +771,8 @@ public class Table extends Room {
 				out = out.replaceAll("%secs", Integer.toString(Strings.GameStartSecs) );
 				out = out.replaceAll("%seatedP", Integer.toString(getPlayersSatDown()) );
 				ircClient.sendIRCMessage(ircChannel, out);
+
+				waitedCount = 0;
 				
 				// Schedule the game to start
 				startGameTimer = new Timer();
@@ -750,7 +782,33 @@ public class Table extends Room {
 		   break;
 	   }
    }
-    
+   
+   /**
+	* This method handles the chips command
+	*
+	* @param sender The nick of the person who sent the message.
+    * @param login The login of the person who sent the message.
+    * @param hostname The hostname of the person who sent the message.
+    * @param message The actual message sent to the channel.
+	*/	
+	private synchronized void onChips(String sender, String login, String hostname, String message) {
+		String[] msg = message.split(" ");
+		if ((msg.length == 0 || msg[0].compareTo("") == 0)) {		
+			Player found = findPlayer( sender );
+				
+			if (found != null) {
+				String out = Strings.CheckChips.replaceAll( "%id", Integer.toString(tableID) );
+				out = out.replaceAll( "%creds", Integer.toString(found.getChips()) );		
+				ircClient.sendIRCMessage( ircChannel, out );
+			} else {
+				String out = Strings.CheckChipsFailed.replaceAll( "%id", Integer.toString(tableID) );	
+				ircClient.sendIRCMessage( ircChannel, out );
+			}
+		} else {
+			invalidArguments( sender, CommandType.TBLCHIPS.getFormat() );
+		}
+	}
+	
 	/**
 	 * This method handles the rebuy command
 	 * 
@@ -769,46 +827,41 @@ public class Table extends Room {
 			if (buy_in != null && !ircClient.userHasCredits( sender, buy_in, profileID ) ) {
 				String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
 				out = out.replaceAll( "%profile", profileName );
-				ircClient.sendIRCMessage(sender, out);
-			} else if ( buy_in != null && (buy_in < minbuy || buy_in > maxbuy)) {
-				String out = Strings.IncorrectBuyInMsg.replaceAll("%buyin", Integer.toString(buy_in) );
-				out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
-				out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
-				out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
-				out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
-				ircClient.sendIRCMessage( sender, out );						
-			} else {
-				Player found = null;
-				// find the player
-				for (Player plyr: players) {
-					if (plyr.getName().compareToIgnoreCase( sender ) == 0) {
-						found = plyr;
-						break;
-					}
-				}
-				
-				// check if they are sat out
-				if (found == null) {
-					for (Player plyr: satOutPlayers) {
-						if (plyr.getName().compareToIgnoreCase( sender ) == 0) {
-							found = plyr;
-							break;
-						}
-					}
-				}
+				ircClient.sendIRCNotice(sender, out);
+			} else if (buy_in != null) {
+				Player found = findPlayer(sender);
 				
 				if (found != null) {
-					// Remove chips from db
-					Database.getInstance().buyIn(sender, buy_in, profileID);
-		    		Database.getInstance().addPokerTableCount(found.getName(), tableID, profileID, buy_in);
+					int total = buy_in + found.getRebuy() + found.getChips();
+					int diff = maxbuy - total;
 					
-					found.rebuy(buy_in);
-					
-					String out = Strings.RebuySuccess.replaceAll( "%id", Integer.toString(tableID) );
-					out = out.replaceAll( "%user", found.getName() );
-					out = out.replaceAll( "%new", msg[0] );
-					out = out.replaceAll( "%total", Integer.toString(found.getChips() + found.getRebuy()) );		
-					ircClient.sendIRCMessage( ircChannel, out );
+					if ( total > maxbuy ) {
+						String out = Strings.RebuyFailure.replaceAll( "%id", Integer.toString(tableID) );
+						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
+						out = out.replaceAll( "%total", Integer.toString(found.getChips() + found.getRebuy()) );		
+						ircClient.sendIRCNotice( sender, out );
+					} else if (diff < 0) {
+						String out = Strings.IncorrectBuyInMsg.replaceAll("%buyin", Integer.toString(buy_in) );
+						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
+						out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
+						out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
+						out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
+						ircClient.sendIRCNotice(sender, out);
+					} else {
+						// Remove chips from db
+						Database.getInstance().buyIn(sender, buy_in, profileID);
+			    		Database.getInstance().addPokerTableCount(found.getName(), tableID, profileID, buy_in);
+						
+						found.rebuy(buy_in);
+						
+						String out = Strings.RebuySuccess.replaceAll( "%id", Integer.toString(tableID) );
+						out = out.replaceAll( "%user", found.getName() );
+						out = out.replaceAll( "%new", msg[0] );
+						out = out.replaceAll( "%total", Integer.toString(found.getChips() + found.getRebuy()) );		
+						ircClient.sendIRCMessage( ircChannel, out );
+						
+						if (satOutPlayers.contains(found)) playerSitsDown(found);
+					}
 				} else {
 					EventLog.log("RECOVERABLE: User tried to rebuy but is not on the table", "Table", "onRebuy");
 					ircClient.deVoice(ircChannel, sender);
@@ -831,29 +884,16 @@ public class Table extends Room {
 	private synchronized void onLeave(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			Player found = null;
-			// find the player
-			boolean is_active = false;
-			for (Player plyr: players) {
-				if (plyr.getName().compareToIgnoreCase( sender ) == 0) {
-					found = plyr;
-					is_active = true;
-					break;
-				}
+			Player found = findPlayer( sender );
+			boolean is_active = (found != null ? players.contains(found) : false);
+
+			if (found != null) { 
+				if (found.getSittingOutTimer() != null) found.getSittingOutTimer().cancel();
+				playerLeaves(found, is_active);
+			} else {
+				EventLog.log(sender + "failed to leave as they should not have been voiced.", "Table", "onLeave");
+				ircClient.deVoice(ircChannel, sender);
 			}
-			
-			// check if they are sat out
-			if (found != null) {
-				for (Player plyr: satOutPlayers) {
-					if (plyr.getName().compareToIgnoreCase( sender ) == 0) {
-						found = plyr;
-						is_active = false;
-						break;
-					}
-				}
-			}
-			
-			playerLeaves(found, is_active);
 		} else {
 			invalidArguments( sender, CommandType.LEAVE.getFormat() );
 		}
@@ -879,8 +919,8 @@ public class Table extends Room {
 			}
 			
 			if (found != null && (found.isBroke() && found.getRebuy() == 0)) {
-				ircClient.sendIRCMessage( sender, Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
-			} else {
+				ircClient.sendIRCNotice( sender, Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
+			} else if (found != null) {
 				playerSitsDown(found);
 			}
 		} else {
@@ -910,7 +950,7 @@ public class Table extends Room {
 			if (found != null) {
 				playerSitsOut(found);
 			} else {
-				ircClient.sendIRCMessage( sender, Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
+				ircClient.sendIRCNotice( sender, Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
 			}
 		} else {
 			invalidArguments( sender, CommandType.SITOUT.getFormat() );
@@ -920,7 +960,7 @@ public class Table extends Room {
 	/**
 	 * Announces the next actor and valid actions and waits
 	 */
-	private void getAction() {
+	private synchronized void getAction() {
 		Set<ActionType> allowed = getAllowedActions(actor);
 		String actions = allowed.toString();
 		if ( allowed.contains(ActionType.CALL) )
@@ -947,18 +987,19 @@ public class Table extends Room {
     /**
      * This method handles the results of an action and moves to the next action
      */
-    private void actionReceived(boolean is_first) {    	
-    	while (actor.isBroke() && playersToAct > 1) {
-    		if (actor.isBroke()) playersToAct--;
-    	} 
+    private synchronized void actionReceived(boolean is_first) {
+		try {
+			rotateActor();
+	    	while (actor.isBroke() && playersToAct > 1) {
+	    		if (actor.isBroke()) playersToAct--;
+	    		rotateActor();
+	    	} 
+		} catch (IllegalStateException e) {
+			EventLog.fatal(e,"Table", "actionReceived");
+			System.exit(1);
+		}
     	
     	if (playersToAct > 0 && !(is_first && playersToAct == 1)) {
-    		try {
-    			rotateActor();
-    		} catch (IllegalStateException e) {
-    			EventLog.fatal(e,"Table", "actionReceived");
-    			System.exit(1);
-    		}
     		getAction();
     	} else {
     		// Reset the results of betting in the previous round
@@ -1017,112 +1058,122 @@ public class Table extends Room {
 	private synchronized void onAction(ActionType action, String extra, boolean timeout) {
 		actionReceived = true;
 		if (actionTimer != null) actionTimer.cancel();
-		
-		Set<ActionType> allowedActions = getAllowedActions(actor);        
-        if (!allowedActions.contains(action)) {
-            String out = Strings.InvalidAction.replaceAll("%hID", Integer.toString(handID));
-            out = out.replaceAll("%invalid", action.getName() );
-            out = out.replaceAll("%valid", allowedActions.toString() );
-            ircClient.sendIRCMessage( ircChannel, out );
-            ircClient.sendIRCMessage( actor.getName(), out );
-        } else {
-        	Integer amount = Utils.tryParse(extra);
-        	if (amount == null) amount = 0;
-        	
-        	int valid = 0;
-        	boolean stop = false;
-    		if ( action == ActionType.CALL ) {
-    			valid = bet - actor.getBet();
-    			if (amount > valid) amount = (amount - valid);
-    		} else if ( action == ActionType.BET ) {
-    			valid = minBet;
-    			if (amount < valid && actor.getChips() >= valid) {
-    				String out = Strings.InvalidBet.replaceAll("%hID", Integer.toString(handID));
-    				out.replaceAll("%pChips", Integer.toString(actor.getChips()));
-    				out.replaceAll("%min", Integer.toString(valid));
-    				stop = true;
-    			} else if (amount > actor.getChips()) {
-    				amount = actor.getChips();
-    			}
-    		} else if (  action == ActionType.RAISE ) {
-    			valid = (bet - actor.getBet()) + minBet;
-    			int to_call = bet - actor.getBet();
-    			if (amount < valid && actor.getChips() >= valid) {
-    				String out = Strings.InvalidBet.replaceAll("%hID", Integer.toString(handID));
-    				out.replaceAll("%pChips", Integer.toString(actor.getChips()));
-    				out.replaceAll("%min", Integer.toString(valid));
-    				stop = true;
-    			} else if (actor.getChips() <= to_call) {
-    				action = ActionType.CALL;
-    			} else if (amount > actor.getChips()) {
-    				amount = actor.getChips();
-    			}
-    		}
-        	
-	        if (!stop) {   	
-	            playersToAct--;
-	            switch (action) {
-	                case CHECK:
-	                case CALL:
-	                	extra = "";	                	
-	                    break;
-	                case BET:
-	                case RAISE:
-	                	minBet = amount;
-	                    bet = minBet;
-	                    // Other players get one more turn.
-	                    playersToAct = activePlayers.size() - 1;
-	                	extra = " to " + Integer.toString(minBet);
-	                    break;
-	                case FOLD:
-	                	try {
-		                    actor.setCards(null);
-	                    } catch (IllegalArgumentException | IllegalStateException e) {
-	                    	EventLog.fatal(e, "Table", "onAction");
-	                    	System.exit(1);
-	                    }
-	                    activePlayers.remove(actor);
-	                    extra = "";
-	                    break;
-	                default:
-	                	throw new IllegalArgumentException("Blind actions are not valid at this point");
-	            }
-	            
-	            try {
-	            	actor.act(action, minBet, bet);
-	            } catch (IllegalArgumentException e) {
-	            	EventLog.fatal(e, "Table", "onAction");
-	            	System.exit(1);	            	
-	            }
-                pot += actor.getBetIncrement();
-	            
-	            String out = Strings.TableAction.replaceAll("%hID", Integer.toString(handID));
-	            out = out.replaceAll("%actor", actor.getName());
-	            out = out.replaceAll("%action", action.getText());
-	            out = out.replaceAll("%amount", extra);
-	            out = out.replaceAll("%chips", Integer.toString(actor.getChips()) );
-	            out = out.replaceAll("%pot", Integer.toString(pot));
+		if (actor != null) {
+			Set<ActionType> allowedActions = getAllowedActions(actor);        
+	        if (!allowedActions.contains(action)) {
+	            String out = Strings.InvalidAction.replaceAll("%hID", Integer.toString(handID));
+	            out = out.replaceAll("%invalid", action.getName() );
+	            out = out.replaceAll("%valid", allowedActions.toString() );
 	            ircClient.sendIRCMessage( ircChannel, out );
-	            
-	            // If user is all in, set there pot
-	            if (actor.isBroke()) {
-	                actor.setAllInPot(pot);
+	            ircClient.sendIRCNotice( actor.getName(), out );
+	        } else {
+	        	Integer amount = Utils.tryParse(extra);
+	        	if (amount == null) amount = 0;
+	        	
+	        	int valid = 0;
+	        	boolean stop = false;
+	    		if ( action == ActionType.CALL ) {
+	    			valid = bet - actor.getBet();
+	    			if (actor.getChips() >= valid) {
+	    				amount = valid;
+					} else if (amount > actor.getChips()) {
+						amount = actor.getChips();
+					}
+	    		} else if ( action == ActionType.BET ) {
+	    			valid = minBet;
+	    			if (amount < valid && actor.getChips() >= valid) {
+	    				String out = Strings.InvalidBet.replaceAll("%hID", Integer.toString(handID));
+	    				out.replaceAll("%pChips", Integer.toString(actor.getChips()));
+	    				out.replaceAll("%min", Integer.toString(valid));
+	    				stop = true;
+	    			} else if (amount > actor.getChips()) {
+	    				amount = actor.getChips();
+	    			}
+	    		} else if (  action == ActionType.RAISE ) {
+	    			valid = (bet - actor.getBet()) + minBet;
+	    			int to_call = bet - actor.getBet();
+	    			if (amount < valid && actor.getChips() >= valid) {
+	    				String out = Strings.InvalidBet.replaceAll("%hID", Integer.toString(handID));
+	    				out.replaceAll("%pChips", Integer.toString(actor.getChips()));
+	    				out.replaceAll("%min", Integer.toString(valid));
+	    				stop = true;
+	    			} else if (actor.getChips() <= to_call) {
+	    				action = ActionType.CALL;
+	    			} else if (amount > (actor.getChips() +  actor.getBet())) {
+	    				amount = actor.getChips() + actor.getBet();
+	    			}
+	    		}
+	        	
+		        if (!stop) {   	
+		            playersToAct--;
+		            switch (action) {
+		                case CHECK:
+		                case CALL:
+		                	extra = "";	                	
+		                    break;
+		                case BET:
+		                case RAISE:
+		                	minBet = amount;
+		                    bet = minBet;
+		                    // Other players get one more turn.
+		                    playersToAct = activePlayers.size() - 1;
+		                	extra = " to " + Integer.toString(minBet);
+		                    break;
+		                case FOLD:
+		                	try {
+			                    actor.setCards(null);
+		                    } catch (IllegalArgumentException | IllegalStateException e) {
+		                    	EventLog.fatal(e, "Table", "onAction");
+		                    	System.exit(1);
+		                    }
+		                    activePlayers.remove(actor);
+		                    extra = "";
+		                    break;
+		                default:
+		                	throw new IllegalArgumentException("Blind actions are not valid at this point");
+		            }
+		            
+		            try {
+		            	actor.act(action, minBet, bet);
+		            } catch (IllegalArgumentException e) {
+		            	EventLog.fatal(e, "Table", "onAction");
+		            	System.exit(1);	            	
+		            }
+	                pot += actor.getBetIncrement();
 	                
-	                out = Strings.PlayerAllIn.replaceAll("%hID", Integer.toString(handID));
-	                out = out.replaceAll("%actor", actor.getName());
-	                ircClient.sendIRCMessage( ircChannel, out );
-	            }
-
-                if (action == ActionType.FOLD && activePlayers.size() == 1) {
-                    // The player left wins.
-                    playerWins(activePlayers.get(0));
-                    playersToAct = 0;
-                } else {
-    	            // Continue play
-    	            actionReceived(false);
-                }
+	                int player_total = playerBets.get(actor) + actor.getBetIncrement();
+	                playerBets.put(actor, player_total);
+		            
+		            // If user is all in, announce it and side up a new side pot if needed
+		            if (actor.isBroke()) {	                	                
+		                String out = Strings.PlayerAllIn.replaceAll("%hID", Integer.toString(handID));
+		                out = out.replaceAll("%actor", actor.getName());
+		                ircClient.sendIRCMessage( ircChannel, out );
+		            }
+		            
+		            // Re-calulate all the pots
+		            calculateSidePots();
+		            
+		            // TODO: add side pot output
+		            String out = Strings.TableAction.replaceAll("%hID", Integer.toString(handID));
+		            out = out.replaceAll("%actor", actor.getName());
+		            out = out.replaceAll("%action", action.getText());
+		            out = out.replaceAll("%amount", extra);
+		            out = out.replaceAll("%chips", Integer.toString(actor.getChips()) );
+		            out = out.replaceAll("%pot", Integer.toString(pot));
+		            ircClient.sendIRCMessage( ircChannel, out );
+	
+	                if (action == ActionType.FOLD && activePlayers.size() == 1) {
+	                    playersToAct = 0;
+	                    // The player left wins.
+	                    playerWins(activePlayers.get(0));
+	                } else {
+	    	            // Continue play
+	    	            actionReceived(false);
+	                }
+		        }
 	        }
-        }
+		}
 	}
 	
 	/**
@@ -1130,10 +1181,15 @@ public class Table extends Room {
 	 * 
 	 * @param user the user who tried to act
 	 */
-	private void invalidAction(String user) {
-		String out = Strings.InvalidActor.replaceAll("%hID", Integer.toString(handID));
+	private synchronized void invalidAction(String user) {
+		String out;
+		if (actor == null) out = Strings.InvalidActTime;
+		else {
+			out = Strings.InvalidActor.replaceAll( "%actor", actor.getName() );
+			out = out.replaceAll("%hID", Integer.toString(handID));
+		}
+		
 		out = out.replaceAll( "%user", user );
-		out = out.replaceAll( "%actor", actor.getName() );
 		ircClient.sendIRCMessage( ircChannel, out );
 	}
     
@@ -1151,19 +1207,14 @@ public class Table extends Room {
         if (board.size() == 0) {
             // Pre-Flop; player left of big blind starts, bet is the big blind.
             bet = bigBlind;
-            if (activePlayers.size() == 2) {
+            if (players.size() == 2)
             	actorPosition = (dealerPosition + 1) % activePlayers.size();
-            } else {
+            else
             	actorPosition = (dealerPosition + 2) % activePlayers.size();
-            }
         } else {
             // Otherwise, player left of dealer starts, no initial bet.
             bet = 0;
-            if (activePlayers.size() == 2) {
-                actorPosition = (dealerPosition + 1) % activePlayers.size();
-            } else  {
-            	actorPosition = dealerPosition;      
-            }
+            actorPosition = dealerPosition;
         }
         
         actionReceived(true);
@@ -1176,7 +1227,7 @@ public class Table extends Room {
      * 
      * @return The allowed actions.
      */
-    private Set<ActionType> getAllowedActions(Player player) {
+    private synchronized Set<ActionType> getAllowedActions(Player player) {
         int actorBet = actor.getBet();
         Set<ActionType> actions = new HashSet<ActionType>();
         if (bet == 0) {
@@ -1203,110 +1254,142 @@ public class Table extends Room {
     
     /**
      * Performs the Showdown.
-     * TODO: move output to Strings class
-     * TODO: handle split pots/rake correctly (currently this doesn't quite work)
      */
-    private void doShowdown() {
-    	// Rake
-		// None if only the blinds are in
-		// Otherwise Minimum or RakePercent whichever is greater 
-		int rake = 0;
-		if ( pot > (bigBlind*2) ) {
-			rake = Variables.MinimumRake;
-			int perc = (int)Math.round(pot * (Variables.RakePercentage / 100.0));
-			if (perc < Variables.MinimumRake)
-				rake = Variables.MinimumRake;
-			else if (perc > Variables.MaximumRake)
-				rake = Variables.MaximumRake;
-			else
-				rake = perc;
-		}
-    	pot = pot - rake;
+    private synchronized void doShowdown() {    	
+    	// Add final pot to side pots
+     	SidePot lastpot = new SidePot();
+    	for (Player left: activePlayers) {
+    		if (!left.isBroke()) {
+    			if (lastpot.getBet() == 0) {
+    				lastpot.setBet( left.getTotalBet() );
+    				lastpot.call( left );
+    			} else {
+    				lastpot.call( left );
+    			}
+    		}
+    	}
+    	if (lastpot.getPlayers().size() > 0) {
+    		sidePots.add(lastpot);
+    	}
     	
-        // Look at each hand value, sorted from highest to lowest.
-        Map<HandValue, List<Player>> rankedPlayers = getRankedPlayers();
-        for (HandValue handValue : rankedPlayers.keySet()) {
-            // Get players with winning hand value.
-            List<Player> winners = rankedPlayers.get(handValue);
-            if (winners.size() == 1) {
-                // Single winner.
-                Player winner = winners.get(0);
-                int potShare = winner.getAllInPot();
-                if (potShare != 0) {
-                	winner.win(potShare);
-                	pot -= potShare;
-                    
-                    ircClient.sendIRCMessage( ircChannel,
-                    		String.format("%s wins %d chips with %s\n", winner.getName(), potShare, handValue.toString() ) );
-                    if (pot == 0) {
+    	// Process each pot separately
+    	int totalpot = 0;
+    	int totalbet = 0;
+    	int totalrake = 0;
+    	String potname = "";
+    	int i = 0;
+    	for (SidePot side: sidePots) {
+    		if (i == 0) potname = "Main Pot";
+    		else potname = "Side Pot " + Integer.toString(i);
+    		
+    		// More than one player so decide the winner
+    		if (side.getPlayers().size() > 1) {
+        		// Take the rake
+        		int rake = 0;
+        		if ( pot > (bigBlind*2) ) {
+        			rake += side.rake();
+        		}
+        		int potsize = side.getPot() - totalpot;
+        		
+                // Look at each hand value, sorted from highest to lowest.
+                Map<HandValue, List<Player>> rankedPlayers = getRankedPlayers( side.getPlayers() );
+                for (HandValue handValue : rankedPlayers.keySet()) {
+                    // Get players with winning hand value.
+                    List<Player> winners = rankedPlayers.get(handValue);
+                    if (winners.size() == 1) {
+                        // Single winner.
+                        Player winner = winners.get(0);
+                    	winner.win( potsize );
+                        // Add to DB
+                    	if (i == 0) {
+                            Database.getInstance().setHandWinner(handID, winner.getName(), potsize);
+                    	} else {
+                            Database.getInstance().addHandWinner(handID, winner.getName(), potsize);                    		
+                    	}
+                    	String out = Strings.PotWinner.replaceAll("%winner", winner.getName());
+                    	out = out.replaceAll("%hand", handValue.toString());
+                    	out = out.replaceAll("%pot", potname);
+                    	out = out.replaceAll("%amount", Integer.toString(potsize));
+                    	out = out.replaceAll("%id", Integer.toString(tableID));
+                    	out = out.replaceAll("%hID", Integer.toString(handID));
+                    	
+                    	ircClient.sendIRCMessage( ircChannel, out );
+                        break;
+                    } else {                    
+                        // Tie; share the pot amongst winners.
+                        int remainder = potsize % winners.size();
+                        if (remainder != 0) {
+                        	potsize -= remainder;
+                        	rake += remainder;
+                        }
+                        int potShare = potsize / winners.size();
+                        
+                        int y = 0;
+                        for (Player winner : winners) {
+                            // Give the player his share of the pot.
+                            winner.win(potShare);
+                            
+                            // Add to db
+                            if (i == 0 && y == 0) {
+                                Database.getInstance().setHandWinner(handID, winner.getName(), potShare);
+                        	} else {
+                                Database.getInstance().addHandWinner(handID, winner.getName(), potShare);                    		
+                        	}
+                            
+                            // Announce
+                        	String out = Strings.PotWinner.replaceAll("%winner", winner.getName());
+                        	out = out.replaceAll("%hand", handValue.toString());
+                        	out = out.replaceAll("%pot", potname);
+                        	out = out.replaceAll("%amount", Integer.toString(potShare));
+                        	out = out.replaceAll("%id", Integer.toString(tableID));
+                        	out = out.replaceAll("%hID", Integer.toString(handID));
+                        	ircClient.sendIRCMessage( ircChannel, out );   
+                        	y++;
+                        }
                         break;
                     }
-                } else {
-                	winner.win(pot);
-                	ircClient.sendIRCMessage( ircChannel,
-                    		String.format("%s wins %d chips with %s\n", winner.getName(), pot, handValue.toString() ) );
-                    break;
                 }
-            } else {
-            	// Add the remainder of a shared pot to rake
-                rake += pot % winners.size();
-                
-                // Tie; share the pot amongst winners.
-                int tempPot = pot;
-                
-                StringBuilder sb = new StringBuilder("Tie: ");
-                for (Player player : winners) {                	
-                    // Determine the player's share of the pot.
-                    int potShare = player.getAllInPot();
-                    if (potShare == 0) {
-                        // Player is not all-in, so he competes for the whole pot.
-                        potShare = pot / winners.size();
-                    } else {
-                        // Player is not all-in, so he competes for his pot.
-                    	int temp = potShare - (rake/winners.size()) / winners.size();
-                    	rake = temp % winners.size();
-                    	potShare = (potShare - rake) / winners.size();
-                    }
-                    
-                    // Give the player his share of the pot.
-                    player.win(potShare);
-                    tempPot -= potShare;
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
-                    
-                    sb.append(String.format("%s wins %d with %s\n", player.getName(), potShare, handValue.toString()));
-                    
-                    // If there is no more pot to divide, we're done.
-                    if (tempPot == 0) {
-                        break;
-                    } else {
-                    	// TODO: if this is uneven chips that couldn't be divided, add to rake not next player
-                    	pot = tempPot;
-                    }
-                }
+                // Add this pot's rake to the total rake
+        		totalrake += rake;
+	    	} else {
+	    		// Only one player, pot is returned.
+	    		Player returnee = side.getPlayers().get(0);
+	    		int returned = side.getPot() - totalbet;
+	    		returnee.win( returned );
+	    		
+            	String out = Strings.PotReturned.replaceAll("%winner", returnee.getName());
+            	out = out.replaceAll("%amount", Integer.toString(returned));
+            	out = out.replaceAll("%id", Integer.toString(tableID));
+            	out = out.replaceAll("%hID", Integer.toString(handID));
+            	ircClient.sendIRCMessage( ircChannel, out );
+	    	}
 
-                ircClient.sendIRCMessage( ircChannel, sb.toString() );
-                
-                if (tempPot > 0) {
-                	rake += tempPot;
-                    EventLog.info("Rake was had to clear the remains of the pot as rake", "Table", "doShowdown");
-                }
-                break;
-            }
-        }
-        ircClient.sendIRCMessage( ircChannel, "Rake: " + Integer.toString(rake) );
+    		// Each side pot contains the previous pot's total, so remove it
+    		totalbet = side.getBet();
+    		totalpot = side.getPot();
+    		
+    		// Increase pot number
+    		i++;
+    	}
+    	
+    	// Announce rake
+    	String out = Strings.RakeTaken.replaceAll("%rake", Integer.toString(totalrake));
+    	out = out.replaceAll("%id", Integer.toString(tableID));
+    	out = out.replaceAll("%hID", Integer.toString(handID));
+        ircClient.sendIRCMessage( ircChannel, out );
         nextHand();
     }
 	
     /**
      * Returns the active players mapped and sorted by their hand value.
      * 
+     * @param player_list The list of players to compare
+     * 
      * @return The active players mapped by their hand value (sorted). 
      */
-    private Map<HandValue, List<Player>> getRankedPlayers() {
+    private synchronized Map<HandValue, List<Player>> getRankedPlayers(List<Player> player_list) {
 		Map<HandValue, List<Player>> winners = new TreeMap<HandValue, List<Player>>();
-		for (Player player : activePlayers) {
+		for (Player player : player_list) {
 	            // Create a hand with the community cards and the player's hole cards.
 	            Hand hand = null;
 	            try {
@@ -1340,7 +1423,7 @@ public class Table extends Room {
      * 
      * @param player The winning player.
      */
-    private void playerWins(Player player) {
+    private synchronized void playerWins(Player player) {
     	// Rake
 		// None if only the blinds are in
 		// Otherwise Minimum or RakePercent whichever is greater 
@@ -1358,6 +1441,9 @@ public class Table extends Room {
     	pot = pot - rake;
     	
         player.win(pot);
+        
+        // Add to DB
+        Database.getInstance().setHandWinner(handID, player.getName(), pot);
         
         // Announce
         String out = Strings.PlayerWins.replaceAll("%hID", Integer.toString(handID));
@@ -1377,7 +1463,7 @@ public class Table extends Room {
     /**
      * Schedules the wait for players timer
      */
-    private void scheduleWaitForPlayers() {
+    private synchronized void scheduleWaitForPlayers() {
 		waitForPlayersTimer = new Timer();
 		waitForPlayersTimer.schedule(new TableTask( this, TableTask.WaitForPlayersTaskName),
 				Strings.WaitingForPlayersSecs*1000);
@@ -1386,12 +1472,12 @@ public class Table extends Room {
     /**
      * Rotates the position of the player in turn (the actor).
      */
-    private void rotateActor() {
+    private synchronized void rotateActor() {
         if (activePlayers.size() > 0) {
             do {
                 actorPosition = (actorPosition + 1) % players.size();
                 actor = players.get(actorPosition);
-            } while (!activePlayers.contains(actor) || actor.isBroke());
+            } while (!activePlayers.contains(actor));
         } else {
             // Should never happen.
             throw new IllegalStateException("No active players left");
@@ -1401,7 +1487,7 @@ public class Table extends Room {
     /**
      * This method handles when a user didn't respond and is automatically folded.
      */
-    private void noActionReceived() {
+    private synchronized void noActionReceived() {
     	// Announce    	
     	String out = Strings.NoAction.replaceAll("%hID", Integer.toString(handID) );
     	out = out.replaceAll("%actor", actor.getName() );
@@ -1414,10 +1500,11 @@ public class Table extends Room {
     /**
      * Posts the small blind.
      */
-    private void postSmallBlind() {
+    private synchronized void postSmallBlind() {
         final int smallBlind = bigBlind / 2;
         actor.postSmallBlind(smallBlind);
         pot += smallBlind;
+        playerBets.put(actor, smallBlind);
 
         String out = Strings.SmallBlindPosted.replaceAll("%sb", Integer.toString(smallBlind) );
         out = out.replaceAll("%player", actor.getName() );
@@ -1434,19 +1521,27 @@ public class Table extends Room {
     /**
      * Posts the big blind.
      */
-    private void postBigBlind() {
+    private synchronized void postBigBlind() {
         actor.postBigBlind(bigBlind);
         pot += bigBlind;
+        playerBets.put(actor, bigBlind);
 
         String out = Strings.BigBlindPosted.replaceAll("%bb", Integer.toString(bigBlind) );
         out = out.replaceAll("%player", actor.getName() );
         ircClient.sendIRCMessage( ircChannel, out );
+        
+		try {
+			rotateActor();
+		} catch (IllegalStateException e) {
+			EventLog.fatal(e,"Table", "postBigBlind");
+			System.exit(1);
+		}
     }
 	
     /**
      * Deals the Hole Cards.
      */
-    private void dealHoleCards() {
+    private synchronized void dealHoleCards() {
         for (int i = 0; i < activePlayers.size(); i++) {
         	// Order from left of dealer
         	int position = (dealerPosition + i + 1) % activePlayers.size();
@@ -1474,7 +1569,7 @@ public class Table extends Room {
      * @param phaseName The name of the phase.
      * @param noOfCards The number of cards to deal.
      */
-    private void dealCommunityCards(String phaseName, int noOfCards) {
+    private synchronized void dealCommunityCards(String phaseName, int noOfCards) {
     	String cardstr = "";
         for (int i = 0; i < noOfCards; i++) {
         	Card card = deck.deal();
@@ -1526,6 +1621,9 @@ public class Table extends Room {
         currentRound = 0;
         handActive = false;
         List<Player> remove_list = new ArrayList<Player>();
+        playerBets = new HashMap<Player,Integer>();
+        
+		sidePots.clear();
         
         activePlayers.clear();
         for (Player player : players) {
@@ -1534,6 +1632,7 @@ public class Table extends Room {
            	if (player.isBroke()) {
            		remove_list.add(player);
            	}
+           	playerBets.put( player, 0 );
            	
            	// Only add non-sat out players to activePlayers
             if (!remove_list.contains(player)) {
@@ -1544,7 +1643,9 @@ public class Table extends Room {
         
         // Sit all broke players out.
         for (Player player: remove_list) {
-       		ircClient.sendIRCMessage(ircChannel, Strings.OutOfChips.replaceAll("%player", player.getName()));
+        	String out = Strings.OutOfChips.replaceAll("%player", player.getName());
+        	out = out.replaceAll("%id", Integer.toString(tableID));
+       		ircClient.sendIRCMessage(ircChannel, out);
         	playerSitsOut(player);
         }
         
@@ -1559,7 +1660,7 @@ public class Table extends Room {
         		actorPosition = (dealerPosition + 1) % activePlayers.size();
         	}
         	actor = activePlayers.get(actorPosition);
-        	int bbPosition = (actorPosition + 1) % players.size();
+        	int bbPosition = (actorPosition + 1) % activePlayers.size();
         
 	        minBet = bigBlind;
 	        bet = minBet;
@@ -1583,6 +1684,7 @@ public class Table extends Room {
 	        dealHoleCards();
 	        doBettingRound();
         } else {
+        	actor = null;
         	handActive = false;
         	// not enough players
 			scheduleWaitForPlayers();
@@ -1592,7 +1694,7 @@ public class Table extends Room {
     /**
      * Shuts down this table when we have no active or sat out players
      */
-    private void closeTable() {
+	private synchronized void closeTable() {
     	tables.remove(tableID);
 		ircClient.closeTable( this );
 		this.interrupt();
@@ -1618,12 +1720,15 @@ public class Table extends Room {
 			for (Player player: playerlist) {
 				if (player.getName().compareToIgnoreCase(nick) == 0) {
 					ircClient.voice(ircChannel, nick);
+					if ( satOutPlayers.contains(player ) ) { playerSitsDown( player ); }
 					break;
 				}
 			}
 			// user didn't exist, devoice
-			ircClient.deOp(ircChannel, nick);
-			ircClient.deVoice(ircChannel, nick);
+			if ( nick.compareToIgnoreCase(ircClient.getNick()) != 0 ) {
+				ircClient.deOp(ircChannel, nick);
+				ircClient.deVoice(ircChannel, nick);
+			}
 		}
 				
 		if (disconnected) {
@@ -1635,7 +1740,7 @@ public class Table extends Room {
 	 * Used to cancel the currently running hand
 	 * Generally called after a disconnect
 	 */
-	public void cancelHand() {
+	public synchronized void cancelHand() {
 		for (Player player: players)	{
 			player.cancelBet();
 		}
@@ -1645,5 +1750,72 @@ public class Table extends Room {
 		if (startGameTimer != null) startGameTimer.cancel();
 		
 		disconnected = true;
+	}
+	
+	/**
+	 * Calculates the players in each side pot and the amount of each
+	 */
+	private synchronized void calculateSidePots() {
+		// Reset the sidepots
+		sidePots.clear();
+		
+		// For each unique "all-in" bet amount, create a new sidepot
+		List<Integer> sidepot_amounts = new ArrayList<Integer>();
+		for (Player player: activePlayers) {
+			if (player.isBroke()) {
+				// Player is all in, do we have a side pot for this size?
+				// If not, create one
+				int totalbet = player.getTotalBet();
+				if ( !sidepot_amounts.contains( totalbet ) ) {
+					sidePots.add( new SidePot( totalbet ) );
+					sidepot_amounts.add( totalbet );
+				}
+			}
+		}
+		
+		// For each player that has any chips in the pot,
+		// add them or their chips to the sidePots
+		for (SidePot sidepot: sidePots) {
+			for (Entry<Player, Integer> entry: playerBets.entrySet()) {
+				Integer pbet = entry.getValue();
+				if ( pbet >= sidepot.getBet() ) {
+					sidepot.call( entry.getKey() );
+				} else {
+					sidepot.add( pbet );
+				}
+			}
+		}
+		
+        // Order the pots (ascending)
+        Collections.sort( sidePots );
+	}
+	
+	/**
+	 * Finds a player object with a specific name
+	 * 
+	 * @param name the player name
+	 * @return the player
+	 */
+	private Player findPlayer(String name) {
+		Player found = null;
+		// find the player
+		for (Player plyr: players) {
+			if (plyr.getName().compareToIgnoreCase( name ) == 0) {
+				found = plyr;
+				break;
+			}
+		}
+		
+		// check if they are sat out
+		if (found == null) {
+			for (Player plyr: satOutPlayers) {
+				if (plyr.getName().compareToIgnoreCase( name ) == 0) {
+					found = plyr;
+					break;
+				}
+			}
+		}
+		
+		return found;
 	}
 }
