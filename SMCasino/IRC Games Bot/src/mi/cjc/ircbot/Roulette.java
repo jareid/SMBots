@@ -438,7 +438,7 @@ public class Roulette implements IRCGame {
 		HashMap<Integer,Integer> retList = new HashMap<Integer,Integer>();
 		retList.put(1, this.delay); // 1 is for ending game / starting a new game
 		retList.put(2, -this.delay);
-		return retList;
+		return retList; 
 	}
 
 	@Override
