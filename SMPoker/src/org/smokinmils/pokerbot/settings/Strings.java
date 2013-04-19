@@ -129,13 +129,13 @@ public final class Strings {
 	public static final String CheckCommand = CommandChar + "c";
 	public static final String CheckCommand_Desc = "%b%c12Check on the current round" +
 												   "%b%c12Aliases: !c / !check / !call all work for this command";
-	public static final String CheckCommand_Format = CheckCommand + "";
+	public static final String CheckCommand_Format = "%b%c12" + CheckCommand + "";
 	public static final String[] CheckCommand_Alternatives = {"!check", "!call"};
 	
 	public static final String BetCommand = CommandChar + "r";
 	public static final String BetCommand_Desc = "%b%c12Place a bet/Raise for the current round.\n " +
 												 "%b%c12Aliases: !bet / !raise / !b / !r all work for this command";
-	public static final String BetCommand_Format = "%b%c12" + BetCommand + "<amount>";
+	public static final String BetCommand_Format = "%b%c12" + BetCommand + " <amount>";
 	public static final String[] BetCommand_Alternatives = {"!b", "!bet", "!raise"};
 	
 	public static final String FoldCommand = CommandChar + "f";
@@ -149,11 +149,16 @@ public final class Strings {
 	public static final String TblChipsCommand_Desc = "%b%c12Check the amount of chips you have on the table";
 	public static final String TblChipsCommand_Format = TblChipsCommand + "";
 	
+	public static final String ShowCommand = CommandChar + "s";
+	public static final String ShowCommand_Desc = "%b%c12Shows your hole cards at the end of a hand";
+	public static final String ShowCommand_Format = ShowCommand + "";
+	public static final String[] ShowCommand_Alternatives = {"!show"};
+	
 	public static final String RebuyCommand = CommandChar + "rebuy";
 	public static final String RebuyCommand_Desc = "%b%c12Rebuys chips for this table\n"
 												 + "%b%c12You are only allowed to re-purchase chips if you have less than the table maximum"
 												 + "%b%c12Chips can be bought to make your total equal the maxium";
-	public static final String RebuyCommand_Format = "%b%c12" + RebuyCommand + "<amount>";
+	public static final String RebuyCommand_Format = "%b%c12" + RebuyCommand + " <amount>";
 	
 	public static final String SitDownCommand = CommandChar + "sitdown";
 	public static final String SitDownCommand_Desc = "%b%c12Sit back down and start playing";
@@ -212,6 +217,8 @@ public final class Strings {
 
 	public static final String CheckChips =  "%b%c12[Table %c04%id%c12] You currently have %c04%creds%c12 chips on the table";
 	public static final String CheckChipsFailed =  "%b%c12[Table %c04%id%c12] You are not currently seated on the table";
+	public static final String CheckChipsUser =  "%b%c12[Table %c04%id%c12] %c04%user%c12 currently has %c04%creds%c12 chips on the table";
+	public static final String CheckChipsUserFailed =  "%b%c12[Table %c04%id%c12] %c04%user%c12 is not currently seated on the table";
 	
 	/**
 	 * This string is used to specify the message sent when a user checks their credit in the system
@@ -353,8 +360,6 @@ public final class Strings {
 	 * %maxP - maximum number of players on the table
 	 * %seatedP - number of players currently sat down
 	 */
-	public static final int MaxWaitCount = 20;
-	public static final int WaitingForPlayersSecs = 15;
 	public static final String WaitingForPlayersMsg = "%b%c12We are currently waiting for %need more players (%c04%seated%c12 of %c04%max%c12 seated) [Min: %c04%min%c12]";
 	
 	/**
@@ -367,7 +372,6 @@ public final class Strings {
 	 * %sb - Small blind
 	 * %seatedP - number of players currently sat down
 	 */
-	public static final int GameStartSecs = 10;
 	public static final String GameStartMsg = "%b%c12We now have %c04%seatedP%c12 players and the game (SB: %c04%sb%c12 / BB: %c04%bb%c12) will begin momentarily";
 	
 	
@@ -653,7 +657,7 @@ public final class Strings {
 	 * %action
 	 * %cmd
 	 */
-	public static final String AllowedActionString = "%action - %cmd";
+	public static final String AllowedActionString = "%n%c12%action - %c04%cmd%c12";
 
 
 	/**
@@ -681,4 +685,9 @@ public final class Strings {
 	 */
 	public static final String PotReturned = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%winner%c12 has been returned %c04%amount%c12 chips as there was no callers.";
 
+	public static final String StartShowCard = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Players can now show cards. Use %c04!show%c12 or %c04!s%c12 to show to show them. You have %c04%secs%c12 seconds.";	
+	public static final String ShowCards	 = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%who%c12 had %cards";	
+	public static final String ShowCardFailInHand = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Play is in progress, you can not show your cards.";	
+	public static final String ShowCardFailNotActive = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) You were not active in this hand.";	
+	public static final String ShowCardFailNoPlayer = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) You are not a player at the table.";	
 }

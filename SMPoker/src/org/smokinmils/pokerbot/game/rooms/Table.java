@@ -124,6 +124,10 @@ public class Table extends Room {
 	private Timer waitForPlayersTimer;
 	private int waitedCount;
 	
+	/** Timer to handle a request to show cards */
+	private Timer showCardsTimer;
+	private boolean canShow;
+	
 	/** Timer to start a game */
 	private Timer startGameTimer;
 	
@@ -142,11 +146,17 @@ public class Table extends Room {
 	/** Player bets */
 	private Map<Player,Integer> playerBets;
 	
+	/** Hand card strings */
+	private Map<String, String> phaseStrings;
+	
 	/** Rounds */
 	private static final int PREFLOP = 0;
 	private static final int FLOP 	 = 1;
+	private static final String FLOPSTR = "Flop";
 	private static final int TURN	 = 2;
+	private static final String TURNSTR = "Turn";
 	private static final int RIVER	 = 3;
+	private static final String RIVERSTR = "River";
 	
 	/** The round of the current hand */
 	private int currentRound;
@@ -174,6 +184,7 @@ public class Table extends Room {
 		activePlayers = new ArrayList<Player>();
 		satOutPlayers = new ArrayList<Player>();
         board = new ArrayList<Card>();
+        phaseStrings = new HashMap<String,String>();
 
 		sidePots = new ArrayList<SidePot>();
         
@@ -186,6 +197,8 @@ public class Table extends Room {
 		}
         
 		startGameTimer = null;
+		showCardsTimer = null;
+		canShow = false;
 		actionTimer = null;
 		waitForPlayersTimer = null;
 		waitedCount = 0;
@@ -478,13 +491,22 @@ public class Table extends Room {
     	}
     	
     	// Remove from our player list
-    	if (sat_out) {
-	    	satOutPlayers.remove(player);
-	    	// Cancel timer
-			if (player.getSittingOutTimer() != null) player.getSittingOutTimer().cancel();
-    	} else {
-    		players.remove(player);
-    	}
+		players.remove(player);
+	    satOutPlayers.remove(player);
+	    
+		// handle current hands
+		if (player == actor) {
+	    	onAction(ActionType.FOLD, "", true);
+		} else if (activePlayers.contains(player)) {
+			playersToAct--;
+	    	activePlayers.remove(player);
+			if (activePlayers.size() == 1) {
+				playerWins(activePlayers.get(0));
+			}
+		}
+	    
+	    // Cancel timer
+		if (player.getSittingOutTimer() != null) player.getSittingOutTimer().cancel();
 		
 		// Announce
 		String out = Strings.PlayerLeaves.replaceAll("%id", Integer.toString(tableID) );
@@ -518,7 +540,12 @@ public class Table extends Room {
      */
     private synchronized void playerSitsOut(Player player) {
     	// Cancel timer
-		player.scheduleSitOut(this);
+		player.scheduleSitOut(this); 
+		
+		// Switch the player lists
+    	players.remove(player);
+    	satOutPlayers.add(player); 
+		player.setSatOut(true);
     	
 		// handle current hands
 		if (player == actor) {
@@ -527,14 +554,10 @@ public class Table extends Room {
 			playersToAct--;
 	    	activePlayers.remove(player);
 			if (activePlayers.size() == 1) {
+				actor = null;
 				playerWins(activePlayers.get(0));
 			}
-		} 
-		
-		// Switch the player lists
-    	players.remove(player);
-    	satOutPlayers.add(player); 
-		player.setSatOut(true);
+		}
     	
     	// Announce
 		String out = Strings.PlayerSitsOut.replaceAll("%id", Integer.toString(tableID));
@@ -592,8 +615,12 @@ public class Table extends Room {
 					invalidArguments( sender, cmd.getFormat() );
 				}
 				break;
+			case SHOW:
+				onShow(sender, login, hostname, restofmsg);
+				break;
 			case TBLCHIPS:
 				onChips(sender, login, hostname, restofmsg);
+				break;
 			case REBUY:
 				onRebuy(sender, login, hostname, restofmsg);
 				break;
@@ -716,7 +743,7 @@ public class Table extends Room {
    protected synchronized void onTimer(String timerName) {	   
 	   switch (timerName) {
 	   case TableTask.ActionTaskName:
-		   if (!actionReceived) {
+		   if (!actionReceived && actor != null) {
 			   String out = Strings.NoActionWarning.replaceAll("%hID", Integer.toString(handID) );
 		    	out = out.replaceAll("%actor", actor.getName() );
 		    	out = out.replaceAll("%secs", Integer.toString(Variables.ActionWarningTimeSecs) );
@@ -732,6 +759,11 @@ public class Table extends Room {
 		   if (!actionReceived) {
 			   noActionReceived();
 		   }
+		   break;
+	   case TableTask.ShowCardTaskName:
+		   if (showCardsTimer != null) showCardsTimer.cancel();
+		   canShow = false;
+		   nextHand();
 		   break;
 	   case TableTask.StartGameTaskName:
 		   if (startGameTimer != null) startGameTimer.cancel();
@@ -749,7 +781,7 @@ public class Table extends Room {
 		   if (waitForPlayersTimer != null) waitForPlayersTimer.cancel();
 			// Do we need players at the table?
 			if (getNoOfPlayers() == 0) {
-				if (createdManually && waitedCount > Strings.MaxWaitCount) closeTable();
+				if (createdManually && waitedCount > Variables.MaxWaitCount) closeTable();
 				else {
 					waitedCount++;					
 					scheduleWaitForPlayers();
@@ -768,7 +800,7 @@ public class Table extends Room {
 			} else {
 				String out = Strings.GameStartMsg.replaceAll("%bb", Integer.toString(getBigBlind()) );
 				out = out.replaceAll("%sb", Integer.toString(getSmallBlind()) );
-				out = out.replaceAll("%secs", Integer.toString(Strings.GameStartSecs) );
+				out = out.replaceAll("%secs", Integer.toString(Variables.GameStartSecs) );
 				out = out.replaceAll("%seatedP", Integer.toString(getPlayersSatDown()) );
 				ircClient.sendIRCMessage(ircChannel, out);
 
@@ -777,7 +809,7 @@ public class Table extends Room {
 				// Schedule the game to start
 				startGameTimer = new Timer();
 				startGameTimer.schedule(new TableTask( this, TableTask.StartGameTaskName ),
-						Strings.GameStartSecs*1000);
+						Variables.GameStartSecs*1000);
 			}
 		   break;
 	   }
@@ -799,13 +831,67 @@ public class Table extends Room {
 			if (found != null) {
 				String out = Strings.CheckChips.replaceAll( "%id", Integer.toString(tableID) );
 				out = out.replaceAll( "%creds", Integer.toString(found.getChips()) );		
-				ircClient.sendIRCMessage( ircChannel, out );
+				ircClient.sendIRCNotice( sender, out );
 			} else {
 				String out = Strings.CheckChipsFailed.replaceAll( "%id", Integer.toString(tableID) );	
-				ircClient.sendIRCMessage( ircChannel, out );
+				ircClient.sendIRCNotice( sender, out );
+			}
+		} else if ((msg.length == 1 && msg[0].compareTo("") != 0)) {		
+			Player found = findPlayer( msg[0] );
+				
+			if (found != null) {
+				String out = Strings.CheckChipsUser.replaceAll( "%id", Integer.toString(tableID) );
+				out = out.replaceAll( "%user", msg[0] );
+				out = out.replaceAll( "%creds", Integer.toString(found.getChips()) );		
+				ircClient.sendIRCNotice( sender, out );
+			} else {
+				String out = Strings.CheckChipsUserFailed.replaceAll( "%id", Integer.toString(tableID) );
+				out = out.replaceAll( "%user", msg[0] );	
+				ircClient.sendIRCNotice( sender, out );
 			}
 		} else {
 			invalidArguments( sender, CommandType.TBLCHIPS.getFormat() );
+		}
+	}
+	
+   /**
+	* This method handles the chips command
+	*
+	* @param sender The nick of the person who sent the message.
+    * @param login The login of the person who sent the message.
+    * @param hostname The hostname of the person who sent the message.
+    * @param message The actual message sent to the channel.
+	*/	
+	private synchronized void onShow(String sender, String login, String hostname, String message) {
+		Player found = findPlayer( sender );
+		
+		if (found == null) {
+			String out = Strings.ShowCardFailNoPlayer.replaceAll( "%id", Integer.toString(tableID) );
+			out = out.replaceAll( "%hID", Integer.toString(handID) );
+			ircClient.sendIRCNotice( sender, out );
+		} else if (found.getCards().length == 0) {
+			String out = Strings.ShowCardFailNotActive.replaceAll( "%id", Integer.toString(tableID) );
+			out = out.replaceAll( "%hID", Integer.toString(handID) );
+			ircClient.sendIRCNotice( sender, out );			
+		} else if (!canShow) {
+			String out = Strings.ShowCardFailInHand.replaceAll( "%id", Integer.toString(tableID) );
+			out = out.replaceAll( "%hID", Integer.toString(handID) );
+			ircClient.sendIRCNotice( sender, out );					
+		} else {
+        	Card[] cards = found.getCards();
+        	String cardstr = "%n[";
+        	for (int i = 0; i < cards.length; i++) {
+        		if (cards[i] != null) {
+                    cardstr = cardstr + cards[i].toIRCString() + "%n ";        			
+        		}
+        	}
+			cardstr += "] ";
+			
+			String out = Strings.ShowCards.replaceAll( "%id", Integer.toString(tableID) );
+			out = out.replaceAll( "%hID", Integer.toString(handID) );
+			out = out.replaceAll( "%who", found.getName() );
+			out = out.replaceAll( "%cards", cardstr );
+			ircClient.sendIRCMessage( ircChannel, out );			
 		}
 	}
 	
@@ -888,7 +974,6 @@ public class Table extends Room {
 			boolean is_active = (found != null ? players.contains(found) : false);
 
 			if (found != null) { 
-				if (found.getSittingOutTimer() != null) found.getSittingOutTimer().cancel();
 				playerLeaves(found, is_active);
 			} else {
 				EventLog.log(sender + "failed to leave as they should not have been voiced.", "Table", "onLeave");
@@ -964,11 +1049,11 @@ public class Table extends Room {
 		Set<ActionType> allowed = getAllowedActions(actor);
 		String actions = allowed.toString();
 		if ( allowed.contains(ActionType.CALL) )
-			actions += " {" + (bet - actor.getBet()) + " to call}";
+			actions += " {%c04" + (bet - actor.getBet()) + "%c12 to call}";
 		if ( allowed.contains(ActionType.BET) )
-			actions += " {" + minBet + " to bet}";
+			actions += " {%c04" + minBet + "%c12 to bet}";
 		if ( allowed.contains(ActionType.RAISE) )
-			actions += " {" + ((bet - actor.getBet()) + minBet) + " to raise}";
+			actions += " {%c04" + ((bet - actor.getBet()) + minBet) + "%c12 to raise}";
 		
 		String out = Strings.GetAction.replaceAll( "%hID", Integer.toString(handID) );
 		out = out.replaceAll( "%actor", actor.getName() );
@@ -1012,7 +1097,7 @@ public class Table extends Room {
                 if (activePlayers.size() > 1) {
                     bet = 0;
                     minBet = bigBlind;
-                    dealCommunityCards("Flop", 3);
+                    dealCommunityCards(FLOPSTR, 3);
                     doBettingRound();
                 }
     			break;
@@ -1020,7 +1105,7 @@ public class Table extends Room {
     			currentRound++;
                 if (activePlayers.size() > 1) {
                     bet = 0;
-                    dealCommunityCards("Turn", 1);
+                    dealCommunityCards(TURNSTR, 1);
                     minBet = bigBlind;
                     doBettingRound();
                 }
@@ -1029,7 +1114,7 @@ public class Table extends Room {
     			currentRound++;
                 if (activePlayers.size() > 1) {
                     bet = 0;
-                    dealCommunityCards("River", 1);
+                    dealCommunityCards(RIVERSTR, 1);
                     minBet = bigBlind;
                     doBettingRound();
                 }
@@ -1377,7 +1462,8 @@ public class Table extends Room {
     	out = out.replaceAll("%id", Integer.toString(tableID));
     	out = out.replaceAll("%hID", Integer.toString(handID));
         ircClient.sendIRCMessage( ircChannel, out );
-        nextHand();
+
+        startShowCards();
     }
 	
     /**
@@ -1456,8 +1542,7 @@ public class Table extends Room {
         
         pot = 0;
         
-        // start next hand
-        nextHand();
+        startShowCards();
     }
     	
     /**
@@ -1466,7 +1551,7 @@ public class Table extends Room {
     private synchronized void scheduleWaitForPlayers() {
 		waitForPlayersTimer = new Timer();
 		waitForPlayersTimer.schedule(new TableTask( this, TableTask.WaitForPlayersTaskName),
-				Strings.WaitingForPlayersSecs*1000);
+				Variables.WaitingForPlayersSecs*1000);
     }
     
     /**
@@ -1582,25 +1667,26 @@ public class Table extends Room {
             board.add( card );
             cardstr = cardstr + card.toIRCString() + "%n ";
         }
+        phaseStrings.put(phaseName, cardstr);
+        
+        String board_out = createBoardOutput(phaseName);
         
         // Notify channel of the card(s) dealt
    	 	String out = Strings.CommunityDealt.replaceAll("%hID", Integer.toString(handID));
    		out = out.replaceAll("%round", phaseName );
-   		out = out.replaceAll("%cards", cardstr );
+   		out = out.replaceAll("%cards", board_out );
    		ircClient.sendIRCMessage( ircChannel, out );
    	 
    		// Notify each player of all their cards
         for (Player player : activePlayers) {
         	Card[] cards = player.getCards();
-        	cardstr = "";
+        	cardstr = " %n[";
         	for (int i = 0; i < cards.length; i++) {
         		if (cards[i] != null) {
                     cardstr = cardstr + cards[i].toIRCString() + "%n ";        			
         		}
         	}
-        	for (int i = 0; i < board.size(); i++) {
-               cardstr = cardstr + board.get(i).toIRCString() + "%n ";
-        	}
+			cardstr += "] " + board_out;
         	
        	 	out = Strings.CommunityDealtPlayer.replaceAll("%hID", Integer.toString(handID));
        	    out = out.replaceAll("%id", Integer.toString(tableID) );
@@ -1622,6 +1708,7 @@ public class Table extends Room {
         handActive = false;
         List<Player> remove_list = new ArrayList<Player>();
         playerBets = new HashMap<Player,Integer>();
+        phaseStrings.clear();
         
 		sidePots.clear();
         
@@ -1653,7 +1740,7 @@ public class Table extends Room {
         	handActive = true;
         	deck.shuffle();        
     		
-        	dealerPosition = (dealerPosition + 1) % activePlayers.size();
+        	dealerPosition = (dealerPosition + activePlayers.size() - 1) % activePlayers.size();
         	if (players.size() == 2) {
 	        	actorPosition = dealerPosition;
         	} else {
@@ -1817,5 +1904,39 @@ public class Table extends Room {
 		}
 		
 		return found;
+	}
+	
+	/**
+	 * Creates the public output of cards for the board
+	 * 
+	 * @param phaseName The current board
+	 * @return the cards output
+	 */
+	private String createBoardOutput(String phaseName) {
+		String output = "";
+		if (phaseName.compareTo(FLOPSTR) == 0) {
+			output = phaseStrings.get(FLOPSTR);
+		} else if (phaseName.compareTo(TURNSTR) == 0) {
+			output = phaseStrings.get(FLOPSTR) + "| ";
+			output += phaseStrings.get(TURNSTR);
+		} else if (phaseName.compareTo(RIVERSTR) == 0) {
+			output = phaseStrings.get(FLOPSTR) + "| ";
+			output += phaseStrings.get(TURNSTR) + "| ";
+			output += phaseStrings.get(RIVERSTR);
+		}
+		return output;
+	}
+	
+	/**
+	 * Enables the ability for players to show cards.
+	 */
+	private void startShowCards() {
+        canShow = true;
+		String out = Strings.StartShowCard.replaceAll( "%id", Integer.toString(tableID) );
+		out = out.replaceAll( "%hID", Integer.toString(handID) );
+		out = out.replaceAll( "%secs", Integer.toString(Variables.ShowCardSecs));
+		ircClient.sendIRCMessage( ircChannel, out );					
+        showCardsTimer = new Timer();
+        showCardsTimer.schedule( new TableTask( this, TableTask.ShowCardTaskName), Variables.ShowCardSecs*1000 );
 	}
 }

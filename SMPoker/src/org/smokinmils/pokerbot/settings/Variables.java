@@ -39,6 +39,14 @@ public class Variables {
 	
 	public static final int AnnounceMins = 5;
 	
+	public static final int MaxWaitCount = 15;
+	
+	public static final int WaitingForPlayersSecs = 30;
+	
+	public static final int GameStartSecs = 10;
+	
+	public static final int ShowCardSecs = 10;
+	
 	public static final int MinimumRake = 1;
 	public static final int MaximumRake = 100;
 	public static final int RakePercentage = 5;

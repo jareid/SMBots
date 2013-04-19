@@ -902,9 +902,9 @@ public class Database {
 	   Connection conn = null;
 	   Statement stmt = null;
 	   String sql = "UPDATE " + DBSettings.Table_Hands +
-				    "SET " + DBSettings.Col_Hands_WinnerID + " = (" + getUserIDSQL(username) + ")"
-				           + DBSettings.Col_Hands_Amount + " = " + Integer.toString(pot) + " " +
-	   				"WHERE " + DBSettings.Col_Hands_ID + " = " + Integer.toString(hand_id);
+				    " SET " + DBSettings.Col_Hands_WinnerID + " = (" + getUserIDSQL(username) + "), "
+				           + DBSettings.Col_Hands_Amount + " = '" + Integer.toString(pot) + "' " +
+	   				"WHERE " + DBSettings.Col_Hands_ID + " = '" + Integer.toString(hand_id) + "'";
 	   
 	   try {
 		   conn = getConnection();
