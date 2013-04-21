@@ -23,6 +23,7 @@ public class TableTask extends TimerTask {
 	public static final String WaitForPlayersTaskName = "WaitForPlayers";
 	public static final String ActionTaskName = "Action";
 	public static final String ActionWarningTaskName = "ActionWarning";
+	public static final String ShowCardTaskName = "ShowCards";
 	
 	/**Name of this timer used for when it completes */
 	private String taskName;

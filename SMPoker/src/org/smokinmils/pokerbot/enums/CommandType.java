@@ -26,7 +26,8 @@ public enum CommandType {
 	WATCHTBL(Strings.WatchTlCommand, Strings.WatchTlCommand_Desc, Strings.WatchTlCommand_Format),
 	TABLES	(Strings.TablesCommand,  Strings.TablesCommand_Desc,  Strings.TablesCommand_Format),
 	JOIN	(Strings.JoinCommand, 	 Strings.JoinCommand_Desc,    Strings.JoinCommand_Format),
-	PROMOS	(Strings.PromosCommand,  Strings.PromosCommand_Desc,  Strings.PromosCommand_Format),
+	PROMOS	(Strings.PromosCommand,  Strings.PromosCommand_Desc,  Strings.PromosCommand_Format,
+			Strings.PromosCommand_Alternatives),
 	/*GIVE	(Strings.GiveCommand,	 Strings.GiveCommand_Desc,	  Strings.GiveCommand_Format),*/
 	PROFILE	(Strings.ProfileCommand, Strings.ProfileCommand_Desc, Strings.ProfileCommand_Format),
 	PROFILES(Strings.ProfilesCommand,Strings.ProfilesCommand_Desc,Strings.ProfileCommand_Format),
@@ -38,6 +39,8 @@ public enum CommandType {
 	 		 Strings.BetCommand_Alternatives),
 	FOLD 	(Strings.FoldCommand,    Strings.FoldCommand_Desc,    Strings.FoldCommand_Format,
 			 Strings.FoldCommand_Alternatives),
+	SHOW 	(Strings.ShowCommand,    Strings.ShowCommand_Desc,    Strings.ShowCommand_Format,
+			 Strings.ShowCommand_Alternatives),
 	TBLCHIPS(Strings.TblChipsCommand,Strings.TblChipsCommand_Desc,Strings.TblChipsCommand_Format),
 	REBUY	(Strings.RebuyCommand,   Strings.RebuyCommand_Desc,   Strings.RebuyCommand_Format),
 	SITDOWN (Strings.SitDownCommand, Strings.SitDownCommand_Desc, Strings.SitDownCommand_Format),
