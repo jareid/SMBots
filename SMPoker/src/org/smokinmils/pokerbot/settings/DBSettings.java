@@ -117,6 +117,7 @@ public class DBSettings {
 	public static final String PokerBuyIn = "pokerbuy";
 	public static final String PokerCashOut = "pokercash";
 	public static final String TransAdmin = "admin";
+	public static final String PokerJackpot = "pkrjackpot";
 	
 	/** Table that stores information about the IRC users */
 	public static final String Table_Users = "users";

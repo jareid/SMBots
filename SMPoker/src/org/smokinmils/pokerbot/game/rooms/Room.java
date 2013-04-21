@@ -13,13 +13,14 @@ import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.smokinmils.logging.EventLog;
+
 import org.jibble.pircbot.Colors;
 import org.smokinmils.pokerbot.Client;
 import org.smokinmils.pokerbot.enums.CommandType;
 import org.smokinmils.pokerbot.enums.EventType;
 import org.smokinmils.pokerbot.enums.RoomType;
 import org.smokinmils.pokerbot.game.events.*;
-import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 
 /**
@@ -75,7 +76,6 @@ public class Room extends Thread {
 		boolean interuptted = false;
     	while ( !(Thread.interrupted() || interuptted) ) { 
         	if ( !Events.isEmpty() ) {
-        		EventLog.debug("Processing next event", "Room", "run");
                 Event event = Events.removeFirst();
                 try {
                 switch (event.Type) {
@@ -144,7 +144,6 @@ public class Room extends Thread {
 	public void addEvent( String sender, String login,
 						  String host, String extra,
 						  EventType type) {
-		EventLog.debug("New event added", "Room", "addEvent");
 		Events.addLast( new Event(sender, login, host, extra, type) );		
 	}
 	

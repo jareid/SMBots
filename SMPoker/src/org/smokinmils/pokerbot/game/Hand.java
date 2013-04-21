@@ -10,7 +10,7 @@ package org.smokinmils.pokerbot.game;
 
 import java.util.Collection;
 
-import org.smokinmils.pokerbot.logging.EventLog;
+import org.smokinmils.logging.EventLog;
 
 public class Hand { 
 	/** The maximum number of cards in a hand. */

@@ -8,11 +8,12 @@
  */ 
 package org.smokinmils.pokerbot;
 
+import org.smokinmils.logging.EventLog;
+
 import org.smokinmils.pokerbot.enums.EventType;
 import org.smokinmils.pokerbot.game.rooms.Lobby;
 import org.smokinmils.pokerbot.game.rooms.Room;
 import org.smokinmils.pokerbot.game.rooms.Table;
-import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
 import org.smokinmils.pokerbot.tasks.Reconnect;
@@ -154,16 +155,11 @@ public class Client extends PircBot {
 			sendStatusRequest( joinee );
 		} else {
 			if (channel.compareToIgnoreCase(lobbyChan) == 0) {
-				/* TODO: change to loops */
-				newTable(2, 8, 1, false);
-				//newTable(6, 8, 1, false);
-				//newTable(10, 8, 1, false);
-				newTable(2, 8, 2, false);
-				//newTable(6, 8, 2, false);
-				//newTable(10, 8, 2, false);
-				newTable(2, 8, 3, false);
-				newTable(6, 8, 3, false);
-				newTable(10, 8, 3, false);
+				Integer[] blinds = {2,6,10};
+				List<String> profiles = Database.getInstance().getProfileTypes();
+				for (Integer x: blinds)
+					for (int y = 1; y <= profiles.size(); y++) 
+						newTable(x, 8, y, false);
 			}
 		}
 		
@@ -374,7 +370,9 @@ public class Client extends PircBot {
 		this.sendMessage("ChanServ", "INVITE " + chan );
 		this.joinChannel( chan );
 		
-		sendIRCMessage( lobbyChan, table.formatTableInfo(Strings.NewTable) );
+		if (manual) {
+			sendIRCMessage( lobbyChan, table.formatTableInfo(Strings.NewTable) );
+		}
 		
 		return tableid;
 	}

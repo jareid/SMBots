@@ -11,10 +11,11 @@ package org.smokinmils.pokerbot.game.rooms;
 import java.util.List;
 import java.util.Timer;
 
+import org.smokinmils.logging.EventLog;
+
 import org.smokinmils.pokerbot.enums.ActionType;
 import org.smokinmils.pokerbot.game.Card;
 import org.smokinmils.pokerbot.game.Hand;
-import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Variables;
 import org.smokinmils.pokerbot.tasks.SittingOut;
 
@@ -336,11 +337,19 @@ public class Player {
 	public void setSatOut(boolean satout) { sittingOut = satout; }
 	
 	/**
-	 * 
-	 */
-	
+	 * Schedules a player to be removed from the tbale after sitting out.
+	 */	
 	public void scheduleSitOut(Table table)  {
 		sittingOutTimer = new Timer();
 		sittingOutTimer.schedule( new SittingOut( table, this ), Variables.MaxSitOutMins*1000*60 );
+	}
+	
+    /**
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+	public String toString() {
+		return this.name;
 	}
 }

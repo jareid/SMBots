@@ -6,7 +6,7 @@
  * 
  * Copyright (C) 2013 Jamie Reid
  */ 
-package org.smokinmils.pokerbot.logging;
+package org.smokinmils.logging;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

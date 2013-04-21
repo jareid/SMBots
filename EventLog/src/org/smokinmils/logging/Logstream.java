@@ -6,7 +6,7 @@
  * 
  * Copyright (C) 2013 Jamie Reid
  */ 
-package org.smokinmils.pokerbot.logging;
+package org.smokinmils.logging;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
