@@ -8,6 +8,14 @@
  */ 
 package org.smokinmils.pokerbot.game.rooms;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +30,9 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.jibble.pircbot.User;
+
+import org.smokinmils.logging.EventLog;
+
 import org.smokinmils.pokerbot.Client;
 import org.smokinmils.pokerbot.Database;
 import org.smokinmils.pokerbot.Utils;
@@ -33,7 +44,6 @@ import org.smokinmils.pokerbot.game.Deck;
 import org.smokinmils.pokerbot.game.Hand;
 import org.smokinmils.pokerbot.game.HandValue;
 import org.smokinmils.pokerbot.game.SidePot;
-import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
 import org.smokinmils.pokerbot.tasks.TableTask;
@@ -46,6 +56,9 @@ import org.smokinmils.pokerbot.tasks.TableTask;
 public class Table extends Room {	
 	/** Stores the most recent table's ID */
 	private static Integer CurrentID = 0;
+	
+	/** Jackpot random */
+    private static SecureRandom secureRandom = new SecureRandom();
 	
 	/** A map of all tables and their big blind */
 	private static Map<Integer,Integer> tables = new HashMap<Integer,Integer>();
@@ -68,6 +81,9 @@ public class Table extends Room {
 	
     /** The active players in the current hand. */
     private final List<Player> activePlayers;
+
+    /** The active players in the current hand. */
+    private final List<Player> jackpotPlayers;
     
     /** The players at the table but sitting out. */
     private final List<Player> satOutPlayers;
@@ -182,7 +198,8 @@ public class Table extends Room {
     	boolean failed = false;
 		players = new ArrayList<Player>();
 		activePlayers = new ArrayList<Player>();
-		satOutPlayers = new ArrayList<Player>();
+		satOutPlayers = new ArrayList<Player>();		
+		jackpotPlayers = new ArrayList<Player>();
         board = new ArrayList<Card>();
         phaseStrings = new HashMap<String,String>();
 
@@ -550,7 +567,7 @@ public class Table extends Room {
 		// handle current hands
 		if (player == actor) {
 	    	onAction(ActionType.FOLD, "", true);
-		} else if (activePlayers.contains(player)) {
+		} else if (activePlayers.contains(player) && !player.isBroke()) {
 			playersToAct--;
 	    	activePlayers.remove(player);
 			if (activePlayers.size() == 1) {
@@ -1076,7 +1093,7 @@ public class Table extends Room {
 		try {
 			rotateActor();
 	    	while (actor.isBroke() && playersToAct > 1) {
-	    		if (actor.isBroke()) playersToAct--;
+	    		playersToAct--;
 	    		rotateActor();
 	    	} 
 		} catch (IllegalStateException e) {
@@ -1238,8 +1255,7 @@ public class Table extends Room {
 		            
 		            // Re-calulate all the pots
 		            calculateSidePots();
-		            
-		            // TODO: add side pot output
+
 		            String out = Strings.TableAction.replaceAll("%hID", Integer.toString(handID));
 		            out = out.replaceAll("%actor", actor.getName());
 		            out = out.replaceAll("%action", action.getText());
@@ -1287,7 +1303,13 @@ public class Table extends Room {
     	for (Player p: activePlayers) {
     		if (p.isBroke()) playersToAct--;
     	}
-        
+    	
+    	EventLog.debug(Integer.toString(handID) + ": next betting round", "Table", "doBettingRound");
+    	EventLog.debug(Integer.toString(handID) + ": playersToAct = " + Integer.toString(playersToAct),
+    			 "Table", "doBettingRound");
+    	EventLog.debug(Integer.toString(handID) + ": activePlayers = " + activePlayers.toString(),
+   			 "Table", "doBettingRound");
+    	
         // Determine the initial player and bet size.
         if (board.size() == 0) {
             // Pre-Flop; player left of big blind starts, bet is the big blind.
@@ -1301,6 +1323,11 @@ public class Table extends Room {
             bet = 0;
             actorPosition = dealerPosition;
         }
+
+    	EventLog.debug(Integer.toString(handID) + ": dealerPosition = " + Integer.toString(dealerPosition),
+   			 "Table", "doBettingRound");
+    	EventLog.debug(Integer.toString(handID) + ": actorPosition = " + Integer.toString(actorPosition),
+      			 "Table", "doBettingRound");
         
         actionReceived(true);
     }
@@ -1363,9 +1390,17 @@ public class Table extends Room {
     	int totalrake = 0;
     	String potname = "";
     	int i = 0;
-    	for (SidePot side: sidePots) {
+    	for (SidePot side: sidePots) { 		
     		if (i == 0) potname = "Main Pot";
     		else potname = "Side Pot " + Integer.toString(i);
+    		
+     		if (side.getPot() < 0) {
+    			EventLog.log("Hand " + Integer.toString(handID) + " " + potname + " is less than 0, something went wrong!", "Table", "doShowdown");
+    			continue;
+    		} else if (side.getPot() == 0) {
+    			EventLog.log("Hand " + Integer.toString(handID) + " " + potname + " is 0, ignoring!", "Table", "doShowdown");
+    			continue;
+    		}
     		
     		// More than one player so decide the winner
     		if (side.getPlayers().size() > 1) {
@@ -1439,7 +1474,7 @@ public class Table extends Room {
 	    	} else {
 	    		// Only one player, pot is returned.
 	    		Player returnee = side.getPlayers().get(0);
-	    		int returned = side.getPot() - totalbet;
+	    		int returned = side.getBet() - totalbet;
 	    		returnee.win( returned );
 	    		
             	String out = Strings.PotReturned.replaceAll("%winner", returnee.getName());
@@ -1450,8 +1485,8 @@ public class Table extends Room {
 	    	}
 
     		// Each side pot contains the previous pot's total, so remove it
-    		totalbet = side.getBet();
     		totalpot = side.getPot();
+    		totalbet = side.getBet();
     		
     		// Increase pot number
     		i++;
@@ -1464,6 +1499,12 @@ public class Table extends Room {
         ircClient.sendIRCMessage( ircChannel, out );
 
         startShowCards();
+        
+        // Update the jackpot.
+    	updateJackpot(ircClient, totalrake, profileName);
+    	
+    	// Check if this hand wins.
+    	if ( checkJackpot() ) jackpotWon();
     }
 	
     /**
@@ -1542,7 +1583,13 @@ public class Table extends Room {
         
         pot = 0;
         
-        startShowCards();
+        startShowCards();        
+        
+        // Update the jackpot.
+    	updateJackpot(ircClient, rake, profileName);
+    	
+    	// Check if this hand wins.
+    	if ( checkJackpot() ) jackpotWon();
     }
     	
     /**
@@ -1609,6 +1656,7 @@ public class Table extends Room {
     private synchronized void postBigBlind() {
         actor.postBigBlind(bigBlind);
         pot += bigBlind;
+        bet = bigBlind;
         playerBets.put(actor, bigBlind);
 
         String out = Strings.BigBlindPosted.replaceAll("%bb", Integer.toString(bigBlind) );
@@ -1713,6 +1761,7 @@ public class Table extends Room {
 		sidePots.clear();
         
         activePlayers.clear();
+        jackpotPlayers.clear();
         for (Player player : players) {
             player.resetHand();
             // Remove players without chips
@@ -1724,6 +1773,7 @@ public class Table extends Room {
            	// Only add non-sat out players to activePlayers
             if (!remove_list.contains(player)) {
                 activePlayers.add(player);
+                jackpotPlayers.add(player);
             }
     		Database.getInstance().addPokerTableCount(player.getName(), tableID, profileID, player.getChips());
         }
@@ -1938,5 +1988,126 @@ public class Table extends Room {
 		ircClient.sendIRCMessage( ircChannel, out );					
         showCardsTimer = new Timer();
         showCardsTimer.schedule( new TableTask( this, TableTask.ShowCardTaskName), Variables.ShowCardSecs*1000 );
+	}
+	
+	
+	/**
+	 * Save the new jackpot value
+	 */
+	private static synchronized void updateJackpot(Client irc, int rake, String profile) {
+		try {
+			Integer jackpot = null;
+			try {
+				BufferedReader readFile = new BufferedReader(new FileReader("jackpot." + profile));
+				jackpot = Utils.tryParse(readFile.readLine()); 
+				readFile.close();
+			} catch (FileNotFoundException e) {
+			}
+			 
+			if (jackpot == null) jackpot = 0;		 
+			double incr = (rake * (Variables.JackpotRakePercentage / 100.0));
+			int incrint = (int) Math.round(incr);
+			
+			EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
+						 + Integer.toString(incrint) + " (" + Integer.toString(rake) + ")",
+						 "Table", "updateJackpot");
+			
+			if (incrint > 0) {
+				jackpot += incrint;
+				// Announce to lobbyChan
+				String out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(jackpot));
+				out = out.replaceAll("%profile", profile);
+				irc.sendIRCMessage(out);
+				 
+				// Write the jackpot back to file
+				FileWriter writeFile;
+				writeFile = new FileWriter("jackpot." + profile);
+				writeFile.write(jackpot + "\n");
+				writeFile.close();
+			}
+		} catch (IOException e1)  {
+    		irc.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
+    		EventLog.fatal(e1, "Table", "updateJackpot");
+    		StringWriter sw = new StringWriter();
+    		PrintWriter pw = new PrintWriter(sw);
+    		e1.printStackTrace(pw);
+    		EventLog.log(sw.toString(), "Table", "updateJackpot");
+    		try {
+				Thread.sleep(10);
+			} catch (InterruptedException inte) {
+			}
+    		System.exit(1);
+		}
+	}
+	
+	/**
+	 * Check if the jackpot has been won
+	 */
+	private static synchronized boolean checkJackpot() {
+		return (secureRandom.nextInt(Variables.JackpotChance + 1) == Variables.JackpotChance);		
+	}
+	
+	/**
+	 * Jackpot has been won, split between all players on the table
+	 */
+	private void jackpotWon() {
+		try {
+			Integer jackpot = null;
+			try {
+				BufferedReader readFile = new BufferedReader(new FileReader("jackpot." + profileName));
+				jackpot = Utils.tryParse(readFile.readLine()); 
+				readFile.close();
+			} catch (FileNotFoundException e) {
+			}
+			 
+			if (jackpot != null) {
+				int remainder = jackpot % players.size();
+				jackpot -= remainder;
+				
+				if (jackpot != 0) {
+					int win = jackpot / players.size();
+					for (Player player: jackpotPlayers) {
+						// TODO: change to a jackpot.
+						Database.getInstance().cashOut(player.getName(), win, profileID);
+					}
+					
+					// Announce to lobby
+					String out = Strings.JackpotWon.replaceAll("%chips", Integer.toString(jackpot));
+					out = out.replaceAll("%profile", profileName);
+					out = out.replaceAll("%winners", jackpotPlayers.toString());
+					ircClient.sendIRCMessage(out);
+					
+					// Announce to table
+					out = Strings.JackpotWonTable.replaceAll("%chips", Integer.toString(win));
+					out = out.replaceAll("%profile", profileName);
+					out = out.replaceAll("%winners", jackpotPlayers.toString());
+					ircClient.sendIRCMessage(ircChannel, out);
+					
+					// Update jackpot with remainder
+					if (remainder > 0) {
+						out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(remainder));
+						ircClient.sendIRCMessage(out);
+					}
+					 
+					// Write the jackpot back to file
+					FileWriter writeFile;
+					writeFile = new FileWriter("jackpot." + profileName);
+					writeFile.write(remainder + "\n");
+					writeFile.close();
+				}
+			}
+		} catch (IOException e1)  {
+    		ircClient.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
+    		EventLog.fatal(e1, "Table", "jackpotWon");
+    		StringWriter sw = new StringWriter();
+    		PrintWriter pw = new PrintWriter(sw);
+    		e1.printStackTrace(pw);
+    		EventLog.log(sw.toString(), "Table", "jackpotWon");
+    		try {
+				Thread.sleep(10);
+			} catch (InterruptedException inte) {
+			}
+    		System.exit(1);
+		}
 	}
 }

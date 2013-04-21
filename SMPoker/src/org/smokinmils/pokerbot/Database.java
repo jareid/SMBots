@@ -16,8 +16,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.smokinmils.logging.EventLog;
+
 import org.smokinmils.pokerbot.enums.TransactionType;
-import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.DBSettings;
 
 import com.mchange.v2.c3p0.DataSources;
@@ -43,7 +44,8 @@ public class Database {
    /** The database URL */
    private String url = "jdbc:mysql://" + DBSettings.DBServer
 		   				+ ":" + DBSettings.DBPort
-		   				+ "/" + DBSettings.DBName;   
+		   				+ "/" + DBSettings.DBName
+		   				+ "?autoReconnect=true";   
    
    /**
     * Constructor
@@ -808,6 +810,40 @@ public class Database {
 		   }
 	   }
 	   addTransaction(username, amount, TransactionType.CASHOUT, profile_id);
+	   
+   }
+   
+   /**
+    * Adds the winnings from a poker jackpot
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    */
+   public void jackpot(String username, int amount, int profile_id) {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   
+	   String sql = "UPDATE " + DBSettings.Table_UserProfiles + 
+			   		" SET " + DBSettings.Col_UserProfiles_Amount + " = ("
+			    			   + DBSettings.Col_UserProfiles_Amount + " + " + Integer.toString(amount) + ")" +		   		
+			    	" WHERE " + DBSettings.Col_UserProfiles_UserID + " = (" + getUserIDSQL(username) + ") AND "
+			 			  	  + DBSettings.Col_UserProfiles_TypeID + " = '" + Integer.toString(profile_id) + "'";
+	   
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   stmt.executeUpdate(sql);
+	   } catch (SQLException e) {
+			EventLog.log( e, "Database", "jackpot");
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				EventLog.log( e, "Database", "jackpot");
+		   }
+	   }
+	   addTransaction(username, amount, TransactionType.JACKPOT, profile_id);
 	   
    }
    

@@ -8,7 +8,7 @@
  */ 
 package org.smokinmils.pokerbot;
 
-import org.smokinmils.pokerbot.logging.EventLog;
+import org.smokinmils.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Variables;
 
 /**
@@ -24,7 +24,7 @@ public class GameBot {
 	 */
 	public static void main(String[] args) {
 		// Set up debug output
-		boolean is_debug = false;
+		boolean is_debug = true;
 		
         // Now start our bot up.
         Client bot = new Client( Variables.LobbyChan, is_debug );

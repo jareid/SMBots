@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/SMPoker/mchange-commons-java-0.2.3.4.jar"/>
 	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/SMPoker/mysql-connector-java-5.1.24-bin.jar"/>
 	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/SMPoker/pircbot.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/EventLog"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

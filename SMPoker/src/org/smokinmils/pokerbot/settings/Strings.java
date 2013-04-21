@@ -60,7 +60,7 @@ public final class Strings {
 	/**
 	 * This string is output the poker announcement
 	 */
-	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands";
+	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands. Use %c04!jackpots%c12 to list the current poker jackpot sizes.";
 	
 	
 	/**
@@ -113,9 +113,10 @@ public final class Strings {
 												+ "%b%c12If no buy in is specified, you will be seated with the minimum chips";
 	public static final String JoinCommand_Format = "%b%c12" + JoinCommand + " <table id> ?buy in?";
 	
-	public static final String PromosCommand = CommandChar + "promos";
-	public static final String PromosCommand_Desc = "%b%c12Lists all the currently running promotions and the prizes you can win";
+	public static final String PromosCommand = CommandChar + "jackpots";
+	public static final String PromosCommand_Desc = "%b%c12Lists all the jackpot totals for each profile. Each hand has a chance of winning!";
 	public static final String PromosCommand_Format = "%b%c12" + PromosCommand + "";
+	public static final String[] PromosCommand_Alternatives = {"!jackpot"};
 	
 	/**
 	 * The following list of settings are the commands for tables in the following order
@@ -129,20 +130,20 @@ public final class Strings {
 	public static final String CheckCommand = CommandChar + "c";
 	public static final String CheckCommand_Desc = "%b%c12Check on the current round" +
 												   "%b%c12Aliases: !c / !check / !call all work for this command";
-	public static final String CheckCommand_Format = "%b%c12" + CheckCommand + "";
+	public static final String CheckCommand_Format = CheckCommand + "";
 	public static final String[] CheckCommand_Alternatives = {"!check", "!call"};
 	
 	public static final String BetCommand = CommandChar + "r";
 	public static final String BetCommand_Desc = "%b%c12Place a bet/Raise for the current round.\n " +
 												 "%b%c12Aliases: !bet / !raise / !b / !r all work for this command";
-	public static final String BetCommand_Format = "%b%c12" + BetCommand + " <amount>";
+	public static final String BetCommand_Format = BetCommand + " <amount>";
 	public static final String[] BetCommand_Alternatives = {"!b", "!bet", "!raise"};
 	
 	public static final String FoldCommand = CommandChar + "f";
 	public static final String FoldCommand_Desc = "%b%c12Fold your current hand\n"
 												+ "%b%c12If it is free to play/check, you will be checked." +
 												   "%b%c12Aliases: !f / !fold all work for this command";
-	public static final String FoldCommand_Format = "%b%c12" + FoldCommand + "";
+	public static final String FoldCommand_Format = FoldCommand + "";
 	public static final String[] FoldCommand_Alternatives = {"!fold"};
 	
 	public static final String TblChipsCommand = CommandChar + "chips";
@@ -199,10 +200,12 @@ public final class Strings {
 	public static final String TableTopic = "%b%c12Welcome to the SM Poker Table %c04%id%c12 for the %c04%profile%c12 profile - SB: %c04%sb%c12 / BB: %c04%bb%c12 (Buy In: %c04%min%c12-%c04%max%c12) - Players: %c04%Pcur%c12 of %c04%Pmax%c12 - HandID: %c04%hID%c12";
 	
 	
-	public static final String InfoMessage = "%b%c12For more information, please supply " + InfoCommand + " with one of the following options:\n" +
-											 "%b%c12Lobby Commands: %c04info chips tables promos start join watch profile profiles\n" +
-											 "%b%c12Table Commands: %c04c r f rebuy leave sitdown sitout\n" +
-										 	 "%b%c12All commands for room type: table lobby";
+	public static final String InfoMessage = "%b%c12A poker table is represented by a channel. To list the current tables and see how to join type %c04!tables\n" +
+											 "%b%c12For more information on something specific please use command %c04!poker <choice>%c12 where %c04<choice>%c12 is one of the following:" +
+											 "%b%c12Lobby Commands: %c04tables, join, watch, jackpots\n" +
+											 "%b%c12Table Commands: %c04c r f chips rebuy leave sitdown sitout\n" +
+										 	 "%b%c12For a list of table commands, type %c04!poker table\n" +
+	 										 "%b%c12For a list of lobby commands, type %c04!poker lobby";
 	
 	public static final String Promotions = "%b%c12There are currently no promtions running";
 	
@@ -251,7 +254,7 @@ public final class Strings {
 	 * %curP - The current number of players seated
 	 * %profile - The name of the profile this table's chips are for.
 	 */
-	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%curP%c12 (Min: %c04%minP%c12 / Max: %c04%maxP%c12) | Profile: %c04%profile%c12 - To join type %c04!join %id <buyin amount>";
+	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%minP%c12/%c04%maxP%c12) | Profile: %c04%profile%c12 - To join type %c04!join %id <buyin amount>%c12 (Buyin amount must be between %c04%min%c12 and %c04%max";
 	
 	/**
 	 * This string is used to specify the message sent when a user searches for tables and:
@@ -479,7 +482,7 @@ public final class Strings {
 	 * %valid - The valid actions
 	 * %actor
 	 */
-	public static final String GetAction = "%b%c12(%c04#%hID%c12) %c04%actor%c12 to act. Valid actions: %c04%valid";
+	public static final String GetAction = "%b%c12(%c04#%hID%c12) %c04%actor%c12 to act. Valid actions: %valid";
 	
 	/**
 	 * Table action
@@ -657,7 +660,7 @@ public final class Strings {
 	 * %action
 	 * %cmd
 	 */
-	public static final String AllowedActionString = "%n%c12%action - %c04%cmd%c12";
+	public static final String AllowedActionString = "%n%b%c12%action - %c04%cmd%c12";
 
 
 	/**
@@ -690,4 +693,15 @@ public final class Strings {
 	public static final String ShowCardFailInHand = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Play is in progress, you can not show your cards.";	
 	public static final String ShowCardFailNotActive = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) You were not active in this hand.";	
 	public static final String ShowCardFailNoPlayer = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) You are not a player at the table.";	
+
+	public static final String JackpotIncreased = "%b%c12The %c04%profile%c12 poker jackpot is now %c04%chips%c12 chips! " +
+												  "Every hand has a chance to win and the jackpot will be divided between all in that hand.";
+
+	public static final String JackpotWonTable = "%b%c12Congratulations to %c04%winners%c12 who won %c04%chips%c12 each from the %c04%profile%c12 Jackpot";
+	
+	public static final String JackpotWon = "%b%c12The %c04%profile%c12 poker jackpot of %c04%chips%c12 chips has been won! " +
+											"Congratulations to the winners:%c04 %winners";
+	
+	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
+	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12)";
 }

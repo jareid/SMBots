@@ -8,6 +8,8 @@
  */ 
 package org.smokinmils.pokerbot.game.rooms;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +19,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import org.smokinmils.logging.EventLog;
+
 import org.smokinmils.pokerbot.Client;
 import org.smokinmils.pokerbot.Database;
 import org.smokinmils.pokerbot.Utils;
 import org.smokinmils.pokerbot.enums.CommandType;
 import org.smokinmils.pokerbot.enums.RoomType;
-import org.smokinmils.pokerbot.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;
 
@@ -83,7 +86,7 @@ public class Lobby extends Room {
 				onJoinTable(sender, login, hostname, message);
 				break;
 			case PROMOS:
-				onPromotions(sender, login, hostname, message);
+				onJackpots(sender, login, hostname, message);
 				break;
 			//case GIVE:
 				//disabled
@@ -255,14 +258,8 @@ public class Lobby extends Room {
 			ircClient.sendIRCNotice(sender,
 						Strings.AllTablesMsg.replaceAll("%count", Integer.toString(tables.size())));
 			for (Entry<Integer, Integer> table: tables.entrySet()) {
-				String out = Strings.TableInfoMsg.replaceAll("%id", Integer.toString(table.getKey()));
-				Table tbl = ircClient.getTable(table.getKey());
-				out = out.replaceAll("%bb", Integer.toString(tbl.getBigBlind()) );
-				out = out.replaceAll("%minP", Integer.toString(tbl.getMinPlayers()) );
-				out = out.replaceAll("%maxP", Integer.toString(tbl.getMaxPlayers()) );
-				out = out.replaceAll("%curP", Integer.toString(tbl.getNoOfPlayers()) );
-				out = out.replaceAll("%profile", tbl.getProfile() );
-				ircClient.sendIRCNotice(sender, out);
+				Table tbl = ircClient.getTable(table.getKey());				
+				ircClient.sendIRCNotice(sender, tbl.formatTableInfo(Strings.TableInfoMsg));
 			}
 		} else if (msg.length == 1){
 			Vector<Integer> table_ids = new Vector<Integer>();
@@ -286,14 +283,8 @@ public class Lobby extends Room {
 				ircClient.sendIRCNotice(sender, out);
 				
 				for (Integer id: table_ids) {
-					out = Strings.TableInfoMsg.replaceAll("%id", Integer.toString(id));
-					Table tbl = ircClient.getTable(id);
-					out = out.replaceAll("%bb", Integer.toString(tbl.getBigBlind()) );
-					out = out.replaceAll("%minP", Integer.toString(tbl.getMinPlayers()) );
-					out = out.replaceAll("%maxP", Integer.toString(tbl.getMaxPlayers()) );
-					out = out.replaceAll("%curP", Integer.toString(tbl.getNoOfPlayers()) );
-					out = out.replaceAll("%profile", tbl.getProfile() );
-					ircClient.sendIRCNotice(sender, out);
+					Table tbl = ircClient.getTable(id);			
+					ircClient.sendIRCNotice(sender, tbl.formatTableInfo(Strings.TableInfoMsg));
 				}					
 			}
 		} else {
@@ -466,12 +457,29 @@ public class Lobby extends Room {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
 	 */	
-	private void onPromotions(String sender, String login, String hostname, String message) {
+	private void onJackpots(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			for (String line: Strings.Promotions.split("\n")) {
-				ircClient.sendIRCMessage( ircChannel, line );	
+			List<String> profiles = Database.getInstance().getProfileTypes();
+			String jackpotstr = "";
+			
+			for (String profile: profiles) {
+				Integer jackpot = null;
+				try {
+					BufferedReader readFile = new BufferedReader(new FileReader("jackpot." + profile));
+					jackpot = Utils.tryParse(readFile.readLine()); 
+					readFile.close();
+				} catch (Exception e) {
+				}
+				 
+				if (jackpot == null) jackpot = 0;
+				
+				jackpotstr += Strings.JackpotAmount.replaceAll("%profile",
+						profile).replaceAll("%amount", Integer.toString(jackpot));
 			}
+			
+			String out = Strings.JackpotInfo.replaceAll("%jackpots", jackpotstr);
+			ircClient.sendIRCMessage(out);				
 		} else {
 			invalidArguments( sender, CommandType.PROMOS.getFormat() );
 		}

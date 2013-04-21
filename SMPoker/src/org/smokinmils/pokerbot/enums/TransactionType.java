@@ -19,6 +19,7 @@ public enum TransactionType {
 	BUYIN(DBSettings.PokerBuyIn),
 	CASHOUT(DBSettings.PokerCashOut),
 	ADMIN(DBSettings.TransAdmin),
+	JACKPOT(DBSettings.PokerJackpot)
 	;
 	
 	/** The text. */

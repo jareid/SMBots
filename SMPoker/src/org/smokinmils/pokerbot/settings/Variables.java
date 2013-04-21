@@ -52,6 +52,9 @@ public class Variables {
 	public static final int RakePercentage = 5;
 	public static final int MinimumPotForRake = 4;
 	
+	public static final int JackpotChance = 1000;
+	public static final int JackpotRakePercentage = 34;
+	
 	/**
 	 * NickServ's STATUS command can produce the following results:
 	 * 0 - no such user online or nickname not registered
