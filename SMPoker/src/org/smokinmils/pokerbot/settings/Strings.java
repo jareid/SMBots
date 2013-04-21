@@ -254,7 +254,7 @@ public final class Strings {
 	 * %curP - The current number of players seated
 	 * %profile - The name of the profile this table's chips are for.
 	 */
-	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%minP%c12/%c04%maxP%c12) | Profile: %c04%profile%c12 - To join type %c04!join %id <buyin amount>%c12 (Buyin amount must be between %c04%min%c12 and %c04%max";
+	public static final String TableInfoMsg = "%b%c12TableID: %c04%id%c12 | Big Blind: %c04%bb%c12 | Seated: %c04%minP%c12/%c04%maxP%c12) | Profile: %c04%profile%c12 - To join type %c04!join %id <buyin amount>%c12 (Buyin amount must be between %c04%min%c12 and %c04%max%c12)";
 	
 	/**
 	 * This string is used to specify the message sent when a user searches for tables and:
@@ -703,5 +703,5 @@ public final class Strings {
 											"Congratulations to the winners:%c04 %winners";
 	
 	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
-	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12)";
+	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12) ";
 }

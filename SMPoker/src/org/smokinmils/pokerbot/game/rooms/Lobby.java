@@ -155,7 +155,6 @@ public class Lobby extends Room {
 	private void onInfo(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			sendFormat(sender, CommandType.INFO.getCommandText(), CommandType.INFO.getFormat());
 			for (String line: Strings.InfoMessage.split("\n")) {
 				ircClient.sendIRCNotice( sender, line );
 			}

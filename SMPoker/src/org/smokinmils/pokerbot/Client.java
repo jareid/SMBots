@@ -370,7 +370,9 @@ public class Client extends PircBot {
 		this.sendMessage("ChanServ", "INVITE " + chan );
 		this.joinChannel( chan );
 		
-		sendIRCMessage( lobbyChan, table.formatTableInfo(Strings.NewTable) );
+		if (manual) {
+			sendIRCMessage( lobbyChan, table.formatTableInfo(Strings.NewTable) );
+		}
 		
 		return tableid;
 	}
