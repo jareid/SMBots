@@ -46,18 +46,18 @@ public class Bot extends ListenerAdapter implements Listener
 		games = new ArrayList<IRCGame>();
 		validUsers = new ArrayList<String>();
 		badUsers = new ArrayList<String>();
-		/*
+		
 		// Live configuration
 		games.add(new Roulette(5, "#smokin_dice", bot));
 		games.add(new Roulette(1, "#sm_roulette", bot));
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
-		/*/
+		/*
 		// test config
 		games.add(new Roulette(1, "#testeroo", bot));
 		//games.add(new DiceDuel("#testeroo"));
 		//games.add(new OverUnder("#testeroo"));
-		
+		*/
 		
 		// initialize timing events
 		
@@ -247,6 +247,8 @@ public class Bot extends ListenerAdapter implements Listener
 					infoText = "Error with info text, please contact an Admin";
 				}
 				e.getBot().sendMessage(e.getUser(), infoText);
+				e.getBot().sendNotice(e.getUser(), infoText);
+
 			}
 			//TODO make this more elegant :)
 			if ( command.equalsIgnoreCase("check") || command.equalsIgnoreCase("chips") || command.equalsIgnoreCase("payout"))
@@ -440,8 +442,8 @@ public class Bot extends ListenerAdapter implements Listener
 			
 			bot.connect("irc.swiftirc.net");
 			//bot.joinChannel("#testeroo");
-			//bot.joinChannel("#sm_hosts");
-			//bot.identify("5w807");
+			bot.joinChannel("#sm_hosts");
+			bot.identify("5w807");
 		}
 		catch(Exception e)
 		{
