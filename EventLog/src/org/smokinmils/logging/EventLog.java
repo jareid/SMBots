@@ -8,6 +8,8 @@
  */ 
 package org.smokinmils.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,46 +20,42 @@ import java.util.concurrent.LinkedBlockingQueue;
  *
  */
 public class EventLog {
+	private static Logstream _eventLog;
+	private static boolean _debug;
 
- private static Logstream _eventLog;
- private static boolean _debug;
+	public static Logstream create(BlockingQueue<StringBuilder> queue, String rootPath) {
+		_eventLog = new Logstream(queue, rootPath);
+		return _eventLog;
+	}
 
- public static Logstream create(BlockingQueue<StringBuilder> queue, String rootPath)
- {
-     _eventLog = new Logstream(queue, rootPath);
-     return _eventLog;
- }
+	public static Logstream create(String rootPath, boolean debug) {
+		_debug = debug;
+	    return create(new LinkedBlockingQueue<StringBuilder>(), rootPath);
+	}
 
- public static Logstream create(String rootPath, boolean debug)
- {
-	 _debug = debug;
-     return create(new LinkedBlockingQueue<StringBuilder>(), rootPath);
- }
-
- public static void log(Exception ex, String cls, String func)
- {
-     log("Exception: " + ex.toString(), cls, func);
- }
-
- public static void log(String msg, String cls, String func)
- {
-     _eventLog.write(msg, cls, func);
- }
- 
- public static void info(String msg, String cls, String func)
- {
-     log("INFO: " + msg, cls, func);
- }
- 
- public static void debug(String msg, String cls, String func)
- {
-	 if (_debug == true) {
-		 log("DEBUG " + msg, cls, func);
-	 }
- }
- 
- public static void fatal(Exception ex, String cls, String func)
- {
-     log("Fatal Exception: " + ex.toString(), cls, func);
- }
+	public static void log(Exception ex, String cls, String func) {
+	    log("Exception: " + ex.toString(), cls, func);
+	}
+	
+	public static void log(String msg, String cls, String func) {
+	    _eventLog.write(msg, cls, func);
+	}
+	 
+	public static void info(String msg, String cls, String func) {
+	    log("INFO: " + msg, cls, func);
+	}
+	 
+	public static void debug(String msg, String cls, String func) {
+		if (_debug == true) {
+			log("DEBUG " + msg, cls, func);
+		}
+	}
+	
+	public static void fatal(Exception ex, String cls, String func) {
+	    log("Fatal Exception: " + ex.toString(), cls, func);
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		log(sw.toString(), cls, func);
+	}
 }

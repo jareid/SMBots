@@ -92,4 +92,22 @@ public class IrcBot extends PircBotX {
 	public boolean userIsIdentified(String nick) {
 		return IdentifiedUsers.contains(nick);
 	}
+	
+	/**
+	 * Removes an identified user from the bot.
+	 * 
+	 * @param nick	The nickname to check
+	 */
+	public void removeIdentifiedUser(String nick) {
+		IdentifiedUsers.remove(nick);
+	}
+	
+	/**
+	 * Adds an identified user to the bot.
+	 * 
+	 * @param nick	The nickname to check
+	 */
+	public void addIdentifiedUser(String nick) {
+		IdentifiedUsers.add(nick);
+	}
 }

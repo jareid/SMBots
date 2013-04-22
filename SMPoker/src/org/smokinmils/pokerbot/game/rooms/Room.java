@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.pokerbot.game.rooms;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -112,10 +110,6 @@ public class Room extends Thread {
             	} catch (Exception e) {
             		ircClient.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
             		EventLog.fatal(e, "Room", "run");
-            		StringWriter sw = new StringWriter();
-            		PrintWriter pw = new PrintWriter(sw);
-            		e.printStackTrace(pw);
-            		EventLog.log(sw.toString(), "Room", "run");
             		try {
 						Thread.sleep(10);
 					} catch (InterruptedException inte) {

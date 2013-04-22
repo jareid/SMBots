@@ -13,8 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +29,11 @@ import java.util.Vector;
 
 import org.jibble.pircbot.User;
 
+import org.smokinmils.pokerbot.Utils;
 import org.smokinmils.logging.EventLog;
 
 import org.smokinmils.pokerbot.Client;
 import org.smokinmils.pokerbot.Database;
-import org.smokinmils.pokerbot.Utils;
 import org.smokinmils.pokerbot.enums.ActionType;
 import org.smokinmils.pokerbot.enums.CommandType;
 import org.smokinmils.pokerbot.enums.RoomType;
@@ -2028,10 +2026,6 @@ public class Table extends Room {
 		} catch (IOException e1)  {
     		irc.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
     		EventLog.fatal(e1, "Table", "updateJackpot");
-    		StringWriter sw = new StringWriter();
-    		PrintWriter pw = new PrintWriter(sw);
-    		e1.printStackTrace(pw);
-    		EventLog.log(sw.toString(), "Table", "updateJackpot");
     		try {
 				Thread.sleep(10);
 			} catch (InterruptedException inte) {
@@ -2099,10 +2093,6 @@ public class Table extends Room {
 		} catch (IOException e1)  {
     		ircClient.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
     		EventLog.fatal(e1, "Table", "jackpotWon");
-    		StringWriter sw = new StringWriter();
-    		PrintWriter pw = new PrintWriter(sw);
-    		e1.printStackTrace(pw);
-    		EventLog.log(sw.toString(), "Table", "jackpotWon");
     		try {
 				Thread.sleep(10);
 			} catch (InterruptedException inte) {

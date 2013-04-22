@@ -19,11 +19,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import org.smokinmils.pokerbot.Utils;
 import org.smokinmils.logging.EventLog;
 
 import org.smokinmils.pokerbot.Client;
 import org.smokinmils.pokerbot.Database;
-import org.smokinmils.pokerbot.Utils;
 import org.smokinmils.pokerbot.enums.CommandType;
 import org.smokinmils.pokerbot.enums.RoomType;
 import org.smokinmils.pokerbot.settings.Strings;

@@ -8,6 +8,7 @@
  */ 
 package org.smokinmils.pokerbot;
 
+import org.smokinmils.pokerbot.Utils;
 import org.smokinmils.logging.EventLog;
 
 import org.smokinmils.pokerbot.enums.EventType;
