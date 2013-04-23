@@ -17,7 +17,6 @@ import org.smokinmils.bot.events.Action;
 import org.smokinmils.bot.events.Join;
 import org.smokinmils.bot.events.Kick;
 import org.smokinmils.bot.events.Message;
-import org.smokinmils.bot.events.Notice;
 import org.smokinmils.bot.events.Part;
 import org.smokinmils.bot.events.PrivateMessage;
 import org.smokinmils.bot.events.Quit;

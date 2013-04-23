@@ -1,0 +1,6 @@
+21:12:47: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+21:12:47: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:12:47: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:12:47: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:12:47: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:03: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of User(nick=JReid, realName=IRcap[8.71] 7 www.ircap.net/int, login=~jrdev, hostmask=AA7F1AC2.D76869EC.80AE2375.IP, away=false, ircop=false, server=*.SwiftIRC.net, hops=0, bot=Version{SmokinMils Bot System 0.1} Connected{true} Server{irc.swiftirc.net} Port{6667} Password{null}, uuid=cd95e747-bdd6-4352-8c62-58291a0e83b8)

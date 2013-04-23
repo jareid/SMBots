@@ -1,0 +1,12 @@
+21:02:01: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+21:02:01: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:01: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:01: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:01: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:07: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of User(nick=JReid, realName=IRcap[8.71] 7 www.ircap.net/int, login=~jrdev, hostmask=AA7F1AC2.D76869EC.80AE2375.IP, away=false, ircop=false, server=*.SwiftIRC.net, hops=0, bot=Version{SmokinMils Bot System 0.1} Connected{true} Server{irc.swiftirc.net} Port{6667} Password{null}, uuid=4e642430-af3d-4081-a4a8-6c78ca3e2d06)
+21:02:22: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+21:02:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:02:25: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of User(nick=JReid, realName=IRcap[8.71] 7 www.ircap.net/int, login=~jrdev, hostmask=AA7F1AC2.D76869EC.80AE2375.IP, away=false, ircop=false, server=*.SwiftIRC.net, hops=0, bot=Version{SmokinMils Bot System 0.1} Connected{true} Server{irc.swiftirc.net} Port{6667} Password{null}, uuid=4d9324f4-6a4e-41e6-a302-9be4a66701a5)

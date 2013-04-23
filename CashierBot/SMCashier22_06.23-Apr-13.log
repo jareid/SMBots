@@ -1,0 +1,21 @@
+22:06:34: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+22:06:34: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:06:34: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:06:34: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:06:34: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:06:34: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of User(nick=JReid, realName=IRcap[8.71] 7 www.ircap.net/int, login=~jrdev, hostmask=AA7F1AC2.D76869EC.80AE2375.IP, away=false, ircop=false, server=*.SwiftIRC.net, hops=0, bot=Version{SmokinMils Bot System 0.1} Connected{true} Server{irc.swiftirc.net} Port{6667} Password{null}, uuid=d5028f80-df7c-4847-abde-4b6bc1740914)
+22:07:01: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of User(nick=JReid, realName=IRcap[8.71] 7 www.ircap.net/int, login=~jrdev, hostmask=AA7F1AC2.D76869EC.80AE2375.IP, away=false, ircop=false, server=*.SwiftIRC.net, hops=0, bot=Version{SmokinMils Bot System 0.1} Connected{true} Server{irc.swiftirc.net} Port{6667} Password{null}, uuid=d5028f80-df7c-4847-abde-4b6bc1740914)
+22:08:16: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of User(nick=JReid, realName=IRcap[8.71] 7 www.ircap.net/int, login=~jrdev, hostmask=AA7F1AC2.D76869EC.80AE2375.IP, away=false, ircop=false, server=*.SwiftIRC.net, hops=0, bot=Version{SmokinMils Bot System 0.1} Connected{true} Server{irc.swiftirc.net} Port{6667} Password{null}, uuid=d5028f80-df7c-4847-abde-4b6bc1740914)
+22:08:36: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
+22:08:50: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
+22:09:53: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
+22:11:42: BetDetails->run() :: Exception: org.smokinmils.database.DBException: '1.1017955005E10' in column '2' is outside valid range for the datatype INTEGER.
+22:11:42: BetDetails->run() :: org.smokinmils.database.DBException: '1.1017955005E10' in column '2' is outside valid range for the datatype INTEGER.
+	at org.smokinmils.Database.getTopBetter(Database.java:687)
+	at org.smokinmils.cashier.BetDetails.run(BetDetails.java:57)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+22:13:22: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
+22:13:39: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
+22:13:52: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
