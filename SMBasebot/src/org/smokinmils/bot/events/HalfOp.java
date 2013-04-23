@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.HalfOpEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -30,10 +28,9 @@ public class HalfOp extends HalfOpEvent<IrcBot> {
 	 * @param recipient The nick of the user that got owner status.
 	 * @param isHalfOp
 	 */
-	public HalfOp(IrcBot bot, Channel channel,
-				  User source, User recipient,
-				  boolean isHalfOp) {
-		super(bot, channel, source, recipient, isHalfOp);
+	public HalfOp(HalfOpEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getSource(),
+				event.getRecipient(), event.isHalfOp()); 
 	}
 
 }

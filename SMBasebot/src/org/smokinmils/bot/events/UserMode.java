@@ -8,7 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.UserModeEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -19,14 +18,15 @@ import org.smokinmils.bot.IrcBot;
 public class UserMode extends UserModeEvent<IrcBot> {
 
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object.
+	 * Timestamp is automatically set to current time as reported by System.currentTimeMillis()
 	 * 
 	 * @param bot
 	 * @param target - The user that the mode operation applies to.
 	 * @param source - The user that set the mode.
 	 * @param mode - The mode that has been set.
 	 */
-	public UserMode(IrcBot bot, User target, User source, String mode) {
-		super(bot, target, source, mode);
+	public UserMode(UserModeEvent<IrcBot> event) {
+		super(event.getBot(), event.getTarget(), event.getSource(), event.getMode());
 	}
 }

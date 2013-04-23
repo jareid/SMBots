@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.PartEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -26,8 +24,8 @@ public class Part extends PartEvent<IrcBot> {
 	 * @param user The user that quit from the server in snapshot form
 	 * @param reason The reason given for quitting the server.
 	 */
-	public Part(IrcBot bot, Channel channel, User user, String reason) {
-		super(bot, channel, user, reason);
+	public Part(PartEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getReason());
 	}
 
 }

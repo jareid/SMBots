@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.RemovePrivateEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -28,8 +26,8 @@ public class RemovePrivate extends RemovePrivateEvent<IrcBot> {
 	 * @param channel The channel in which the mode change took place.
 	 * @param user The user that performed the mode change.
 	 */
-	public RemovePrivate(IrcBot bot, Channel channel, User user) {
-		super(bot, channel, user);
+	public RemovePrivate(RemovePrivateEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 
 }

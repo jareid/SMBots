@@ -8,10 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import java.util.Set;
-
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.UserListEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -35,9 +31,8 @@ public class UserList extends UserListEvent<IrcBot> {
 	 * @param channel - The channel that the user list is from.
 	 * @param users - An immutable Set of Users belonging to this channel.
 	 */
-	public UserList(IrcBot bot, Channel channel, Set<User> users) {
-		super(bot, channel, users);
-		// TODO Auto-generated constructor stub
+	public UserList(UserListEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUsers());
 	}
 
 }

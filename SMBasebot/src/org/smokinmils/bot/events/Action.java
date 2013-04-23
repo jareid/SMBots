@@ -10,8 +10,6 @@ package org.smokinmils.bot.events;
 
 import org.smokinmils.bot.IrcBot;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 
 /**
@@ -27,7 +25,7 @@ public class Action extends ActionEvent<IrcBot> {
 	 * @param channel The channel object representing the target channel of the action. A value of null means that this is is a private message, not a channel
 	 * @param action The action carried out by the user.
 	 */
-	public Action(IrcBot bot, User user, Channel channel, String action) {
-		super(bot, user, channel, action);
+	public Action(ActionEvent<IrcBot> event) {
+		super(event.getBot(), event.getUser(), event.getChannel(), event.getMessage());
 	}
 }

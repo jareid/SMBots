@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.NoticeEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -27,8 +25,7 @@ public class Notice extends NoticeEvent<IrcBot> {
 	 * @param user The user who sent the notice.
 	 * @param notice The actual message.
 	 */
-	public Notice(IrcBot bot, User user, Channel channel, String notice) {
-		super(bot, user, channel, notice);
+	public Notice(NoticeEvent<IrcBot> event) {
+		super(event.getBot(), event.getUser(), event.getChannel(), event.getNotice());
 	}
-
 }

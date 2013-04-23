@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.SetModeratedEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -28,7 +26,7 @@ public class SetModerated extends SetModeratedEvent<IrcBot> {
 	 * @param channel The channel in which the mode change took place.
 	 * @param user The user that performed the mode change.
 	 */
-	public SetModerated(IrcBot bot, Channel channel, User user) {
-		super(bot, channel, user);
+	public SetModerated(SetModeratedEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 }

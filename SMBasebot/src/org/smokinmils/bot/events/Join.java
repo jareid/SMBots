@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -25,7 +23,7 @@ public class Join extends JoinEvent<IrcBot> {
 	 * @param channel The channel which somebody joined.
 	 * @param user The user who joined the channel.
 	 */
-	public Join(IrcBot bot, Channel channel, User user) {
-		super(bot, channel, user);
+	public Join(JoinEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 }

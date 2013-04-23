@@ -23,7 +23,7 @@ public class Invite extends InviteEvent<IrcBot> {
 	 * @param channel The channel which somebody joined.
 	 * @param user The user who joined the channel.
 	 */
-	public Invite(IrcBot bot, String user, String channel) {
-		super(bot, user, channel);
+	public Invite(InviteEvent<IrcBot> event) {
+		super(event.getBot(), event.getUser(), event.getChannel());
 	}
 }

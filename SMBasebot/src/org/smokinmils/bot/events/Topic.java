@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.TopicEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -21,7 +19,8 @@ import org.smokinmils.bot.IrcBot;
 public class Topic extends TopicEvent<IrcBot> {
 
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object.
+	 * Timestamp is automatically set to current time as reported by System.currentTimeMillis()
 	 * 
 	 * @param bot
 	 * @param channel - The channel that the topic belongs to.
@@ -30,10 +29,9 @@ public class Topic extends TopicEvent<IrcBot> {
 	 * @param date - When the topic was set (milliseconds since the epoch).
 	 * @param changed - True if the topic has just been changed, false if the topic was already there.
 	 */
-	public Topic(IrcBot bot, Channel channel, String topic, User user,
-			long date, boolean changed) {
-		super(bot, channel, topic, user, date, changed);
-		// TODO Auto-generated constructor stub
+	public Topic(TopicEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getTopic(),
+				event.getUser(), event.getDate(), event.isChanged());
 	}
 
 }

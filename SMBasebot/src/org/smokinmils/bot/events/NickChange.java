@@ -26,8 +26,7 @@ public class NickChange extends NickChangeEvent<IrcBot> {
 	 * @param newNick - The new nick.
 	 * @param user - The user that changed their nick
 	 */
-	public NickChange(IrcBot bot, String oldNick, String newNick, User user) {
-		super(bot, oldNick, newNick, user);
+	public NickChange(NickChangeEvent<IrcBot> event) {
+		super(event.getBot(), event.getOldNick(), event.getNewNick(), event.getUser());
 	}
-
 }

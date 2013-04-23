@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.SuperOpEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -31,9 +29,8 @@ public class SuperOp extends SuperOpEvent<IrcBot> {
 	 * @param recipient - The nick of the user that got 'voiced'.
 	 * @param isSuperOp
 	 */
-	public SuperOp(IrcBot bot, Channel channel, User source, User recipient,
-			boolean isSuperOp) {
-		super(bot, channel, source, recipient, isSuperOp);
+	public SuperOp(SuperOpEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getSource(), event.getRecipient(), event.isSuperOp() );
 	}
 
 }

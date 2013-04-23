@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.SetChannelKeyEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -29,8 +27,8 @@ public class SetChannelKey extends SetChannelKeyEvent<IrcBot> {
 	 * @param user The user that performed the mode change.
 	 * @param key The new key for the channel.
 	 */
-	public SetChannelKey(IrcBot bot, Channel channel, User user, String key) {
-		super(bot, channel, user, key);
+	public SetChannelKey(SetChannelKeyEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getKey());
 	}
 	
 }

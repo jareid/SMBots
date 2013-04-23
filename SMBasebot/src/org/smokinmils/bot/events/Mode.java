@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.ModeEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -29,8 +27,7 @@ public class Mode extends ModeEvent<IrcBot> {
 	 * @param user The user that set the mode.
 	 * @param mode The mode that has been set.
 	 */
-	public Mode(IrcBot bot, Channel channel, User user, String mode) {
-		super(bot, channel, user, mode);
+	public Mode(ModeEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getMode());
 	}
-
 }

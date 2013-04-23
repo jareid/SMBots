@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.OpEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -22,7 +20,8 @@ import org.smokinmils.bot.IrcBot;
  */
 public class Op extends OpEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object.
+	 * Timestamp is automatically set to current time as reported by System.currentTimeMillis()
 	 * 
 	 * @param bot
 	 * @param channel The channel in which the mode change took place.
@@ -30,9 +29,9 @@ public class Op extends OpEvent<IrcBot> {
 	 * @param recipient The nick of the user that got owner status.
 	 * @param isOp
 	 */
-	public Op(IrcBot bot, Channel channel, User source, User recipient,
-			boolean isOp) {
-		super(bot, channel, source, recipient, isOp);
+	public Op(OpEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getSource(),
+				event.getRecipient(), event.isOp()); 
 	}
 
 }

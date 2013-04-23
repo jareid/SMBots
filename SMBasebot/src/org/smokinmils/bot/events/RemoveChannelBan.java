@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.RemoveChannelBanEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -29,8 +27,8 @@ public class RemoveChannelBan extends RemoveChannelBanEvent<IrcBot> {
 	 * @param user The user that performed the mode change.
 	 * @param hostmask The ban hostmask removed.
 	 */
-	public RemoveChannelBan(IrcBot bot, Channel channel, User user, String hostmask) {
-		super(bot, channel, user, hostmask);
+	public RemoveChannelBan(RemoveChannelBanEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getHostmask());
 	}
 
 }

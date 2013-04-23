@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.SetChannelLimitEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -29,7 +27,7 @@ public class SetChannelLimit extends SetChannelLimitEvent<IrcBot> {
 	 * @param user The user that performed the mode change.
 	 * @param limit The maximum number of users that may be in this channel at the same time.
 	 */
-	public SetChannelLimit(IrcBot bot, Channel channel, User user, int limit) {
-		super(bot, channel, user, limit);
+	public SetChannelLimit(SetChannelLimitEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getLimit());
 	}
 }

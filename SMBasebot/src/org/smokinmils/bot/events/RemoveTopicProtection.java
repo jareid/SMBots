@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.RemoveTopicProtectionEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -28,7 +26,7 @@ public class RemoveTopicProtection extends RemoveTopicProtectionEvent<IrcBot> {
 	 * @param channel The channel in which the mode change took place.
 	 * @param user The user that performed the mode change.
 	 */
-	public RemoveTopicProtection(IrcBot bot, Channel channel, User user) {
-		super(bot, channel, user);
+	public RemoveTopicProtection(RemoveTopicProtectionEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 }

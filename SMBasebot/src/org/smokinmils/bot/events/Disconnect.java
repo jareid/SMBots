@@ -26,7 +26,7 @@ public class Disconnect extends DisconnectEvent<IrcBot> {
 	 * 
 	 * @param bot
 	 */
-	public Disconnect(IrcBot bot) {
-		super(bot);
+	public Disconnect(DisconnectEvent<IrcBot> event) {
+		super(event.getBot());
 	}
 }

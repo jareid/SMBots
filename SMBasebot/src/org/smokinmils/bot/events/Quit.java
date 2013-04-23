@@ -8,7 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.UserSnapshot;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -25,8 +24,8 @@ public class Quit extends QuitEvent<IrcBot> {
 	 * @param user The user that quit from the server in snapshot form
 	 * @param reason The reason given for quitting the server.
 	 */
-	public Quit(IrcBot bot, UserSnapshot user, String reason) {
-		super(bot, user, reason);
+	public Quit(QuitEvent<IrcBot> event) {
+		super(event.getBot(), event.getUser(), event.getReason());
 	}
 	
 

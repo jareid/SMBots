@@ -22,8 +22,8 @@ public class Connect extends ConnectEvent<IrcBot> {
 	 * 
 	 * @param bot
 	 */
-	public Connect(IrcBot bot) {
-		super(bot);
+	public Connect(ConnectEvent<IrcBot> event) {
+		super(event.getBot());
 	}
 
 }

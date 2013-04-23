@@ -11,7 +11,6 @@ package org.smokinmils.bot;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter ;
 import org.pircbotx.hooks.events.*;
@@ -179,7 +178,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onOwner(OwnerEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.owner( new Owner(event) );
 	}
 	
 	public void owner(Owner event) throws Exception {}
@@ -190,7 +189,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onPart(PartEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.part( new Part(event) );
 	}
 	
 	public void part(Part event) throws Exception {}	
@@ -201,7 +200,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onPrivateMessage(PrivateMessageEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.privateMessage( new PrivateMessage(event) );
 	}
 	
 	public void privateMessage(PrivateMessage event) throws Exception {}
@@ -212,7 +211,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onQuit(QuitEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.quit( new Quit(event) );
 	}
 	
 	public void quit(Quit event) throws Exception {}
@@ -223,7 +222,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveChannelBan(RemoveChannelBanEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeChannelBan( new RemoveChannelBan(event) );
 	}
 	
 	public void removeChannelBan(RemoveChannelBan event) throws Exception {}
@@ -234,7 +233,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveChannelKey(RemoveChannelKeyEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeChannelKey( new RemoveChannelKey (event) );
 	}
 	
 	public void removeChannelKey(RemoveChannelKey event) throws Exception {}
@@ -245,7 +244,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveChannelLimit(RemoveChannelLimitEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeChannelLimit( new RemoveChannelLimit(event) );
 	}
 	
 	public void removeChannelLimit(RemoveChannelLimit event) throws Exception {}
@@ -256,7 +255,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveInviteOnly(RemoveInviteOnlyEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeInviteOnly( new RemoveInviteOnly(event) );
 	}
 	
 	public void removeInviteOnly(RemoveInviteOnly event) throws Exception {}
@@ -267,7 +266,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveModerated(RemoveModeratedEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeModerated( new RemoveModerated(event) );
 	}
 	
 	public void removeModerated(RemoveModerated event) throws Exception {}
@@ -278,7 +277,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveNoExternalMessages(RemoveNoExternalMessagesEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeNoExternalMessages( new RemoveNoExternalMessages(event) );
 	}
 	
 	public void removeNoExternalMessages(RemoveNoExternalMessages event) throws Exception {}
@@ -289,7 +288,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemovePrivate(RemovePrivateEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removePrivate( new RemovePrivate(event) );
 	}
 	
 	public void removePrivate(RemovePrivate event) throws Exception {}
@@ -300,7 +299,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveSecret(RemoveSecretEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeSecret( new RemoveSecret(event) );
 	}
 	
 	public void removeSecret(RemoveSecret event) throws Exception {}
@@ -311,7 +310,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onRemoveTopicProtection(RemoveTopicProtectionEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.removeTopicProtection( new RemoveTopicProtection(event) );
 	}
 	
 	public void removeTopicProtection(RemoveTopicProtection event) throws Exception {}
@@ -322,7 +321,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetChannelBan(SetChannelBanEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setChannelBan( new SetChannelBan(event) );
 	}
 	
 	public void setChannelBan(SetChannelBan event) throws Exception {}
@@ -333,7 +332,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetChannelKey(SetChannelKeyEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setChannelKey( new SetChannelKey(event) );
 	}
 	
 	public void setChannelKey(SetChannelKey event) throws Exception {}
@@ -344,7 +343,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetChannelLimit(SetChannelLimitEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setChannelLimit( new SetChannelLimit(event) );
 	}
 	
 	public void setChannelLimit(SetChannelLimit event) throws Exception {}
@@ -355,7 +354,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetInviteOnly(SetInviteOnlyEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setInviteOnly( new SetInviteOnly(event) );
 	}
 	
 	public void setInviteOnly(SetInviteOnly event) throws Exception {}
@@ -366,7 +365,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetModerated(SetModeratedEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setModerated( new SetModerated(event) );
 	}
 	
 	public void setModerated(SetModerated event) throws Exception {}
@@ -377,7 +376,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetNoExternalMessages(SetNoExternalMessagesEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setNoExternalMessages( new SetNoExternalMessages(event) );
 	}
 	
 	public void setNoExternalMessages(SetNoExternalMessages event) throws Exception {}
@@ -388,7 +387,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetPrivate(SetPrivateEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setPrivate( new SetPrivate(event) );
 	}
 	
 	public void setPrivate(SetPrivate event) throws Exception {}
@@ -399,7 +398,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetSecret(SetSecretEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setSecret( new SetSecret(event) );
 	}
 	
 	public void setSecret(SetSecret event) throws Exception {}
@@ -410,7 +409,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSetTopicProtection(SetTopicProtectionEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.setTopicProtection( new SetTopicProtection(event) );
 	}
 	
 	public void setTopicProtection(SetTopicProtection event) throws Exception {}
@@ -421,7 +420,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onSuperOp(SuperOpEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.superOp( new SuperOp(event) );
 	}
 	
 	public void superOp(SuperOp event) throws Exception {}
@@ -432,7 +431,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onTopic(TopicEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.topic( new Topic(event) );
 	}
 	
 	public void topic(Topic event) throws Exception {}
@@ -443,7 +442,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onUserList(UserListEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.userList( new UserList(event) );
 	}
 	
 	public void userList(UserList event) throws Exception {}
@@ -454,7 +453,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onUserMode(UserModeEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.userMode( new UserMode (event) );
 	}
 	
 	public void userMode(UserMode event) throws Exception {}
@@ -465,7 +464,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * NOT TO BE USED
 	 */
 	public void onVoice(VoiceEvent<IrcBot> event) throws Exception {
-		this.kick( new Kick (event) );
+		this.voice( new Voice(event) );
 	}
 	
 	public void voice(Voice event) throws Exception {}

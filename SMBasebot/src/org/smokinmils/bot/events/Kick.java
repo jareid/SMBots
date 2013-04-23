@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.KickEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -29,10 +27,9 @@ public class Kick extends KickEvent<IrcBot> {
 	 * @param recipient The unfortunate recipient of the kick.
 	 * @param reason The reason given by the user who performed the kick.
 	 */
-	public Kick(IrcBot bot, Channel channel,
-			    User source, User recipient,
-			    String reason) {
-		super(bot, channel, source, recipient, reason);
+	public Kick(KickEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getSource(),
+				event.getRecipient(), event.getReason());
 	}
 
 }

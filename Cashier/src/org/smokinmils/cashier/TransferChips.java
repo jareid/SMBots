@@ -40,7 +40,8 @@ public class TransferChips extends Event {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
 	 */
-	public void onMessage(Message event) {
+	@Override
+	public void message(Message event) {
 		IrcBot bot = event.getBot();
 		String message = event.getMessage();
 		String sender = event.getUser().getNick();

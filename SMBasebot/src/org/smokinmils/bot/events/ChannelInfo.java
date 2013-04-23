@@ -8,9 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import java.util.Set;
-
-import org.pircbotx.ChannelListEntry;
 import org.pircbotx.hooks.events.ChannelInfoEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -21,7 +18,7 @@ import org.smokinmils.bot.IrcBot;
  * 
  * @author Jamie
  */
-public class ChannelInfo extends ChannelInfoEvent<IrcBot>{
+public class ChannelInfo extends ChannelInfoEvent<IrcBot> {
 	/**
 	 * After calling the listChannels() method in PircBotX, the server will start to send us information about each channel on the server. You may listen for this event in order to receive the information about each channel as soon as it is received.
 	 * 
@@ -30,7 +27,7 @@ public class ChannelInfo extends ChannelInfoEvent<IrcBot>{
 	 * @param bot
 	 * @param list  A list of ChannelList Entries
 	 */
-	public ChannelInfo(IrcBot bot, Set<ChannelListEntry> list) {
-		super(bot, list);
+	public ChannelInfo(ChannelInfoEvent<IrcBot> event) {
+		super(event.getBot(), event.getList());
 	}
 }

@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.OwnerEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -31,10 +29,9 @@ public class Owner extends OwnerEvent<IrcBot> {
 	 * @param recipient The nick of the user that got owner status.
 	 * @param isOwner
 	 */
-	public Owner(IrcBot bot, Channel channel, User source, User recipient,
-			boolean isOwner) {
-		super(bot, channel, source, recipient, isOwner);
-		// TODO Auto-generated constructor stub
+	public Owner(OwnerEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getSource(),
+				event.getRecipient(), event.isOwner()); 
 	}
 
 }

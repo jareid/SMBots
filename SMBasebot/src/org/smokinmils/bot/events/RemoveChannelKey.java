@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.RemoveChannelKeyEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -29,8 +27,8 @@ public class RemoveChannelKey extends RemoveChannelKeyEvent<IrcBot> {
 	 * @param user The user that performed the mode change.
 	 * @param key The key that was in use before the channel key was removed.
 	 */
-	public RemoveChannelKey(IrcBot bot, Channel channel, User user, String key) {
-		super(bot, channel, user, key);
+	public RemoveChannelKey(RemoveChannelKeyEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getKey());
 	}
 
 }

@@ -10,7 +10,7 @@ package org.smokinmils.bot;
 
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
-import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.NoticeEvent;
 import org.smokinmils.Database;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.events.Action;
@@ -41,7 +41,7 @@ public class CheckIdentified extends Event {
 	private static final int RequiredStatus = 3;
 	
 	@Override
-	public void onAction(Action event) {
+	public void action(Action event) {
 		IrcBot bot = event.getBot();
 		User user = event.getUser();
 		if ( !bot.userIsIdentified( user.getNick() ) ) {
@@ -59,7 +59,7 @@ public class CheckIdentified extends Event {
 	}
 	
 	@Override
-	public void onPrivateMessage(PrivateMessage event) {
+	public void privateMessage(PrivateMessage event) {
 		IrcBot bot = event.getBot();
 		User user = event.getUser();
 		if ( !bot.userIsIdentified( user.getNick() ) ) {
@@ -68,7 +68,7 @@ public class CheckIdentified extends Event {
 	}
 	
 	@Override
-	public void onJoin(Join event) {
+	public void join(Join event) {
 		User user = event.getUser();
 		// (Re-)Check the user's status with NickServ
 		if (user.getNick().compareToIgnoreCase( event.getBot().getNick() ) != 0) {
@@ -78,22 +78,22 @@ public class CheckIdentified extends Event {
 	}
 	
 	@Override
-	public void onPart(Part event) {
+	public void part(Part event) {
 		event.getBot().removeIdentifiedUser( event.getUser().getNick() );
 	}
 	
 	@Override
-	public void onKick(Kick event) {
+	public void kick(Kick event) {
 		event.getBot().removeIdentifiedUser( event.getRecipient().getNick() );
 	}	
 	
 	@Override
-	public void onQuit(Quit event) {
+	public void quit(Quit event) {
 		event.getBot().removeIdentifiedUser( event.getUser().getNick() );
 	}
 	
 	@Override
-	public void onUserList(UserList event) {
+	public void userList(UserList event) {
 		IrcBot bot = event.getBot();
 		for (User usr: event.getUsers()) {
 			bot.removeIdentifiedUser( usr.getNick() );
@@ -108,23 +108,24 @@ public class CheckIdentified extends Event {
      * @param bot the IRC bot
      * @param user the username
      */
-    private void sendStatusRequest(IrcBot bot, User user) {
-		bot.sendRawLine( "PRIVMSG NickServ STATUS " + user );
-	    EventLog.debug("Checking the status of " + user, "CheckIdentified", "sendStatusRequest");
-		
+    @SuppressWarnings("unchecked")
+	private void sendStatusRequest(IrcBot bot, User user) {
+	    EventLog.debug("Checking the status of " + user.getNick(), "CheckIdentified", "sendStatusRequest");
+	    
 	    WaitForQueue queue = new WaitForQueue( bot );
+		bot.sendRawLine( "PRIVMSG NickServ STATUS " + user.getNick() );
+		
 	    boolean received = false;
 	    //Infinite loop since we might receive notices from non NickServ
 	    while (!received) {
 	        //Use the waitFor() method to wait for a MessageEvent.
 	        //This will block (wait) until a message event comes in, ignoring
 	        //everything else	  
-	    	Notice currentEvent = null;
+	    	NoticeEvent<IrcBot> currentEvent = null;
 			try {
-				currentEvent = queue.waitFor(Notice.class);
-			} catch (InterruptedException e) {
-				EventLog.fatal(e, "CheckIdentified", "sendStatusRequest");
-				// TODO: system.exit(0) here?
+				currentEvent = queue.waitFor(NoticeEvent.class);
+			} catch (InterruptedException ex) {
+				EventLog.log(ex, "CheckIdentified", "sendStatusRequest");
 			}
 			
 	        //Check if this message is the response
@@ -132,7 +133,7 @@ public class CheckIdentified extends Event {
 	        if ( currentEvent.getMessage().startsWith(NickServStatus)
 	        	 && currentEvent.getUser().getNick().compareToIgnoreCase(NickServ) == 0
 	        	 && msg.length == 3
-	        	 && msg[2].compareToIgnoreCase( user.getNick() ) == 0 ) {
+	        	 && msg[1].compareToIgnoreCase( user.getNick() ) == 0 ) {
     			Integer code = Utils.tryParse( msg[2] );
     			
     			// Only add users with the correct levels
@@ -148,12 +149,6 @@ public class CheckIdentified extends Event {
 	        	queue.close();
 	        	received = true;
 	        }
-	        
-	        try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				EventLog.fatal(e, "CheckIdentified", "sendStatusRequest");
-			}
 	    }
     }
 }

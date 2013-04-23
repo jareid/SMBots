@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.RemoveModeratedEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -28,8 +26,8 @@ public class RemoveModerated extends RemoveModeratedEvent<IrcBot> {
 	 * @param channel The channel in which the mode change took place.
 	 * @param user The user that performed the mode change.
 	 */
-	public RemoveModerated(IrcBot bot, Channel channel, User user) {
-		super(bot, channel, user);
+	public RemoveModerated(RemoveModeratedEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 
 }

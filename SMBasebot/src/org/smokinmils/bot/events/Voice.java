@@ -8,14 +8,12 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.VoiceEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
  * Called when a user (possibly us) gets voice status granted in a channel.
- * This is a type of mode change and therefor is also dispatched in a ModeEvent
+ * This is a type of mode change and therefore is also dispatched in a ModeEvent
  * @author Jamie
  */
 public class Voice extends VoiceEvent<IrcBot> {
@@ -28,10 +26,8 @@ public class Voice extends VoiceEvent<IrcBot> {
 	 * @param recipient - The nick of the user that got 'voiced'.
 	 * @param isVoice
 	 */
-	public Voice(IrcBot bot, Channel channel, User source, User recipient,
-			boolean isVoice) {
-		super(bot, channel, source, recipient, isVoice);
-		// TODO Auto-generated constructor stub
+	public Voice(VoiceEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getSource(), event.getRecipient(), event.hasVoice());
 	}
 
 }
