@@ -1,14 +1,22 @@
+/**
+ * This file is part of a commercial IRC bot that 
+ * allows users to play online IRC games.
+ * 
+ * The project was commissioned by Julian Clark
+ * 
+ * Copyright (C) 2013 Jamie Reid & Carl Clegg
+ */ 
 package org.smokinmils.database.tables;
 
 public class TransactionTypesTable {
 	
 	/** Table name */
-	private static final String Name = "transaction_types";
+	public static final String Name = "transaction_types";
 	
 	/** Column for the unique id */
-	private static final String Col_ID = "id";
+	public static final String Col_ID = "id";
 	
 	/** Column for the type of transaction */
-	private static final String Col_Type = "type";
+	public static final String Col_Type = "type";
 	
 }

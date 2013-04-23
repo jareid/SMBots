@@ -38,7 +38,6 @@ public class GameBot {
         // Connect to the IRC server.
         try {
         	bot.connect( Variables.Server, Variables.Port );
-	    	while(true) {}
         } catch (Exception e) {
         	EventLog.fatal(e, "GameBot", "main"); 
         	System.exit(0);

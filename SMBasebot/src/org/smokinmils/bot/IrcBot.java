@@ -14,6 +14,7 @@ import java.util.List;
 import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.smokinmils.SMBaseBot;
+import org.smokinmils.database.types.ProfileType;
 
 /**
  * Provides the IRC functionality
@@ -21,6 +22,16 @@ import org.smokinmils.SMBaseBot;
  * @author Jamie
  */
 public class IrcBot extends PircBotX {
+	public static final String InvalidArgs = "%b%c12You provided invalid arguments for the command. The format is:";
+	public static final String ValidProfiles = "%b%c12Valid profiles are: %c04" + ProfileType.values().toString();
+	
+	/**
+	 * This string is used when a user doesn't have enough chips
+	 * 
+	 * %chips - The amount the user tried to spend
+	 */
+	public static final String NoChipsMsg = "%b%c12Sorry, you do not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
+	
 	/** List of users identified with NickServ */
 	private List<String> IdentifiedUsers;
 	
@@ -81,6 +92,30 @@ public class IrcBot extends PircBotX {
 		for (String line: out.split("\n")) {
 			this.sendMessage(target, line);
 		}
+	}
+	
+	/**
+	 * Outputs a notice to a user informing them they don't have enough chips
+	 * 
+	 * @param user		The user
+	 * @param amount	The amount they tried to use
+	 * @param profile	The profile they tried to use
+	 */
+	public void NoChips(String user, int amount, ProfileType profile) {
+		String out = NoChipsMsg.replaceAll( "%chips", Integer.toString(amount));
+		out = out.replaceAll( "%profile", profile.toString() );
+		sendIRCNotice(user, out);
+	}
+	
+    /**
+     * Sends the invalid argument message 
+     * 
+     * @param who		The user to send to
+     * @param format	The command format
+     */
+    public void invalidArguments(String who, String format) {
+		sendIRCNotice(who, InvalidArgs);
+		sendIRCNotice(who, format);		
 	}
 	
 	/**

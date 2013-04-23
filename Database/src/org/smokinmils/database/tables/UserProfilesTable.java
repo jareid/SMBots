@@ -1,20 +1,28 @@
+/**
+ * This file is part of a commercial IRC bot that 
+ * allows users to play online IRC games.
+ * 
+ * The project was commissioned by Julian Clark
+ * 
+ * Copyright (C) 2013 Jamie Reid & Carl Clegg
+ */ 
 package org.smokinmils.database.tables;
 
 public class UserProfilesTable {
 	
 	/** Table name */
-	private static final String Name = "user_profiles";
+	public static final String Name = "user_profiles";
 	
 	/** Column for the userid */
-	private static final String Col_UserID = "user_id";
+	public static final String Col_UserID = "user_id";
 	
 	/** Column for the typeid */
-	private static final String Col_TypeID = "type_id";
+	public static final String Col_TypeID = "type_id";
 	
 	/** Column for the amount */
-	private static final String Col_Amount = "amount";
+	public static final String Col_Amount = "amount";
 	
 	/** Column for last updated */
-	private static final String Col_LastUpdated = "last_updated";
+	public static final String Col_LastUpdated = "last_updated";
 
 }

@@ -1158,6 +1158,8 @@ public class Table extends Room {
 	private synchronized void onAction(ActionType action, String extra, boolean timeout) {
 		actionReceived = true;
 		if (actionTimer != null) actionTimer.cancel();
+		if (actor == null)
+			EventLog.debug("actor is null and we received an action: " +action.toString(), "Table", "onAction");
 		if (actor != null) {
 			Set<ActionType> allowedActions = getAllowedActions(actor);        
 	        if (!allowedActions.contains(action)) {

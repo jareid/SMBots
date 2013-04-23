@@ -45,10 +45,11 @@ public class Logstream implements Runnable {
             try {
                 StringBuilder builder = _queue.take();  
                 flush(builder);
+                Thread.sleep(10);
             } catch(InterruptedException ex) {
                 flush(ex.toString());
                 System.out.println("Exception: LogStream.run: " + ex.getMessage());
-            }    
+            }
         }
     }
 

@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.smokinmils.bot.IrcBot;
 
@@ -27,8 +25,7 @@ public class Message extends MessageEvent<IrcBot> {
 	 * @param user The user who sent the private message.
 	 * @param message The actual message.
 	 */
-	public Message(IrcBot bot, Channel channel, User user, String message) {
-		super(bot, channel, user, message);
+	public Message(MessageEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(), event.getUser(), event.getMessage());
 	}
-
 }

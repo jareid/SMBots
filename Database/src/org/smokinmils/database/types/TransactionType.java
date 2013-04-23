@@ -6,7 +6,7 @@
  * 
  * Copyright (C) 2013 Jamie Reid
  */ 
-package org.smokinmils.database;
+package org.smokinmils.database.types;
 
 /**
 * An enumerate for the DB's credits transaction types
@@ -14,10 +14,17 @@ package org.smokinmils.database;
 * @author Jamie Reid
 */
 public enum TransactionType {
-	BUYIN("pokerbuy"),
-	CASHOUT("pokercash"),
 	ADMIN("admin"),
-	JACKPOT("pkrjackpot")
+	BET("bet"),
+	CANCEL("cancel"),
+	CREDIT("credit"),
+	PAYOUT("payout"),
+	POKER_JACKPOT("pkrjackpot"),
+	POKER_BUYIN("pokerbuy"),
+	POKER_CASHOUT("pokercash"),
+	RESET("reset"),
+	TRANSFER("transfer"),
+	WIN("win"),
 	;
 	
 	/** The text. */
@@ -26,7 +33,6 @@ public enum TransactionType {
 	/**
 	 * Constructor.
 	 * 
-	 * @param name  The name.
 	 * @param text  textual representation.
 	 */
 	TransactionType(String text) {
@@ -46,4 +52,22 @@ public enum TransactionType {
 	 */
 	@Override
 	public String toString() { return text;	}
+	
+	/** 
+	 * Converts a String to the correct TransactionType
+	 * 
+	 * @param text the string to check
+	 * @return the correct enumerate object
+	 */
+    public static TransactionType fromString(String text) {
+        if (text != null) {
+        	text = text.toLowerCase();
+        	for (TransactionType tt : TransactionType.values()) {
+        		if ( tt.getText().compareTo(text) == 0 ) {
+        			return tt;
+        		}
+        	}
+        }
+        return null;
+    }
 }

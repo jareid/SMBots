@@ -118,7 +118,7 @@ public class Room extends Thread {
             	}
             }
         	try {
-        		Thread.sleep(75);
+        		Thread.sleep(30);
         	} catch (InterruptedException e) {
         		interuptted = true;
         	}

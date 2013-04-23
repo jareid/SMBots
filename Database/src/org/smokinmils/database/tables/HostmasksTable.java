@@ -1,17 +1,25 @@
+/**
+ * This file is part of a commercial IRC bot that 
+ * allows users to play online IRC games.
+ * 
+ * The project was commissioned by Julian Clark
+ * 
+ * Copyright (C) 2013 Jamie Reid & Carl Clegg
+ */ 
 package org.smokinmils.database.tables;
 
 public class HostmasksTable {
 
 	/** The name of the table */
-	private static final String Name = "hostmasks";
+	public static final String Name = "hostmasks";
 	
 	/** Column for the unique id */
-	private static final String Col_ID = "id";
+	public static final String Col_ID = "id";
 	
 	/** Column for the hostmask */
-	private static final String Col_Host = "host";
+	public static final String Col_Host = "host";
 	
 	/** Column for the userid */
-	private static final String Col_UserID = "userid";
+	public static final String Col_UserID = "userid";
 	
 }

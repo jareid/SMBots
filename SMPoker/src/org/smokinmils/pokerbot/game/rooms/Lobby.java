@@ -185,62 +185,6 @@ public class Lobby extends Room {
 			invalidArguments( sender, CommandType.INFO.getFormat() );
 		}
 	}
-		
-	/**
-	 * This method handles the chips command
-	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
-	 *
-	@SuppressWarnings("unused")
-	private void onChips(String sender, String login, String hostname, String message) {
-		String[] msg = message.split(" ");
-		String user;
-		
-		if ((msg.length == 0 && msg[0].compareTo("") == 0) || msg.length == 1) {
-			user = (msg[0].compareTo("") != 0 ? msg[0] : sender);
-			Map<String,Integer> creds = Database.getInstance().checkAllCredits( user );
-			
-			String credstr;
-			if (creds.size() != 0) {
-				String active = Database.getInstance().getActiveProfile( user );
-				if (user.compareToIgnoreCase(sender) == 0) {
-					credstr = Strings.CheckCreditSelfMsg;
-				} else  {
-					credstr = Strings.CheckCreditMsg;
-				}
-				Integer active_creds = creds.get(active);
-				if (active_creds == null) active_creds = 0;
-				credstr = credstr.replaceAll("%creds", Integer.toString(active_creds));
-				credstr = credstr.replaceAll("%active", active);
-				
-				if (creds.size() > 0) {
-					credstr += " and ";
-					for (Entry<String, Integer> cred: creds.entrySet()) {
-						if (cred.getKey().compareTo(active) != 0) {
-							String othercred = Strings.CreditsOtherProfiles.replaceAll("%name", cred.getKey());
-							othercred = othercred.replaceAll("%amount",Integer.toString(cred.getValue()));
-							credstr += othercred + " ";
-						}
-					}
-				}
-			} else {
-				if (user.compareToIgnoreCase(sender) == 0) {
-					credstr = Strings.NoCreditsSelf;
-				} else  {
-					credstr = Strings.NoCredits;
-				}
-			}
-			credstr = credstr.replaceAll("%user", user);
-			credstr = credstr.replaceAll("%sender", sender);
-			
-			ircClient.sendIRCMessage(ircChannel, credstr);		
-		} else {
-			invalidArguments( sender, CommandType.CHIPS.getFormat() );
-		}
-	}*/
 	
 	/**
 	 * This method handles the new table command
@@ -483,56 +427,6 @@ public class Lobby extends Room {
 			invalidArguments( sender, CommandType.PROMOS.getFormat() );
 		}
 	}
-	
-	/**
-	 * This method handles the give command
-	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
-	private void onGive(String sender, String login, String hostname, String message) {
-		String[] msg = message.split(" ");
-
-		if (ircClient.isHost(sender, ircChannel)) {
-			if (msg.length == 3) {
-				String user = msg[0];
-				String profile = msg[2];
-				Integer amount = Utils.tryParse(msg[1]);
-				
-				if (amount != null) {
-					List<String> profiles = Database.getInstance().getProfileTypes();
-					
-					if ( profiles.contains(profile) ) {
-						boolean success = Database.getInstance().giveChips(user, amount, profile);
-						if (success) {
-							String out = Strings.GiveChips.replaceAll("%amount", Integer.toString(amount));
-							out = out.replaceAll("%who", user);
-							out = out.replaceAll("%sender", sender);
-							out = out.replaceAll("%profile", profile);
-							ircClient.sendIRCMessage(ircChannel, out);
-							
-							out = Strings.GiveChipsPM.replaceAll("%amount", Integer.toString(amount));
-							out = out.replaceAll("%who", user);
-							out = out.replaceAll("%sender", sender);
-							out = out.replaceAll("%profile", profile);
-							ircClient.sendIRCNotice(user, out);
-						} else {
-							EventLog.log(sender + " attempted to give someone chips and the database failed", "Lobby", "onGive");
-						}
-					} else {
-						ircClient.sendIRCMessage(ircChannel, Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()));
-					}
-				} else {
-					invalidArguments( sender, CommandType.GIVE.getFormat() );
-				}
-			} else {
-				invalidArguments( sender, CommandType.GIVE.getFormat() );
-			}
-		} else {
-			EventLog.info(sender + " attempted to give someone chips", "Lobby", "onGive");
-		}
-	}*/
 	
 	/**
 	 * This method handles the profile command

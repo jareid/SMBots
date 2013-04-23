@@ -35,6 +35,10 @@ public class EventLog {
 
 	public static void log(Exception ex, String cls, String func) {
 	    log("Exception: " + ex.toString(), cls, func);
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		log(sw.toString(), cls, func);
 	}
 	
 	public static void log(String msg, String cls, String func) {
@@ -53,9 +57,5 @@ public class EventLog {
 	
 	public static void fatal(Exception ex, String cls, String func) {
 	    log("Fatal Exception: " + ex.toString(), cls, func);
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		ex.printStackTrace(pw);
-		log(sw.toString(), cls, func);
 	}
 }

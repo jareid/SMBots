@@ -1,23 +1,1042 @@
 /**
- * This file is part of the 'pokerbot' a commercial IRC bot that 
- * allows users to play Texas Hold'em poker from IRC
+ * This file is part of a commercial IRC bot that 
+ * allows users to play online IRC games.
  * 
  * The project was commissioned by Julian Clark
  * 
- * Copyright (C) 2013 Jamie Reid
+ * Copyright (C) 2013 Jamie Reid & Carl Clegg
  */ 
 package org.smokinmils;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.smokinmils.database.TransactionType;
-/*import org.smokinmils.EventLog;
-import org.smokinmils.pokerbot.settings.DBSettings;
+import org.smokinmils.database.DBException;
+import org.smokinmils.database.DBSettings;
+import org.smokinmils.database.tables.*;
+import org.smokinmils.database.types.*;
 
-import com.mchange.v2.c3p0.DataSources;*/
+import com.mchange.v2.c3p0.DataSources;
+
+/**
+ * A singleton Database access system for the poker bot
+ * 
+ * @author Jamie Reid
+ */
+public class Database {	
+	/** Instance variable */
+	private static Database instance;
+    static {
+        try {
+            instance = new Database();
+        } catch (Exception e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
+   /** Static 'instance' method */
+   public static Database getInstance() { return instance; }
+   
+   /** The un-pooled data source */
+   private DataSource unpooled;
+   
+   /** The pooled data source */
+   private DataSource pooled;
+   
+   /** The database URL */
+   private String url = "jdbc:mysql://" + DBSettings.DBServer
+		   				+ ":" + DBSettings.DBPort
+		   				+ "/" + DBSettings.DBName
+		   				+ "?autoReconnect=true";   
+   
+   /**
+    * Constructor
+    */
+   private Database() throws Exception {
+	   unpooled = DataSources.unpooledDataSource(url, DBSettings.DBUser, DBSettings.DBPass);
+	   pooled = DataSources.pooledDataSource( unpooled );
+   }
+   
+   /**
+    * Getter method for a connection from the connection pool
+    * 
+    * @returns A connection
+    */
+	private Connection getConnection() throws SQLException {
+	   return pooled.getConnection();
+	}
+   
+   /**
+    * Adds a new hostmask to the DB for this user
+    * 
+    * If the user does not exist, we need to add the user to the user table
+    * 
+    * @param username	The user
+    * @param hostmask	The hostmask
+    */
+   public void addHostmask(String username, String hostmask) throws DBException,SQLException {
+	   String user_exist  = "SELECT " + UsersTable.Col_ID +
+					   		" FROM " + UsersTable.Name +
+						 	" WHERE " + UsersTable.Col_Username +
+						 	" LIKE '" + username + "'";
+	   
+	   String insert_user = "INSERT INTO " + UsersTable.Name + "(" +
+			   				UsersTable.Col_Username + ") VALUES('" + username + "')"; 
+	   	   
+	   String insert_hostmask = "INSERT IGNORE INTO " + HostmasksTable.Name + "(" +
+			   											HostmasksTable.Col_Host + ", " +
+			   											HostmasksTable.Col_UserID + ") " +  														
+  								"VALUES('" + hostmask + "', '%userid')";
+	   
+	   int user_id = runGetIntQuery( user_exist );
+	   if ( user_id == -1 ) {
+		   user_id = runGetIDQuery( insert_user );
+	   }
+	   insert_hostmask = insert_hostmask.replaceAll("%userid", Integer.toString(user_id));
+	   runBasicQuery( insert_hostmask );
+   }
+   
+   /**
+    * Getter method for a user's active profile text
+    *  
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The profile name
+    * 
+    * @return			The amount of credits
+    */
+   public ProfileType getActiveProfile(String username)
+		   throws DBException, SQLException  {
+	   String sql = "SELECT " + UsersView.Col_ActiveProfile +
+			   		" FROM " + UsersView.Name +
+				 	" WHERE " + UsersView.Col_Username +
+				 	" LIKE '" + username + "'";
+	   return ProfileType.fromString( runGetStringQuery(sql) );
+   }
+   
+   /**
+    * Getter method for a user's active profile ID
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The username
+    * 
+    * @return			The profile id
+    */
+   public int getActiveProfileID(String username)
+		   throws DBException, SQLException  {
+	   ProfileType profile = getActiveProfile( username );
+	   int id = -1;
+	   if (profile != null) {
+		   id = runGetIntQuery( getProfileIDSQL( profile ) );
+	   }
+	   return id;
+   }
+   
+   
+   /**
+    * Checks a user exists in the user table, if they don't adds them
+    * 
+    * @param username The user's nickname
+    * @param hostmask
+    */
+   public void checkUserExists(String username, String hostmask) throws DBException, SQLException {
+	   String sql = "SELECT COUNT(*) FROM " + UsersTable.Name +
+  				" WHERE " + UsersTable.Col_Username + " LIKE " + "'" + username + "'";
+	   
+	   String ins_user_sql = "INSERT INTO " + UsersTable.Name + "(" 
+								+ UsersTable.Col_Username
+								+ ") VALUES('" + username + "')";
+	
+		if ( runGetIntQuery(sql) < 1) {
+			runBasicQuery(ins_user_sql);
+		}
+		addHostmask(username, hostmask);
+   }
+   
+   /**
+    * Checks a user exists in the user table, if they don't adds them
+    * 
+    * @param username The user's nickname
+    * @param hostmask
+    */
+   public boolean checkUserExists(String username) throws DBException, SQLException {
+	   String sql = "SELECT COUNT(*) FROM " + UsersTable.Name +
+  				" WHERE " + UsersTable.Col_Username + " LIKE " + "'" + username + "'";
+	
+		return runGetIntQuery(sql) == 1;
+   }
+   
+   /**
+    * Getter method for a user's credit count on the DB
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The username
+    * 
+    * @return			The amount of credits
+    */
+   public int checkCredits(String username) throws DBException, SQLException  {
+	   ProfileType active = getActiveProfile( username );
+	   return checkCredits(username, active);
+   }
+   
+   /**
+    * Getter method for a user's credit count on the DB
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The username
+    * @param profile	The profile name
+    * 
+    * @return			The amount of credits
+    */
+   public int checkCredits(String username, ProfileType profile)
+		   throws DBException, SQLException  {
+	   String sql = "SELECT " + UserProfilesView.Col_Amount +
+			   		" FROM " + UserProfilesView.Name +
+				 	" WHERE " + UserProfilesView.Col_Username + " = '" + username + "' AND "
+				 			  + UserProfilesView.Col_Profile + " = '" + profile.toString() + "'";
+	   
+	   int credits = runGetIntQuery( sql );
+	   if (credits < 0) credits = 0;
+	   return credits;
+   }
+   
+   /**
+    * Getter method for a user's credit count on the DB for all profiles
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The username
+    * 
+    * @return			The amount of credits
+    */
+   public Map<ProfileType,Integer> checkAllCredits(String username)
+		   throws DBException, SQLException {
+	   Map<ProfileType,Integer> res = new HashMap<ProfileType,Integer>();
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   String sql = "SELECT " + UserProfilesView.Col_Profile + "," + UserProfilesView.Col_Amount +
+			   		" FROM " + UserProfilesView.Name +
+				 	" WHERE " + UserProfilesView.Col_Username +
+				 	" LIKE '" + username + "'";
+	   
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   rs = stmt.executeQuery(sql);
+		   
+		   while ( rs.next() ) {
+			   res.put(ProfileType.fromString(rs.getString(UserProfilesView.Col_Profile)), 
+					   rs.getInt(UserProfilesView.Col_Amount));
+		   }
+	   } catch (SQLException e) {
+		  throw new DBException(e, sql);
+	   } finally {
+		   try {
+			   if (rs != null) rs.close();
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				  throw e;
+		   }
+	   }
+	   return res;
+   }
+   
+   /**
+    * Updates the active profile for a users chips to the new profile
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The username
+    * 
+    * @return			The amount of credits
+    */
+   public boolean updateActiveProfile(String username, ProfileType profile)
+		   throws DBException, SQLException {
+	   String sql = "UPDATE " + UsersTable.Name +
+			   		" SET " + UsersTable.Col_ActiveProfile + " = "
+			   				+ "(" + getProfileIDSQL(profile) + ")" +
+				 	" WHERE " + UsersTable.Col_Username +
+				 	" LIKE '" + username + "'";
+	   
+	   return runBasicQuery( sql ) == 1;
+   }
+   
+
+   /**
+    * Adds a number of chips at a certain table for a user so it can be returned if the 
+    * bot decides it needs to take a break and crashes
+    * 
+    * @param username
+    * @param table_id
+    * @param profile
+    * @param amount
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   public void addPokerTableCount(String username, int table_id, ProfileType profile, int amount)
+		   throws DBException, SQLException {
+	   String updsql = "UPDATE " + PokerBetsTable.Name +
+			   		   " SET " + PokerBetsTable.Col_Amount + " = '" + Integer.toString(amount) + "'" +
+			   		   " WHERE " + PokerBetsTable.Col_UserID + " = (" + getUserIDSQL(username) + ") AND " +
+			   		   				PokerBetsTable.Col_ProfileID + " = (" + getProfileIDSQL(profile) + ") AND " +
+			   		   				PokerBetsTable.Col_TableID + " = '" + Integer.toString(table_id) + "'";
+
+	   String inssql = "INSERT INTO " + PokerBetsTable.Name
+			   				+ " ("	+ PokerBetsTable.Col_UserID + ","
+			   						+ PokerBetsTable.Col_ProfileID + ","
+			   						+ PokerBetsTable.Col_TableID + ","
+			   						+ PokerBetsTable.Col_Amount + ") " +
+			   			"VALUES((" + getUserIDSQL(username) + "), ("
+			   					   + getProfileIDSQL(profile) + "), "
+					   			   + Integer.toString(table_id) + ", "	
+					   			   + Integer.toString(amount) + ")";
+	   int numrows = runBasicQuery( updsql );
+	   if ( numrows == 0 ) {
+		   runBasicQuery( inssql );
+	   }
+   }
+   
+   /**
+    * Restores all the bets from when the bot crashed.
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @param username	The username
+    * 
+    * @return			The amount of credits
+    */
+   public void restorePokerBets() throws DBException, SQLException {
+	   String sql = "SELECT " + PokerBetsTable.Col_UserID + ","
+			   				  + PokerBetsTable.Col_ProfileID + ","
+					   		  + PokerBetsTable.Col_Amount +
+			   		" FROM " + PokerBetsTable.Name;
+	   
+	   String updsql = "UPDATE " + UserProfilesTable.Name +
+				  	   " SET " + UserProfilesTable.Col_Amount
+				  	           + " = (" + UserProfilesTable.Col_Amount + " + %amount)" +
+				  	   " WHERE " + UserProfilesTable.Col_UserID + " = '%user_id' AND "
+				  		    	 + UserProfilesTable.Col_TypeID + " = '%type_id'";
+
+	   String delsql = "DELETE FROM " + PokerBetsTable.Name;
+
+	   Connection conn = null;
+	   Statement stmt = null;
+	   Statement updstmt = null;
+	   ResultSet rs = null;
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   updstmt = conn.createStatement();
+		   try {
+			   rs = stmt.executeQuery(sql);
+		   } catch (SQLException e) {
+			   throw new DBException(e, sql);
+		   }
+		   
+		   while ( rs.next() ) {
+			   String updsql_inst = updsql.replaceAll("%amount", Integer.toString( rs.getInt(PokerBetsTable.Col_Amount) ) );
+			   updsql_inst = updsql_inst.replaceAll("%user_id", Integer.toString( rs.getInt(PokerBetsTable.Col_UserID) ) );
+			   updsql_inst = updsql_inst.replaceAll("%type_id", Integer.toString( rs.getInt(PokerBetsTable.Col_ProfileID) ) );
+			   try {
+				   updstmt.executeUpdate(updsql_inst);
+			   } catch (SQLException e) {
+				   throw new DBException(e, updsql_inst);
+			   }
+		   }
+		   try {
+			   updstmt.executeUpdate(delsql);
+		   } catch (SQLException e) {
+			   throw new DBException(e, delsql);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (rs != null) rs.close();
+			   if (updstmt != null) stmt.close();
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException exc) {
+				throw exc;
+		   }
+	   }
+   }
+   
+   /**
+    * Getter method for a user's credit count on the DB
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @return			The list of profile types
+    */
+   public String getProfileName(int id) throws DBException, SQLException {
+	   String sql = "SELECT " + ProfileTypeTable.Col_Name +
+			   		" FROM " + ProfileTypeTable.Name +
+			   		" WHERE "  + ProfileTypeTable.Col_ID + " = '" + id + "'";
+	   
+	   return runGetStringQuery( sql );
+   }
+   
+   /**
+    * Getter method for a user's credit count on the DB
+    * 
+    * Performs an SQL statement on the DB
+    * 
+    * @return			The list of profile types
+    */
+   public int getProfileID(ProfileType profile) throws DBException, SQLException {
+	   return runGetIntQuery( getProfileIDSQL(profile) );
+   }
+   
+   /**
+    * Transfer's chips from one user to another
+    * 
+    * Presumes both users exist and the sender has enough chips
+    * 
+    * @param sender	The user who is sending chips
+    * @param user	The user to received the chips
+    * @param profile The profile the chips are from.
+    */
+	public void transferChips(String sender, String user, int amount, ProfileType profile)
+			throws DBException, SQLException {
+	   String chips_sql = "SELECT COUNT(*) FROM " + UserProfilesView.Name +
+   						  " WHERE " + UserProfilesView.Col_Profile + " LIKE " + "'" + profile.toString() + "'" +
+   						  " AND " + UserProfilesView.Col_Username + " LIKE " + "'" + user + "'";
+
+		String upd_minus_sql = "UPDATE " + UserProfilesTable.Name +
+			   				   " SET " + UserProfilesTable.Col_Amount + "= (" + UserProfilesTable.Col_Amount
+			   																+ " - " + amount + ")" +
+			   				   " WHERE " + UserProfilesTable.Col_TypeID + " LIKE (" + getProfileIDSQL(profile) +
+			   				   ") AND " + UserProfilesTable.Col_UserID + " LIKE (" + getUserIDSQL(sender) + ")";
+	
+	   String ins_sql = "INSERT INTO " + UserProfilesTable.Name + "(" 
+									   + UserProfilesTable.Col_UserID + ", " 
+									   + UserProfilesTable.Col_TypeID + ", "			
+									   + UserProfilesTable.Col_Amount
+   				        + ") VALUES((" + getUserIDSQL(user) + "), ("
+   							  	 	   + getProfileIDSQL(profile) + "), "
+   							  	 	   + "'" + Integer.toString(amount) + "') ";
+		
+		String upd_add_sql = "UPDATE " + UserProfilesTable.Name +
+							 " SET " + UserProfilesTable.Col_Amount + "= (" + UserProfilesTable.Col_Amount
+																+ " + " + amount + ")" +
+				   	         " WHERE " + UserProfilesTable.Col_TypeID + " LIKE (" + getProfileIDSQL(profile) +
+				             ") AND " + UserProfilesTable.Col_UserID + " LIKE (" + getUserIDSQL(user) + ")";
+		
+		
+		if ( runGetIntQuery( chips_sql ) < 1 ) {
+			runBasicQuery( ins_sql );
+		} else {
+			runBasicQuery( upd_add_sql );
+		}
+		runBasicQuery( upd_minus_sql );
+
+	   addTransaction(sender, (0 - amount), GamesType.ADMIN, TransactionType.TRANSFER, profile);
+	   addTransaction(user, amount, GamesType.ADMIN, TransactionType.TRANSFER, profile);
+	}
+   
+   /**
+    * Gives a players chips
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    * @param profile	The profile type
+ * @return 
+    */
+   public boolean giveChips(String username, int amount, ProfileType profile)
+		   throws DBException, SQLException {	   
+	   String chips_sql = "SELECT COUNT(*) FROM " + UserProfilesView.Name +
+			   				" WHERE " + UserProfilesView.Col_Profile + " LIKE " + "'" + profile.toString() + "'" +
+			   					" AND " + UserProfilesView.Col_Username + " LIKE " + "'" + username + "'";
+
+	   String ins_sql = "INSERT INTO " + UserProfilesTable.Name + "(" 
+  							+ UserProfilesTable.Col_UserID + ", " 
+			   				+ UserProfilesTable.Col_TypeID + ", "			
+			   				+ UserProfilesTable.Col_Amount
+			   				+ ") VALUES((" + getUserIDSQL(username) + "), ("
+			   							  + getProfileIDSQL(profile) + "), "
+			   							  + "'" + Integer.toString(amount) + "') ";
+	   
+	   String ins_user_sql = "INSERT INTO " + UsersTable.Name + "(" 
+					+ UsersTable.Col_Username
+					+ ") VALUES('" + username + "')";
+	   
+	   String upd_sql = "UPDATE " + UserProfilesTable.Name +
+			   			" SET " + UserProfilesTable.Col_Amount + "= (" + UserProfilesTable.Col_Amount
+			   																+ " + " + amount + ")" +
+			   			" WHERE " + UserProfilesTable.Col_TypeID + " LIKE (" + getProfileIDSQL(profile) +
+			   				") AND " + UserProfilesTable.Col_UserID + " LIKE (" + getUserIDSQL(username) + ")";
+	   boolean result = false;
+	   
+	   int profile_id = runGetIntQuery( getProfileIDSQL(profile) );
+	   // check valid profile
+	   if (profile_id != -1) {
+		   // decide whether to insert or update
+		   if ( runGetIntQuery( chips_sql ) >= 1) {
+			   // update
+			   result = (runBasicQuery( upd_sql ) == 0);
+		   } else {
+			   // check user exists 
+			   if (runGetIntQuery( getUserIDSQL(username) ) > 0) {
+				   // user exists so just add to profiles
+				   result = (runBasicQuery( ins_sql ) == 0);
+			   } else {
+				   // user didnt exist so add to both users and profiles
+				   int numrows = runBasicQuery( ins_user_sql );
+				   if (numrows == 1)  {
+					   result = (runBasicQuery( ins_sql ) == 0);
+				   }
+			   }
+		   }
+	   }
+		   
+	   if (result) {
+		   addTransaction(username, amount, GamesType.POKER, TransactionType.ADMIN, profile);
+	   }
+	   
+	   return result;
+   }
+   
+   /**
+    * Adds a players poker chips back to their balance
+    * We don't care if the user doesn't exist as they needed to exist to join the table
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    */
+   public void cashOut(String username, int amount, ProfileType prof_type)
+		   throws DBException, SQLException {
+	   String sql = "UPDATE " + UserProfilesTable.Name + 
+		   		" SET " + UserProfilesTable.Col_Amount + " = ("
+		    			   + UserProfilesTable.Col_Amount + " + " + Integer.toString(amount) + ")" +		   		
+		    	" WHERE " + UserProfilesTable.Col_UserID + " = (" + getUserIDSQL(username) + ") AND "
+		 			  	  + UserProfilesTable.Col_TypeID + " = (" + getProfileIDSQL(prof_type) + ")";
+
+	   runBasicQuery(sql);
+	   addTransaction(username, amount, GamesType.POKER, TransactionType.POKER_CASHOUT, prof_type);	   
+   }
+   
+   /**
+    * Updates the global jackpot total
+    * 
+    * @param prof_type	The profile the jackpot is for
+    * @param amount		The amount to increase it by
+    */
+   public void updateJackpot(ProfileType prof_type, int amount)
+		   throws DBException, SQLException {
+	   String sql = "INSERT INTO " + JackpotTable.Name + "("
+			   							+ JackpotTable.Col_Profile + ","
+			   							+ JackpotTable.Col_Total + ")" + 
+			   		"VALUES ((" + getProfileIDSQL(prof_type) + ", '" + amount + "')" +
+			   		"ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total +
+			   								 " = " + JackpotTable.Col_Total + " + " + amount;
+	   runBasicQuery(sql);
+   }
+   
+   /**
+    * Retrieves the jackpot from the database
+    * 
+    * @param prof_type	The profile the jackpot is for
+    * @param amount		The amount to increase it by
+    */
+   public int getJackpot(ProfileType prof_type) throws DBException, SQLException {
+	   String sql = "SELECT " + JackpotTable.Col_Total + " FROM " + JackpotTable.Name +
+			   		" WHERE " + JackpotTable.Col_Profile + " = '" + getProfileIDSQL(prof_type) + "'";
+	   int res = runGetIntQuery(sql);
+	   return (res <= 0 ? 0 : res);
+   }
+   
+   /**
+    * Adds the winnings from a jackpot
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    */
+   public void jackpot(String username, int amount, ProfileType prof_type) 
+		   throws DBException, SQLException {
+	   String sql = "UPDATE " + UserProfilesTable.Name + 
+		   		" SET " + UserProfilesTable.Col_Amount + " = ("
+		    			   + UserProfilesTable.Col_Amount + " + " + Integer.toString(amount) + ")" +		   		
+		    	" WHERE " + UserProfilesTable.Col_UserID + " = (" + getUserIDSQL(username) + ") AND "
+		 			  	  + UserProfilesTable.Col_TypeID + " = (" + getProfileIDSQL(prof_type) + ")";
+	     
+	   String reset = "INSERT INTO " + JackpotTable.Name + "("
+							+ JackpotTable.Col_Profile + ","
+							+ JackpotTable.Col_Total + ")" + 
+					"VALUES ((" + getProfileIDSQL(prof_type) + ", '0')" +
+					"ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total + " = '0'";
+	   
+	   runBasicQuery(sql);
+	   runBasicQuery(reset);	 
+	   addTransaction(username, amount, GamesType.ADMIN, TransactionType.POKER_JACKPOT, prof_type);	   
+   }
+   
+   /**
+    * Removes poker chips from a player's balance
+    * We don't care if the user doesn't exist as they needed to exist to join the table
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    */
+   public void buyIn(String username, int amount, ProfileType prof_type) 
+		   throws DBException, SQLException {
+	   String sql = "UPDATE " + UserProfilesTable.Name + 
+			   		" SET " + UserProfilesTable.Col_Amount + " = ("
+			    			   + UserProfilesTable.Col_Amount + " - " + Integer.toString(amount) + ")" +		   		
+			    	" WHERE " + UserProfilesTable.Col_UserID + " = (" + getUserIDSQL(username) + ") AND "
+			 			  	  + UserProfilesTable.Col_TypeID + " = (" + getProfileIDSQL(prof_type) + ")";
+	   
+	   runBasicQuery(sql);
+	   addTransaction(username, -amount, GamesType.POKER, TransactionType.POKER_BUYIN, prof_type);
+	}
+   
+   /**
+    * Getter method for the next hand ID
+    * 
+    * Performs an SQL statement on the DB where the new hand is created with a blank winner
+    * 
+    * @return  The handID
+    */
+   public int getHandID() throws DBException, SQLException {
+	   String sql = "INSERT INTO " + PokerHandsTable.Name +
+	   			" ( " + PokerHandsTable.Col_WinnerID + 
+	   			", " + PokerHandsTable.Col_Amount + ") " +
+	   			"VALUES ('0', '0')";
+
+	   return runGetIDQuery(sql);
+   }
+   
+   /**
+    * Updates the hand table with the hand winner and pot size
+    * 
+    * @param hand_id	The ID
+    * @param username	The winner
+    * @param pot		The pot size
+    */
+   public void setHandWinner(int hand_id, String username, int pot)
+		   throws DBException, SQLException {
+	   String sql = "UPDATE " + PokerHandsTable.Name +
+				    " SET " + PokerHandsTable.Col_WinnerID + " = (" + getUserIDSQL(username) + "), "
+				           + PokerHandsTable.Col_Amount + " = '" + Integer.toString(pot) + "' " +
+	   				"WHERE " + PokerHandsTable.Col_ID + " = '" + Integer.toString(hand_id) + "'";
+
+	   runBasicQuery(sql);
+   }
+   
+   /**
+    * Updates the hand table with the hand winner and pot size
+    * 
+    * @param hand_id	The ID
+    * @param username	The winner
+    * @param pot		The pot size
+    */
+   public void addHandWinner(int hand_id, String username, int pot)
+		   throws DBException, SQLException {
+	   String sql = "INSERT INTO " + PokerHandsTable.Name + "("
+			   						+ PokerHandsTable.Col_WinnerID + ", "
+			   						+ PokerHandsTable.Col_Amount + ", "
+			   						+ PokerHandsTable.Col_ID + ") VALUES( " 
+			   						+ "(" + getUserIDSQL(username) + "),'" + Integer.toString(pot) + "','" + Integer.toString(hand_id) + "')";
+
+	   runBasicQuery(sql);
+   }
+   
+   /**
+    * Gets the highest better for a profile
+    * 
+    * @param profile	The profile to check
+    * 
+    * @return The username of the highest better for the provided profile
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public BetterInfo getTopBetter(ProfileType profile) throws DBException, SQLException {
+		String sql = "SELECT " + TotalBetsView.Col_Username + ","
+				   			   + TotalBetsView.Col_Total + 
+					 " FROM " + TotalBetsView.Name +
+					 " WHERE " + TotalBetsView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " LIMIT 1";
+		
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   String user = null;
+	   int total = -1;
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(1);
+			   rs = stmt.executeQuery(sql);
+			   
+			   if ( rs.next() ) {
+				   user = rs.getString(TotalBetsView.Col_Username);
+				   total = rs.getInt(TotalBetsView.Col_Total);
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), sql);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+
+		return new BetterInfo(user, total);
+	}
+	
+   /**
+    * Gets the highest winner for a profile
+    * 
+    * @param profile	The profile to check
+    * 
+    * @return The username of the highest better for the provided profile
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public BetterInfo getTopWinner(ProfileType profile) throws DBException, SQLException {
+		String sql = "SELECT " + OrderedWinnersView.Col_Username + ","
+				   			   + OrderedWinnersView.Col_Total + 
+					 " FROM " + OrderedWinnersView.Name +
+					 " WHERE " + OrderedWinnersView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " LIMIT 1";
+		
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   String user = null;
+	   int total = -1;
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(1);
+			   rs = stmt.executeQuery(sql);
+			   
+			   if ( rs.next() ) {
+				   user = rs.getString(OrderedWinnersView.Col_Username);
+				   total = rs.getInt(OrderedWinnersView.Col_Total);
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), sql);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+
+		return new BetterInfo(user, total);
+	}
+	
+   /**
+    * Gets the highest single bet for a profile
+    * 
+    * @param profile	The profile to check
+    * 
+    * @return The username of the highest better for the provided profile
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public BetterInfo getHighestBet(ProfileType profile) throws DBException, SQLException {
+		String sql = "SELECT " + OrderedBetsView.Col_Username + ","
+							   + OrderedBetsView.Col_Game + ","
+							   + OrderedBetsView.Col_Total + 
+					 " FROM " + OrderedBetsView.Name +
+					 " WHERE " + OrderedBetsView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " LIMIT 1";
+		
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   String user = null;
+	   String game = null;
+	   int total = -1;
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(1);
+			   rs = stmt.executeQuery(sql);
+			   
+			   if ( rs.next() ) {
+				   user = rs.getString(OrderedBetsView.Col_Username);
+				   game = rs.getString(OrderedBetsView.Col_Game);
+				   total = rs.getInt(OrderedBetsView.Col_Total);
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), sql);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+
+		return new BetterInfo(user, game, total);
+	}
+	
+   
+   /**
+    * Adds a new transaction to the transaction table
+    * 
+    * @param username 	The username 
+    * @param amount		The amount
+    * @param tzx_type	The type of transaction
+    */
+   public void addTransaction(String username, int amount,
+		   					  GamesType game_type,
+		   					  TransactionType tzx_type,
+		   					  ProfileType prof_type) 
+		   							  throws DBException, SQLException { 
+	   String sql = "INSERT INTO " + TransactionsTable.Name + "(" 
+  							+ TransactionsTable.Col_TypeID + ", " 
+			   				+ TransactionsTable.Col_GameID + ", "			   				
+			   				+ TransactionsTable.Col_UserID + ", "
+			   				+ TransactionsTable.Col_Amount + ", "
+					   		+ TransactionsTable.Col_ProfileType + ") VALUES("
+			   				  + "(" + getTzxTypeIDSQL(tzx_type) + "), "
+			   				  + "(" + getGameIDSQL(game_type) + "), "
+			   				  + "(" + getUserIDSQL(username) + "), "
+					   		  + "(" + Integer.toString(amount) + "), "
+			   				  + "(" + getProfileIDSQL(prof_type) + "))";
+	   
+	   runBasicQuery(sql);
+   }
+   
+   /**
+    * Runs a single query that returns a single column and row
+    * 
+    * @param query	The query to execute
+    * 
+    * @return		The resulting String
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private String runGetStringQuery(String query) throws DBException, SQLException {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   String ret = null;
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(1);
+			   rs = stmt.executeQuery(query);
+			   
+			   if ( rs.next() ) {
+				   ret = rs.getString(1);
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), query);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+	   return ret;
+   }
+      
+   /**
+    * Runs a single query that returns a single column and row
+    * 
+    * @param query	The query to execute
+    * 
+    * @return		The resulting integer
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private int runGetIntQuery(String query) throws DBException, SQLException {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   int ret = -1;
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(1);
+			   rs = stmt.executeQuery(query);
+			   
+			   if ( rs.next() ) {
+				   ret = rs.getInt(1);
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), query);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+	   return ret;
+   }
+   
+   /**
+    * Runs a single query that returns an ID from the tabke
+    * 
+    * @param query	The query to execute
+    * 
+    * @return		The resulting int ID
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private int runGetIDQuery(String query) throws DBException, SQLException {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   int ret = -1;
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   try {
+			   stmt.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+		       rs = stmt.getGeneratedKeys();
+		       if (rs.next()) {
+		           ret = rs.getInt(1);
+		       } else {
+		           throw new RuntimeException("Can't find most recent hand ID we just created");
+		       }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), query);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+	   return ret;
+   }
+   
+   /**
+    * Runs a single query that returns nothing
+    * 
+    * @param query	The query to execute
+    * 
+    * @return the number of rows affected.
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private int runBasicQuery(String query) throws DBException, SQLException {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   int numrows = -1;
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   try {
+			   numrows = stmt.executeUpdate(query);
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), query);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+	   return numrows;
+   }
+   
+   /**
+    * Provides the SQL for retrieving a user's ID
+    * 
+    * @param username The username
+    * 
+    * @return The ID
+    */
+   private static final String getUserIDSQL(String username) {
+	   String out = "SELECT uu." + UsersTable.Col_ID +
+					" FROM " + UsersTable.Name + " uu" +
+					" WHERE uu." + UsersTable.Col_Username +
+					" LIKE '" + username + "' LIMIT 1";
+	   return out;
+   }
+   
+   /**
+    * Provides the SQL for retrieving the Poker game ID
+    * 
+    * @return The ID
+    */
+   private static final String getGameIDSQL(GamesType game) {
+	   String out = "SELECT gg." + GamesTable.Col_ID +
+					" FROM " + GamesTable.Name + " gg" +
+					" WHERE gg." + GamesTable.Col_Name +
+					" LIKE '" + game.toString() + "' LIMIT 1";
+	   return out;
+   }
+   
+   /**
+    * Provides the SQL for checking a profile type
+    */
+   private static final String getProfileIDSQL(ProfileType profile) {
+	   String prof_sql = "SELECT pt." + ProfileTypeTable.Col_ID
+ 	  			+ " FROM " + ProfileTypeTable.Name + " pt"
+ 	  			+ " WHERE pt." + ProfileTypeTable.Col_Name
+ 	  			+ " LIKE " + "'" + profile.toString() + "'";
+	   return prof_sql;
+   }
+   
+   /**
+    * Provides the SQL for getting a transaction type ID
+    */
+   private static final String getTzxTypeIDSQL(TransactionType tzx_type) {
+	   String out = "SELECT tt." + TransactionTypesTable.Col_ID
+	   			  + " FROM " + TransactionTypesTable.Name + " tt"
+		   		  + " WHERE tt." + TransactionTypesTable.Col_Type
+		   		  + " LIKE '" +  tzx_type.toString() + "'";
+	   return out;
+   }
+}

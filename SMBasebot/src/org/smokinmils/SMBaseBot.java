@@ -9,6 +9,7 @@
 package org.smokinmils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -42,6 +43,9 @@ public class SMBaseBot {
    
 	/** The bot nickname */
 	private static String _nick;
+	
+	/** The bot nickserv password */
+	private static String _password;
    
 	/** The bot ident string */
 	private static String _ident;
@@ -55,22 +59,26 @@ public class SMBaseBot {
    /**
     * Constructor
     */
-   private SMBaseBot() { }   
+   private SMBaseBot() {
+	   bots = new HashMap<String,IrcBot>();
+   }   
    
    /**
     * Sets up the bot with the correct servers and channels
     * 
     * @param nickname a list of all the servers the bot should connect to
+    * @param password the nickserv password for the bot
     * @param login the ident name for this bot
     * @param debug if we should turn the debug on
     * 
     * @return true if the bot hasn't already been initialised
     */
-   public boolean initialise(String nickname, String login, boolean debug) {
+   public boolean initialise(String nickname, String password, String login, boolean debug) {
 	   boolean ret = false;
 	   if (!_initialised) {
 		   _debug = debug;
 		   _nick = nickname;
+		   _password = password;
 		   _ident = login;
 	       _initialised = true;
 	       EventLog.create(_nick, _debug);
@@ -98,6 +106,7 @@ public class SMBaseBot {
 	   newbot.setName(_nick);
 	   newbot.setLogin(_ident);
 	   newbot.setVerbose(_debug);
+	   newbot.identify(_password);
 	   newbot.setAutoNickChange(true);
 	   newbot.useShutdownHook(false);
 	   newbot.setVersion(Version);
@@ -186,5 +195,16 @@ public class SMBaseBot {
 			EventLog.log("A bot was passed to the function that is not a part of the system", "SMBaseBot", "getServer");
 		
 		return ret;
+	}
+	
+   /**
+    * Returns the bot for a certain server
+    * 
+    * @param server the name of the server
+    * 
+    * @return the bot object
+    */
+	public IrcBot getBot(String server) {
+		return bots.get(server);
 	}
 }

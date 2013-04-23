@@ -1,26 +1,37 @@
+/**
+ * This file is part of a commercial IRC bot that 
+ * allows users to play online IRC games.
+ * 
+ * The project was commissioned by Julian Clark
+ * 
+ * Copyright (C) 2013 Jamie Reid & Carl Clegg
+ */ 
 package org.smokinmils.database.tables;
 
 public class UsersTable {
 
 	/** Table name */
-	private static final String Name = "users";
+	public static final String Name = "users";
+
+	/** Column for the id */
+	public static final String Col_ID = "id";
 	
 	/** Column for the username */
-	private static final String Col_Username = "username";
+	public static final String Col_Username = "username";
 	
 	// bzzt not used any more
 	/** Column for the current chips */
-	private static final String Col_Chips = "chips";
+	public static final String Col_Chips = "chips";
 	
 	/** Column for the number of wins */
-	private static final String Col_Wins = "wins";
+	public static final String Col_Wins = "wins";
 	
 	/** Column for the number of losses */
-	private static final String Col_Losses = "losses";
+	public static final String Col_Losses = "losses";
 	
 	/** Column for the total amount bet */
-	private static final String Col_TotalBets = "total_bets";
+	public static final String Col_TotalBets = "total_bets";
 	
 	/** Column for the active profile */
-	private static final String Col_ActiveProfile = "active_profile";
+	public static final String Col_ActiveProfile = "active_profile";
 }
