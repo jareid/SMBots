@@ -52,10 +52,10 @@ public class TransferChips extends Event {
 				message.startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 
-			if (msg.length == 3) {
-				String user = msg[0];
-				Integer amount = Utils.tryParse(msg[1]);
-				ProfileType profile = ProfileType.fromString(msg[2]);
+			if (msg.length == 4) {
+				String user = msg[1];
+				Integer amount = Utils.tryParse(msg[2]);
+				ProfileType profile = ProfileType.fromString(msg[3]);
 				
 				if (!user.isEmpty() && amount != null) {
 					// Check valid profile

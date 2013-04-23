@@ -62,8 +62,8 @@ public class CheckChips extends Event {
 			String[] msg = message.split(" ");
 			String user = "";
 			
-			if ((msg.length == 0 && msg[0].compareTo("") == 0) || msg.length == 1) {
-				user = (msg[0].compareTo("") != 0 ? msg[0] : sender);
+			if (msg.length == 1 || msg.length == 2) {
+				user = (msg.length > 1 ? msg[1] : sender);
 				Map<ProfileType, Integer> creds = null;
 				try {
 					creds = Database.getInstance().checkAllCredits( user );

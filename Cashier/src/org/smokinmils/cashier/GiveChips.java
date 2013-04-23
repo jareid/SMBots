@@ -51,10 +51,10 @@ public class GiveChips extends Event {
 			String[] msg = message.split(" ");
 
 			if (event.getUser().getChannelsOpIn().contains( chan ) ) {
-				if (msg.length == 3) {
-					String user = msg[0];
-					Integer amount = Utils.tryParse(msg[1]);
-					ProfileType profile = ProfileType.fromString(msg[2]);
+				if (msg.length == 4) {
+					String user = msg[1];
+					Integer amount = Utils.tryParse(msg[2]);
+					ProfileType profile = ProfileType.fromString(msg[3]);
 					
 					if (amount != null) {						
 						if ( profile != null ) {
@@ -90,7 +90,7 @@ public class GiveChips extends Event {
 					bot.invalidArguments( sender, Format );
 				}
 			} else {
-				EventLog.info(sender + " attempted to give someone chips", "Lobby", "onGive");
+				EventLog.info(sender + " attempted to give someone chips", "GiveChips", "onMessage");
 			}
 		}
 	}

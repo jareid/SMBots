@@ -44,15 +44,15 @@ public class CashierBot {
     	basebot.addListener("SwiftIRC", cc_event);
     	
     	GiveChips gc_event = new GiveChips();
-    	cc_event.addValidChan(all_swift_chans);
+    	gc_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", gc_event);
     	
     	Jackpots jp_event = new Jackpots();
-    	cc_event.addValidChan(all_swift_chans);
+    	jp_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", jp_event);
     	
     	TransferChips tc_event = new TransferChips();
-    	cc_event.addValidChan(all_swift_chans);
+    	tc_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", tc_event);
     	
     	while(true) { Thread.sleep(10); }

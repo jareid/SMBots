@@ -18,20 +18,20 @@ public class BetterInfo {
 
 	public GamesType Game;
 	
-	public int Amount;
+	public long Amount;
 	
-	public BetterInfo(String user, int amount) {
+	public BetterInfo(String user, long amount) {
 		User = user;
 		Amount = amount;
 	}
 	
-	public BetterInfo(String user, GamesType game, int amount) {
+	public BetterInfo(String user, GamesType game, long amount) {
 		User = user;
 		Game = game;
 		Amount = amount;
 	}
 	
-	public BetterInfo(String user, String game, int amount) {
+	public BetterInfo(String user, String game, long amount) {
 		User = user;
 		Game = GamesType.fromString(game);
 		Amount = amount;

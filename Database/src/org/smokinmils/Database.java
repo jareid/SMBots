@@ -483,17 +483,17 @@ public class Database {
 		   // decide whether to insert or update
 		   if ( runGetIntQuery( chips_sql ) >= 1) {
 			   // update
-			   result = (runBasicQuery( upd_sql ) == 0);
+			   result = (runBasicQuery( upd_sql ) == 1);
 		   } else {
 			   // check user exists 
 			   if (runGetIntQuery( getUserIDSQL(username) ) > 0) {
 				   // user exists so just add to profiles
-				   result = (runBasicQuery( ins_sql ) == 0);
+				   result = (runBasicQuery( ins_sql ) == 1);
 			   } else {
 				   // user didnt exist so add to both users and profiles
 				   int numrows = runBasicQuery( ins_user_sql );
 				   if (numrows == 1)  {
-					   result = (runBasicQuery( ins_sql ) == 0);
+					   result = (runBasicQuery( ins_sql ) == 1);
 				   }
 			   }
 		   }
@@ -671,7 +671,7 @@ public class Database {
 	   Statement stmt = null;
 	   ResultSet rs = null;
 	   String user = null;
-	   int total = -1;
+	   long total = -1;
 	   try {
 		   try {
 			   conn = getConnection();
@@ -681,7 +681,7 @@ public class Database {
 			   
 			   if ( rs.next() ) {
 				   user = rs.getString(TotalBetsView.Col_Username);
-				   total = rs.getInt(TotalBetsView.Col_Total);
+				   total = rs.getLong(TotalBetsView.Col_Total);
 			   }
 		   } catch (SQLException e) {
 			   throw new DBException(e.getMessage(), sql);
@@ -721,7 +721,7 @@ public class Database {
 	   Statement stmt = null;
 	   ResultSet rs = null;
 	   String user = null;
-	   int total = -1;
+	   long total = -1;
 	   try {
 		   try {
 			   conn = getConnection();
@@ -731,7 +731,7 @@ public class Database {
 			   
 			   if ( rs.next() ) {
 				   user = rs.getString(OrderedWinnersView.Col_Username);
-				   total = rs.getInt(OrderedWinnersView.Col_Total);
+				   total = rs.getLong(OrderedWinnersView.Col_Total);
 			   }
 		   } catch (SQLException e) {
 			   throw new DBException(e.getMessage(), sql);
@@ -773,7 +773,7 @@ public class Database {
 	   ResultSet rs = null;
 	   String user = null;
 	   String game = null;
-	   int total = -1;
+	   long total = -1;
 	   try {
 		   try {
 			   conn = getConnection();
@@ -784,7 +784,7 @@ public class Database {
 			   if ( rs.next() ) {
 				   user = rs.getString(OrderedBetsView.Col_Username);
 				   game = rs.getString(OrderedBetsView.Col_Game);
-				   total = rs.getInt(OrderedBetsView.Col_Total);
+				   total = rs.getLong(OrderedBetsView.Col_Total);
 			   }
 		   } catch (SQLException e) {
 			   throw new DBException(e.getMessage(), sql);
