@@ -15,9 +15,9 @@ import java.util.Map.Entry;
 
 import org.pircbotx.Channel;
 import org.pircbotx.exception.IrcException;
-import org.pircbotx.exception.NickAlreadyInUseException;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.smokinmils.bot.CheckIdentified;
+import org.smokinmils.bot.ConnectEvents;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
@@ -121,17 +121,14 @@ public class SMBaseBot {
 	   newbot.setMessageDelay(5);
 	   
 	   newbot.setListenerManager( new ThreadedListenerManager<IrcBot>() );
-	   newbot.getListenerManager().addListener( new CheckIdentified() );
+	   newbot.getListenerManager().addListener( new CheckIdentified() );	   
+	   newbot.getListenerManager().addListener( new ConnectEvents() );
 	   
 	   try {
 		   newbot.connect(addr, port);
-	   } catch (NickAlreadyInUseException e) {
-		   // TODO 
-	   } catch (IOException e) {
-		   // TODO
-	   } catch (IrcException e) {
-		   // TODO
-	   }
+		} catch (IOException | IrcException e) {
+			EventLog.fatal(e, "ConnectEvents", "onDisconnect");
+		}
 	   
 	   bots.put(name, newbot);
    }
