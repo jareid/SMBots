@@ -137,7 +137,7 @@ public class CheckIdentified extends Event {
     			
     			// Only add users with the correct levels
     			if (code >= RequiredStatus) {
-    				EventLog.info(user + " identified", "CheckIdentified", "sendStatusRequest");
+    				EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
     				bot.addIdentifiedUser( user.getNick() );
     				try {
     					Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );

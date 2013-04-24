@@ -8,11 +8,6 @@
  */ 
 package org.smokinmils.pokerbot.game.rooms;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1194,7 +1189,7 @@ public class Table extends Room {
 	    		} else if (  action == ActionType.RAISE ) {
 	    			valid = (bet - actor.getBet()) + minBet;
 	    			int to_call = bet - actor.getBet();
-	    			if (amount < valid && actor.getChips() >= valid) {
+	    			if (amount < valid) {
 	    				String out = Strings.InvalidBet.replaceAll("%hID", Integer.toString(handID));
 	    				out.replaceAll("%pChips", Integer.toString(actor.getChips()));
 	    				out.replaceAll("%min", Integer.toString(valid));
@@ -1501,10 +1496,10 @@ public class Table extends Room {
         startShowCards();
         
         // Update the jackpot.
-    	updateJackpot(ircClient, totalrake, profileName);
+        boolean can_win = updateJackpot(ircClient, totalrake, profileName);
     	
     	// Check if this hand wins.
-    	if ( checkJackpot() ) jackpotWon();
+    	if ( can_win && checkJackpot() ) jackpotWon();
     }
 	
     /**
@@ -1586,10 +1581,10 @@ public class Table extends Room {
         startShowCards();        
         
         // Update the jackpot.
-    	updateJackpot(ircClient, rake, profileName);
+    	boolean can_win = updateJackpot(ircClient, rake, profileName);
     	
     	// Check if this hand wins.
-    	if ( checkJackpot() ) jackpotWon();
+    	if ( can_win && checkJackpot() ) jackpotWon();
     }
     	
     /**
@@ -1981,6 +1976,7 @@ public class Table extends Room {
 	 * Enables the ability for players to show cards.
 	 */
 	private void startShowCards() {
+		actor = null;
         canShow = true;
 		String out = Strings.StartShowCard.replaceAll( "%id", Integer.toString(tableID) );
 		out = out.replaceAll( "%hID", Integer.toString(handID) );
@@ -1994,112 +1990,73 @@ public class Table extends Room {
 	/**
 	 * Save the new jackpot value
 	 */
-	private static synchronized void updateJackpot(Client irc, int rake, String profile) {
-		try {
-			Integer jackpot = null;
-			try {
-				BufferedReader readFile = new BufferedReader(new FileReader("jackpot." + profile));
-				jackpot = Utils.tryParse(readFile.readLine()); 
-				readFile.close();
-			} catch (FileNotFoundException e) {
-			}
+	private static synchronized boolean updateJackpot(Client irc, int rake, String profile) {
+		boolean added = false;
+		int jackpot = Database.getInstance().getJackpot(profile);
+		
+		double incr = (rake * (Variables.JackpotRakePercentage / 100.0));
+		int incrint = (int) Math.round(incr);
+		
+		EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
+					 + Integer.toString(incrint) + " (" + Integer.toString(rake) + ")",
+					 "Table", "updateJackpot");
+		
+		if (incrint > 0) {
+			added = true;
+			jackpot += incrint;
+			// Announce to lobbyChan
+			String out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(jackpot));
+			out = out.replaceAll("%profile", profile);
+			irc.sendIRCMessage(out);
 			 
-			if (jackpot == null) jackpot = 0;		 
-			double incr = (rake * (Variables.JackpotRakePercentage / 100.0));
-			int incrint = (int) Math.round(incr);
-			
-			EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
-						 + Integer.toString(incrint) + " (" + Integer.toString(rake) + ")",
-						 "Table", "updateJackpot");
-			
-			if (incrint > 0) {
-				jackpot += incrint;
-				// Announce to lobbyChan
-				String out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(jackpot));
-				out = out.replaceAll("%profile", profile);
-				irc.sendIRCMessage(out);
-				 
-				// Write the jackpot back to file
-				FileWriter writeFile;
-				writeFile = new FileWriter("jackpot." + profile);
-				writeFile.write(jackpot + "\n");
-				writeFile.close();
-			}
-		} catch (IOException e1)  {
-    		irc.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
-    		EventLog.fatal(e1, "Table", "updateJackpot");
-    		try {
-				Thread.sleep(10);
-			} catch (InterruptedException inte) {
-			}
-    		System.exit(1);
+			Database.getInstance().updateJackpot(profile, incrint);
 		}
+		return added;
 	}
 	
 	/**
 	 * Check if the jackpot has been won
 	 */
 	private static synchronized boolean checkJackpot() {
-		return (secureRandom.nextInt(Variables.JackpotChance + 1) == Variables.JackpotChance);		
+		return (secureRandom.nextInt(Variables.JackpotChance + 1) >= 1);		
 	}
 	
 	/**
 	 * Jackpot has been won, split between all players on the table
 	 */
 	private void jackpotWon() {
-		try {
-			Integer jackpot = null;
-			try {
-				BufferedReader readFile = new BufferedReader(new FileReader("jackpot." + profileName));
-				jackpot = Utils.tryParse(readFile.readLine()); 
-				readFile.close();
-			} catch (FileNotFoundException e) {
-			}
-			 
-			if (jackpot != null) {
-				int remainder = jackpot % players.size();
-				jackpot -= remainder;
-				
-				if (jackpot != 0) {
-					int win = jackpot / players.size();
-					for (Player player: jackpotPlayers) {
-						// TODO: change to a jackpot.
-						Database.getInstance().cashOut(player.getName(), win, profileID);
-					}
-					
-					// Announce to lobby
-					String out = Strings.JackpotWon.replaceAll("%chips", Integer.toString(jackpot));
-					out = out.replaceAll("%profile", profileName);
-					out = out.replaceAll("%winners", jackpotPlayers.toString());
-					ircClient.sendIRCMessage(out);
-					
-					// Announce to table
-					out = Strings.JackpotWonTable.replaceAll("%chips", Integer.toString(win));
-					out = out.replaceAll("%profile", profileName);
-					out = out.replaceAll("%winners", jackpotPlayers.toString());
-					ircClient.sendIRCMessage(ircChannel, out);
-					
-					// Update jackpot with remainder
-					if (remainder > 0) {
-						out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(remainder));
-						ircClient.sendIRCMessage(out);
-					}
-					 
-					// Write the jackpot back to file
-					FileWriter writeFile;
-					writeFile = new FileWriter("jackpot." + profileName);
-					writeFile.write(remainder + "\n");
-					writeFile.close();
+		int jackpot = Database.getInstance().getJackpot(profileName);
+		 
+		if (jackpot > 0) {
+			int remainder = jackpot % players.size();
+			jackpot -= remainder;
+			
+			if (jackpot != 0) {
+				int win = jackpot / players.size();
+				for (Player player: jackpotPlayers) {
+					Database.getInstance().jackpot(player.getName(), win, profileName);
 				}
+				
+				// Announce to lobby
+				String out = Strings.JackpotWon.replaceAll("%chips", Integer.toString(jackpot));
+				out = out.replaceAll("%profile", profileName);
+				out = out.replaceAll("%winners", jackpotPlayers.toString());
+				ircClient.sendIRCMessage(out);
+				
+				// Announce to table
+				out = Strings.JackpotWonTable.replaceAll("%chips", Integer.toString(win));
+				out = out.replaceAll("%profile", profileName);
+				out = out.replaceAll("%winners", jackpotPlayers.toString());
+				ircClient.sendIRCMessage(ircChannel, out);
+				
+				// Update jackpot with remainder
+				if (remainder > 0) {
+					out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(remainder));
+					out = out.replaceAll("%profile", profileName);
+					ircClient.sendIRCMessage(out);
+				}
+				Database.getInstance().updateJackpot(profileName, remainder);
 			}
-		} catch (IOException e1)  {
-    		ircClient.sendIRCMessage("Something caused the bot to crash... please notify the staff.");
-    		EventLog.fatal(e1, "Table", "jackpotWon");
-    		try {
-				Thread.sleep(10);
-			} catch (InterruptedException inte) {
-			}
-    		System.exit(1);
 		}
 	}
 }

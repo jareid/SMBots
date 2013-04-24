@@ -16,6 +16,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.smokinmils.database.DBException;
+import org.smokinmils.database.tables.JackpotTable;
+import org.smokinmils.database.tables.UserProfilesTable;
 import org.smokinmils.logging.EventLog;
 
 import org.smokinmils.pokerbot.enums.TransactionType;
@@ -814,37 +817,127 @@ public class Database {
    }
    
    /**
-    * Adds the winnings from a poker jackpot
+    * Updates the global jackpot total
+    * 
+    * @param prof_type	The profile the jackpot is for
+    * @param amount		The amount to increase it by
+    */
+   public void updateJackpot(String prof_type, int amount) {
+	   String sql = "INSERT INTO " + JackpotTable.Name + "("
+			   							+ JackpotTable.Col_Profile + ","
+			   							+ JackpotTable.Col_Total + ")" + 
+			   		" VALUES ((" + getProfileIDSQL(prof_type) + "), '" + amount + "')" +
+			   		" ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total +
+			   								 " = " + JackpotTable.Col_Total + " + " + amount;
+	   runBasicQuery(sql);
+   }
+   
+   /**
+    * Retrieves the jackpot from the database
+    * 
+    * @param prof_type	The profile the jackpot is for
+    * @param amount		The amount to increase it by
+    */
+   public int getJackpot(String prof_type) {
+	   String sql = "SELECT " + JackpotTable.Col_Total + " FROM " + JackpotTable.Name +
+			   		" WHERE " + JackpotTable.Col_Profile + " = (" + getProfileIDSQL(prof_type) + ")";
+	   int res = runGetIntQuery(sql);
+	   return (res <= 0 ? 0 : res);
+   }
+   
+   /**
+    * Adds the winnings from a jackpot
     * 
     * @param username	The player's username
     * @param amount		The cash out value
     */
-   public void jackpot(String username, int amount, int profile_id) {
+   public void jackpot(String username, int amount, String prof_type) {
+	   String sql = "UPDATE " + UserProfilesTable.Name + 
+		   		" SET " + UserProfilesTable.Col_Amount + " = ("
+		    			   + UserProfilesTable.Col_Amount + " + " + Integer.toString(amount) + ")" +		   		
+		    	" WHERE " + UserProfilesTable.Col_UserID + " = (" + getUserIDSQL(username) + ") AND "
+		 			  	  + UserProfilesTable.Col_TypeID + " = (" + getProfileIDSQL(prof_type) + ")";
+	     
+	   String reset = "INSERT INTO " + JackpotTable.Name + "("
+							+ JackpotTable.Col_Profile + ","
+							+ JackpotTable.Col_Total + ")" + 
+					" VALUES ((" + getProfileIDSQL(prof_type) + "), '0')" +
+					" ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total + " = '0'";
+	   
+	   runBasicQuery(sql);
+	   runBasicQuery(reset);	 
+	   addTransaction(username, amount, TransactionType.JACKPOT, runGetIntQuery(getProfileIDSQL(prof_type)) );	   
+   }
+   
+   /**
+    * Runs a single query that returns a single column and row
+    * 
+    * @param query	The query to execute
+    * 
+    * @return		The resulting integer
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private int runGetIntQuery(String query) {
 	   Connection conn = null;
 	   Statement stmt = null;
-	   
-	   String sql = "UPDATE " + DBSettings.Table_UserProfiles + 
-			   		" SET " + DBSettings.Col_UserProfiles_Amount + " = ("
-			    			   + DBSettings.Col_UserProfiles_Amount + " + " + Integer.toString(amount) + ")" +		   		
-			    	" WHERE " + DBSettings.Col_UserProfiles_UserID + " = (" + getUserIDSQL(username) + ") AND "
-			 			  	  + DBSettings.Col_UserProfiles_TypeID + " = '" + Integer.toString(profile_id) + "'";
-	   
+	   ResultSet rs = null;
+	   int ret = -1;
 	   try {
 		   conn = getConnection();
 		   stmt = conn.createStatement();
-		   stmt.executeUpdate(sql);
-	   } catch (SQLException e) {
-			EventLog.log( e, "Database", "jackpot");
+		   stmt.setMaxRows(1);
+		   rs = stmt.executeQuery(query);
+		   
+		   if ( rs.next() ) {
+			   ret = rs.getInt(1);
+		   }
+	   } catch (SQLException ex) {
+		   EventLog.log(ex, "Database", "runGetIntQuery");
+	   } finally {
+		   try {
+			   if (rs != null) rs.close();
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+			   EventLog.log(e, "Database", "runGetIntQuery");
+		   }
+	   }
+	   return ret;
+   }
+   
+   /**
+    * Runs a single query that returns nothing
+    * 
+    * @param query	The query to execute
+    * 
+    * @return the number of rows affected.
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private int runBasicQuery(String query) {
+	   EventLog.log(query, "", "");
+	   Connection conn = null;
+	   Statement stmt = null;
+	   int numrows = -1;
+	   try {
+		   conn = getConnection();
+		   stmt = conn.createStatement();
+		   numrows = stmt.executeUpdate(query);
+	   } catch (SQLException ex) {
+		   EventLog.log(ex, "Database", "runGetIntQuery");
 	   } finally {
 		   try {
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {
-				EventLog.log( e, "Database", "jackpot");
+
+			   EventLog.log(e, "Database", "runGetIntQuery");
 		   }
 	   }
-	   addTransaction(username, amount, TransactionType.JACKPOT, profile_id);
-	   
+	   return numrows;
    }
    
    /**

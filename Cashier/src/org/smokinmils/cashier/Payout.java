@@ -27,8 +27,9 @@ public class Payout extends Event {
 	public static final String Description = "%b%c12Payout a number of chips from a players profile";
 	public static final String Format = "%b%c12" + Command + " <user> <amount> <profile>";
 	
-	private static final String PayoutChips = "%b%c04%sender:%c12 Paid out %c04%amount%c12 chips to the %c04%profile%c12 account of %c04%who%c12";
-	private static final String PayoutChipsPM = "%b%c12You have had %c04%amount%c12 chips paid out into your account by %c04%sender%c12";
+	private static final String PayoutChips = "%b%c04%sender:%c12 Paid out %c04%amount%c12 chips from the %c04%profile%c12 account of %c04%who%c12";
+	private static final String PayoutChipsPM = "%b%c12You have had %c04%amount%c12 chips paid out from your account by %c04%sender%c12";
+	public static final String NoChipsMsg = "%b%c12Sorry, %c04%user%c12 does not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 	
 	/**
 	 * This method handles the chips command
@@ -55,9 +56,23 @@ public class Payout extends Event {
 					String user = msg[1];
 					Integer amount = Utils.tryParse(msg[2]);
 					ProfileType profile = ProfileType.fromString(msg[3]);
-					
-					if (amount != null && amount > 0) {						
-						if ( profile != null ) {
+						
+					if (amount != null && amount > 0) {
+						int chips = 0;
+						try {
+							chips = Database.getInstance().checkCredits( user, profile );
+						} catch (Exception e) {
+							EventLog.log(e, "Payout", "message");
+						}
+
+						if ( profile == null ) {
+							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
+						} else if ( chips < amount ) {
+							String out = NoChipsMsg.replaceAll( "%chips", Integer.toString(amount));
+							out = out.replaceAll( "%profile", profile.toString() );
+							out = out.replaceAll( "%user", user );
+							bot.sendIRCMessage(chan.getName(), out);
+						} else {
 							boolean success = false;
 							try {
 								success = Database.getInstance().payoutChips(user, amount, profile);
@@ -80,8 +95,6 @@ public class Payout extends Event {
 							} else {
 								EventLog.log(sender + " attempted to pay out chips and the database failed", "Payout", "message");
 							}
-						} else {
-							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 						}
 					} else {
 						bot.invalidArguments( sender, Format );

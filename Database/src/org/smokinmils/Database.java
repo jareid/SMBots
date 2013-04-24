@@ -9,7 +9,9 @@
 package org.smokinmils;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -565,8 +567,8 @@ public class Database {
 	   String sql = "INSERT INTO " + JackpotTable.Name + "("
 			   							+ JackpotTable.Col_Profile + ","
 			   							+ JackpotTable.Col_Total + ")" + 
-			   		"VALUES ((" + getProfileIDSQL(prof_type) + ", '" + amount + "')" +
-			   		"ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total +
+			   		" VALUES ((" + getProfileIDSQL(prof_type) + "), '" + amount + "')" +
+			   		" ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total +
 			   								 " = " + JackpotTable.Col_Total + " + " + amount;
 	   runBasicQuery(sql);
    }
@@ -579,7 +581,7 @@ public class Database {
     */
    public int getJackpot(ProfileType prof_type) throws DBException, SQLException {
 	   String sql = "SELECT " + JackpotTable.Col_Total + " FROM " + JackpotTable.Name +
-			   		" WHERE " + JackpotTable.Col_Profile + " = '" + getProfileIDSQL(prof_type) + "'";
+			   		" WHERE " + JackpotTable.Col_Profile + " = (" + getProfileIDSQL(prof_type) + ")";
 	   int res = runGetIntQuery(sql);
 	   return (res <= 0 ? 0 : res);
    }
@@ -601,12 +603,12 @@ public class Database {
 	   String reset = "INSERT INTO " + JackpotTable.Name + "("
 							+ JackpotTable.Col_Profile + ","
 							+ JackpotTable.Col_Total + ")" + 
-					"VALUES ((" + getProfileIDSQL(prof_type) + ", '0')" +
-					"ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total + " = '0'";
+					" VALUES ((" + getProfileIDSQL(prof_type) + "), '0')" +
+					" ON DUPLICATE KEY UPDATE " + JackpotTable.Col_Total + " = '0'";
 	   
 	   runBasicQuery(sql);
 	   runBasicQuery(reset);	 
-	   addTransaction(username, amount, GamesType.ADMIN, TransactionType.POKER_JACKPOT, prof_type);	   
+	   addTransaction(username, amount, GamesType.ADMIN, TransactionType.JACKPOT, prof_type);	   
    }
    
    /**
@@ -680,6 +682,107 @@ public class Database {
    }
    
    /**
+    * Updates the competition id and time
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   public void competitionEnd()  throws DBException, SQLException {
+	   String sql = "UPDATE " + CompetitionIDTable.Name +
+			   		" SET " + CompetitionIDTable.Col_ID + " = (" + CompetitionIDTable.Col_ID + " + 1), "
+			   				+ CompetitionIDTable.Col_Ends + " = ADDDATE("
+			   											  + CompetitionIDTable.Col_Ends + ", INTERVAL 7 DAY)";
+
+	   runBasicQuery(sql);
+   }
+   
+   /**
+    * Checks if the competition for the current week is ended
+    * 
+    * @return true if the competition is over
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   public boolean competitionOver() throws DBException, SQLException{
+	   String sql = "SELECT IF(TIMESTAMPDIFF(MINUTE, CURRENT_TIMESTAMP(), " +
+			   		CompetitionIDTable.Col_Ends + ") > 0, '1', '0')" +
+			   		"FROM " + CompetitionIDTable.Name + " LIMIT 1";
+	   return ( runGetIntQuery(sql) == 1 ? true : false);
+   }
+   
+   /**
+    * Checks if the competition for the current week is ended
+    * 
+    * @return the number of seconds until the competition ends
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   public int getCompetitionTimeLeft() throws DBException, SQLException{
+	   String sql = "SELECT (UNIX_TIMESTAMP(" +
+			   		CompetitionIDTable.Col_Ends + ") - UNIX_TIMESTAMP(NOW()))" +
+			   		" FROM " + CompetitionIDTable.Name + " LIMIT 1";
+	   int res = runGetIntQuery(sql);
+	   return ( res < 0 ? 0 : res );
+   }
+   
+   /**
+    * Gets the highest better for a profile
+    * 
+    * @param profile	The profile to check
+    * @param profile	The profile to check
+    * 
+    * @return A list of users of the highest better for the provided profile
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public List<BetterInfo> getCompetition(ProfileType profile, int number) throws DBException, SQLException {
+		String sql = "SELECT " + CompetitionView.Col_Username + ","
+				   			   + CompetitionView.Col_Total + 
+					 " FROM " + CompetitionView.Name +
+					 " WHERE " + CompetitionView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " ORDER BY " + CompetitionView.Col_Total + " DESC " +
+					 " LIMIT 0, " + Integer.toString(number);
+		
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   String user = null;
+	   long total = -1;
+	   List<BetterInfo> winners = new ArrayList<BetterInfo>();
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(number);
+			   rs = stmt.executeQuery(sql);
+			   
+			   while ( rs.next() ) {
+				   user = rs.getString(TotalBetsView.Col_Username);
+				   total = rs.getLong(TotalBetsView.Col_Total);
+				   winners.add( new BetterInfo(user, total) );
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), sql);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (rs != null) rs.close();
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+
+	   return winners;
+	}
+   
+   /**
     * Gets the highest better for a profile
     * 
     * @param profile	The profile to check
@@ -694,6 +797,7 @@ public class Database {
 				   			   + TotalBetsView.Col_Total + 
 					 " FROM " + TotalBetsView.Name +
 					 " WHERE " + TotalBetsView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " ORDER BY " + TotalBetsView.Col_Total + " DESC " +
 					 " LIMIT 1";
 		
 	   Connection conn = null;
@@ -719,6 +823,7 @@ public class Database {
 		   throw ex;
 	   } finally {
 		   try {
+			   if (rs != null) rs.close();
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {
@@ -744,6 +849,7 @@ public class Database {
 				   			   + OrderedWinnersView.Col_Total + 
 					 " FROM " + OrderedWinnersView.Name +
 					 " WHERE " + OrderedWinnersView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " ORDER BY " + OrderedWinnersView.Col_Total + " DESC " +
 					 " LIMIT 1";
 		
 	   Connection conn = null;
@@ -769,6 +875,7 @@ public class Database {
 		   throw ex;
 	   } finally {
 		   try {
+			   if (rs != null) rs.close();
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {
@@ -795,6 +902,7 @@ public class Database {
 							   + OrderedBetsView.Col_Total + 
 					 " FROM " + OrderedBetsView.Name +
 					 " WHERE " + OrderedBetsView.Col_Profile + " LIKE '" + profile.toString() + "'" +
+					 " ORDER BY " + OrderedBetsView.Col_Total + " DESC " +
 					 " LIMIT 1";
 		
 	   Connection conn = null;
@@ -822,6 +930,7 @@ public class Database {
 		   throw ex;
 	   } finally {
 		   try {
+			   if (rs != null) rs.close();
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {
@@ -892,6 +1001,7 @@ public class Database {
 		   throw ex;
 	   } finally {
 		   try {
+			   if (rs != null) rs.close();
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {
@@ -933,6 +1043,7 @@ public class Database {
 		   throw ex;
 	   } finally {
 		   try {
+			   if (rs != null) rs.close();
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {
@@ -975,6 +1086,7 @@ public class Database {
 		   throw ex;
 	   } finally {
 		   try {
+			   if (rs != null) rs.close();
 			   if (stmt != null) stmt.close();
 			   if (conn != null) conn.close();
 		   } catch (SQLException e) {

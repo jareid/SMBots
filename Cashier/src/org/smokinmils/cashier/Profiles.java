@@ -21,7 +21,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie
  */
-public class Jackpots extends Event {
+public class Profiles extends Event {
 	public static final String Command = "!jackpots";
 	public static final String Description = "b%c12Lists all the jackpot totals for each profile. Each hand has a chance of winning!";
 	public static final String Format = "%b%c12" + Command + "";

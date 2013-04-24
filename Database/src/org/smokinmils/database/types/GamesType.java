@@ -57,7 +57,6 @@ public enum GamesType {
 	 */
     public static GamesType fromString(String text) {
         if (text != null) {
-        	text = text.toLowerCase();
         	for (GamesType gt : GamesType.values()) {
         		if ( gt.getText().compareTo(text) == 0 ) {
         			return gt;

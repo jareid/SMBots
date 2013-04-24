@@ -9,6 +9,7 @@
 package org.smokinmils.bot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.pircbotx.Colors;
@@ -23,7 +24,7 @@ import org.smokinmils.database.types.ProfileType;
  */
 public class IrcBot extends PircBotX {
 	public static final String InvalidArgs = "%b%c12You provided invalid arguments for the command. The format is:";
-	public static final String ValidProfiles = "%b%c12Valid profiles are: %c04" + ProfileType.values().toString();
+	public static final String ValidProfiles = "%b%c12Valid profiles are: %c04" + Arrays.asList(ProfileType.values()).toString();
 	
 	/**
 	 * This string is used when a user doesn't have enough chips

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.pircbotx.Channel;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
@@ -206,5 +207,18 @@ public class SMBaseBot {
     */
 	public IrcBot getBot(String server) {
 		return bots.get(server);
+	}
+	
+	/**
+	 * Sends a message to all channels on all servers
+	 * 
+	 * @param out The message to send.
+	 */
+	public static void sendMessageToAll(String out) {
+		for (IrcBot bot: bots.values())  {
+			for (Channel chan: bot.getChannels()) {
+				bot.sendIRCMessage(chan.getName(), out);
+			}
+		}
 	}
 }

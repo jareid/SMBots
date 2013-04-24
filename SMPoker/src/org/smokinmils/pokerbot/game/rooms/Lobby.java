@@ -8,8 +8,6 @@
  */ 
 package org.smokinmils.pokerbot.game.rooms;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +18,6 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import org.smokinmils.pokerbot.Utils;
-import org.smokinmils.logging.EventLog;
 
 import org.smokinmils.pokerbot.Client;
 import org.smokinmils.pokerbot.Database;
@@ -69,10 +66,6 @@ public class Lobby extends Room {
 			case INFO:
 				onInfo(sender, login, hostname, message);
 				break;
-			//case CHIPS:
-				//disabled
-				//onChips(sender, login, hostname, message);
-				//break;
 			case NEWTABLE:
 				onNewTable(sender, login, hostname, message);
 				break;
@@ -84,19 +77,6 @@ public class Lobby extends Room {
 				break;
 			case JOIN:
 				onJoinTable(sender, login, hostname, message);
-				break;
-			case PROMOS:
-				onJackpots(sender, login, hostname, message);
-				break;
-			//case GIVE:
-				//disabled
-				//onGive(sender, login, hostname, message);
-				//break;
-			case PROFILE:
-				onProfile(sender, login, hostname, message);
-				break;
-			case PROFILES:
-				onProfiles(sender, login, hostname, message);
 				break;
 			default:
 				// no action
@@ -171,9 +151,7 @@ public class Lobby extends Room {
 				}
 			} else if ( msg[0].compareToIgnoreCase("lobby") == 0 ) {
 				CommandType[] lobby_cmds = {CommandType.INFO, /*CommandType.CHIPS,*/ CommandType.TABLES,
-											CommandType.NEWTABLE, CommandType.WATCHTBL, 
-											CommandType.JOIN, CommandType.PROMOS,
-											/*CommandType.GIVE,*/ CommandType.PROFILE, CommandType.PROFILES};
+											CommandType.NEWTABLE, CommandType.WATCHTBL, CommandType.JOIN};
 				for (CommandType item: lobby_cmds) {
 					sendFullCommand(sender, item);
 					ircClient.sendIRCNotice(sender,"%b%c15-----");
@@ -389,94 +367,6 @@ public class Lobby extends Room {
 			}
 		} else {
 			invalidArguments( sender, CommandType.JOIN.getFormat() );
-		}
-	}
-	
-	/**
-	 * This method handles the promotions command
-	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
-	 */	
-	private void onJackpots(String sender, String login, String hostname, String message) {
-		String[] msg = message.split(" ");
-		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			List<String> profiles = Database.getInstance().getProfileTypes();
-			String jackpotstr = "";
-			
-			for (String profile: profiles) {
-				Integer jackpot = null;
-				try {
-					BufferedReader readFile = new BufferedReader(new FileReader("jackpot." + profile));
-					jackpot = Utils.tryParse(readFile.readLine()); 
-					readFile.close();
-				} catch (Exception e) {
-				}
-				 
-				if (jackpot == null) jackpot = 0;
-				
-				jackpotstr += Strings.JackpotAmount.replaceAll("%profile",
-						profile).replaceAll("%amount", Integer.toString(jackpot));
-			}
-			
-			String out = Strings.JackpotInfo.replaceAll("%jackpots", jackpotstr);
-			ircClient.sendIRCMessage(out);				
-		} else {
-			invalidArguments( sender, CommandType.PROMOS.getFormat() );
-		}
-	}
-	
-	/**
-	 * This method handles the profile command
-	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
-	 */	
-	private void onProfile(String sender, String login, String hostname, String message) {
-		String[] msg = message.split(" ");
-		if (msg.length == 1 && msg[0].compareTo("") != 0) {
-			List<String> profiles = Database.getInstance().getProfileTypes();
-			
-			if (profiles.contains(msg[0])) {
-				boolean success = Database.getInstance().updateActiveProfile(sender, msg[0]);
-				if (success) {
-					String out = Strings.ProfileChanged.replaceAll("%user", sender);
-					out = out.replaceAll("%profile", msg[0]);
-					ircClient.sendIRCMessage(ircChannel, out);
-				} else {
-					String out = Strings.ProfileChangeFail.replaceAll("%user", sender);
-					out = out.replaceAll("%profile", msg[0]);
-					ircClient.sendIRCMessage(ircChannel, out);
-					EventLog.log(out, "Lobby", "onProfile");
-				}				
-			} else {
-				ircClient.sendIRCMessage( ircChannel,
-						Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()) );
-			}
-		} else {
-			invalidArguments( sender, CommandType.PROFILE.getFormat() );
-		}
-	}
-	
-	/**
-	 * This method handles the profile command
-	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
-	 */	
-	private void onProfiles(String sender, String login, String hostname, String message) {
-		String[] msg = message.split(" ");
-		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			List<String> profiles = Database.getInstance().getProfileTypes();
-			ircClient.sendIRCMessage(ircChannel, Strings.ValidProfiles.replaceAll("%profiles", profiles.toString()));
-		} else {
-			invalidArguments( sender, CommandType.PROFILE.getFormat() );
 		}
 	}
 	

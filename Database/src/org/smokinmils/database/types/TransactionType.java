@@ -19,7 +19,7 @@ public enum TransactionType {
 	CANCEL("cancel"),
 	CREDIT("credit"),
 	PAYOUT("payout"),
-	POKER_JACKPOT("pkrjackpot"),
+	JACKPOT("pkrjackpot"),
 	POKER_BUYIN("pokerbuy"),
 	POKER_CASHOUT("pokercash"),
 	RESET("reset"),

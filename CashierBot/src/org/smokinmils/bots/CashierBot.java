@@ -25,14 +25,10 @@ public class CashierBot {
     	basebot.initialise("SMCashier", "smokinmilsdev", "smokinmils", debug);
     	basebot.addServer("SwiftIRC", "irc.swiftirc.net", 6667);
     	
-    	//String[] all_swift_chans = {"#smokin_dice", "#sm_hosts", "#sm_overunder", "#sm_roulette"};
-    	String[] all_swift_chans = {"#testeroo"};
+    	String[] all_swift_chans = {"#smokin_dice", "#sm_hosts", "#sm_overunder", "#sm_roulette"};
     	
     	for (String chan: all_swift_chans) {
     		basebot.addChannel("SwiftIRC", chan);
-    		
-    		Timer bet_timer = new Timer();
-        	bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot("SwiftIRC"), chan ), 5*60*1000, 20*60*1000);
     	}
     	
     	CheckChips cc_event = new CheckChips();
@@ -44,12 +40,16 @@ public class CashierBot {
     	basebot.addListener("SwiftIRC", gc_event);
     	
     	Payout p_event = new Payout();
-    	p_event.addValidChan(all_swift_chans);
+    	p_event.addValidChan("#sm_hosts");
     	basebot.addListener("SwiftIRC", p_event);
     	
     	Profile prf_event = new Profile();
     	prf_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", prf_event);
+    	
+    	Profiles prfs_event = new Profiles();
+    	prfs_event.addValidChan(all_swift_chans);
+    	basebot.addListener("SwiftIRC", prfs_event);
     	
     	Jackpots jp_event = new Jackpots();
     	jp_event.addValidChan(all_swift_chans);
@@ -58,6 +58,12 @@ public class CashierBot {
     	TransferChips tc_event = new TransferChips();
     	tc_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", tc_event);
+    	
+    	Timer bet_timer = new Timer();
+    	bet_timer.scheduleAtFixedRate( new BetDetails( ), 5*60*1000, 20*60*1000);
+    	
+    	Timer comp_timer = new Timer();
+    	comp_timer.scheduleAtFixedRate( new Competition( ), 2*60*1000, 10*60*1000);
     	
     	while(true) { Thread.sleep(10); }
     }

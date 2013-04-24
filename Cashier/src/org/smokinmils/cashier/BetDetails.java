@@ -11,7 +11,7 @@ package org.smokinmils.cashier;
 import java.util.TimerTask;
 
 import org.smokinmils.Database;
-import org.smokinmils.bot.IrcBot;
+import org.smokinmils.SMBaseBot;
 import org.smokinmils.database.types.BetterInfo;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
@@ -26,23 +26,15 @@ import org.smokinmils.logging.EventLog;
 public class BetDetails extends TimerTask {
 	/** The output message for the statistics */
 	private static final String AnnounceLine = "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 " +
-										 		"Highest bet made by %c04%hb_user%c12 with %c04%hb_chips%c12 on %c04%hb_game%c12| " +
+										 		"Highest bet made by %c04%hb_user%c12 with %c04%hb_chips%c12 on %c04%hb_game%c12 | " +
 										 		"%c12 Highest bet total was %c04%hbt_user%c12 with %c04%hbt_chips%c12";
-	
-	/** A reference to the IrcBot for this class */
-	private IrcBot Bot;
-	
-	/** The channel to announce in */
-	private String Channel;
-	
+
 	/**
 	 * Constructor
 	 * 
 	 * @param bot
 	 */
-	public BetDetails(IrcBot bot, String channel) {
-		Bot = bot;
-		Channel = channel;
+	public BetDetails() {
 	}
 	
 	/**
@@ -63,7 +55,7 @@ public class BetDetails extends TimerTask {
 				out = out.replaceAll("%hbt_user", top_better.User);
 				out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
 				
-				Bot.sendIRCMessage(Channel, out);
+				SMBaseBot.sendMessageToAll(out);
 			} catch (Exception e) {
 				EventLog.log(e, "BetDetails", "run");
 			}

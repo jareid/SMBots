@@ -8,7 +8,6 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.NickChangeEvent;
 import org.smokinmils.bot.IrcBot;
 

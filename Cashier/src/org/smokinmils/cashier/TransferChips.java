@@ -64,7 +64,7 @@ public class TransferChips extends Event {
 					} else {
 						try {
 							int chips = Database.getInstance().checkCredits( sender, profile );
-							if ( chips >= amount ) {
+							if ( amount >= chips ) {
 								bot.NoChips(sender, amount, profile);
 							} else if ( !Database.getInstance().checkUserExists( user ) ) {
 								String out = NoUser.replaceAll("%user", user);

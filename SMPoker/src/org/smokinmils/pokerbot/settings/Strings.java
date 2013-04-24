@@ -75,22 +75,6 @@ public final class Strings {
 	public static final String InfoCommand_Desc = "%b%c12Receive help on the available commands";
 	public static final String InfoCommand_Format = "%b%c12" + InfoCommand + " ?command|lobby|table?";
 	
-	public static final String ChipsCommand = CommandChar + "check";
-	public static final String ChipsCommand_Desc = "%b%c12Query the bot about how many chips you or someone else has";
-	public static final String ChipsCommand_Format = "%b%c12" + ChipsCommand + " ?user?";
-	
-	public static final String GiveCommand = CommandChar + "chips";
-	public static final String GiveCommand_Desc = "%b%c12Give a user a number of chips to a certain game profile";
-	public static final String GiveCommand_Format = "%b%c12" + GiveCommand + " <user> <amount> <profile>";
-	
-	public static final String ProfileCommand = CommandChar + "profile";
-	public static final String ProfileCommand_Desc = "%b%c12Changes the active profile for you";
-	public static final String ProfileCommand_Format = ProfileCommand + "<profile>";
-	
-	public static final String ProfilesCommand = CommandChar + "profiles";
-	public static final String ProfilesCommand_Desc = "%b%c12Lists the available profiles";
-	public static final String ProfilesCommand_Format = "%b%c12" + ProfilesCommand + "";
-	
 	public static final String NewTablCommand = CommandChar + "start";
 	public static final String NewTablCommand_Desc = "%b%c12Creates a new table with big_blind as the Big blind.\n"
 													 + "%b%c12Big blind will always be made even.\n"
@@ -112,11 +96,6 @@ public final class Strings {
 												+ "%b%c12Buy in must be between the table minimum and maximum"
 												+ "%b%c12If no buy in is specified, you will be seated with the minimum chips";
 	public static final String JoinCommand_Format = "%b%c12" + JoinCommand + " <table id> ?buy in?";
-	
-	public static final String PromosCommand = CommandChar + "jackpots";
-	public static final String PromosCommand_Desc = "%b%c12Lists all the jackpot totals for each profile. Each hand has a chance of winning!";
-	public static final String PromosCommand_Format = "%b%c12" + PromosCommand + "";
-	public static final String[] PromosCommand_Alternatives = {"!jackpot"};
 	
 	/**
 	 * The following list of settings are the commands for tables in the following order
@@ -702,6 +681,6 @@ public final class Strings {
 	public static final String JackpotWon = "%b%c12The %c04%profile%c12 poker jackpot of %c04%chips%c12 chips has been won! " +
 											"Congratulations to the winners:%c04 %winners";
 	
-	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
+	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every bet/poker hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
 	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12) ";
 }
