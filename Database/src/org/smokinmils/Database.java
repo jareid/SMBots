@@ -443,16 +443,45 @@ public class Database {
 	   addTransaction(sender, (0 - amount), GamesType.ADMIN, TransactionType.TRANSFER, profile);
 	   addTransaction(user, amount, GamesType.ADMIN, TransactionType.TRANSFER, profile);
 	}
-   
+	
    /**
-    * Gives a players chips
+    * Adjusts a players chips
     * 
     * @param username	The player's username
     * @param amount		The cash out value
     * @param profile	The profile type
- * @return 
+    * 
+    * @return true if it succeeded
     */
-   public boolean giveChips(String username, int amount, ProfileType profile)
+	public boolean giveChips(String username, int amount, ProfileType profile)
+			throws DBException, SQLException {
+		return adjustChips(username, amount, profile, TransactionType.CREDIT);
+	}
+	
+   /**
+    * Adjusts a players chips
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    * @param profile	The profile type
+    * 
+    * @return true if it succeeded
+    */
+	public boolean payoutChips(String username, int amount, ProfileType profile)
+			throws DBException, SQLException {
+		return adjustChips(username, (0-amount), profile, TransactionType.PAYOUT);
+	}
+   
+   /**
+    * Adjusts a players chips
+    * 
+    * @param username	The player's username
+    * @param amount		The cash out value
+    * @param profile	The profile type
+    * 
+    * @return true if it succeeded
+    */
+   private boolean adjustChips(String username, int amount, ProfileType profile, TransactionType tzx_type)
 		   throws DBException, SQLException {	   
 	   String chips_sql = "SELECT COUNT(*) FROM " + UserProfilesView.Name +
 			   				" WHERE " + UserProfilesView.Col_Profile + " LIKE " + "'" + profile.toString() + "'" +
@@ -500,7 +529,7 @@ public class Database {
 	   }
 		   
 	   if (result) {
-		   addTransaction(username, amount, GamesType.POKER, TransactionType.ADMIN, profile);
+		   addTransaction(username, amount, GamesType.ADMIN, tzx_type, profile);
 	   }
 	   
 	   return result;

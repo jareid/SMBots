@@ -11,11 +11,7 @@ package org.smokinmils.bots;
 import java.util.Timer;
 
 import org.smokinmils.SMBaseBot;
-import org.smokinmils.cashier.BetDetails;
-import org.smokinmils.cashier.CheckChips;
-import org.smokinmils.cashier.GiveChips;
-import org.smokinmils.cashier.Jackpots;
-import org.smokinmils.cashier.TransferChips;
+import org.smokinmils.cashier.*;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -46,6 +42,14 @@ public class CashierBot {
     	GiveChips gc_event = new GiveChips();
     	gc_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", gc_event);
+    	
+    	Payout p_event = new Payout();
+    	p_event.addValidChan(all_swift_chans);
+    	basebot.addListener("SwiftIRC", p_event);
+    	
+    	Profile prf_event = new Profile();
+    	prf_event.addValidChan(all_swift_chans);
+    	basebot.addListener("SwiftIRC", prf_event);
     	
     	Jackpots jp_event = new Jackpots();
     	jp_event.addValidChan(all_swift_chans);
