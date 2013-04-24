@@ -56,13 +56,13 @@ public class GiveChips extends Event {
 					Integer amount = Utils.tryParse(msg[2]);
 					ProfileType profile = ProfileType.fromString(msg[3]);
 					
-					if (amount != null) {						
+					if (amount != null && amount > 0) {						
 						if ( profile != null ) {
 							boolean success = false;
 							try {
 								success = Database.getInstance().giveChips(user, amount, profile);
 							} catch (Exception e) {
-								EventLog.log(e, "GiveChips", "onMessage");
+								EventLog.log(e, "GiveChips", "message");
 							}
 							
 							if (success) {
@@ -78,7 +78,7 @@ public class GiveChips extends Event {
 								out = out.replaceAll("%profile", profile.toString());
 								bot.sendIRCNotice(user, out);
 							} else {
-								EventLog.log(sender + " attempted to give someone chips and the database failed", "Lobby", "onGive");
+								EventLog.log(sender + " attempted to give someone chips and the database failed", "GiveChips", "message");
 							}
 						} else {
 							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
@@ -90,7 +90,7 @@ public class GiveChips extends Event {
 					bot.invalidArguments( sender, Format );
 				}
 			} else {
-				EventLog.info(sender + " attempted to give someone chips", "GiveChips", "onMessage");
+				EventLog.info(sender + " attempted to give someone chips", "GiveChips", "message");
 			}
 		}
 	}

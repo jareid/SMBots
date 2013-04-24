@@ -54,7 +54,7 @@ public class Jackpots extends Event {
 				try {
 					jackpot = Database.getInstance().getJackpot(profile); 
 				} catch (Exception e) {
-					EventLog.log(e, "Jackpots", "onMessage");
+					EventLog.log(e, "Jackpots", "message");
 				}
 				 
 				if (jackpot == null) jackpot = 0;

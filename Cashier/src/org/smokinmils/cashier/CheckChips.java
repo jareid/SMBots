@@ -68,7 +68,7 @@ public class CheckChips extends Event {
 				try {
 					creds = Database.getInstance().checkAllCredits( user );
 				} catch (Exception e) {
-					EventLog.log(e, "CheckChips", "onMessage");
+					EventLog.log(e, "CheckChips", "message");
 				}
 				
 				String credstr;
@@ -77,7 +77,7 @@ public class CheckChips extends Event {
 					try {
 						active = Database.getInstance().getActiveProfile( user );
 					} catch (Exception e) {
-						EventLog.log(e, "CheckChips", "onMessage");
+						EventLog.log(e, "CheckChips", "message");
 					}
 					
 					if (user.compareToIgnoreCase(sender) == 0) {

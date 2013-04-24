@@ -95,7 +95,7 @@ public class TransferChips extends Event {
 								bot.sendIRCNotice(sender, out);
 							}
 						} catch (Exception e) {
-							EventLog.log(e, "TransferChips", "onMessage");
+							EventLog.log(e, "TransferChips", "message");
 						}
 					}
 				} else {
