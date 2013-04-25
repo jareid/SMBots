@@ -9,30 +9,19 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.pircbotx.Colors;
-import org.pircbotx.User;
 import org.pircbotx.Channel;
+import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.Event;
-import org.pircbotx.hooks.Listener;
-import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.events.KickEvent;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.pircbotx.hooks.events.NickChangeEvent;
-import org.pircbotx.hooks.events.NoticeEvent;
-import org.pircbotx.hooks.events.PartEvent;
-import org.pircbotx.hooks.events.QuitEvent;
-
+import org.pircbotx.User;
+import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.logging.EventLog;
+import org.smokinmils.bot.events.Message;
 
-@SuppressWarnings("rawtypes")
 public class Casino extends Event
 {
+	
 	// <Channel, Game>
 	private ArrayList<IRCGame> games;
-	private ArrayList<String> validUsers;
-	private ArrayList<String> badUsers;
 	
 	private String MSG = Colors.BLUE;
 	private String VAR = Colors.RED;
@@ -43,25 +32,25 @@ public class Casino extends Event
 	private String infoText;
 	
 	private static Object locked = new Object();
-	
-	public Casino(IrcBot bot, String chan)
-	{
 		
+	public Casino(IrcBot bot) {
+		
+		// TODO Auto-generated constructor stub
+				
 		games = new ArrayList<IRCGame>();
-		validUsers = new ArrayList<String>();
-		badUsers = new ArrayList<String>();
 		
 		new ArrayList<String>();
+		/*
 		// Live configuration
 		games.add(new Roulette(5, "#smokin_dice", bot));
 		games.add(new Roulette(1, "#sm_roulette", bot));
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
-		
+		*/
 		// test config
-		//games.add(new Roulette(1, "#testeroo", bot));
-		//games.add(new DiceDuel("#testeroo"));
-		//games.add(new OverUnder("#testeroo"));
+		games.add(new Roulette(1, "#testeroo", bot));
+		games.add(new DiceDuel("#testeroo"));
+		games.add(new OverUnder("#testeroo"));
 		
 		
 		// initialize timing events
@@ -93,55 +82,10 @@ public class Casino extends Event
 				}
 			}
 		}
-		// read the info text TODO tidy this up
 		
 	}
-	
-	
-	/*
-	// quit, change name
-	@Override
-	public void nickChange(NickChangeEvent e) throws Exception
-	{
-		// when some one changes nick, remove them from the valid users list if they exist
-		if(validUsers.contains(e.getOldNick()))
-		{
-			validUsers.remove(e.getOldNick());
-		}
-	}
-	
-	@Override
-	public void onKick(KickEvent e) throws Exception
-	{
-		
-		// when some one is kicked, remove them from the valid users list if they exist
-		if(validUsers.contains(e.getRecipient().getNick()))
-		{
-			validUsers.remove(e.getRecipient().getNick());
-		}
-	}
-	
-	@Override
-	public void onQuit(QuitEvent e) throws Exception
-	{
-		// when some one quits, remove them from the valid users list if they exist
-		if(validUsers.contains(e.getUser().getNick()))
-		{
-			validUsers.remove(e.getUser().getNick());
-		}
-	}
-	
-	@Override
-	public void onPart(PartEvent e) throws Exception
-	{
-		// when some one parts, remove them from the valid users list if they exist
-		if(validUsers.contains(e.getUser().getNick()))
-		{
-			validUsers.remove(e.getUser().getNick());
-		}
-	}
-	*/
-	public synchronized void message(MessageEvent e) throws Exception
+
+	public synchronized void message(Message e) throws Exception
 	{
 		synchronized(locked)
 		{
@@ -150,49 +94,7 @@ public class Casino extends Event
 			if(e.getMessage().startsWith("!") && e.getMessage().length() > 1)
 			{
 								
-				// Extract the command, see if it is valid with the current game
-				// if the user is not verified, just ignore the command
-				if(!validUsers.contains(e.getUser().getNick()))
-				{
-					// user is invalid, so perform a wait for and attempt to check if they
-					// are authenticated
-					
-					// this needs to be fixed as it is pretty horrible 
-					
-					//System.out.println("In not valid users if statement");
-	
-						e.getBot().sendMessage("nickserv", "status " + e.getUser().getNick());
-						NoticeEvent currentEvent = e.getBot().waitFor(NoticeEvent.class);
-						
-						if (currentEvent.getUser().getNick().equalsIgnoreCase("nickserv"))
-						{
-							//System.out.println("Got event, processing");
-							String check = currentEvent.getMessage().split(" ")[2];
-							String who = currentEvent.getMessage().split(" ")[1];
-							if(check.equalsIgnoreCase("3") && e.getUser().getNick().equalsIgnoreCase(who))
-							{
-								validUsers.add(e.getUser().getNick());
-								System.out.println("Validated user: " + e.getUser().getNick());
-								//return;
-							}
-							else
-							{
-								// quit since they are not validated
-								if(!badUsers.contains(e.getUser().getNick()))
-								{
-									e.getBot().sendMessage(e.getUser().getNick(), "To use our systems you must first register your name using the command: /ns register PASS PASS EMAIL EMAIL then check your email for a confirmation link, and then identify yourself using /ns id PASS");
-									badUsers.add(e.getUser().getNick());
-								}
-								
-								System.out.println("Invalid User: " + e.getUser().getNick() );
-								locked = false;
-								return;
-							}
-						}
-					
-				}
 				
-				// at this point we have a user who is regged with nickserv
 				if(!Accounts.getInstance().isValidUser(e.getUser().getNick()))
 				{
 					// this user is registered with nickserv, but not on our systems, 
@@ -232,12 +134,8 @@ public class Casino extends Event
 					}
 					e.getBot().sendMessage(e.getUser(), infoText);
 					e.getBot().sendNotice(e.getUser(), infoText);
-	
-				
-				
-					
 				}
-				else //if ( game.isValidCommand(command) )
+				else 
 				{
 					// game commands
 					// since replies might require multiple lines, iterate through the replies and send them
@@ -263,6 +161,7 @@ public class Casino extends Event
 	 * @param username	The username in question
 	 * @return			The users level, where 0 = normal, 1 = voiced, 2 = op
 	 */
+	
 	private int getUserLevel(String username, String channel, User user)
 	{
 
@@ -280,51 +179,6 @@ public class Casino extends Event
 		
 		return 0;
 	}
-	
-	
-	
-	/**
-	 * Sets up and runs the Bot
-	 * @param args n/a
-	 */
-	/*
-	public static void main(String[] args)
-	{
-		// first thing process refunds, and get the db connected
-		// TODO could do this on disconnect too?
-		Accounts.getInstance().processRefunds();
-		
-		// then connect and shit
-		PircBotX bot = new PircBotX();;
-		bot.setName(Settings.BOTNAME);
-		bot.setLogin("Bot");
-		
-		//bot.setVerbose(true);
-		
-		bot.setAutoNickChange(true);
-		
-		//TODO this will spam a lot, maybe sort out admin to know it needs to run fast?
-		bot.setMessageDelay(0);
-		// not on my network
-		
-		
-		try
-		{
-			
-			bot.connect("irc.swiftirc.net");
-			//bot.joinChannel("#testeroo");
-			bot.joinChannel("#sm_hosts");
-			bot.identify("5w807");
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		//ListenerManager manager = new ListenerManager();
-		
-		bot.getListenerManager().addListener(new Bot(bot));
-	}
-	*/
 	
 	/**
 	 * Simple extension to time task to deal with game triggers
@@ -352,7 +206,6 @@ public class Casino extends Event
 			 //sendMessage(channel, reply);
 		}
 	}
-
 }
 
 
