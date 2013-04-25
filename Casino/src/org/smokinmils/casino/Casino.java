@@ -40,18 +40,19 @@ public class Casino extends Event
 		games = new ArrayList<IRCGame>();
 		
 		new ArrayList<String>();
-		/*
+		
 		// Live configuration
 		games.add(new Roulette(5, "#smokin_dice", bot));
 		games.add(new Roulette(1, "#sm_roulette", bot));
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
-		*/
+		
 		// test config
+		/*
 		games.add(new Roulette(1, "#testeroo", bot));
 		games.add(new DiceDuel("#testeroo"));
 		games.add(new OverUnder("#testeroo"));
-		
+		*/
 		
 		// initialize timing events
 		
