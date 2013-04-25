@@ -116,6 +116,7 @@ public class Casino extends Event
 				else if (command.equalsIgnoreCase("fix") && e.getChannel().getName().equalsIgnoreCase("#sm_hosts"))
 				{
 					locked = false;
+					e.respond(BLD+VAR+"Unlocked");
 					return;
 				}
 				else if (command.equalsIgnoreCase("info"))
