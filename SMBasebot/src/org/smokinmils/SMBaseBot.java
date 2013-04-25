@@ -128,8 +128,6 @@ public class SMBaseBot {
 		} catch (IOException | IrcException e) {
 			EventLog.fatal(e, "ConnectEvents", "onDisconnect");
 		}
-
-	   newbot.identify(_password);
 	   
 	   bots.put(name, newbot);
    }
@@ -218,5 +216,12 @@ public class SMBaseBot {
 				bot.sendIRCMessage(chan.getName(), out);
 			}
 		}
+	}
+	
+	/**
+	 * Identifies a bot
+	 */
+	public static void identify(IrcBot bot) {
+		bot.identify(_password);
 	}
 }

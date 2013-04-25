@@ -12,7 +12,9 @@ import java.io.IOException;
 
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.ConnectEvent;
 import org.pircbotx.hooks.events.ReconnectEvent;
+import org.smokinmils.SMBaseBot;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -21,6 +23,10 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class ConnectEvents extends ListenerAdapter<IrcBot> {
+	public void onConnect(ConnectEvent<IrcBot> event) {
+		SMBaseBot.identify( event.getBot() );
+	}
+	
 	public void onDisconnect(ReconnectEvent<IrcBot> event) {
 		EventLog.log("Bot disconnected, attempting reconnection...", "ConnectEvents", "onDisconnect");
 		try {
