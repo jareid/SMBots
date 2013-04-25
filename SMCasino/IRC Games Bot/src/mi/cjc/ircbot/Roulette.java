@@ -33,6 +33,8 @@ public class Roulette implements IRCGame {
 	public final int CLOSE = 1;
 	public int state;
 	
+	private static Object locked = new Object();
+	
 	public Roulette(int delay, String channel, PircBotX bot)
 	{
 		//TODO add in stuff for ranks, and loading stuff from file :)
@@ -65,155 +67,203 @@ public class Roulette implements IRCGame {
 	}
 
 	@Override
-	public List<String> processCommand(String[] commands, User user, int userlevel, PircBotX bot) {
+	public synchronized List<String> processCommand(String[] commands, User user, int userlevel, PircBotX bot) {
 		// Process the command
-		String command = commands[0];
-		
-		String username = user.getNick();
-		
-		if(command.equalsIgnoreCase("bet"))
+		synchronized(locked)
 		{
-			// if we are not accepting bets
-			if(this.state == CLOSE)
-				return (List<String>) Arrays.asList(BLD +MSG + "Bets are now closed, please wait for the next round!" );
-			if(commands.length < 3) // if they have done "!bet" with nothing else
-				return s_invalidBetString;
+			locked = true;
+			String command = commands[0];
 			
-			// attempt to parse the amount
-			int amount;
+			String username = user.getNick();
 			
-			try {
-				amount = Integer.parseInt(commands[1]); // we need some exception handling here
-			}
-			catch(Exception e)
+			if(command.equalsIgnoreCase("bet"))
 			{
-				return s_invalidBetString;
-			}
-			
-			// check they have enough to bet before even attempting to parse the actual bet itself
-			if(Accounts.getInstance().checkChips(username) < amount)
-				return (List<String>) Arrays.asList(BLD +MSG + "You do not have enough chips for that!" );
-			
-			//check for negative bets / 0 bets
-			if(amount <= 0)
-				return (List<String>) Arrays.asList(BLD+MSG + "You have to bet more than 0!");
-			// check if they are betting on red or black
-			String choice = commands[2].toLowerCase();
-			
-			if(choice.equalsIgnoreCase("red") || choice.equalsIgnoreCase("black"))
-			{
-				
-				Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
-				Bet bet = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
-				colourBets.add(bet);
-				Accounts.getInstance().addBet(bet, 3); // 
-				Accounts.getInstance().addTransaction(username,Accounts.getInstance().getActiveProfile(username),1, -amount, 3);
-				return (List<String>) Arrays.asList(BLD+VAR + username +MSG+": You have bet " +VAR + amount +MSG+ " on " + VAR+choice);
-			}
-			else if(choice.equalsIgnoreCase("1st") || choice.equalsIgnoreCase("2nd") || choice.equalsIgnoreCase("3rd"))
-			{
-				Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
-				Bet bet = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
-				rowBets.add(bet);
-				Accounts.getInstance().addBet(bet, 5);
-				Accounts.getInstance().addTransaction(username, Accounts.getInstance().getActiveProfile(username),1, -amount, 5);
-				return (List<String>) Arrays.asList(BLD+VAR+username +MSG+": You have bet " +VAR+ amount +MSG+ " on the " +VAR+ choice +MSG+ " row" );
-			}
-			else if(choice.equalsIgnoreCase("even") || choice.equalsIgnoreCase("odd") )
-			{
-				Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
-				Bet bet = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
-				evenOddBets.add(bet);
-				Accounts.getInstance().addBet(bet, 6);
-				Accounts.getInstance().addTransaction(username, Accounts.getInstance().getActiveProfile(username),1, -amount, 6);
-				return (List<String>) Arrays.asList(BLD+VAR+username +MSG+": You have bet " + VAR+amount + MSG+" on " +VAR+ choice);
-			}
-			// if we get this far the bet is either invalid, (which should never reach due to checking in the bot,
-			// or we are betting on a number, so let's try to 
-				
-			int bet;
-			try
-			{
-				bet = Integer.parseInt(choice);
-			}
-			catch (Exception e)
-			{
-				// not a number, lets just return an invalid bet
-				return s_invalidBetString;
-			}
-			// check range for bets
-			if (bet < 1 || bet > 36)
-				return s_invalidBetString;
-			else
-			{
-				Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
-				Bet bett = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
-				// bett?  need to sort variable names
-				numberBets.add(bett);
-				Accounts.getInstance().addBet(bett, 4);
-				Accounts.getInstance().addTransaction(username,Accounts.getInstance().getActiveProfile(username), 1, -amount, 4);
-				return (List<String>) Arrays.asList(BLD+VAR+username +MSG+": You have bet " + VAR+amount + MSG+" on the number " + VAR+bet);
-			}
-		}// </bet>
-		else if(command.equalsIgnoreCase("cancel"))
-		{
-			for (Bet bet : numberBets)
-			{
-				if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
+				// if we are not accepting bets
+				if(this.state == CLOSE)
 				{
-					bet.invalidate();
-					Accounts.getInstance().delBet(bet, 4);
-					Accounts.getInstance().addChips(username, bet.getProfile(), bet.getAmount(), user);
-					Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 4);
-					
-				}
-			}
-			for (Bet bet : colourBets)
-			{
-				if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
-				{
-					bet.invalidate();
-					Accounts.getInstance().delBet(bet, 3);
-					Accounts.getInstance().addChips(username, bet.getProfile(), bet.getAmount(), user);
-					Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 3);
-				}
-			}
-			for (Bet bet : rowBets)
-			{
-				if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
-				{
-					bet.invalidate();
-					Accounts.getInstance().delBet(bet, 5);
-					Accounts.getInstance().addChips(username, bet.getProfile(),bet.getAmount(), user);
-					Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 5);
-				}
-			}
-			for (Bet bet : evenOddBets)
-			{
-				if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
-				{
-					bet.invalidate();
-					Accounts.getInstance().delBet(bet, 6);
-					Accounts.getInstance().addChips(username, bet.getProfile(), bet.getAmount(), user);
-					Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 6);
-					
-				}
-			}
-			return (List<String>) Arrays.asList(BLD+MSG+"All bets cancelled for " +VAR+ username);
-		}
-		else if (command.equalsIgnoreCase("end"))
-		{
-			// call end function
-			if(userlevel > 0)
-				return this.endGame(bot);
-			else
-				return (List<String>) Arrays.asList(BLD+MSG+"You don't have the required permissions for that");
-		}
-		// these are debug commands to be removed later on... maybe
-		else if (command.equalsIgnoreCase("board"))
-			return printBoard();
+					locked = false;
 
-		return null;
+					return (List<String>) Arrays.asList(BLD +MSG + "Bets are now closed, please wait for the next round!" );
+				}
+				if(commands.length < 3) // if they have done "!bet" with nothing else
+				{
+					locked = false;
+					return s_invalidBetString;
+				
+				}
+				
+				// attempt to parse the amount
+				int amount;
+				
+				try {
+					amount = Integer.parseInt(commands[1]); // we need some exception handling here
+				}
+				catch(Exception e)
+				{
+					locked = false;
+
+					return s_invalidBetString;
+				}
+				
+				// check they have enough to bet before even attempting to parse the actual bet itself
+				if(Accounts.getInstance().checkChips(username) < amount)
+				{
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD +MSG + "You do not have enough chips for that!" );
+				}
+				//check for negative bets / 0 bets
+				if(amount <= 0)
+				{			
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD+MSG + "You have to bet more than 0!");
+				}
+					// check if they are betting on red or black
+				String choice = commands[2].toLowerCase();
+				
+				if(choice.equalsIgnoreCase("red") || choice.equalsIgnoreCase("black"))
+				{
+					
+					Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
+					Bet bet = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
+					colourBets.add(bet);
+					Accounts.getInstance().addBet(bet, 3); // 
+					Accounts.getInstance().addTransaction(username,Accounts.getInstance().getActiveProfile(username),1, -amount, 3);
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD+VAR + username +MSG+": You have bet " +VAR + amount +MSG+ " on " + VAR+choice);
+				}
+				else if(choice.equalsIgnoreCase("1st") || choice.equalsIgnoreCase("2nd") || choice.equalsIgnoreCase("3rd"))
+				{
+					Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
+					Bet bet = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
+					rowBets.add(bet);
+					Accounts.getInstance().addBet(bet, 5);
+					Accounts.getInstance().addTransaction(username, Accounts.getInstance().getActiveProfile(username),1, -amount, 5);
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD+VAR+username +MSG+": You have bet " +VAR+ amount +MSG+ " on the " +VAR+ choice +MSG+ " row" );
+				}
+				else if(choice.equalsIgnoreCase("even") || choice.equalsIgnoreCase("odd") )
+				{
+					Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
+					Bet bet = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
+					evenOddBets.add(bet);
+					Accounts.getInstance().addBet(bet, 6);
+					Accounts.getInstance().addTransaction(username, Accounts.getInstance().getActiveProfile(username),1, -amount, 6);
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD+VAR+username +MSG+": You have bet " + VAR+amount + MSG+" on " +VAR+ choice);
+				}
+				// if we get this far the bet is either invalid, (which should never reach due to checking in the bot,
+				// or we are betting on a number, so let's try to 
+					
+				int bet;
+				try
+				{
+					bet = Integer.parseInt(choice);
+				}
+				catch (Exception e)
+				{
+					// not a number, lets just return an invalid bet
+					locked = false;
+					return s_invalidBetString;
+				}
+				// check range for bets
+				if (bet < 1 || bet > 36)
+				{
+					locked = false;
+
+					return s_invalidBetString;
+				}
+				else
+				{
+					Accounts.getInstance().removeChips(username, Accounts.getInstance().getActiveProfile(username), amount);
+					Bet bett = new Bet(username, Accounts.getInstance().getActiveProfile(username), amount, choice);
+					// bett?  need to sort variable names
+					numberBets.add(bett);
+					Accounts.getInstance().addBet(bett, 4);
+					Accounts.getInstance().addTransaction(username,Accounts.getInstance().getActiveProfile(username), 1, -amount, 4);
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD+VAR+username +MSG+": You have bet " + VAR+amount + MSG+" on the number " + VAR+bet);
+				}
+			}// </bet>
+			else if(command.equalsIgnoreCase("cancel"))
+			{
+				for (Bet bet : numberBets)
+				{
+					if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
+					{
+						bet.invalidate();
+						Accounts.getInstance().delBet(bet, 4);
+						Accounts.getInstance().addChips(username, bet.getProfile(), bet.getAmount(), user);
+						Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 4);
+						
+					}
+				}
+				for (Bet bet : colourBets)
+				{
+					if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
+					{
+						bet.invalidate();
+						Accounts.getInstance().delBet(bet, 3);
+						Accounts.getInstance().addChips(username, bet.getProfile(), bet.getAmount(), user);
+						Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 3);
+					}
+				}
+				for (Bet bet : rowBets)
+				{
+					if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
+					{
+						bet.invalidate();
+						Accounts.getInstance().delBet(bet, 5);
+						Accounts.getInstance().addChips(username, bet.getProfile(),bet.getAmount(), user);
+						Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 5);
+					}
+				}
+				for (Bet bet : evenOddBets)
+				{
+					if(bet.isValid() && bet.getUser().equalsIgnoreCase(username))
+					{
+						bet.invalidate();
+						Accounts.getInstance().delBet(bet, 6);
+						Accounts.getInstance().addChips(username, bet.getProfile(), bet.getAmount(), user);
+						Accounts.getInstance().addTransaction(username, bet.getProfile(),3, bet.getAmount(), 6);
+						
+					}
+				}
+				locked = false;
+
+				return (List<String>) Arrays.asList(BLD+MSG+"All bets cancelled for " +VAR+ username);
+			}
+			else if (command.equalsIgnoreCase("end"))
+			{
+				// call end function
+				if(userlevel > 0)
+				{
+					locked = false;
+
+					return this.endGame(bot);
+				}
+				else
+				{
+					locked = false;
+
+					return (List<String>) Arrays.asList(BLD+MSG+"You don't have the required permissions for that");
+				}
+			}
+			// these are debug commands to be removed later on... maybe
+			else if (command.equalsIgnoreCase("board"))
+			{
+				locked = false;
+
+				return printBoard();
+			}
+			locked = false;
+			return null;
+		}
 		
 	}
 

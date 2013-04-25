@@ -91,7 +91,7 @@ public class DiceDuel implements IRCGame {
 				Accounts.getInstance().addBet(bet, 2);
 				Accounts.getInstance().addTransaction(username, Accounts.getInstance().getActiveProfile(username),1, -amount, this.ID);
 				//System.out.println("post adding bet");
-				return (List<String>) Arrays.asList(BLD+VAR + username + MSG + " has opened a new dice duel wager of " + VAR + amount + MSG +" chips! To call this wager type " + VAR + "!call " + username);
+				return (List<String>) Arrays.asList(BLD+VAR + username + MSG + " has opened a new dice duel wager of " + VAR + amount + " "+MSG + ((bet.getProfile().equalsIgnoreCase("play")) ? "play":"real") + " chips! To call this wager type " + VAR + "!call " + username);
 			}
 			else
 			{
@@ -234,9 +234,9 @@ public class DiceDuel implements IRCGame {
 			String open = BLD+MSG + "Current open wagers: ";
 			for(Bet bet : openBets)
 			{
-				open += VAR + bet.getUser() + MSG + "(" + VAR + bet.getAmount() + MSG +") ";
+				open += VAR + bet.getUser() + MSG + "(" + VAR + bet.getAmount() + MSG +" " + VAR + ((bet.getProfile().equalsIgnoreCase("play")) ? "play":"real") + MSG + ") ";
 			}
-			open += MSG + "To call a wager type !call <name>";
+			open += MSG + "To call a wager type "+VAR+"!call <name>";
 			return (List<String>) Arrays.asList(open);
 		}
 	}
