@@ -2018,7 +2018,7 @@ public class Table extends Room {
 	 * Check if the jackpot has been won
 	 */
 	private static synchronized boolean checkJackpot() {
-		return (secureRandom.nextInt(Variables.JackpotChance + 1) >= 1);		
+		return (secureRandom.nextInt(Variables.JackpotChance + 1) == Variables.JackpotChance);		
 	}
 	
 	/**
