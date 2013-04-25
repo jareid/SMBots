@@ -60,7 +60,7 @@ public final class Strings {
 	/**
 	 * This string is output the poker announcement
 	 */
-	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands. Use %c04!jackpots%c12 to list the current poker jackpot sizes.";
+	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands.";
 	
 	
 	/**
@@ -673,14 +673,13 @@ public final class Strings {
 	public static final String ShowCardFailNotActive = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) You were not active in this hand.";	
 	public static final String ShowCardFailNoPlayer = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) You are not a player at the table.";	
 
-	public static final String JackpotIncreased = "%b%c12The %c04%profile%c12 poker jackpot is now %c04%chips%c12 chips! " +
-												  "Every hand has a chance to win and the jackpot will be divided between all in that hand.";
+	public static final String JackpotIncreased = "%b%c12The %c04%profile%c12 jackpot is now %c04%chips%c12 chips! " +
+												  "Every bet and poker hand has a chance to win.";
 
 	public static final String JackpotWonTable = "%b%c12Congratulations to %c04%winners%c12 who won %c04%chips%c12 each from the %c04%profile%c12 Jackpot";
 	
-	public static final String JackpotWon = "%b%c12The %c04%profile%c12 poker jackpot of %c04%chips%c12 chips has been won! " +
-											"Congratulations to the winners:%c04 %winners";
+	public static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a poker hand! " +
+											"Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
 	
-	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every bet/poker hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
 	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12) ";
 }

@@ -8,9 +8,12 @@
  */ 
 package org.smokinmils.cashier;
 
+import org.smokinmils.Database;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
+import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.logging.EventLog;
 
 /**
  * Provides the functionality to check a user's chips
@@ -18,9 +21,9 @@ import org.smokinmils.bot.events.Message;
  * @author Jamie
  */
 public class Profile extends Event {
-	public static final String Command = "!profiles";
-	public static final String Description = "%b%c12Lists the available profiles";
-	public static final String Format = "%b%c12" + Command + "";
+	public static final String Command = "!profile";
+	public static final String Description = "%b%c12Changes the active profile for you";
+	public static final String Format = "%b%c12" + Command + " <profile>";
 	
 	public static final String ProfileChanged = "%b%c04%user %c12is now using the %c04%profile%c12 game profile";
 	public static final String ProfileChangeFail = "%b%c04%user %c12tried to change to the %c04%profile%c12 game profile and it failed. Please try again!";
@@ -43,8 +46,33 @@ public class Profile extends Event {
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
 				message.startsWith( Command ) ) {			
-			bot.sendIRCMessage(chan, IrcBot.ValidProfiles);		
-			bot.sendIRCNotice(sender, IrcBot.ValidProfiles);
+			String[] msg = message.split(" ");
+			if (msg.length == 2) {
+				ProfileType profile = ProfileType.fromString(msg[1]);
+				if (profile != null) {
+					boolean success = false;
+					try {
+						success = Database.getInstance().updateActiveProfile(sender,profile);
+					} catch (Exception e) {
+						EventLog.log(e, "Profile", "message");
+					}
+					if (success) {
+						String out = ProfileChanged.replaceAll("%user", sender);
+						out = out.replaceAll("%profile", profile.toString());
+						bot.sendIRCMessage(chan, out);
+					} else {
+						String out = ProfileChangeFail.replaceAll("%user", sender);
+						out = out.replaceAll("%profile", profile.toString());
+						bot.sendIRCMessage(chan, out);
+						EventLog.log(out, "Profile", "message");
+					}				
+				} else {
+					bot.sendIRCMessage( chan,
+							IrcBot.ValidProfiles.replaceAll("%profiles", ProfileType.values().toString()) );
+				}
+			} else {
+				bot.invalidArguments( sender, Format );
+			}			
 		}
 	}
 }

@@ -8,6 +8,9 @@
  */ 
 package org.smokinmils.bot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.NoticeEvent;
@@ -39,6 +42,15 @@ public class CheckIdentified extends Event {
 	/** The required nickserv status value */
 	private static final int RequiredStatus = 3;
 	
+	/** A list of users already sent a no identification message */
+	private static List<String> SentNoIdent = new ArrayList<String>();
+	
+	/**
+	 * This string is output when the user does not meet the above status with NickServ
+	 */
+	public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
+	
+	
 	@Override
 	public void action(Action event) {
 		IrcBot bot = event.getBot();
@@ -54,6 +66,13 @@ public class CheckIdentified extends Event {
 		User user = event.getUser();
 		if ( !bot.userIsIdentified( user.getNick() ) ) {
 			sendStatusRequest( bot, user );
+			if ( event.getMessage().startsWith("!") ) {
+    			// If we already told this user, don't tell them again
+    			if ( !SentNoIdent.contains( user.getNick() ) ) {
+        			bot.sendIRCMessage( user.getNick(), NotIdentifiedMsg );
+        			SentNoIdent.add( user.getNick() );
+    			}
+			}
 		}
 	}
 	
@@ -139,6 +158,7 @@ public class CheckIdentified extends Event {
     			if (code >= RequiredStatus) {
     				EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
     				bot.addIdentifiedUser( user.getNick() );
+        			SentNoIdent.remove( user.getNick() );
     				try {
     					Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
     				} catch (Exception e) {

@@ -107,7 +107,6 @@ public class SMBaseBot {
 	   newbot.setName(_nick);
 	   newbot.setLogin(_ident);
 	   newbot.setVerbose(_debug);
-	   newbot.identify(_password);
 	   newbot.setAutoNickChange(true);
 	   newbot.useShutdownHook(false);
 	   newbot.setVersion(Version);
@@ -129,6 +128,8 @@ public class SMBaseBot {
 		} catch (IOException | IrcException e) {
 			EventLog.fatal(e, "ConnectEvents", "onDisconnect");
 		}
+
+	   newbot.identify(_password);
 	   
 	   bots.put(name, newbot);
    }

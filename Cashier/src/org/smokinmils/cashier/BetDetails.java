@@ -11,7 +11,7 @@ package org.smokinmils.cashier;
 import java.util.TimerTask;
 
 import org.smokinmils.Database;
-import org.smokinmils.SMBaseBot;
+import org.smokinmils.bot.IrcBot;
 import org.smokinmils.database.types.BetterInfo;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
@@ -29,12 +29,17 @@ public class BetDetails extends TimerTask {
 										 		"Highest bet made by %c04%hb_user%c12 with %c04%hb_chips%c12 on %c04%hb_game%c12 | " +
 										 		"%c12 Highest bet total was %c04%hbt_user%c12 with %c04%hbt_chips%c12";
 
+	private IrcBot Bot;
+	private String Channel;
+	
 	/**
 	 * Constructor
 	 * 
 	 * @param bot
 	 */
-	public BetDetails() {
+	public BetDetails(IrcBot bot, String chan) {
+		Bot = bot;
+		Channel = chan;
 	}
 	
 	/**
@@ -55,7 +60,7 @@ public class BetDetails extends TimerTask {
 				out = out.replaceAll("%hbt_user", top_better.User);
 				out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
 				
-				SMBaseBot.sendMessageToAll(out);
+				Bot.sendIRCMessage(Channel, out);
 			} catch (Exception e) {
 				EventLog.log(e, "BetDetails", "run");
 			}

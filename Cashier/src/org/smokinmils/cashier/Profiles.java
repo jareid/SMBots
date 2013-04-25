@@ -8,26 +8,22 @@
  */ 
 package org.smokinmils.cashier;
 
-import org.pircbotx.Channel;
-import org.smokinmils.Database;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
-import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.logging.EventLog;
 
 /**
- * Provides the functionality to give a user some chips
+ * Provides the functionality to check a user's chips
  * 
  * @author Jamie
  */
 public class Profiles extends Event {
-	public static final String Command = "!jackpots";
-	public static final String Description = "b%c12Lists all the jackpot totals for each profile. Each hand has a chance of winning!";
+	public static final String Command = "!profiles";
+	public static final String Description = "%b%c12Lists the available profiles";
 	public static final String Format = "%b%c12" + Command + "";
 	
-	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
-	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12) ";
+	public static final String ProfileChanged = "%b%c04%user %c12is now using the %c04%profile%c12 game profile";
+	public static final String ProfileChangeFail = "%b%c04%user %c12tried to change to the %c04%profile%c12 game profile and it failed. Please try again!";
 	
 	/**
 	 * This method handles the chips command
@@ -42,27 +38,13 @@ public class Profiles extends Event {
 		IrcBot bot = event.getBot();
 		String message = event.getMessage();
 		String sender = event.getUser().getNick();
-		Channel chan = event.getChannel();
+		String chan = event.getChannel().getName();
 		
-		if ( isValidChannel( chan.getName() ) &&
+		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {
-			String jackpotstr = "";
-			
-			for (ProfileType profile: ProfileType.values()) {
-				int jackpot = 0;
-				try {
-					jackpot = Database.getInstance().getJackpot(profile); 
-				} catch (Exception e) {
-					EventLog.log(e, "Jackpots", "message");
-				}
-				
-				jackpotstr += JackpotAmount.replaceAll("%profile",
-								profile.toString()).replaceAll("%amount", Integer.toString(jackpot));
-			}
-			
-			String out = JackpotInfo.replaceAll("%jackpots", jackpotstr);
-			bot.sendIRCMessage(chan.getName(), out);
+				message.startsWith( Command ) ) {			
+			bot.sendIRCMessage(chan, IrcBot.ValidProfiles);		
+			bot.sendIRCNotice(sender, IrcBot.ValidProfiles);
 		}
 	}
 }

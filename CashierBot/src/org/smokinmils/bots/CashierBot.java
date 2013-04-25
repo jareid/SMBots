@@ -22,7 +22,7 @@ public class CashierBot {
     public static void main(String[] args) throws Exception {
     	SMBaseBot basebot = SMBaseBot.getInstance();
     	boolean debug = true;
-    	basebot.initialise("SMCashier", "smokinmilsdev", "smokinmils", debug);
+    	basebot.initialise("SM_Cashier", "smokinmilsdev", "smokinmils", debug);
     	basebot.addServer("SwiftIRC", "irc.swiftirc.net", 6667);
     	
     	String[] all_swift_chans = {"#smokin_dice", "#sm_hosts", "#sm_overunder", "#sm_roulette"};
@@ -40,7 +40,7 @@ public class CashierBot {
     	basebot.addListener("SwiftIRC", gc_event);
     	
     	Payout p_event = new Payout();
-    	p_event.addValidChan("#sm_hosts");
+    	p_event.addValidChan(all_swift_chans);
     	basebot.addListener("SwiftIRC", p_event);
     	
     	Profile prf_event = new Profile();
@@ -60,10 +60,13 @@ public class CashierBot {
     	basebot.addListener("SwiftIRC", tc_event);
     	
     	Timer bet_timer = new Timer();
-    	bet_timer.scheduleAtFixedRate( new BetDetails( ), 5*60*1000, 20*60*1000);
+    	bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot("SwiftIRC"), "#smokin_dice" ), 5*60*1000, 60*60*1000);
     	
     	Timer comp_timer = new Timer();
-    	comp_timer.scheduleAtFixedRate( new Competition( ), 2*60*1000, 10*60*1000);
+    	comp_timer.scheduleAtFixedRate( new Competition( basebot.getBot("SwiftIRC"), "#smokin_dice" ), 2*60*1000, 60*60*1000);
+    	
+    	Timer jkpt_timer = new Timer();
+    	jkpt_timer.scheduleAtFixedRate( new JackpotAnnounce( basebot.getBot("SwiftIRC"), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
     	while(true) { Thread.sleep(10); }
     }

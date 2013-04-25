@@ -2042,11 +2042,15 @@ public class Table extends Room {
 				out = out.replaceAll("%profile", profileName);
 				out = out.replaceAll("%winners", jackpotPlayers.toString());
 				ircClient.sendIRCMessage(out);
+				ircClient.sendIRCMessage(out);
+				ircClient.sendIRCMessage(out);
 				
 				// Announce to table
 				out = Strings.JackpotWonTable.replaceAll("%chips", Integer.toString(win));
 				out = out.replaceAll("%profile", profileName);
 				out = out.replaceAll("%winners", jackpotPlayers.toString());
+				ircClient.sendIRCMessage(ircChannel, out);
+				ircClient.sendIRCMessage(ircChannel, out);
 				ircClient.sendIRCMessage(ircChannel, out);
 				
 				// Update jackpot with remainder

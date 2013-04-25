@@ -1,0 +1,36 @@
+22:47:52: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+22:47:52: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:47:52: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:47:52: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:47:52: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:47:52: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:47:52: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+22:47:53: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of JReid
+22:47:53: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+22:47:57: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of SMCashier
+22:47:57: CheckIdentified->sendStatusRequest() :: DEBUG Checking the status of cjc
+22:47:57: CheckIdentified->sendStatusRequest() :: INFO: cjc identified
+23:59:53: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+23:59:53: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.Competition.end(Competition.java:124)
+	at org.smokinmils.cashier.Competition.run(Competition.java:60)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+23:59:53: Competition->end() :: No data for 07
+23:59:54: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+23:59:54: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.Competition.end(Competition.java:124)
+	at org.smokinmils.cashier.Competition.run(Competition.java:60)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+23:59:54: Competition->end() :: No data for eoc

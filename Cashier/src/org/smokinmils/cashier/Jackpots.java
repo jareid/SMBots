@@ -23,11 +23,11 @@ import org.smokinmils.logging.EventLog;
  */
 public class Jackpots extends Event {
 	public static final String Command = "!jackpots";
-	public static final String Description = "b%c12Lists all the jackpot totals for each profile. Each hand has a chance of winning!";
+	public static final String Description = "b%c12Lists all the jackpot totals for each profile. Each poker hand and bet has a chance of winning!";
 	public static final String Format = "%b%c12" + Command + "";
 	
-	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: [%jackpots]. Every hand has a chance to win the jackpot. Jackpots are shared between those in the hand.";
-	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12) ";
+	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: %jackpots. Every poker hand and bet has a chance to win the jackpot.";
+	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12)";
 	
 	/**
 	 * This method handles the chips command
@@ -49,6 +49,7 @@ public class Jackpots extends Event {
 				message.startsWith( Command ) ) {
 			String jackpotstr = "";
 			
+			int i = 0;
 			for (ProfileType profile: ProfileType.values()) {
 				int jackpot = 0;
 				try {
@@ -59,6 +60,12 @@ public class Jackpots extends Event {
 				
 				jackpotstr += JackpotAmount.replaceAll("%profile",
 								profile.toString()).replaceAll("%amount", Integer.toString(jackpot));
+				if (i == (ProfileType.values().length - 2)) {
+					jackpotstr += " and ";
+				} else if (i < (ProfileType.values().length - 2)) {
+					jackpotstr += ", ";
+				}
+				i++;
 			}
 			
 			String out = JackpotInfo.replaceAll("%jackpots", jackpotstr);
