@@ -126,7 +126,7 @@ public class DiceDuel implements IRCGame {
 					else if(Accounts.getInstance().getActiveProfile(p1).equalsIgnoreCase("play") && !bet.getProfile().equalsIgnoreCase("play"))
 					{
 						bet.reset();
-						return (List<String>) Arrays.asList(BLD+VAR + username + MSG + ": you need to use play chips to call a play chips dd!");
+						return (List<String>) Arrays.asList(BLD+VAR + username + MSG + ": you need to use real chips to call a real chips dd!");
  
 					}
 					
