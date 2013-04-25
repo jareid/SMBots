@@ -12,6 +12,7 @@ import java.util.Timer;
 
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.cashier.*;
+import org.smokinmils.casino.Casino;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -30,6 +31,10 @@ public class CashierBot {
     	for (String chan: all_swift_chans) {
     		basebot.addChannel("SwiftIRC", chan);
     	}
+    	
+    	Casino casino = new Casino(basebot.getBot("SwiftIRC"));
+    	casino.addValidChan(all_swift_chans);
+    	basebot.addListener("SwiftIRC", casino);
     	
     	CheckChips cc_event = new CheckChips();
     	cc_event.addValidChan(all_swift_chans);
