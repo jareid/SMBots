@@ -51,7 +51,7 @@ public class Payout extends Event {
 				message.startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 
-			if ( chan.isOp(event.getUser()) ) {
+			if ( bot.userIsOp(event.getUser(), chan.getName()) ) {
 				if (msg.length == 4) {
 					String user = msg[1];
 					Integer amount = Utils.tryParse(msg[2]);

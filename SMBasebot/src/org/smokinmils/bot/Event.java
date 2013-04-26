@@ -480,7 +480,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * @param channel the channel name
 	 */
 	public void addValidChan(String channel) {
-		validChannels.add(channel);
+		validChannels.add(channel.toLowerCase());
 	}
 	
 	/**
@@ -490,7 +490,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 */
 	public void addValidChan(String[] channels) {
 		for (String chan: channels)  {
-			validChannels.add(chan);
+			validChannels.add(chan.toLowerCase());
 		}
 	}
 	
@@ -502,6 +502,6 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 * @return true if this listener is active in the channel, false otherwise
 	 */
 	public boolean isValidChannel(String channel) {
-		return validChannels.contains(channel);
+		return validChannels.contains(channel.toLowerCase());
 	}
 }

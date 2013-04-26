@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.database.types.ProfileType;
 
@@ -146,4 +148,20 @@ public class IrcBot extends PircBotX {
 	public void addIdentifiedUser(String nick) {
 		IdentifiedUsers.add(nick.toLowerCase());
 	}
-}
+	
+	/**
+	 * Checks if a user is an op for a channel
+	 * @param user
+	 * @param chan
+	 */
+	public boolean userIsOp(User user, String chan) {
+		boolean ret = false;
+		for (Channel opchans: user.getChannelsOpIn()) {
+			if (chan.equalsIgnoreCase(opchans.getName())) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	}
+ }

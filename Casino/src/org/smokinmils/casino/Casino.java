@@ -33,8 +33,8 @@ public class Casino extends Event
 	
 	private static Object locked = new Object();
 		
-	public Casino(IrcBot bot) {
-		
+	public Casino(IrcBot bot) {		
+		Accounts.getInstance().processRefunds();
 		// TODO Auto-generated constructor stub
 				
 		games = new ArrayList<IRCGame>();

@@ -695,7 +695,7 @@ public class Database {
    public BetterInfo competitionPosition(ProfileType profile, String user) 
 		   throws DBException, SQLException {
 	   String sql = "SELECT t.position FROM (SELECT c.*,(@position:=@position+1) AS position" +
-			   		" FROM + CompetitionView.Name + c, (SELECT @position:=0) p WHERE "
+			   		" FROM " + CompetitionView.Name + " c, (SELECT @position:=0) p WHERE "
 			   				+ CompetitionView.Col_Profile + " LIKE '" + profile.toString() + "') t" +
 			   		" WHERE " + CompetitionView.Col_Username + " LIKE '" + user + "'";
 	   String csql = "SELECT " + CompetitionView.Col_Total + " FROM " + CompetitionView.Name

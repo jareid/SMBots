@@ -27,8 +27,8 @@ public class CompPosition extends Event {
 	public static final String Description = "%b%c12Returns your position for this week's competitiong for all profiles or a single profile";
 	public static final String Format = "%b%c12" + Command + " <profile> <user>";
 	
-	private static final String Position = "%b%c04%sender:%c12 %c04%who%c12 is currently in position %c04%position%c12 for the %c04%profile%c12 competition";
-	private static final String NotRanked = "%b%c04%sender:%c12 %c04%who%c12 is currently in %c04unranked%c12 for the %c04%profile%c12 competition with %c04%chips%c12 chips bet";
+	private static final String Position = "%b%c04%sender:%c12 %c04%who%c12 is currently in position %c04%position%c12 for the %c04%profile%c12 competition with %c04%chips%c12 chips bet";
+	private static final String NotRanked = "%b%c04%sender:%c12 %c04%who%c12 is currently in %c04unranked%c12 for the %c04%profile%c12 competition";
 	
 	/**
 	 * This method handles the chips command

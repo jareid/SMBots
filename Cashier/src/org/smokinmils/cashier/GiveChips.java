@@ -50,8 +50,7 @@ public class GiveChips extends Event {
 				message.startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 
-			EventLog.info(event.getUser().getChannelsOpIn().toString(), "GiveChips", "message");
-			if ( chan.isOp(event.getUser()) || event.getUser().getChannelsOpIn().contains( chan ) ) {
+			if ( bot.userIsOp(event.getUser(), chan.getName()) ) {
 				if (msg.length == 4) {
 					String user = msg[1];
 					Integer amount = Utils.tryParse(msg[2]);
