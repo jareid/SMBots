@@ -23,7 +23,8 @@ public class Settings {
 	public static String BOTNAME = "SM_BOT";
 	
 	
-	
+	public static int JACKPOTCHANCE = 1000;
+	public static int OURAKE = 2; // %
 	
 	
 }

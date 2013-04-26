@@ -13,6 +13,7 @@ import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.smokinmils.SMBaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -30,12 +31,8 @@ public class Casino extends Event
 	private ArrayList<Timer> events;
 	
 	private String infoText;
-	
-	private static Object locked = new Object();
 		
-	public Casino(IrcBot bot) {		
-		Accounts.getInstance().processRefunds();
-		// TODO Auto-generated constructor stub
+	public Casino(IrcBot bot) {
 				
 		games = new ArrayList<IRCGame>();
 		
@@ -47,9 +44,6 @@ public class Casino extends Event
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
 		
-		games.add(new Roulette(2, "#Dual-N-lgot", bot));
-		games.add(new DiceDuel("#Dual-N-lgot"));
-		
 		// test config
 		/*
 		games.add(new Roulette(1, "#testeroo", bot));
@@ -58,8 +52,6 @@ public class Casino extends Event
 		*/
 		
 		// initialize timing events
-		
-		
 		events = new ArrayList<Timer>();
 		for(IRCGame g : games)
 		{
@@ -91,36 +83,28 @@ public class Casino extends Event
 
 	public synchronized void message(Message e) throws Exception
 	{
-		synchronized(locked)
+		// if the message starts with ! (so it is a command) and it is longer than just !
+		SMBaseBot basebot = SMBaseBot.getInstance();
+		if(e.getBot().userIsIdentified(e.getUser().getNick()))
 		{
-			locked = true;
-			// if the message starts with ! (so it is a command) and it is longer than just !
 			if(e.getMessage().startsWith("!") && e.getMessage().length() > 1)
 			{
-								
-				
 				if(!Accounts.getInstance().isValidUser(e.getUser().getNick()))
 				{
-					// this user is registered with nickserv, but not on our systems, 
+					// this user is registered with nickserv(This is dealth in basebot now), but not on our systems, 
 					Accounts.getInstance().addUser(e.getUser().getNick());
 					// then proceed to carry on
 				}
+				// parse the messages
 				String[] words = e.getMessage().split("!")[1].split(" ");
-				// if info, do that, else check if it's an accounting command, else check game commands
 				String command = words[0];
 				String sender = e.getUser().getNick();
 				String chan = e.getChannel().getName();
-				if (command.equalsIgnoreCase("ou") && e.getChannel().getName().equalsIgnoreCase("#smokin_dice"))
+				
+				// HAX to handle ou in smokin_dice
+				if (command.equalsIgnoreCase("ou") && chan.equalsIgnoreCase("#smokin_dice"))
 				{
-					e.respond(BLD + VAR + e.getUser().getNick() + MSG+ " Please join #SM_OverUnder to play Over/Under"); // todo fix this / tidy
-					locked = false;
-					return;
-				}
-				else if (command.equalsIgnoreCase("fix") && e.getChannel().getName().equalsIgnoreCase("#sm_hosts"))
-				{
-					locked = false;
-					e.respond(BLD+VAR+"Unlocked");
-					return;
+					e.respond(BLD + VAR + sender + MSG+ " Please join #SM_OverUnder to play Over/Under"); // todo fix this / tidy
 				}
 				else if (command.equalsIgnoreCase("info"))
 				{
@@ -142,8 +126,8 @@ public class Casino extends Event
 						System.out.println("Error reading the info.txt");
 						infoText = "Error with info text, please contact an Admin";
 					}
-					e.getBot().sendMessage(e.getUser(), infoText);
-					e.getBot().sendNotice(e.getUser(), infoText);
+					e.getBot().sendMessage(sender, infoText);
+					e.getBot().sendNotice(sender, infoText);
 				}
 				else 
 				{
@@ -159,11 +143,14 @@ public class Casino extends Event
 						}
 					}
 				}
-				// other wise it's not a valid command, so do nothing :)
+	
 			}
-			
-			locked = false;
 		}
+		else
+		{
+			// user isn't verified
+		}
+		
 	}
 	
 	/**
@@ -174,20 +161,19 @@ public class Casino extends Event
 	
 	private int getUserLevel(String username, String channel, User user)
 	{
-
-				for(Channel chan : user.getChannelsOpIn())
-				{
-					if(chan.getName().equalsIgnoreCase(channel))
-						return 2;
-				}
-				for(Channel chan : user.getChannelsVoiceIn())
-				{
-					if(chan.getName().equalsIgnoreCase(channel))
-						return 1;
-				}
-			
+		int retVal = 0;
 		
-		return 0;
+		for(Channel chan : user.getChannelsOpIn())
+		{
+			if(chan.getName().equalsIgnoreCase(channel))
+				retVal = 2;
+		}
+		for(Channel chan : user.getChannelsVoiceIn())
+		{
+			if(chan.getName().equalsIgnoreCase(channel))
+				retVal = 1;
+		}
+		return retVal;
 	}
 	
 	/**
