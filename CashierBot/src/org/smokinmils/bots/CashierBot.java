@@ -41,6 +41,10 @@ public class CashierBot {
     	cc_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, cc_event);
     	
+    	CompPosition cp_event = new CompPosition();
+    	cp_event.addValidChan(all_swift_chans);
+    	basebot.addListener(swift_irc, cp_event);
+    	
     	GiveChips gc_event = new GiveChips();
     	gc_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, gc_event);
