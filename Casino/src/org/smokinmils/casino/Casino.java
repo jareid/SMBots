@@ -47,6 +47,9 @@ public class Casino extends Event
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
 		
+		games.add(new Roulette(2, "#Dual-N-lgot", bot));
+		games.add(new DiceDuel("#Dual-N-lgot"));
+		
 		// test config
 		/*
 		games.add(new Roulette(1, "#testeroo", bot));
