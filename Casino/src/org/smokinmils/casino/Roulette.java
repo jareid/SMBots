@@ -8,6 +8,7 @@ import java.util.List;
 import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.smokinmils.bot.Bet;
 
 public class Roulette implements IRCGame {
 

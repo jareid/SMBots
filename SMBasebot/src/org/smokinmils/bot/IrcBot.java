@@ -126,7 +126,7 @@ public class IrcBot extends PircBotX {
 	 * @return	true if the user is identified, false otherwise.
 	 */
 	public boolean userIsIdentified(String nick) {
-		return IdentifiedUsers.contains(nick);
+		return IdentifiedUsers.contains(nick.toLowerCase());
 	}
 	
 	/**
@@ -135,7 +135,7 @@ public class IrcBot extends PircBotX {
 	 * @param nick	The nickname to check
 	 */
 	public void removeIdentifiedUser(String nick) {
-		IdentifiedUsers.remove(nick);
+		IdentifiedUsers.remove(nick.toLowerCase());
 	}
 	
 	/**
@@ -144,6 +144,6 @@ public class IrcBot extends PircBotX {
 	 * @param nick	The nickname to check
 	 */
 	public void addIdentifiedUser(String nick) {
-		IdentifiedUsers.add(nick);
+		IdentifiedUsers.add(nick.toLowerCase());
 	}
 }

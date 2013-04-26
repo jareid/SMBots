@@ -13,6 +13,7 @@ import org.smokinmils.Database;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
+import org.smokinmils.database.types.BetterInfo;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
 
@@ -27,7 +28,7 @@ public class CompPosition extends Event {
 	public static final String Format = "%b%c12" + Command + " <profile> <user>";
 	
 	private static final String Position = "%b%c04%sender:%c12 %c04%who%c12 is currently in position %c04%position%c12 for the %c04%profile%c12 competition";
-	private static final String NotRanked = "%b%c04%sender:%c12 %c04%who%c12 is currently in %c04unranked%c12 for the %c04%profile%c12 competition";
+	private static final String NotRanked = "%b%c04%sender:%c12 %c04%who%c12 is currently in %c04unranked%c12 for the %c04%profile%c12 competition with %c04%chips%c12 chips bet";
 	
 	/**
 	 * This method handles the chips command
@@ -52,19 +53,20 @@ public class CompPosition extends Event {
 				String who = (msg.length == 2 ? sender : msg[2] );
 				ProfileType profile = ProfileType.fromString(msg[1]);
 				if (profile != null) {
-					int position = -1;
+					BetterInfo better = null;
 					try {
-						position = Database.getInstance().competitionPosition(profile, who);
+						better = Database.getInstance().competitionPosition(profile, who);
 					} catch (Exception e) {
 						EventLog.log(e, "CompPosition", "message");
 					}
 					
 					String out = "";
-					if (position == -1) {
+					if (better.Position == -1) {
 						out = NotRanked.replaceAll("%profile", profile.toString());
 					} else {
 						out = Position.replaceAll("%profile", profile.toString());
-						out = out.replaceAll("%position", Integer.toString(position));
+						out = out.replaceAll("%position", Integer.toString(better.Position));
+						out = out.replaceAll("%chips", Long.toString(better.Amount));
 					}					
 
 					out = out.replaceAll("%sender", sender);

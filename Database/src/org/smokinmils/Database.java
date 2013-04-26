@@ -682,6 +682,31 @@ public class Database {
    }
    
    /**
+    * Gets a user's current position in the weekly competition
+    * 
+    * @param profile	The profile to check
+    * @param user		The username
+    * 
+    * @return 	The position
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   public BetterInfo competitionPosition(ProfileType profile, String user) 
+		   throws DBException, SQLException {
+	   String sql = "SELECT t.position FROM (SELECT c.*,(@position:=@position+1) AS position" +
+			   		" FROM + CompetitionView.Name + c, (SELECT @position:=0) p WHERE "
+			   				+ CompetitionView.Col_Profile + " LIKE '" + profile.toString() + "') t" +
+			   		" WHERE " + CompetitionView.Col_Username + " LIKE '" + user + "'";
+	   String csql = "SELECT " + CompetitionView.Col_Total + " FROM " + CompetitionView.Name
+			   		+ " WHERE " + CompetitionView.Col_Profile + " LIKE '" + profile.toString() + "' AND "
+			   					+ CompetitionView.Col_Username + " LIKE '" + user + "'";
+
+	   return new BetterInfo(user, runGetIntQuery(sql), runGetLongQuery(csql));
+	   
+   }
+   
+   /**
     * Updates the competition id and time
     * 
     * @throws DBException
@@ -1035,6 +1060,48 @@ public class Database {
 			   
 			   if ( rs.next() ) {
 				   ret = rs.getInt(1);
+			   }
+		   } catch (SQLException e) {
+			   throw new DBException(e.getMessage(), query);
+		   }
+	   } catch (DBException ex) {
+		   throw ex;
+	   } finally {
+		   try {
+			   if (rs != null) rs.close();
+			   if (stmt != null) stmt.close();
+			   if (conn != null) conn.close();
+		   } catch (SQLException e) {
+				throw e;
+		   }
+	   }
+	   return ret;
+   }
+   
+   /**
+    * Runs a single query that returns a single column and row
+    * 
+    * @param query	The query to execute
+    * 
+    * @return		The resulting integer
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private long runGetLongQuery(String query) throws DBException, SQLException {
+	   Connection conn = null;
+	   Statement stmt = null;
+	   ResultSet rs = null;
+	   long ret = -1;
+	   try {
+		   try {
+			   conn = getConnection();
+			   stmt = conn.createStatement();
+			   stmt.setMaxRows(1);
+			   rs = stmt.executeQuery(query);
+			   
+			   if ( rs.next() ) {
+				   ret = rs.getLong(1);
 			   }
 		   } catch (SQLException e) {
 			   throw new DBException(e.getMessage(), query);

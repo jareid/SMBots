@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.pircbotx.User;
+import org.smokinmils.bot.Bet;
 
 public class DiceDuel implements IRCGame {
 

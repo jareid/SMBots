@@ -1,4 +1,4 @@
-package org.smokinmils.casino;
+package org.smokinmils.bot;
 
 
 public class Bet {

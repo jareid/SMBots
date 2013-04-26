@@ -20,20 +20,33 @@ public class BetterInfo {
 	
 	public long Amount;
 	
+	public int Position;
+	
 	public BetterInfo(String user, long amount) {
 		User = user;
 		Amount = amount;
+		Game = null;
+		Position = 0;
 	}
 	
 	public BetterInfo(String user, GamesType game, long amount) {
 		User = user;
 		Game = game;
 		Amount = amount;
+		Position = 0;
 	}
 	
 	public BetterInfo(String user, String game, long amount) {
 		User = user;
 		Game = GamesType.fromString(game);
 		Amount = amount;
+		Position = 0;
+	}
+	
+	public BetterInfo(String user, int position, long amount) {
+		User = user;
+		Game = null;
+		Amount = amount;
+		Position = position;
 	}
 }

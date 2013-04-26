@@ -12,6 +12,7 @@ import com.mchange.v2.c3p0.DataSources;
 import javax.sql.DataSource;
 
 import org.pircbotx.User;
+import org.smokinmils.bot.Bet;
 
 public class Accounts {
 
