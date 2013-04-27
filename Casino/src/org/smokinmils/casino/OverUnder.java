@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.pircbotx.Colors;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 
 import org.smokinmils.pokerbot.Database;
 import org.smokinmils.bot.Bet;
-import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.pokerbot.settings.Strings;
 
@@ -32,8 +31,6 @@ public class OverUnder implements IRCGame {
 	private String channel;
 
 	// private Random random;
-
-	private static Object locked = new Object();
 
 	public OverUnder(String channel) {
 
@@ -57,7 +54,7 @@ public class OverUnder implements IRCGame {
 
 	@Override
 	public synchronized List<String> processCommand(String[] commands,
-			User user, int userlevel, PircBotX bot) {
+			User user, int userlevel, IrcBot bot) {
 
 		// TODO Auto-generated method stub
 		// Process the command
@@ -342,7 +339,7 @@ public class OverUnder implements IRCGame {
 	 * Jackpot has been won, split between all players on the table
 	 */
 	private void jackpotWon(String profileName, ArrayList<String> players,
-			PircBotX bot) {
+			IrcBot bot) {
 		int jackpot = Database.getInstance().getJackpot(profileName);
 
 		if (jackpot > 0) {
@@ -362,9 +359,9 @@ public class OverUnder implements IRCGame {
 				out = out.replaceAll("%profile", profileName);
 				out = out.replaceAll("%winners", players.toString());
 
-				bot.sendMessage(this.channel, out);
-				bot.sendMessage(this.channel, out);
-				bot.sendMessage(this.channel, out);
+				bot.sendIRCMessage(this.channel, out);
+				bot.sendIRCMessage(this.channel, out);
+				bot.sendIRCMessage(this.channel, out);
 				/*
 				 * ircClient.sendIRCMessage(out); ircClient.sendIRCMessage(out);
 				 * ircClient.sendIRCMessage(out);

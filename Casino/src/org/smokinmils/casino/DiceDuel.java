@@ -1,7 +1,6 @@
 package org.smokinmils.casino;
 
 import org.pircbotx.Colors;
-import org.pircbotx.PircBotX;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.pircbotx.User;
 import org.smokinmils.bot.Bet;
+import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.pokerbot.Database;
 import org.smokinmils.pokerbot.settings.Strings;
@@ -63,7 +63,7 @@ public class DiceDuel implements IRCGame {
 	 */
 	@Override
 	public List<String> processCommand(String[] commands, User user,
-			int userlevel, PircBotX bot) {
+			int userlevel, IrcBot bot) {
 		String command = commands[0];
 
 		String username = user.getNick();
@@ -422,7 +422,7 @@ public class DiceDuel implements IRCGame {
 	 * Jackpot has been won, split between all players on the table
 	 */
 	private void jackpotWon(String profileName, ArrayList<String> players,
-			PircBotX bot) {
+			IrcBot bot) {
 		int jackpot = Database.getInstance().getJackpot(profileName);
 
 		if (jackpot > 0) {
@@ -442,9 +442,9 @@ public class DiceDuel implements IRCGame {
 				out = out.replaceAll("%profile", profileName);
 				out = out.replaceAll("%winners", players.toString());
 
-				bot.sendMessage(this.channel, out);
-				bot.sendMessage(this.channel, out);
-				bot.sendMessage(this.channel, out);
+				bot.sendIRCMessage(this.channel, out);
+				bot.sendIRCMessage(this.channel, out);
+				bot.sendIRCMessage(this.channel, out);
 				/*
 				 * ircClient.sendIRCMessage(out); ircClient.sendIRCMessage(out);
 				 * ircClient.sendIRCMessage(out);

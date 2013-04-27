@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.pircbotx.Colors;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.smokinmils.bot.Bet;
+import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.pokerbot.Database;
 import org.smokinmils.pokerbot.settings.Strings;
@@ -33,7 +33,7 @@ public class Roulette implements IRCGame {
 	private ArrayList<Bet> numberBets;
 	private ArrayList<Bet> evenOddBets;
 
-	private PircBotX bot;
+	private IrcBot bot;
 	private int delay;
 	private String channel;
 
@@ -41,7 +41,7 @@ public class Roulette implements IRCGame {
 	public final int CLOSE = 1;
 	public int state;
 
-	public Roulette(int delay, String channel, PircBotX bot) {
+	public Roulette(int delay, String channel, IrcBot bot) {
 		// TODO add in stuff for ranks, and loading stuff from file :)
 		this.delay = delay;
 		this.bot = bot;
@@ -73,7 +73,7 @@ public class Roulette implements IRCGame {
 
 	@Override
 	public synchronized List<String> processCommand(String[] commands,
-			User user, int userlevel, PircBotX bot) {
+			User user, int userlevel, IrcBot bot) {
 		// Process the command
 
 		Accounts db = Accounts.getInstance();
@@ -310,7 +310,7 @@ public class Roulette implements IRCGame {
 	 * 
 	 * @return winners / win info
 	 */
-	private List<String> endGame(PircBotX bot) {
+	private List<String> endGame(IrcBot bot) {
 
 		Accounts db = Accounts.getInstance();
 		// Let's "roll"
@@ -579,7 +579,7 @@ public class Roulette implements IRCGame {
 	 * Jackpot has been won, split between all players on the table
 	 */
 	private void jackpotWon(String profileName, ArrayList<String> players,
-			PircBotX bot) {
+			IrcBot bot) {
 		int jackpot = Database.getInstance().getJackpot(profileName);
 
 		if (jackpot > 0) {

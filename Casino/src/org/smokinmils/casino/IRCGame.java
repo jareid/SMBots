@@ -3,8 +3,8 @@ package org.smokinmils.casino;
 import java.util.HashMap;
 import java.util.List;
 
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.smokinmils.bot.IrcBot;
 
 /**
  * Interface to represent an irc game that will be called from the BOT different
@@ -34,7 +34,7 @@ public interface IRCGame {
 	 * @return The strings to send back to the channel
 	 */
 	public List<String> processCommand(String[] command, User user,
-			int userlevel, PircBotX bot);
+			int userlevel, IrcBot bot);
 
 	/**
 	 * Get's the information for the game to be sent back to the user

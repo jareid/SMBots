@@ -11,9 +11,7 @@ import java.util.TimerTask;
 
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.smokinmils.SMBaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -82,7 +80,6 @@ public class Casino extends Event {
 	public synchronized void message(Message e) throws Exception {
 		// if the message starts with ! (so it is a command) and it is longer
 		// than just !
-		SMBaseBot basebot = SMBaseBot.getInstance();
 		Accounts db = Accounts.getInstance();
 		if (e.getBot().userIsIdentified(e.getUser().getNick())) {
 			if (e.getMessage().startsWith("!") && e.getMessage().length() > 1) {
@@ -122,8 +119,8 @@ public class Casino extends Event {
 						System.out.println("Error reading the info.txt");
 						infoText = "Error with info text, please contact an Admin";
 					}
-					e.getBot().sendMessage(sender, infoText);
-					e.getBot().sendNotice(sender, infoText);
+					e.getBot().sendIRCMessage(sender, infoText);
+					e.getBot().sendIRCNotice(sender, infoText);
 				} else {
 					// game commands
 					// since replies might require multiple lines, iterate
@@ -135,7 +132,7 @@ public class Casino extends Event {
 							for (String reply : g.processCommand(words, e
 									.getUser(), this.getUserLevel(sender, chan,
 									e.getUser()), e.getBot()))
-								e.getBot().sendMessage(chan, reply);
+								e.getBot().sendIRCMessage(chan, reply);
 						}
 					}
 				}
@@ -177,11 +174,11 @@ public class Casino extends Event {
 	 */
 	class gameTrigger extends TimerTask {
 		private int id;
-		private PircBotX bot;
+		private IrcBot bot;
 		private String channel;
 		private IRCGame game;
 
-		public gameTrigger(int id, IRCGame game, PircBotX bot, String channel) {
+		public gameTrigger(int id, IRCGame game, IrcBot bot, String channel) {
 			this.id = id;
 			this.bot = bot;
 			this.channel = channel;
@@ -191,7 +188,7 @@ public class Casino extends Event {
 		public void run() {
 			// System.out.println("triggered");
 			for (String reply : this.game.timerTask(id))
-				bot.sendMessage(this.channel, reply);
+				bot.sendIRCMessage(this.channel, reply);
 			// sendMessage(channel, reply);
 		}
 	}
