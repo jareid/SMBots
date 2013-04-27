@@ -11,7 +11,6 @@ import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.pokerbot.Database;
-import org.smokinmils.pokerbot.settings.Strings;
 
 public class DiceDuel implements IRCGame {
 
@@ -437,7 +436,7 @@ public class DiceDuel implements IRCGame {
 
 				// Announce to channel
 
-				String out = Strings.JackpotWon.replaceAll("%chips",
+				String out = Strings.JackpotWonDiceDuel.replaceAll("%chips",
 						Integer.toString(jackpot));
 				out = out.replaceAll("%profile", profileName);
 				out = out.replaceAll("%winners", players.toString());
@@ -445,6 +444,10 @@ public class DiceDuel implements IRCGame {
 				bot.sendIRCMessage(this.channel, out);
 				bot.sendIRCMessage(this.channel, out);
 				bot.sendIRCMessage(this.channel, out);
+				
+				bot.sendIRCMessage("#smokin_dice", out);
+				bot.sendIRCMessage("#smokin_dice", out);
+				bot.sendIRCMessage("#smokin_dice", out);
 				/*
 				 * ircClient.sendIRCMessage(out); ircClient.sendIRCMessage(out);
 				 * ircClient.sendIRCMessage(out);
