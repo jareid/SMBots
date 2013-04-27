@@ -9,7 +9,8 @@ public class TrueRandom {
 	/**
 	 * Returns an integer upto the maximum
 	 * 
-	 * @param max maximum value
+	 * @param max
+	 *            maximum value
 	 * @return
 	 */
 	public static Integer nextInt(Integer max) {
