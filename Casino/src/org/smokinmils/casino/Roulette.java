@@ -76,6 +76,8 @@ public class Roulette implements IRCGame {
 		// Process the command
 
 		Accounts db = Accounts.getInstance();
+		Database db_new = Database.getInstance();
+		
 		String command = commands[0];
 
 		String username = user.getNick();
@@ -114,9 +116,7 @@ public class Roulette implements IRCGame {
 
 			// check they have enough to bet before even attempting to parse the
 			// actual bet itself
-			if (db.checkChips(username) < amount) {
-				;
-
+			if (db_new.checkCredits(username) < amount) {
 				return (List<String>) Arrays.asList(BLD + MSG
 						+ "You do not have enough chips for that!");
 			}

@@ -67,6 +67,7 @@ public class DiceDuel implements IRCGame {
 
 		String username = user.getNick();
 		Accounts db = Accounts.getInstance();
+		Database db_new = Database.getInstance();
 
 		if (command.equalsIgnoreCase("dd")) {
 			if (commands.length < 2) // if they have done "!dd" with nothing
@@ -97,7 +98,7 @@ public class DiceDuel implements IRCGame {
 				return (List<String>) Arrays.asList(BLD + MSG
 						+ "You have to bet more than 0!");
 			// choice is null as DiceDuels done have one.
-			if (db.checkChips(username) >= amount) { // add bet, remove chips,
+			if (db_new.checkCredits(username) >= amount) { // add bet, remove chips,
 														// notify channel
 				String profile = db.getActiveProfile(username);
 				Bet bet = new Bet(username, profile, amount, "");
@@ -176,7 +177,7 @@ public class DiceDuel implements IRCGame {
 					}
 
 					// make sure they have enough chips to call said bet
-					if (db.checkChips(p1) >= bet.getAmount())
+					if (db_new.checkCredits(p1) >= bet.getAmount())
 						db.removeChips(p1, db.getActiveProfile(p1),
 								bet.getAmount());
 					else {

@@ -11,6 +11,7 @@ import com.mchange.v2.c3p0.DataSources;
 import javax.sql.DataSource;
 
 import org.pircbotx.User;
+import org.smokinmils.Database;
 import org.smokinmils.bot.Bet;
 
 public class Accounts {
@@ -310,7 +311,7 @@ public class Accounts {
 
 			} else {
 				// active profile
-				current = this.checkChips(username);
+				current = Database.getInstance().checkCredits(username);
 				if (current >= amount) {
 					// enough to remove
 					current = current - amount;
@@ -341,67 +342,6 @@ public class Accounts {
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * Checks the users's chips for the currently active account
-	 * 
-	 * @param username
-	 * @return
-	 */
-	public int checkChips(String username) {
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		int chips = 0;
-		try {
-			conn = getConnection();
-			stmt = conn.createStatement();
-			username = username.toLowerCase();
-
-			rs = stmt
-					.executeQuery("SELECT COUNT(*) AS total FROM users WHERE username='"
-							+ username + "';");
-			rs.next(); // row should always exist as we are doing count
-			if (rs.getInt("total") > 0) {
-				// user exists so we need to get the current amount, and then
-				// update it
-
-				rs = stmt
-						.executeQuery("SELECT user_profiles.amount, users.active_profile FROM users JOIN user_profiles JOIN profile_type WHERE username='"
-								+ username
-								+ "' AND users.id=user_profiles.user_id AND user_profiles.type_id=profile_type.id AND users.active_profile=user_profiles.type_id;");
-				if (rs.next())
-					chips = rs.getInt("amount");
-				else {
-					// they probably don't have any chips on this profile or it
-					// doesn't exist.. TODO add it with 0?
-					stmt.executeUpdate("insert into user_profiles (user_id, type_id, amount) values ((SELECT id FROM users WHERE username='"
-							+ username
-							+ "' LIMIT 1), (SELECT id FROM profile_type WHERE name='"
-							+ rs.getInt("profile") + "' LIMIT 1),0);");
-
-					chips = 0;
-				}
-			}
-		} catch (SQLException e) {
-			System.out.println("Error in SQL query check");
-			System.out.println(e.getErrorCode());
-			return 0;
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (stmt != null)
-					stmt.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-				System.out.println("Error closing(check chips)");
-			}
-		}
-
-		return chips;
 	}
 
 	/**
@@ -894,52 +834,6 @@ public class Accounts {
 	}
 
 	/**
-	 * See if a user is valid
-	 * 
-	 * @param username
-	 *            username to check if real
-	 * @return yay or nay on it being real
-	 */
-	public Boolean isValidUser(String username) {
-		// String profile = "None selected";
-
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		conn = getConnection();
-		boolean valid = false;
-		username = username.toLowerCase();
-
-		try {
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT id FROM users WHERE username='"
-					+ username + "' LIMIT 1;");
-			// TODO select count!?
-			if (rs.next()) {
-				// valid username type
-				valid = true;
-			}
-		} catch (SQLException e) {
-			System.out.println("Unable to find profile for user x3");
-
-			e.printStackTrace();
-
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (stmt != null)
-					stmt.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-				System.out.println("Error closing(getUserProfile)");
-			}
-		}
-		return valid;
-	}
-
-	/**
 	 * Gets profile id from id
 	 * 
 	 * @param profile
@@ -978,42 +872,5 @@ public class Accounts {
 		}
 
 		return id;
-	}
-
-	/**
-	 * Adds a new user to the system
-	 * 
-	 * @param profile
-	 *            in string form,
-	 */
-	public void addUser(String username) {
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-
-		try {
-			conn = getConnection();
-			stmt = conn.createStatement();
-
-			System.out.println("Adding new user.");
-			stmt.executeUpdate("INSERT INTO users (username, active_profile) VALUES('"
-					+ username + "', 3);");
-			// System.out.println("Adding new user's profile");
-		} catch (SQLException e2) {
-			System.out.println("Error in SQL query INSERTING NEW USER");
-			System.out.println(e2.getMessage());
-
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (stmt != null)
-					stmt.close();
-				if (conn != null)
-					conn.close();
-			} catch (SQLException e) {
-				System.out.println("Error Adding new user");
-			}
-		}
 	}
 }

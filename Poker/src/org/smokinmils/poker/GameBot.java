@@ -30,7 +30,7 @@ public class GameBot {
         
         // Restore failed bets
         try {
-			Database.getInstance().restorePokerBets();
+			Database.getInstance().processPokerRefunds();
 		} catch (Exception e) {
 			EventLog.fatal(e, "GameBot", "main");
 			System.exit(0);
@@ -39,8 +39,10 @@ public class GameBot {
     	SMBaseBot basebot = SMBaseBot.getInstance();
     	basebot.initialise(Variables.Nick, Variables.NickServPassword, Variables.Login, debug);
     	String swift_irc = "SwiftIRC";
-    	basebot.addServer(swift_irc, "irc.swiftirc.net", 6667);
-    	
+    	basebot.addServer(swift_irc, "conclave.il.us.SwiftIRC.net", 6667);
+
+		basebot.addChannel(swift_irc, Variables.LobbyChan);
+		
         Client swift_lobby = new Client( swift_irc, Variables.LobbyChan );
     	basebot.addListener(swift_irc, swift_lobby);
     	

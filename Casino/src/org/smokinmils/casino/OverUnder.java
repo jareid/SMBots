@@ -59,6 +59,7 @@ public class OverUnder implements IRCGame {
 		// Process the command
 		String command = commands[0];
 		Accounts db = Accounts.getInstance();
+		Database db_new = Database.getInstance();
 
 		if (command.equalsIgnoreCase("ouroll")) {
 			// iterate through bets to find it, if we do run it
@@ -209,7 +210,7 @@ public class OverUnder implements IRCGame {
 					|| choice.equalsIgnoreCase("7")) {
 
 				// valid choice check chips
-				if (db.checkChips(user.getNick()) < amount) {
+				if (db_new.checkCredits(user.getNick()) < amount) {
 
 					return (List<String>) Arrays.asList(BLD + MSG
 							+ "You do not have enough chips for that!");

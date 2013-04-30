@@ -316,7 +316,7 @@ public class Database {
     * 
     * @return			The amount of credits
     */
-   public void restorePokerBets() throws DBException, SQLException {
+   public void processPokerRefunds() throws DBException, SQLException {
 	   String sql = "SELECT " + PokerBetsTable.Col_UserID + ","
 			   				  + PokerBetsTable.Col_ProfileID + ","
 					   		  + PokerBetsTable.Col_Amount +

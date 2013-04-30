@@ -140,7 +140,10 @@ public class Client extends Event {
 			ProfileType profiles[] = ProfileType.values();
 			for (Integer x: blinds) {
 				for (int y = 0; y < profiles.length; y++) {
-					newTable(x, 8, profiles[y], false);
+					if (profiles[y] == ProfileType.PLAY) {
+						newTable(x, 8, profiles[y], false);
+						// TODO remove ^^
+					}
 				}
 			}
 		}

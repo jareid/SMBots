@@ -25,7 +25,7 @@ public class CashierBot {
     	boolean debug = true;
     	basebot.initialise("SM_BOT", "5w807", "smokinmils", debug);
     	String swift_irc = "SwiftIRC";
-    	basebot.addServer(swift_irc, "irc.swiftirc.net", 6667);
+    	basebot.addServer(swift_irc, "conclave.il.us.SwiftIRC.net", 6667);
     	
     	String[] all_swift_chans = {"#smokin_dice", "#sm_hosts", "#sm_overunder", "#sm_roulette"};
     	

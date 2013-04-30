@@ -37,7 +37,7 @@ public class GameBot {
         
         // Connect to the IRC server.
         try {
-        	bot.connect( Variables.Server, Variables.Port );
+        	bot.connect( "conclave.il.us.SwiftIRC.net", Variables.Port );
         } catch (Exception e) {
         	EventLog.fatal(e, "GameBot", "main"); 
         	System.exit(0);
