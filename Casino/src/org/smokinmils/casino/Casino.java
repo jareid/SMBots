@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.User;
+import org.smokinmils.SMBaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -29,10 +30,9 @@ public class Casino extends Event {
 
 	private String infoText;
 	
-	private static Object lock = new Object();
-	
 	public Casino(IrcBot bot) {
-
+		Accounts.getInstance().processRefunds();
+		
 		games = new ArrayList<IRCGame>();
 
 		new ArrayList<String>();
@@ -80,7 +80,7 @@ public class Casino extends Event {
 	}
 
 	public void message(Message e) throws Exception {
-		synchronized (lock) {
+		synchronized (SMBaseBot.lockObject) {
 			// if the message starts with ! (so it is a command) and it is longer
 			// than just !
 			Accounts db = Accounts.getInstance();

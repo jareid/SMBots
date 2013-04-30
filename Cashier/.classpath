@@ -5,6 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Database"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EventLog"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SMBasebot"/>
-	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/SMBasebot/pircbotx-1.9.jar"/>
+	<classpathentry kind="lib" path="/SMBasebot/lib/pircbotx-1.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

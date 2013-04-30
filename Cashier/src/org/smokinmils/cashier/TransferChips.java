@@ -10,6 +10,7 @@ package org.smokinmils.cashier;
 
 import org.pircbotx.Channel;
 import org.smokinmils.Database;
+import org.smokinmils.SMBaseBot;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -32,8 +33,6 @@ public class TransferChips extends Event {
 	private static final String TransferChipsUser = "%b%c12You have had %c04%amount%c12 chips transfered into your %c04%profile%c12 account by %c04%sender%c12";
 	private static final String TransferChipsSender = "%b%c12You have transferred %c04%amount%c12 chips from your %c04%profile%c12 account to %c04%who%c12";
 	
-	private static Object lock = new Object();
-	
 	/**
 	 * This method handles the chips command
 	 * 
@@ -44,7 +43,7 @@ public class TransferChips extends Event {
 	 */
 	@Override
 	public void message(Message event) {
-		synchronized (lock) {
+		synchronized (SMBaseBot.lockObject) {
 			IrcBot bot = event.getBot();
 			String message = event.getMessage();
 			String sender = event.getUser().getNick();

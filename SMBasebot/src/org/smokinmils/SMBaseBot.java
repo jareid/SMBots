@@ -56,6 +56,8 @@ public class SMBaseBot {
 	
 	/** The message to return on a CTCP FINGER request */
 	private static String FingerMessage = "";
+	
+	public static Object lockObject = new Object();
    
    /**
     * Constructor

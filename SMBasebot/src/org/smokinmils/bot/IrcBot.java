@@ -62,6 +62,7 @@ public class IrcBot extends PircBotX {
 	 * @param target The place where the message is being sent
 	 * @param in The message to send with formatting variables
 	 */	
+	public void sendIRCNotice(Channel target, String in) { sendIRCNotice(target.getName(), in); }
 	public void sendIRCNotice(String target, String in) {
 		String out = in;
 		
@@ -82,7 +83,8 @@ public class IrcBot extends PircBotX {
 	 * 
 	 * @param target The place where the message is being sent
 	 * @param in The message to send with formatting variables
-	 */	
+	 */
+	public void sendIRCMessage(Channel target, String in) { sendIRCMessage(target.getName(), in); }
 	public void sendIRCMessage(String target, String in) {
 		String out = in;
 		
@@ -162,6 +164,58 @@ public class IrcBot extends PircBotX {
 				break;
 			}
 		}
+		return ret;
+	}
+	/**
+	 * Checks if a user is an op for a channel
+	 * @param user
+	 * @param chan
+	 */
+	public boolean userIsHost(User user, String chan) {
+		boolean ret = false;
+		for (Channel opchans: user.getChannelsOwnerIn()) {
+			if (chan.equalsIgnoreCase(opchans.getName())) {
+				ret = true;
+				break;
+			}
+		}
+		
+		if (!ret) {
+			for (Channel opchans: user.getChannelsSuperOpIn()) {
+				if (chan.equalsIgnoreCase(opchans.getName())) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		
+		if (!ret) {
+			for (Channel opchans: user.getChannelsOpIn()) {
+				if (chan.equalsIgnoreCase(opchans.getName())) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		
+		if (!ret) {
+			for (Channel opchans: user.getChannelsHalfOpIn()) {
+				if (chan.equalsIgnoreCase(opchans.getName())) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		
+		if (!ret) {
+			for (Channel opchans: user.getChannelsVoiceIn()) {
+				if (chan.equalsIgnoreCase(opchans.getName())) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		
 		return ret;
 	}
  }

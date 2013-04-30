@@ -5,9 +5,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/SMPoker/pircbot.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EventLog"/>
-	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/c3p0-0.9.2.1.jar"/>
-	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/mchange-commons-java-0.2.3.4.jar"/>
-	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/mysql-connector-java-5.1.24-bin.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Database"/>
+	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/Database/lib/c3p0-0.9.2.1.jar"/>
+	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/Database/lib/mchange-commons-java-0.2.3.4.jar"/>
+	<classpathentry kind="lib" path="G:/[03]Projects/Java/SmokinMils/Database/lib/mysql-connector-java-5.1.24-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
