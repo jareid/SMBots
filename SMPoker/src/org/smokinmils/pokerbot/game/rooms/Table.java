@@ -1652,6 +1652,7 @@ public class Table extends Room {
         actor.postBigBlind(bigBlind);
         pot += bigBlind;
         bet = bigBlind;
+        minBet = bigBlind;
         playerBets.put(actor, bigBlind);
 
         String out = Strings.BigBlindPosted.replaceAll("%bb", Integer.toString(bigBlind) );

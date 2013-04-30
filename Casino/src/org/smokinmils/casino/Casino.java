@@ -28,7 +28,9 @@ public class Casino extends Event {
 	private ArrayList<Timer> events;
 
 	private String infoText;
-
+	
+	private static Object lock = new Object();
+	
 	public Casino(IrcBot bot) {
 
 		games = new ArrayList<IRCGame>();
@@ -77,71 +79,72 @@ public class Casino extends Event {
 
 	}
 
-	public synchronized void message(Message e) throws Exception {
-		// if the message starts with ! (so it is a command) and it is longer
-		// than just !
-		Accounts db = Accounts.getInstance();
-		if (e.getBot().userIsIdentified(e.getUser().getNick())) {
-			if (e.getMessage().startsWith("!") && e.getMessage().length() > 1) {
-				if (!db.isValidUser(e.getUser().getNick())) {
-					// this user is registered with nickserv(This is dealth in
-					// basebot now), but not on our systems,
-					db.addUser(e.getUser().getNick());
-					// then proceed to carry on
-				}
-				// parse the messages
-				String[] words = e.getMessage().split("!")[1].split(" ");
-				String command = words[0];
-				String sender = e.getUser().getNick();
-				String chan = e.getChannel().getName();
-
-				// HAX to handle ou in smokin_dice
-				if (command.equalsIgnoreCase("ou")
-						&& chan.equalsIgnoreCase("#smokin_dice")) {
-					e.respond(BLD + VAR + sender + MSG
-							+ " Please join #SM_OverUnder to play Over/Under"); // todo
-																				// fix
-																				// this
-																				// /
-																				// tidy
-				} else if (command.equalsIgnoreCase("info")) {
-					InputStream fis;
-					BufferedReader br;
-					String line;
-
-					try {
-						fis = new FileInputStream("info.txt");
-						br = new BufferedReader(new InputStreamReader(fis));
-						if ((line = br.readLine()) != null) {
-							infoText = line;
-						}
-					} catch (Exception ex) {
-						System.out.println("Error reading the info.txt");
-						infoText = "Error with info text, please contact an Admin";
+	public void message(Message e) throws Exception {
+		synchronized (lock) {
+			// if the message starts with ! (so it is a command) and it is longer
+			// than just !
+			Accounts db = Accounts.getInstance();
+			if (e.getBot().userIsIdentified(e.getUser().getNick())) {
+				if (e.getMessage().startsWith("!") && e.getMessage().length() > 1) {
+					if (!db.isValidUser(e.getUser().getNick())) {
+						// this user is registered with nickserv(This is dealth in
+						// basebot now), but not on our systems,
+						db.addUser(e.getUser().getNick());
+						// then proceed to carry on
 					}
-					e.getBot().sendIRCMessage(sender, infoText);
-					e.getBot().sendIRCNotice(sender, infoText);
-				} else {
-					// game commands
-					// since replies might require multiple lines, iterate
-					// through the replies and send them
-					for (IRCGame g : games) {
-						if (g.getChannel().equalsIgnoreCase(chan)
-								&& g.isValidCommand(command)) {
-							// should check if is valid here
-							for (String reply : g.processCommand(words, e
-									.getUser(), this.getUserLevel(sender, chan,
-									e.getUser()), e.getBot()))
-								e.getBot().sendIRCMessage(chan, reply);
+					// parse the messages
+					String[] words = e.getMessage().split("!")[1].split(" ");
+					String command = words[0];
+					String sender = e.getUser().getNick();
+					String chan = e.getChannel().getName();
+	
+					// HAX to handle ou in smokin_dice
+					if (command.equalsIgnoreCase("ou")
+							&& chan.equalsIgnoreCase("#smokin_dice")) {
+						e.respond(BLD + VAR + sender + MSG
+								+ " Please join #SM_OverUnder to play Over/Under"); // todo
+																					// fix
+																					// this
+																					// /
+																					// tidy
+					} else if (command.equalsIgnoreCase("info")) {
+						InputStream fis;
+						BufferedReader br;
+						String line;
+	
+						try {
+							fis = new FileInputStream("info.txt");
+							br = new BufferedReader(new InputStreamReader(fis));
+							if ((line = br.readLine()) != null) {
+								infoText = line;
+							}
+						} catch (Exception ex) {
+							System.out.println("Error reading the info.txt");
+							infoText = "Error with info text, please contact an Admin";
+						}
+						e.getBot().sendIRCMessage(sender, infoText);
+						e.getBot().sendIRCNotice(sender, infoText);
+					} else {
+						// game commands
+						// since replies might require multiple lines, iterate
+						// through the replies and send them
+						for (IRCGame g : games) {
+							if (g.getChannel().equalsIgnoreCase(chan)
+									&& g.isValidCommand(command)) {
+								// should check if is valid here
+								for (String reply : g.processCommand(words, e
+										.getUser(), this.getUserLevel(sender, chan,
+										e.getUser()), e.getBot()))
+									e.getBot().sendIRCMessage(chan, reply);
+							}
 						}
 					}
+	
 				}
-
+			} else {
+				// user isn't verified
 			}
-		} else {
-			// user isn't verified
 		}
-
 	}
 
 	/**

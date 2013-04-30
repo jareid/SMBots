@@ -32,6 +32,8 @@ public class TransferChips extends Event {
 	private static final String TransferChipsUser = "%b%c12You have had %c04%amount%c12 chips transfered into your %c04%profile%c12 account by %c04%sender%c12";
 	private static final String TransferChipsSender = "%b%c12You have transferred %c04%amount%c12 chips from your %c04%profile%c12 account to %c04%who%c12";
 	
+	private static Object lock = new Object();
+	
 	/**
 	 * This method handles the chips command
 	 * 
@@ -42,67 +44,69 @@ public class TransferChips extends Event {
 	 */
 	@Override
 	public void message(Message event) {
-		IrcBot bot = event.getBot();
-		String message = event.getMessage();
-		String sender = event.getUser().getNick();
-		Channel chan = event.getChannel();
-		
-		if ( isValidChannel( chan.getName() ) &&
-				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
-			String[] msg = message.split(" ");
-
-			if (msg.length == 4) {
-				String user = msg[1];
-				Integer amount = Utils.tryParse(msg[2]);
-				ProfileType profile = ProfileType.fromString(msg[3]);
-				
-				if (!user.isEmpty() && amount != null) {
-					// Check valid profile
-					if (profile == null) {
-						bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
-					} else {
-						try {
-							int chips = Database.getInstance().checkCredits( sender, profile );
-							if ( amount > chips || amount < 0 ) {
-								bot.NoChips(sender, amount, profile);
-							} else if ( !Database.getInstance().checkUserExists( user ) ) {
-								String out = NoUser.replaceAll("%user", user);
-								out = out.replaceAll("%sender", sender);
-								bot.sendIRCMessage(chan.getName(), out);
-							} else {
-								Database.getInstance().transferChips( sender, user, amount, profile );
-								
-								// Send message to channel
-								String out = TransferChips.replaceAll("%who", user);
-								out = out.replaceAll("%sender", sender);
-								out = out.replaceAll("%amount", Integer.toString(amount) );
-								out = out.replaceAll("%profile", profile.toString());
-								bot.sendIRCMessage(chan.getName(), out);
-								
-								// Send notice to sender
-								out = TransferChipsUser.replaceAll("%who", user);
-								out = out.replaceAll("%sender", sender);
-								out = out.replaceAll("%amount", Integer.toString(amount) );
-								out = out.replaceAll("%profile", profile.toString());
-								bot.sendIRCNotice(user, out);
-								
-								// Send notice to user
-								out = TransferChipsSender.replaceAll("%who", user);
-								out = out.replaceAll("%sender", sender);
-								out = out.replaceAll("%amount", Integer.toString(amount) );
-								out = out.replaceAll("%profile", profile.toString());
-								bot.sendIRCNotice(sender, out);
+		synchronized (lock) {
+			IrcBot bot = event.getBot();
+			String message = event.getMessage();
+			String sender = event.getUser().getNick();
+			Channel chan = event.getChannel();
+			
+			if ( isValidChannel( chan.getName() ) &&
+					bot.userIsIdentified( sender ) &&
+					message.startsWith( Command ) ) {			
+				String[] msg = message.split(" ");
+	
+				if (msg.length == 4) {
+					String user = msg[1];
+					Integer amount = Utils.tryParse(msg[2]);
+					ProfileType profile = ProfileType.fromString(msg[3]);
+					
+					if (!user.isEmpty() && amount != null) {
+						// Check valid profile
+						if (profile == null) {
+							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
+						} else {
+							try {
+								int chips = Database.getInstance().checkCredits( sender, profile );
+								if ( amount > chips || amount < 0 ) {
+									bot.NoChips(sender, amount, profile);
+								} else if ( !Database.getInstance().checkUserExists( user ) ) {
+									String out = NoUser.replaceAll("%user", user);
+									out = out.replaceAll("%sender", sender);
+									bot.sendIRCMessage(chan.getName(), out);
+								} else {
+									Database.getInstance().transferChips( sender, user, amount, profile );
+									
+									// Send message to channel
+									String out = TransferChips.replaceAll("%who", user);
+									out = out.replaceAll("%sender", sender);
+									out = out.replaceAll("%amount", Integer.toString(amount) );
+									out = out.replaceAll("%profile", profile.toString());
+									bot.sendIRCMessage(chan.getName(), out);
+									
+									// Send notice to sender
+									out = TransferChipsUser.replaceAll("%who", user);
+									out = out.replaceAll("%sender", sender);
+									out = out.replaceAll("%amount", Integer.toString(amount) );
+									out = out.replaceAll("%profile", profile.toString());
+									bot.sendIRCNotice(user, out);
+									
+									// Send notice to user
+									out = TransferChipsSender.replaceAll("%who", user);
+									out = out.replaceAll("%sender", sender);
+									out = out.replaceAll("%amount", Integer.toString(amount) );
+									out = out.replaceAll("%profile", profile.toString());
+									bot.sendIRCNotice(sender, out);
+								}
+							} catch (Exception e) {
+								EventLog.log(e, "TransferChips", "message");
 							}
-						} catch (Exception e) {
-							EventLog.log(e, "TransferChips", "message");
 						}
+					} else {
+						bot.invalidArguments( sender, Format );
 					}
 				} else {
 					bot.invalidArguments( sender, Format );
 				}
-			} else {
-				bot.invalidArguments( sender, Format );
 			}
 		}
 	}
