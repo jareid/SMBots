@@ -8,9 +8,17 @@
  */ 
 package org.smokingmils.help;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.ini4j.InvalidFileFormatException;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
+import org.smokinmils.logging.EventLog;
 
 /**
  * Provides the functionality to check a user's chips
@@ -19,12 +27,30 @@ import org.smokinmils.bot.events.Message;
  */
 public class Help extends Event {
 	public static final String Command = "!info";
-	public static final String Description = "%b%c12Lists the available profiles";
-	public static final String Format = "%b%c12" + Command + "";
+	public static final String Description = "%b%c12Lists the available info topics";
+	public static final String Format = "%b%c12" + Command + " ?topic?";
 	
-	public static final String ProfileChanged = "%b%c04%user %c12is now using the %c04%profile%c12 game profile";
-	public static final String ProfileChangeFail = "%b%c04%user %c12tried to change to the %c04%profile%c12 game profile and it failed. Please try again!";
+	public static final String InvalidTopic = "%b%c12Sorry, %c04%topic%c12 is not a valid topic. Please use %c04%cmd%c12 for valid questions/topics!";
 	
+	public static final int MaxCharacters = 80;
+	
+	public static final String FileName = "faq.ini";
+	
+	/**
+	 * Constructor 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 * @throws InvalidFileFormatException 
+	 */
+	public Help() {
+		try {
+			Question.load(FileName);
+		} catch (IOException e) {
+			EventLog.fatal(e, "Help", "Help");
+			System.exit(0);
+		}
+	}
+
 	/**
 	 * This method handles the chips command
 	 * 
@@ -40,61 +66,70 @@ public class Help extends Event {
 		String sender = event.getUser().getNick();
 		String chan = event.getChannel().getName();
 		
-		if ( isValidChannel( event.getChannel().getName() ) &&
-				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
-			/*String[] msg = message.split(" ");
-			if (msg.length == 0 || msg[0].compareTo("") == 0) {
-				for (String line: Strings.InfoMessage.split("\n")) {
-					bot.sendIRCNotice( sender, line );
+		if ( isValidChannel( chan ) &&	message.startsWith( Command ) ) {			
+			String[] msg = message.split(" ");
+			if (msg.length == 1) {
+				// list all questions
+				Map<String, Question> topics = Question.values();
+				// for every question
+				for (Question q: topics.values()) {
+					// output each question
+					List<String> lines = splitToLines(q.getQuestion());
+					int i = 0;
+					for (String line: lines) {
+						i++;
+						String out = "%b%c12" +  line;
+						if ( i == lines.size() ) {
+							out += "%c12 - Use %c04" + Command + " " + q.getTopic();
+						}
+						bot.sendIRCNotice( sender, out );
+					}
 				}
-			} else if (msg.length == 1){
-				CommandType infocmd = CommandType.fromString( Strings.CommandChar + msg[0] );
-				if (infocmd != null) {
-					sendFullCommand(sender, infocmd);
-				} else if ( msg[0].compareToIgnoreCase("table") == 0 ) {
-					CommandType[] table_cmds = {CommandType.CHECK, CommandType.RAISE, CommandType.FOLD,
-							 					CommandType.TBLCHIPS, CommandType.REBUY, CommandType.LEAVE,
-							 					CommandType.SITDOWN, CommandType.SITOUT};
-					for (CommandType item: table_cmds) {
-						sendFullCommand(sender, item);
-					}
-				} else if ( msg[0].compareToIgnoreCase("lobby") == 0 ) {
-					CommandType[] lobby_cmds = {CommandType.INFO, CommandType.TABLES,
-												CommandType.NEWTABLE, CommandType.WATCHTBL, CommandType.JOIN};
-					for (CommandType item: lobby_cmds) {
-						sendFullCommand(sender, item);
-						bot.sendIRCNotice(sender,"%b%c15-----");
-					}
+			} else if (msg.length == 2) {
+				Question q = Question.fromString(msg[1]);
+				if (q == null) {
+					String out = InvalidTopic.replaceAll( "%topic", msg[1] );
+					out = out.replaceAll( "%cmd", Command );
+					bot.sendIRCNotice( sender, out );					
 				} else {
-					bot.sendIRCNotice(sender, Strings.InvalidInfoArgs.replaceAll("%invalid", msg[0]));
+					// output question limited by line length
+					for (String line: splitToLines(q.getQuestion()) )  {
+						bot.sendIRCNotice( sender, "%b%c12" +  line);
+					}
+					// output answer limited by line length
+					for (String line: splitToLines(q.getAnswer()) )  {
+						bot.sendIRCNotice( sender, "%b%c12->" +  line);
+					}
 				}
 			} else {
-				bot.sendIRCNotice(who, InvalidArgs);
-				bot.sendIRCNotice(who, format);		
-			}*/
+				bot.invalidArguments( sender, Format );
+			}
 		}
 	}
-    
-    /**
-     * Sends a command's format message
-     * 
-     * @param who		The user to send to
-     * @param cmd		The command
-     * @param format	The command format
-     */
-    protected void sendFormat(IrcBot bot, String who, String cmd, String format) {	
-	}
-    
-    /**
-     * Sends a command's format followed by it's description
-     * 
-     * @param who		The user to send to
-     * @param cmd		The command
-     */
-    private void sendFullCommand(IrcBot bot, String who, Command cmd) {
-		bot.sendIRCNotice(who, "%b%c04 " + cmd.getCommandText()
-								+ "%c12 - Format:" + cmd.getFormat());
-		bot.sendIRCNotice(who, cmd.getDescription());
+	
+	private List<String> splitToLines(String in) {
+		int start = 0;
+		int end = start + MaxCharacters;
+		int length = in.length();
+		List<String> out = new ArrayList<String>();
+		char is_space = ' ';
+		String line = "";
+		
+		while (end < length) {
+			// only end on a space
+			while (is_space != ' ') {
+				is_space = in.charAt(end);
+				line = in.substring(start, end);
+				end--;
+			}
+			out.add( line + "\n" );
+			
+			//move to next line
+			start = end;
+			end = start + MaxCharacters;
+		}
+		
+		out.add( in.substring(start, length) );
+		return out;
 	}
 }

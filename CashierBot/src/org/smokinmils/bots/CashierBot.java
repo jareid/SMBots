@@ -10,6 +10,7 @@ package org.smokinmils.bots;
 
 import java.util.Timer;
 
+import org.smokingmils.help.Help;
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.cashier.*;
 import org.smokinmils.casino.Casino;
@@ -47,7 +48,15 @@ public class CashierBot {
     	
     	GiveChips gc_event = new GiveChips();
     	gc_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, gc_event);
+    	basebot.addListener(swift_irc, gc_event); 	
+
+    	Help h_event = new Help();
+    	h_event.addValidChan(all_swift_chans);
+    	basebot.addListener(swift_irc, h_event);
+    	
+    	Jackpots jp_event = new Jackpots();
+    	jp_event.addValidChan(all_swift_chans);
+    	basebot.addListener(swift_irc, jp_event);
     	
     	Payout p_event = new Payout();
     	p_event.addValidChan(all_swift_chans);
@@ -60,10 +69,6 @@ public class CashierBot {
     	Profiles prfs_event = new Profiles();
     	prfs_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, prfs_event);
-    	
-    	Jackpots jp_event = new Jackpots();
-    	jp_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, jp_event);
     	
     	TransferChips tc_event = new TransferChips();
     	tc_event.addValidChan(all_swift_chans);
