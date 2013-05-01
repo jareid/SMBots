@@ -117,15 +117,15 @@ public class Help extends Event {
 		
 		while (end < length) {
 			// only end on a space
-			while (is_space != ' ') {
+			do {
 				is_space = in.charAt(end);
 				line = in.substring(start, end);
 				end--;
-			}
+			} while (is_space != ' ');
 			out.add( line + "\n" );
 			
-			//move to next line
-			start = end;
+			//move to next line, we add 2 as startIndex is inclusive and we want to skip the space too. 
+			start = end + 2;
 			end = start + MaxCharacters;
 		}
 		
