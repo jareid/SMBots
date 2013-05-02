@@ -24,11 +24,11 @@ public class CashierBot {
     public static void main(String[] args) throws Exception {
     	SMBaseBot basebot = SMBaseBot.getInstance();
     	boolean debug = true;
-    	basebot.initialise("SM_BOT_TEST", "5w807", "smokinmils", debug);
+    	basebot.initialise("SM_BOT", "5w807", "smokinmils", debug);
     	String swift_irc = "SwiftIRC";
     	basebot.addServer(swift_irc, "conclave.il.us.SwiftIRC.net", 6667);
     	
-    	String[] all_swift_chans = {"#smokin_dice", "#sm_hosts", "#sm_overunder", "#sm_roulette"};
+    	String[] all_swift_chans = {"#smokin_dice", "#sm_tournaments", "#sm_overunder", "#sm_roulette", "#sm_hosts"};
     	//String[] all_swift_chans = {"#testeroo"};
     	
     	for (String chan: all_swift_chans) {
@@ -58,6 +58,10 @@ public class CashierBot {
     	Jackpots jp_event = new Jackpots();
     	jp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, jp_event);
+    	
+    	ManagerSystem ms_event = new ManagerSystem();
+    	ms_event.addValidChan(all_swift_chans);
+    	basebot.addListener(swift_irc, ms_event);
     	
     	Payout p_event = new Payout();
     	p_event.addValidChan(all_swift_chans);

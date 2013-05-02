@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/EventLog"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Basebot"/>
 	<classpathentry kind="lib" path="/Basebot/lib/pircbotx-1.9.jar"/>
+	<classpathentry kind="lib" path="/HelpSystem/lib/ini4j-0.5.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

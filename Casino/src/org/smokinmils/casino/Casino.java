@@ -1,9 +1,5 @@
 package org.smokinmils.casino;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Timer;
@@ -27,8 +23,6 @@ public class Casino extends Event {
 	private String BLD = Colors.BOLD;
 
 	private ArrayList<Timer> events;
-
-	private String infoText;
 	
 	public Casino(IrcBot bot) {
 		Accounts.getInstance().processRefunds();
@@ -100,23 +94,6 @@ public class Casino extends Event {
 																					// this
 																					// /
 																					// tidy
-					} else if (command.equalsIgnoreCase("info")) {
-						InputStream fis;
-						BufferedReader br;
-						String line;
-	
-						try {
-							fis = new FileInputStream("info.txt");
-							br = new BufferedReader(new InputStreamReader(fis));
-							if ((line = br.readLine()) != null) {
-								infoText = line;
-							}
-						} catch (Exception ex) {
-							System.out.println("Error reading the info.txt");
-							infoText = "Error with info text, please contact an Admin";
-						}
-						e.getBot().sendIRCMessage(sender, infoText);
-						e.getBot().sendIRCNotice(sender, infoText);
 					} else {
 						// game commands
 						// since replies might require multiple lines, iterate

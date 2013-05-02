@@ -100,6 +100,54 @@ public class Database {
 	   insert_hostmask = insert_hostmask.replaceAll("%userid", Integer.toString(user_id));
 	   runBasicQuery( insert_hostmask );
    }
+
+
+   /**
+    * Adds a bet to the database
+    * 
+    * @param username	The user making the bet
+    * @param choice		The bet choice
+    * @param amount		The bet amount
+    * @param profile	The profile the bet is from
+    * @param game		The game the bet is on
+    * 
+    * @return	true if the query was run successfully.
+    */
+	public boolean addBet(String username, String choice, int amount,
+						ProfileType profile, GamesType game)
+								   throws DBException, SQLException {
+		String sql = "INSERT INTO " + BetsTable.Name + "("
+										+ BetsTable.Col_UserID + ", "
+										+ BetsTable.Col_Amount + ", "										
+										+ BetsTable.Col_Choice + ", "										
+										+ BetsTable.Col_Gameid + ", "									
+										+ BetsTable.Col_Profile + ") " +
+					 " VALUES(" + getUserIDSQL(username) + ", "
+					 			+ Integer.toString(amount) + ", "
+							 	+ choice + ", "
+							 	+ getGameIDSQL(game) + ", "
+							 	+ getProfileIDSQL(profile) + ")";
+		
+		return runBasicQuery(sql) == 1;		
+	}
+
+	/**
+	 * Deletes a bet from the database
+	 * 
+	 * @param bet
+	 *            The bet to remove
+	 * @param game
+	 *            The game represented as a unique string
+	 * @return 
+	 */
+	public boolean deleteBet(String username, GamesType game)
+			   throws DBException, SQLException {
+		String sql = "DELETE FROM " + BetsTable.Name +
+					 "WHERE " + BetsTable.Col_UserID + " = (" + getUserIDSQL(username) + ") " +
+					 "AND " + BetsTable.Col_Gameid + " = (" + getGameIDSQL(game) + ")";
+		
+		return runBasicQuery(sql) == 1;
+	}
    
    /**
     * Getter method for a user's active profile text
@@ -483,7 +531,7 @@ public class Database {
     * 
     * @return true if it succeeded
     */
-   private boolean adjustChips(String username, int amount, ProfileType profile, TransactionType tzx_type)
+   public boolean adjustChips(String username, int amount, ProfileType profile, TransactionType tzx_type)
 		   throws DBException, SQLException {	   
 	   String chips_sql = "SELECT COUNT(*) FROM " + UserProfilesView.Name +
 			   				" WHERE " + UserProfilesView.Col_Profile + " LIKE " + "'" + profile.toString() + "'" +

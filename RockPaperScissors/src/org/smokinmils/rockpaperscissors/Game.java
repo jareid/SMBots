@@ -8,18 +8,26 @@ package org.smokinmils.rockpaperscissors;
  * Copyright (C) 2013 Jamie Reid
  */ 
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
+import org.pircbotx.hooks.WaitForQueue;
+import org.pircbotx.hooks.events.NoticeEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.smokinmils.Database;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.bot.Bet;
+import org.smokinmils.database.DBException;
+import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -41,6 +49,11 @@ public class Game extends Event {
 	public static final String CxlFormat = "%b%c12" + CxlCommand + " <who>";
 	
 	private static final String OpenWager = "%b%c04%who%c12: You already have a wager open, Type %c04" + Command + "%c12 to cancel it";
+	
+	private static final String ROCK = "rock";
+	private static final String PAPER = "paper";
+	private static final String SCISSORS = "scissors";
+	private static final String[] CHOICES = {ROCK, PAPER, SCISSORS};
 	
 	private static Object thread_lock = new Object();
 	
@@ -105,22 +118,60 @@ public class Game extends Event {
 				if (amount == null || amount == 0) {
 					Database db = Database.getInstance();
 					// choice is null as DiceDuels done have one.
-					if(db.checkCredits(sender) >= amount) {   // add bet, remove chips, notify channel
-						String profile = db.getActiveProfile(sender).toString();
-						Bet bet = new Bet(sender, profile, amount, "");
-						openBets.add(bet);
-						/*db.removeChips(sender, profile, amount);
-						db.addBet(bet, 2);
-						db.addTransaction(sender, profile,1 , -amount, this.ID);
-						//System.out.println("post adding bet");
-						return (List<String>) Arrays.asList(BLD+VAR + username + MSG + " has opened a new dice duel wager of " + VAR + amount + " "+MSG + ((bet.getProfile().equalsIgnoreCase("play")) ? "play":"real") + " chips! To call this wager type " + VAR + "!call " + username);*/
-					} else {
-						// No chips
+					try {
+						if(db.checkCredits(sender) >= amount) {   // add bet, remove chips, notify channel
+							ProfileType profile = db.getActiveProfile(sender);
+							String choice = getChoice( event.getUser(), event.getBot() );
+							Bet bet = new Bet(sender, profile.toString(), amount, choice);
+							openBets.add(bet);
+							db.adjustChips(sender, (0-amount), profile, TransactionType.BET);
+							db.addBet(sender, choice, amount, profile, GamesType.ROCKPAPERSCISSORS)
+							;
+							// Announce
+							//return (List<String>) Arrays.asList(BLD+VAR + username + MSG + " has opened a new dice duel wager of " + VAR + amount + " "+MSG + ((bet.getProfile().equalsIgnoreCase("play")) ? "play":"real") + " chips! To call this wager type " + VAR + "!call " + username);*/
+						} else {
+							// No chips
+						}
+					} catch (Exception e) {
+						EventLog.log(e, "Game", "newGame");
 					}				
 				} else {
 					bot.invalidArguments(sender, Format);
 				}
 			}
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getChoice(User user, IrcBot bot) {
+	    WaitForQueue queue = new WaitForQueue( bot );
+	    String choice = null;
+		
+	    boolean received = false;
+	    //Infinite loop since we might receive notices from non NickServ
+	    while (!received) {
+	        //Use the waitFor() method to wait for a MessageEvent.
+	        //This will block (wait) until a message event comes in, ignoring
+	        //everything else	  
+	    	PrivateMessageEvent<IrcBot> currentEvent = null;
+			try {
+				currentEvent = queue.waitFor(PrivateMessageEvent.class);
+			} catch (InterruptedException ex) {
+				EventLog.log(ex, "Game", "getChoice");
+			}
+			
+	        //Check if this message is the response
+       		String msg = currentEvent.getMessage().toLowerCase();
+	        if ( currentEvent.getUser().equals(user) ) {
+	        	if ( msg.equalsIgnoreCase( user.getNick() ) ) {
+	        		// get and store choice		
+		        	queue.close();
+		        	received = true;
+	        	} else {
+	        		// tell user it is invalid choice.
+	        	}
+	        }
+	    }
+	    return choice;
 	}
 }

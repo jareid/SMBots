@@ -22,6 +22,7 @@ public enum GamesType {
 	ROULETTE_EVENODD("Roulette Even/Odd"),
 	ROULETTE_NUMBER("Roulette Number"),
 	ROULETTE_ROW("Roulette Row"),
+	ROCKPAPERSCISSORS("Rock Paper Scissors"),
 	;
 	
 	/** The text. */

@@ -94,11 +94,12 @@ public class Help extends Event {
 				} else {
 					// output question limited by line length
 					for (String line: splitToLines(q.getQuestion()) )  {
-						bot.sendIRCNotice( sender, "%b%c12" +  line);
+						bot.sendIRCNotice( sender, "%b%c12" + line);
 					}
+					
 					// output answer limited by line length
 					for (String line: splitToLines(q.getAnswer()) )  {
-						bot.sendIRCNotice( sender, "%b%c12->" +  line);
+						bot.sendIRCNotice( sender, "%b%c12" + line);
 					}
 				}
 			} else {
