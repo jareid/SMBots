@@ -36,6 +36,9 @@ public class Casino extends Event {
 		games.add(new Roulette(1, "#sm_roulette", bot));
 		games.add(new OverUnder("#sm_overunder"));
 		games.add(new DiceDuel("#smokin_dice"));
+		
+		games.add(new Roulette(2, "#sm_tournaments", bot));
+		games.add(new DiceDuel("#sm_tournaments"));
 
 		// test config
 		/*

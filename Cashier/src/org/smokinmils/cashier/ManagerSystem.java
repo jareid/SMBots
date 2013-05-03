@@ -106,7 +106,7 @@ public class ManagerSystem extends Event {
 		Channel chan = event.getChannel();
 		
 		if ( isValidChannel( chan.getName() ) && bot.userIsIdentified( sender )) {
-			if (LoggedInUser.equalsIgnoreCase( sender ) &&
+			if (LoggedInUser != null && LoggedInUser.equalsIgnoreCase( sender ) &&
 				chan.getName().equalsIgnoreCase(ActivityChan)) {
 				Inactive.cancel();
 				Inactive = new Timer();
@@ -130,7 +130,7 @@ public class ManagerSystem extends Event {
 				}
 			} else if (message.startsWith( LogoutCommand ) &&
 			   			bot.userIsOp(event.getUser(), chan.getName())) {
-				if (LoggedInUser == null) {
+				if (LoggedInUser == null || !LoggedInUser.equalsIgnoreCase(sender)) {
 					bot.sendIRCNotice(sender, NotLoggedIn);
 				} else {
 					managerLoggedOut();
@@ -143,7 +143,7 @@ public class ManagerSystem extends Event {
 	private static void managerLoggedIn(String who) {
 		if (Inactive != null) Inactive.cancel();
 		Inactive = new Timer();
-		Inactive.scheduleAtFixedRate( new InactiveTask(), 0, InactiveTime*60*1000);
+		Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 		LoggedInUser = who;
 	}
 	
@@ -153,6 +153,7 @@ public class ManagerSystem extends Event {
 	}
 	
 	public static void inactive() {
+		if (Inactive != null) Inactive.cancel();
 		if (LoggedInUser != null) {
 			Bot.sendIRCMessage(ManagerChan, InactiveLoggedOut.replaceAll("%who", LoggedInUser));	
 			managerLoggedOut();

@@ -10,8 +10,6 @@ package org.smokingmils.help;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.ini4j.InvalidFileFormatException;
@@ -31,8 +29,6 @@ public class Help extends Event {
 	public static final String Format = "%b%c12" + Command + " ?topic?";
 	
 	public static final String InvalidTopic = "%b%c12Sorry, %c04%topic%c12 is not a valid topic. Please use %c04%cmd%c12 for valid questions/topics!";
-	
-	public static final int MaxCharacters = 80;
 	
 	public static final String FileName = "faq.ini";
 	
@@ -73,17 +69,7 @@ public class Help extends Event {
 				Map<String, Question> topics = Question.values();
 				// for every question
 				for (Question q: topics.values()) {
-					// output each question
-					List<String> lines = splitToLines(q.getQuestion());
-					int i = 0;
-					for (String line: lines) {
-						i++;
-						String out = "%b%c12" +  line;
-						if ( i == lines.size() ) {
-							out += "%c12 - Use %c04" + Command + " " + q.getTopic();
-						}
-						bot.sendIRCNotice( sender, out );
-					}
+					bot.sendIRCNotice( sender, "%b%c12" + q.getQuestion() + "%c12 - Use %c04" + Command + " " + q.getTopic() );
 				}
 			} else if (msg.length == 2) {
 				Question q = Question.fromString(msg[1]);
@@ -92,15 +78,8 @@ public class Help extends Event {
 					out = out.replaceAll( "%cmd", Command );
 					bot.sendIRCNotice( sender, out );					
 				} else {
-					// output question limited by line length
-					for (String line: splitToLines(q.getQuestion()) )  {
-						bot.sendIRCNotice( sender, "%b%c12" + line);
-					}
-					
-					// output answer limited by line length
-					for (String line: splitToLines(q.getAnswer()) )  {
-						bot.sendIRCNotice( sender, "%b%c12" + line);
-					}
+					bot.sendIRCNotice( sender, "%b%c12" + q.getQuestion());
+					bot.sendIRCNotice( sender, "%b%c12" + q.getAnswer());
 				}
 			} else {
 				bot.invalidArguments( sender, Format );
@@ -108,7 +87,7 @@ public class Help extends Event {
 		}
 	}
 	
-	private List<String> splitToLines(String in) {
+	/*private List<String> splitToLines(String in) {
 		int start = 0;
 		int end = start + MaxCharacters;
 		int length = in.length();
@@ -132,5 +111,5 @@ public class Help extends Event {
 		
 		out.add( in.substring(start, length) );
 		return out;
-	}
+	}*/
 }

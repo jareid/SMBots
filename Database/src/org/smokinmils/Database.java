@@ -148,6 +148,23 @@ public class Database {
 		
 		return runBasicQuery(sql) == 1;
 	}
+	
+	/**
+	 * Records the amount bet into the database, this could probably be tidied
+	 * up with transactions instead
+	 * 
+	 * @param username
+	 *            The username who bet.
+	 * @param amount
+	 *            The amount they bet
+	 */
+	public void recordBet(String username, int amount) throws DBException, SQLException {
+		String sql = "UPDATE " + UsersTable.Name +
+					" SET " + UsersTable.Col_TotalBets + " = (" +
+							  UsersTable.Col_TotalBets + " + " + Integer.toString(amount) + ")" +
+					" WHERE " + UsersTable.Col_Username + " LIKE '" + username + "'";
+		runBasicQuery(sql);
+	}
    
    /**
     * Getter method for a user's active profile text
@@ -505,7 +522,7 @@ public class Database {
     */
 	public boolean giveChips(String username, int amount, ProfileType profile)
 			throws DBException, SQLException {
-		return adjustChips(username, amount, profile, TransactionType.CREDIT);
+		return adjustChips(username, amount, profile, GamesType.POKER, TransactionType.CREDIT);
 	}
 	
    /**
@@ -519,7 +536,7 @@ public class Database {
     */
 	public boolean payoutChips(String username, int amount, ProfileType profile)
 			throws DBException, SQLException {
-		return adjustChips(username, (0-amount), profile, TransactionType.PAYOUT);
+		return adjustChips(username, (0-amount), profile, GamesType.POKER, TransactionType.PAYOUT);
 	}
    
    /**
@@ -531,7 +548,8 @@ public class Database {
     * 
     * @return true if it succeeded
     */
-   public boolean adjustChips(String username, int amount, ProfileType profile, TransactionType tzx_type)
+   public boolean adjustChips(String username, int amount, ProfileType profile, 
+		   				      GamesType game, TransactionType tzx_type)
 		   throws DBException, SQLException {	   
 	   String chips_sql = "SELECT COUNT(*) FROM " + UserProfilesView.Name +
 			   				" WHERE " + UserProfilesView.Col_Profile + " LIKE " + "'" + profile.toString() + "'" +
@@ -579,7 +597,7 @@ public class Database {
 	   }
 		   
 	   if (result) {
-		   addTransaction(username, amount, GamesType.ADMIN, tzx_type, profile);
+		   addTransaction(username, amount, game, tzx_type, profile);
 	   }
 	   
 	   return result;

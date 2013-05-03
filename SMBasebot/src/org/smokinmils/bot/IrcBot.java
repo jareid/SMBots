@@ -65,7 +65,8 @@ public class IrcBot extends PircBotX {
 	public void sendIRCNotice(Channel target, String in) { sendIRCNotice(target.getName(), in); }
 	public void sendIRCNotice(String target, String in) {
 		String out = in;
-		
+
+		out = out.replaceAll("%newline", "\n");
 		out = out.replaceAll("%c", "\u0003");
 		out = out.replaceAll("%b", Colors.BOLD);
 		out = out.replaceAll("%i", Colors.REVERSE);
@@ -87,7 +88,8 @@ public class IrcBot extends PircBotX {
 	public void sendIRCMessage(Channel target, String in) { sendIRCMessage(target.getName(), in); }
 	public void sendIRCMessage(String target, String in) {
 		String out = in;
-		
+
+		out = out.replaceAll("%newline", "\n");
 		out = out.replaceAll("%c", "\u0003");
 		out = out.replaceAll("%b", Colors.BOLD);
 		out = out.replaceAll("%i", Colors.REVERSE);

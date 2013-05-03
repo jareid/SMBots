@@ -59,7 +59,7 @@ public class CashierBot {
     	jp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, jp_event);
     	
-    	ManagerSystem ms_event = new ManagerSystem();
+    	ManagerSystem ms_event = new ManagerSystem("#smokin_dice", "#managers", basebot.getBot(swift_irc));
     	ms_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, ms_event);
     	
@@ -79,13 +79,16 @@ public class CashierBot {
     	tc_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, tc_event);
     	
-    	Timer bet_timer = new Timer();
+    	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#smokin_dice" );
+    	mgr_ano.begin(0);
+    	
+    	Timer bet_timer = new Timer(true);
     	bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot(swift_irc), "#smokin_dice" ), 5*60*1000, 60*60*1000);
     	
-    	Timer comp_timer = new Timer();
+    	Timer comp_timer = new Timer(true);
     	comp_timer.scheduleAtFixedRate( new Competition( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
-    	Timer jkpt_timer = new Timer();
+    	Timer jkpt_timer = new Timer(true);
     	jkpt_timer.scheduleAtFixedRate( new JackpotAnnounce( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
     	while(true) { Thread.sleep(10); }

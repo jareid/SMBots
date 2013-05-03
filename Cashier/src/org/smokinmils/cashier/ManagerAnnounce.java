@@ -44,18 +44,36 @@ public class ManagerAnnounce extends TimerTask {
 		Intervals = new ArrayList<Integer>();
 		Messages = new ArrayList<String>();
 		readData();
-
-		AnnounceTimer = new Timer();
-		AnnounceTimer.schedule( this , DefaultInterval*60*1000);
+	}
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param bot
+	 */
+	public ManagerAnnounce(IrcBot bot, String chan, List<Integer> intervals,
+							List<String> msgs, int next) {
+		Bot = bot;
+		Channel = chan;
+		Intervals = intervals;
+		Messages = msgs;
+		begin(next);
+	}
+	
+	/**
+	 * Initialise the system
+	 */
+	public void begin(int next) {
+		if (next <= 0) next = DefaultInterval;
+		AnnounceTimer = new Timer(true);
+		AnnounceTimer.schedule( this , next*60*1000);
 	}
 	
 	/**
 	 * (non-Javadoc)
 	 * @see java.util.TimerTask#run()
 	 */
-	public void run() {
-		AnnounceTimer.cancel();		
-	
+	public void run() {	
 		String out = null;
 		Integer interval = DefaultInterval;
 		if (Messages.size() >= 1 && Intervals.size() >= 1) {
@@ -70,8 +88,8 @@ public class ManagerAnnounce extends TimerTask {
 			readData();
 		}
 		
-		AnnounceTimer = new Timer();
-		AnnounceTimer.schedule( this , interval*60*1000);
+		if (AnnounceTimer != null) AnnounceTimer.cancel();
+		new ManagerAnnounce( Bot, Channel, Intervals, Messages, interval );
 	}
 	
 	private void readData() {
