@@ -119,7 +119,7 @@ public class SMBaseBot {
 	   newbot.startIdentServer();
 	   
 	   // TODO: move to settings?
-	   newbot.setMessageDelay(5);
+	   newbot.setMessageDelay(1);
 	   
 	   newbot.setListenerManager( new ThreadedListenerManager<IrcBot>() );
 	   newbot.getListenerManager().addListener( new CheckIdentified() );	   

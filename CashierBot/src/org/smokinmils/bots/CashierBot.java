@@ -27,7 +27,7 @@ public class CashierBot {
     	boolean debug = true;
     	basebot.initialise("SM_BOT", "5w807", "smokinmils", debug);
     	String swift_irc = "SwiftIRC";
-    	basebot.addServer(swift_irc, "conclave.il.us.SwiftIRC.net", 6667);
+    	basebot.addServer(swift_irc, "irc.SwiftIRC.net", 6667);
     	
     	String[] all_swift_chans = {"#smokin_dice", "#sm_tournaments", "#sm_overunder", "#sm_roulette", "#sm_hosts"};
     	//String[] all_swift_chans = {"#testeroo"};
@@ -87,14 +87,14 @@ public class CashierBot {
     	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#testeroo" );
     	mgr_ano.begin(0);
     	
-    	//Timer bet_timer = new Timer(true);
-    	//bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot(swift_irc), "#smokin_dice" ), 5*60*1000, 60*60*1000);
+    	Timer bet_timer = new Timer(true);
+    	bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot(swift_irc), "#smokin_dice" ), 5*60*1000, 60*60*1000);
     	
-    	//Timer comp_timer = new Timer(true);
-    	//comp_timer.scheduleAtFixedRate( new Competition( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
+    	Timer comp_timer = new Timer(true);
+    	comp_timer.scheduleAtFixedRate( new Competition( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
-    	//Timer jkpt_timer = new Timer(true);
-    	//jkpt_timer.scheduleAtFixedRate( new JackpotAnnounce( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
+    	Timer jkpt_timer = new Timer(true);
+    	jkpt_timer.scheduleAtFixedRate( new JackpotAnnounce( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
     	while(true) { Thread.sleep(10); }
     }

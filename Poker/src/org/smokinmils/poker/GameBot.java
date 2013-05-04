@@ -39,7 +39,7 @@ public class GameBot {
     	SMBaseBot basebot = SMBaseBot.getInstance();
     	basebot.initialise(Variables.Nick, Variables.NickServPassword, Variables.Login, debug);
     	String swift_irc = "SwiftIRC";
-    	basebot.addServer(swift_irc, "conclave.il.us.SwiftIRC.net", 6667);
+    	basebot.addServer(swift_irc, "irc.SwiftIRC.net", 6667);
 
 		basebot.addChannel(swift_irc, Variables.LobbyChan);
 		

@@ -15,7 +15,7 @@ package org.smokinmils.pokerbot.settings;
  */
 public class DBSettings {
 	/** The Server name of the database */
-	public static final String  DBServer =			"66.147.232.16";
+	public static final String  DBServer =			"199.101.50.187";
 	
 	/** The port number of the database (MySQL is typically 3306) */
 	public static final int 	DBPort =			3306;

@@ -8,11 +8,11 @@ public class Settings {
 
 	/*
 	 * // TEST public static String BOTNAME = "SM_BOT_TEST"; public static
-	 * String DBHOST = "66.147.232.16"; public static String DBNAME = "test";
+	 * String DBHOST = "199.101.50.187"; public static String DBNAME = "test";
 	 */
 
 	// LIVE DATA
-	public static String DBHOST = "199.101.50.187";
+	public static String DBHOST = "localhost";
 	public static String DBNAME = "live";
 	public static String BOTNAME = "SM_BOT";
 
