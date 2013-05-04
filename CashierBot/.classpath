@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Basebot"/>
 	<classpathentry kind="src" path="/Casino"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HelpSystem"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/RockPaperScissors"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

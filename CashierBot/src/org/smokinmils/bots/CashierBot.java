@@ -14,6 +14,7 @@ import org.smokingmils.help.Help;
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.cashier.*;
 import org.smokinmils.casino.Casino;
+import org.smokinmils.rockpaperscissors.Game;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -47,6 +48,10 @@ public class CashierBot {
     	cp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, cp_event);
     	
+    	//Game rps_event = new Game("#testeroo");
+    	//rps_event.addValidChan(all_swift_chans);
+    	//basebot.addListener(swift_irc, rps_event); 	
+    	
     	GiveChips gc_event = new GiveChips();
     	gc_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, gc_event); 	
@@ -79,17 +84,17 @@ public class CashierBot {
     	tc_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, tc_event);
     	
-    	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#smokin_dice" );
+    	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#testeroo" );
     	mgr_ano.begin(0);
     	
-    	Timer bet_timer = new Timer(true);
-    	bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot(swift_irc), "#smokin_dice" ), 5*60*1000, 60*60*1000);
+    	//Timer bet_timer = new Timer(true);
+    	//bet_timer.scheduleAtFixedRate( new BetDetails( basebot.getBot(swift_irc), "#smokin_dice" ), 5*60*1000, 60*60*1000);
     	
-    	Timer comp_timer = new Timer(true);
-    	comp_timer.scheduleAtFixedRate( new Competition( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
+    	//Timer comp_timer = new Timer(true);
+    	//comp_timer.scheduleAtFixedRate( new Competition( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
-    	Timer jkpt_timer = new Timer(true);
-    	jkpt_timer.scheduleAtFixedRate( new JackpotAnnounce( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
+    	//Timer jkpt_timer = new Timer(true);
+    	//jkpt_timer.scheduleAtFixedRate( new JackpotAnnounce( basebot.getBot(swift_irc), "#smokin_dice" ), 2*60*1000, 60*60*1000);
     	
     	while(true) { Thread.sleep(10); }
     }

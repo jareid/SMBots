@@ -10,6 +10,7 @@ package org.smokinmils.rockpaperscissors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -52,8 +53,8 @@ public class Game extends Event {
 	public static final String CxlDescription = "%b%c12Cancels your existing Rock Paper Scissors games";
 	public static final String CxlFormat = "%b%c12" + CxlCommand + " <who>";
 	
-	private static final String OpenWager = "%b%c04%who%c12: You already have a wager open, Type %c04" + Command + "%c12 to cancel it";
-	private static final String OpenedWager = "%b%c04%who%c12: has opened a new dice duel wager of %c04%amount%c12 %profile chips! To call this wager type %c04!call %who";
+	private static final String OpenWager = "%b%c04%who%c12: You already have a wager open, Type %c04" + CxlCommand + "%c12 to cancel it";
+	private static final String OpenedWager = "%b%c04%who%c12: has opened a new RPS wager of %c04%amount%c12 %profile chips! To call this wager type %c04!call %who";
 	private static final String CancelledWager = "%b%c04%who%c12: Cancelled your open wager";
 	private static final String NoChips = "%b%c12Sorry, you do not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 	private static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a Rock Paper Scissors game! " +
@@ -75,7 +76,7 @@ public class Game extends Event {
 	
 	private String JackpotChannel;
 	
-	private ArrayList<Bet> openBets;
+	private List<Bet> openBets;
 	
 	/**
 	 * Constructor
@@ -84,6 +85,7 @@ public class Game extends Event {
 	 */
 	public Game(String chan) {
 		JackpotChannel = chan;
+		openBets = new ArrayList<Bet>();
 	}
 	
 	/**
@@ -103,12 +105,12 @@ public class Game extends Event {
 		synchronized (SMBaseBot.lockObject) {
 			if ( isValidChannel( chan.getName() ) &&
 					bot.userIsIdentified( sender ) ) {			
-				if ( message.startsWith( Command ) ) {
-					newGame(event);
+				if ( message.startsWith( CxlCommand ) ) {
+					cancel(event);
 				} else if ( message.startsWith( CallCommand ) ) {
 					call(event);
-				} else if ( message.startsWith( CxlCommand ) ) {
-					cancel(event);
+				} else if ( message.startsWith( Command ) ) {
+					newGame(event);
 				}
 			}
 		}
@@ -199,7 +201,7 @@ public class Game extends Event {
 									
 									endGame(better, better_prof, better_choice, 
 											caller, caller_prof, caller_choice,
-											amount, bot);
+											amount, bot, chan.getName());
 								} else {
 									bot.sendIRCMessage(chan, NoChoice.replaceAll("%who", event.getUser().getNick()));
 								}
@@ -242,7 +244,7 @@ public class Game extends Event {
 				bot.sendIRCNotice(sender, out);
 			} else {
 				Integer amount = Utils.tryParse(msg[1]);
-				if (amount == null || amount == 0) {
+				if (amount != null && amount != 0) {
 					Database db = Database.getInstance();
 					// choice is null as DiceDuels done have one.
 					try {
@@ -276,6 +278,8 @@ public class Game extends Event {
 					bot.invalidArguments(sender, Format);
 				}
 			}
+		} else {
+			bot.invalidArguments(sender, Format);
 		}
 	}
 	
@@ -427,7 +431,7 @@ public class Game extends Event {
 	
 	private void endGame(String better, ProfileType better_prof, GameLogic better_choice,
 			   			 String caller, ProfileType caller_prof, GameLogic caller_choice,
-			   			 int amount, IrcBot bot) {
+			   			 int amount, IrcBot bot, String chan) {
 		GameLogicComparator c = new GameLogicComparator();
 		int order = c.compare(better_choice, caller_choice);
 		String winstr = c.getWinString();
@@ -436,22 +440,22 @@ public class Game extends Event {
 			// better won
 			doWin(better, better_prof, better_choice, 
 					caller, caller_prof, caller_choice,
-					amount, winstr, bot);
+					amount, winstr, bot, chan);
 		} else if (order == 1) {
 			// caller won
 			doWin(caller, caller_prof, caller_choice, 
 					better, better_prof, better_choice,
-					amount, winstr, bot);
+					amount, winstr, bot, chan);
 		} else {
 			doDraw(better, better_prof,
 				   caller, caller_prof,
-				   amount, bot);
+				   amount, bot, chan);
 		}
 	}
 	
 	private void doWin(String winner, ProfileType win_prof, GameLogic win_choice,
 					   String loser, ProfileType lose_prof, GameLogic lose_choice,
-					   int amount, String winstring, IrcBot bot) {
+					   int amount, String winstring, IrcBot bot, String chan) {
 		Database db = Database.getInstance();
 		// Take the rake and give chips to winner
 		int rake = 1;
@@ -463,6 +467,13 @@ public class Game extends Event {
 		try {
 			db.adjustChips(winner, (0-amount), win_prof, 
 					   GamesType.ROCKPAPERSCISSORS, TransactionType.WIN);
+			
+			//Announce winner and give chips			
+			String out = Win.replaceAll("%winstring", winstring);
+			out = out.replaceAll("%winner", winner);
+			out = out.replaceAll("%loser", loser);
+			out = out.replaceAll("%chips", Integer.toString(win));
+			bot.sendIRCMessage(chan, out);
 	
 			// Record the bet
 			db.recordBet(winner, amount);
@@ -500,15 +511,11 @@ public class Game extends Event {
 				updateJackpot(jackpot_rake, lose_prof);
 			}
 		}
-		String out = Win.replaceAll("%winstring", winstring);
-		out = out.replaceAll("%winner", winner);
-		out = out.replaceAll("%loser", loser);
-		out = out.replaceAll("%chips", Integer.toString(win));
 	}
 	
 	private void doDraw(String better, ProfileType better_prof,
 						String caller, ProfileType caller_prof,						
-  			 			int amount, IrcBot bot) {
+  			 			int amount, IrcBot bot, String chan) {
 		boolean cxld = false;
 		GameLogic b_choice = getChoice(better, bot);
 		if (b_choice != null) {
@@ -516,7 +523,7 @@ public class Game extends Event {
 			if (c_choice != null) {
 				endGame(caller, caller_prof, c_choice, 
 						better, better_prof, b_choice,
-						amount, bot);
+						amount, bot, chan);
 			} else {
 				cxld = true;
 			}

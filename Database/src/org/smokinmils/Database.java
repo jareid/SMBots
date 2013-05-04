@@ -122,11 +122,11 @@ public class Database {
 										+ BetsTable.Col_Choice + ", "										
 										+ BetsTable.Col_Gameid + ", "									
 										+ BetsTable.Col_Profile + ") " +
-					 " VALUES(" + getUserIDSQL(username) + ", "
-					 			+ Integer.toString(amount) + ", "
-							 	+ choice + ", "
-							 	+ getGameIDSQL(game) + ", "
-							 	+ getProfileIDSQL(profile) + ")";
+					 " VALUES((" + getUserIDSQL(username) + "), "
+					 			+ "'" + Integer.toString(amount) + "', "
+							 	+ "'" + choice + "', "
+							 	+ "(" + getGameIDSQL(game) + "), "
+							 	+ "(" + getProfileIDSQL(profile) + "))";
 		
 		return runBasicQuery(sql) == 1;		
 	}
@@ -143,9 +143,9 @@ public class Database {
 	public boolean deleteBet(String username, GamesType game)
 			   throws DBException, SQLException {
 		String sql = "DELETE FROM " + BetsTable.Name +
-					 "WHERE " + BetsTable.Col_UserID + " = (" + getUserIDSQL(username) + ") " +
-					 "AND " + BetsTable.Col_Gameid + " = (" + getGameIDSQL(game) + ")";
-		
+					 " WHERE " + BetsTable.Col_UserID + " = (" + getUserIDSQL(username) + ")" +
+					 " AND " + BetsTable.Col_Gameid + " = (" + getGameIDSQL(game) + ")";
+		 
 		return runBasicQuery(sql) == 1;
 	}
 	
