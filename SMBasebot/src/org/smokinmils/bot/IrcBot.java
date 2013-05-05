@@ -74,7 +74,7 @@ public class IrcBot extends PircBotX {
 		out = out.replaceAll("%n", Colors.NORMAL);
 
 		for (String line: out.split("\n")) {
-			this.sendNotice(target, line);
+			this.sendRawLineNow( "NOTICE " + target + " " + line);
 		}
 	}
 	
@@ -97,7 +97,7 @@ public class IrcBot extends PircBotX {
 		out = out.replaceAll("%n", Colors.NORMAL);
 
 		for (String line: out.split("\n")) {
-			this.sendMessage(target, line);
+			this.sendRawLineNow( "PRIVMSG " + target + " " + line);
 		}
 	}
 	

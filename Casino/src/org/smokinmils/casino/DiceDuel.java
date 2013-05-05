@@ -430,7 +430,7 @@ public class DiceDuel implements IRCGame {
 			jackpot -= remainder;
 
 			if (jackpot != 0) {
-				int win = jackpot;// / players.size();
+				int win = jackpot / players.size();
 				for (String player : players) {
 					Database.getInstance().jackpot(player, win, profileName);
 				}
@@ -461,7 +461,7 @@ public class DiceDuel implements IRCGame {
 				 * ircClient.sendIRCMessage(ircChannel, out);
 				 * ircClient.sendIRCMessage(ircChannel, out);
 				 * ircClient.sendIRCMessage(ircChannel, out);
-				 * 
+				 *
 				 * // Update jackpot with remainder if (remainder > 0) { out =
 				 * Strings.JackpotIncreased.replaceAll("%chips",
 				 * Integer.toString(remainder)); out =

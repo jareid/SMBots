@@ -69,7 +69,7 @@ public class Game extends Event {
 	private static final String NoChoice = "%b%c04%who%c12: You didn't make a choice for the game, the bet has been cancelled.";
 	
 	
-	private static final int JACKPOTCHANCE = 1000;
+	private static final int JACKPOTCHANCE = 10000;
 	
 	private static final int RAKE = 3;
 	private static final int JACKPOTRAKE = 2;

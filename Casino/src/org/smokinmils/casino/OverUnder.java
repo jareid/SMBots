@@ -347,7 +347,7 @@ public class OverUnder implements IRCGame {
 			jackpot -= remainder;
 
 			if (jackpot != 0) {
-				int win = jackpot;// / players.size();
+				int win = jackpot / players.size();
 				for (String player : players) {
 					Database.getInstance().jackpot(player, win, profileName);
 				}

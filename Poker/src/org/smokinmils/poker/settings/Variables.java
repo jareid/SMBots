@@ -51,7 +51,7 @@ public class Variables {
 	public static final int RakePercentage = 5;
 	public static final int MinimumPotForRake = 4;
 	
-	public static final int JackpotChance = 1000;
+	public static final int JackpotChance = 10000;
 	public static final int JackpotRakePercentage = 34;
 	
 	/**
