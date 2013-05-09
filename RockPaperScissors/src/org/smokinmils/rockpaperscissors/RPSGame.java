@@ -61,8 +61,7 @@ public class RPSGame extends Event {
 	private static final String NoChips = "%b%c12Sorry, you do not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 	private static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a Rock Paper Scissors game! " +
 											 "Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
-	private static final String PlayChipsOnly = "%b%c04%who%c12: : you need to use play chips to call a play chips rps!";
-	private static final String RealChipsOnly = "%b%c04%who%c12: : you need to use real chips to call a real chips rps!";
+	private static final String RealChipsOnly = "%b%c04%who%c12: : you need to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
 	private static final String NoBet = "%b%c04%who%c12: I can't find a record of that wager";
 	private static final String SelfBet =  "%b%c04%who%c12: You can't play against yourself!";
 	private static final String Win = "%b%c12%winstring. %c04%loser%c12 loses and %c04%winner%c12 wins %c04%chips%c12!";
@@ -171,7 +170,7 @@ public class RPSGame extends Event {
 					if (bet.getUser().equalsIgnoreCase(better) && bet.isValid()) {
 						try {
 							found = true;
-							ProfileType caller_prof = db.getActiveProfile(better);
+							ProfileType caller_prof = db.getActiveProfile(caller);
 							// TODO: change profile in bet to ProfileType
 							ProfileType better_prof = ProfileType.fromString(bet.getProfile());
 							int amount = bet.getAmount();
@@ -182,18 +181,13 @@ public class RPSGame extends Event {
 							bet.invalidate();
 
 							// quick hax to check if play chips vs non-play chips!
-							if (!caller_prof.equals(ProfileType.PLAY)
-								&& better_prof.equals(ProfileType.PLAY)) {
-								bet.reset();
-								String out = PlayChipsOnly.replaceAll("%who", caller);
-								bot.sendIRCMessage(chan, out);		
-							} else if (caller_prof.equals(ProfileType.PLAY)
-										&& !better_prof.equals(ProfileType.PLAY)) {
+							if (caller_prof != better_prof) {
 								bet.reset();
 								String out = RealChipsOnly.replaceAll("%who", caller);
+								out = out.replaceAll("%profile", better_prof.toString());
 								bot.sendIRCMessage(chan, out);
 							} else if (db.checkCredits(caller) < amount) {
-								bet.reset(); // unlock
+								bet.reset();
 								String out = NoChips.replaceAll( "%chips", Integer.toString(amount));
 								out = out.replaceAll( "%profile", caller_prof.toString() );
 								bot.sendIRCMessage(chan, out);
@@ -509,6 +503,13 @@ public class RPSGame extends Event {
 				db.adjustChips(better, amount, better_prof,
 							   GamesType.ROCKPAPERSCISSORS,
 							   TransactionType.CANCEL);
+				
+				for (Bet bet: openBets) {
+					if (bet.getUser().equalsIgnoreCase(better) && bet.isValid()) {
+						bet.invalidate();
+						break;
+					}
+				}
 				
 				db.adjustChips(caller, amount, caller_prof,
 						   GamesType.ROCKPAPERSCISSORS,

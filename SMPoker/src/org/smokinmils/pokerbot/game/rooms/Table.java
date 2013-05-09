@@ -36,6 +36,7 @@ import org.smokinmils.pokerbot.game.Card;
 import org.smokinmils.pokerbot.game.Deck;
 import org.smokinmils.pokerbot.game.Hand;
 import org.smokinmils.pokerbot.game.HandValue;
+import org.smokinmils.pokerbot.game.Player;
 import org.smokinmils.pokerbot.game.SidePot;
 import org.smokinmils.pokerbot.settings.Strings;
 import org.smokinmils.pokerbot.settings.Variables;

@@ -1,0 +1,24 @@
+13:33:51: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: Question->load() :: test3 has no question
+13:33:51: Question->load() :: test4 has no answer
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:33:51: CheckIdentified->checkIdentified() :: DEBUG Checking the status of GsKiki-VX9
+13:33:51: CheckIdentified->sendStatusRequest() :: INFO: GsKiki-VX9 identified
+13:33:51: CheckIdentified->sendStatusRequest() :: INFO: GsKiki-VX9 identified
+13:33:55: CheckIdentified->checkIdentified() :: DEBUG Checking the status of Mr_J_Rune
+13:33:55: CheckIdentified->sendStatusRequest() :: INFO: Mr_J_Rune identified
+13:33:55: CheckIdentified->sendStatusRequest() :: INFO: Mr_J_Rune identified
+13:33:56: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid
+13:33:56: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+13:33:56: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+13:33:57: CheckIdentified->checkIdentified() :: DEBUG Checking the status of SM_BOT2

@@ -34,6 +34,7 @@ import org.smokinmils.poker.game.Card;
 import org.smokinmils.poker.game.Deck;
 import org.smokinmils.poker.game.Hand;
 import org.smokinmils.poker.game.HandValue;
+import org.smokinmils.poker.game.Player;
 import org.smokinmils.poker.game.SidePot;
 import org.smokinmils.poker.settings.Strings;
 import org.smokinmils.poker.settings.Variables;

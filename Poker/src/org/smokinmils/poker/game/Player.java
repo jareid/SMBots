@@ -6,18 +6,18 @@
  * 
  * Copyright (C) 2013 Jamie Reid
  */ 
-package org.smokinmils.pokerbot.game.rooms;
+package org.smokinmils.poker.game;
 
 import java.util.List;
 import java.util.Timer;
 
+import org.pircbotx.User;
 import org.smokinmils.logging.EventLog;
 
-import org.smokinmils.pokerbot.enums.ActionType;
-import org.smokinmils.pokerbot.game.Card;
-import org.smokinmils.pokerbot.game.Hand;
-import org.smokinmils.pokerbot.settings.Variables;
-import org.smokinmils.pokerbot.tasks.SittingOut;
+import org.smokinmils.poker.enums.ActionType;
+import org.smokinmils.poker.game.rooms.Table;
+import org.smokinmils.poker.settings.Variables;
+import org.smokinmils.poker.tasks.SittingOut;
 
 /**
  * The player for the poker game
@@ -27,6 +27,9 @@ import org.smokinmils.pokerbot.tasks.SittingOut;
 public class Player {
     /** Name. */
 	private String name;
+	
+	/** User */
+	private User user;
     
     /** Players hand */
     private final Hand hand;
@@ -67,12 +70,20 @@ public class Player {
      * @param name 		The player's username.
      * @param cash 		The player's buy in.
      */
-	public Player(String user, int buy_in) {
-		name = user;
+	public Player(User user, String nick, int buy_in) {
+		this.user = user;
+		name = nick;
 		chips = buy_in;
         hand = new Hand();
         sittingOut = false;
 	}
+	
+    /**
+     * Returns the player's irc user object.
+     *
+     * @return The name.
+     */
+    public User getUser() { return user; }
     
     /**
      * Returns the player's name.
@@ -100,7 +111,7 @@ public class Player {
      *
      * @return The chip count
      */
-    public void rebuy(int amount) { rebuy = amount; }
+    public void rebuy(int amount) { rebuy += amount; }
     
     /**
      * Removes all chips

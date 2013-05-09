@@ -1,0 +1,42 @@
+13:54:55: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: Question->load() :: test3 has no question
+13:54:55: Question->load() :: test4 has no answer
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:54:55: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid
+13:54:55: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+13:54:55: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+13:54:59: CheckIdentified->checkIdentified() :: DEBUG Checking the status of GsKiki-VX9
+13:54:59: CheckIdentified->sendStatusRequest() :: INFO: GsKiki-VX9 identified
+13:54:59: CheckIdentified->sendStatusRequest() :: INFO: GsKiki-VX9 identified
+13:55:00: CheckIdentified->checkIdentified() :: DEBUG Checking the status of SM_BOT2
+13:55:00: CheckIdentified->checkIdentified() :: DEBUG Checking the status of Mr_J_Rune
+13:55:00: CheckIdentified->sendStatusRequest() :: INFO: Mr_J_Rune identified
+13:55:00: CheckIdentified->sendStatusRequest() :: INFO: Mr_J_Rune identified
+14:20:39: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid2
+14:20:39: CheckIdentified->sendStatusRequest() :: INFO: JReid2 identified
+14:20:39: CheckIdentified->sendStatusRequest() :: INFO: JReid2 identified
+14:22:51: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid
+14:22:51: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+14:22:51: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+14:23:34: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid2
+14:23:34: CheckIdentified->sendStatusRequest() :: INFO: JReid2 identified
+14:23:34: CheckIdentified->sendStatusRequest() :: INFO: JReid2 identified
+14:23:40: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid
+14:23:40: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+14:23:40: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+14:24:15: CheckIdentified->checkIdentified() :: DEBUG Checking the status of KMV-11
+14:24:15: CheckIdentified->sendStatusRequest() :: INFO: KMV-11 identified
+14:24:15: CheckIdentified->sendStatusRequest() :: INFO: KMV-11 identified
+14:24:27: CheckIdentified->checkIdentified() :: DEBUG Checking the status of JReid2
+14:24:27: CheckIdentified->sendStatusRequest() :: INFO: JReid2 identified
+14:24:27: CheckIdentified->sendStatusRequest() :: INFO: JReid2 identified

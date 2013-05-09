@@ -10,7 +10,7 @@ package org.smokinmils.pokerbot.tasks;
 
 import java.util.TimerTask;
 
-import org.smokinmils.pokerbot.game.rooms.Player;
+import org.smokinmils.pokerbot.game.Player;
 import org.smokinmils.pokerbot.game.rooms.Table;
 
 /**

@@ -11,7 +11,6 @@ package org.smokinmils.pokerbot.game;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.smokinmils.pokerbot.game.rooms.Player;
 import org.smokinmils.pokerbot.settings.Variables;
 
 /**
