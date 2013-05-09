@@ -352,7 +352,7 @@ public class Player {
 	 * Schedules a player to be removed from the tbale after sitting out.
 	 */	
 	public void scheduleSitOut(Table table)  {
-		sittingOutTimer = new Timer();
+		sittingOutTimer = new Timer(true);
 		sittingOutTimer.schedule( new SittingOut( table, this ), Variables.MaxSitOutMins*1000*60 );
 	}
 	

@@ -63,7 +63,8 @@ public class ManagerSystem extends Event {
 		ActivityChan = active_chan;
 		ManagerChan = manager_chan;
 		Bot = bot;
-
+		
+		checkData();
 		// read from the file
 		try {
 			Ini ini = new Ini( new FileReader( FileName ) );
@@ -81,12 +82,12 @@ public class ManagerSystem extends Event {
 			EventLog.log(e, "ManagerSystem", "ManagerSystem");
 		}
 		
-		NextMin = new Timer();
-		NextMin.scheduleAtFixedRate(new IncreaseTime(), 0, 60*1000);
+		NextMin = new Timer(true);
+		NextMin.schedule(new IncreaseTime(), 60*1000);
 		
 		if (LoggedInUser != null) {			
-			Inactive = new Timer();
-			Inactive.scheduleAtFixedRate( new InactiveTask(), 0, InactiveTime*60*1000);
+			Inactive = new Timer(true);
+			Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 		}
 	}
 	
@@ -109,7 +110,7 @@ public class ManagerSystem extends Event {
 			if ( sender.equalsIgnoreCase( LoggedInUser ) &&
 				chan.getName().equalsIgnoreCase(ActivityChan)) {
 				Inactive.cancel();
-				Inactive = new Timer();
+				Inactive = new Timer(true);
 				Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 			}
 			
@@ -142,7 +143,7 @@ public class ManagerSystem extends Event {
 	
 	private static void managerLoggedIn(String who) {
 		if (Inactive != null) Inactive.cancel();
-		Inactive = new Timer();
+		Inactive = new Timer(true);
 		Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 		LoggedInUser = who;
 	}
@@ -175,7 +176,7 @@ public class ManagerSystem extends Event {
 	private static void checkData() {
 		File inifile = new File( FileName );
 		if(!inifile.exists()) {
-			ManagerTimes = new HashMap<String, Double>();
+			ManagerTimes.clear();
 		}
 	}
 	

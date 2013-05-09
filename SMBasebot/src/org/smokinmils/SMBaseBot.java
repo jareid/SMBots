@@ -136,7 +136,7 @@ public class SMBaseBot {
 	   bots.put(name, newbot);
 	   
 	   // check we are in all the channels we should be
-	   Timer rejoin = new Timer();
+	   Timer rejoin = new Timer(true);
 	   rejoin.scheduleAtFixedRate( new AutoJoin(newbot) , 5000, 5000);
    }
    

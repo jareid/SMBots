@@ -42,7 +42,7 @@ public class Lobby extends Room {
 	public Lobby(Channel channel, Client irc) {
 		super(channel, irc, RoomType.LOBBY);
 		RoomTopic = Strings.LobbyTopic;
-		announceTimer = new Timer();
+		announceTimer = new Timer(true);
 	    announceTimer.schedule(new AnnounceTask(), 250);
 	}
 	

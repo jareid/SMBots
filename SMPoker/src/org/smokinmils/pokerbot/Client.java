@@ -123,7 +123,7 @@ public class Client extends PircBot {
 		}
 
 		EventLog.info("Disconnected, attempting to reconnect", "Client", "onDisconnect");
-		reconnectTimer = new Timer();
+		reconnectTimer = new Timer(true);
 		reconnectTimer.schedule(new Reconnect( this ), Variables.ReconnectMS);
 	}
 	

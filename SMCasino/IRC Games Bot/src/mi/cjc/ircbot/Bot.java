@@ -77,13 +77,13 @@ public class Bot extends ListenerAdapter implements Listener
 				{
 					if (entry.getValue() < 0)
 					{
-						Timer timer = new Timer();
+						Timer timer = new Timer(true);
 						timer.schedule(new gameTrigger(entry.getKey(),g, bot,g.getChannel()), (-entry.getValue() * 60 * 1000)-10000, -entry.getValue() * 60 * 1000);
 						events.add(timer);
 					}
 					else
 					{
-						Timer timer = new Timer();
+						Timer timer = new Timer(true);
 						timer.schedule(new gameTrigger(entry.getKey(), g, bot, g.getChannel()), entry.getValue() * 60 * 1000, entry.getValue() * 60 * 1000);
 						events.add(timer);
 					}

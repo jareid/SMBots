@@ -14,7 +14,7 @@ import org.smokingmils.help.Help;
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.cashier.*;
 import org.smokinmils.casino.Casino;
-import org.smokinmils.rockpaperscissors.Game;
+import org.smokinmils.rockpaperscissors.RPSGame;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -48,9 +48,10 @@ public class CashierBot {
     	cp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, cp_event);
     	
-    	//Game rps_event = new Game("#testeroo");
-    	//rps_event.addValidChan(all_swift_chans);
-    	//basebot.addListener(swift_irc, rps_event); 	
+    	RPSGame rps_event = new RPSGame("#smokin_dice");
+    	rps_event.addValidChan(all_swift_chans);
+    	rps_event.addAnnounce("#smokin_dice", basebot.getBot(swift_irc));
+    	basebot.addListener(swift_irc, rps_event); 	
     	
     	GiveChips gc_event = new GiveChips();
     	gc_event.addValidChan(all_swift_chans);
@@ -84,7 +85,7 @@ public class CashierBot {
     	tc_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, tc_event);
     	
-    	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#testeroo" );
+    	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#smokin_dice" );
     	mgr_ano.begin(0);
     	
     	Timer bet_timer = new Timer(true);

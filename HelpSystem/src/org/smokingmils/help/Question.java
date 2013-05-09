@@ -63,6 +63,7 @@ public class Question {
     		String q = section.get("question");
     		String a = section.get("answer");
     		Integer i = section.get("i", Integer.class);
+    		if (i == null) i = _allQuestions.size();
     		if (q == null) {
     			EventLog.log(name + " has no question", "Question", "load");
     		} else if (a == null) {

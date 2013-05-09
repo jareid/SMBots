@@ -57,14 +57,14 @@ public class Casino extends Event {
 				for (Map.Entry<Integer, Integer> entry : g.getTimedTasks()
 						.entrySet()) {
 					if (entry.getValue() < 0) {
-						Timer timer = new Timer();
+						Timer timer = new Timer(true);
 						timer.schedule(new gameTrigger(entry.getKey(), g, bot,
 								g.getChannel()),
 								(-entry.getValue() * 60 * 1000) - 10000, -entry
 										.getValue() * 60 * 1000);
 						events.add(timer);
 					} else {
-						Timer timer = new Timer();
+						Timer timer = new Timer(true);
 						timer.schedule(new gameTrigger(entry.getKey(), g, bot,
 								g.getChannel()), entry.getValue() * 60 * 1000,
 								entry.getValue() * 60 * 1000);

@@ -801,7 +801,7 @@ public class Table extends Room {
 				waitedCount = 0;
 				
 				// Schedule the game to start
-				startGameTimer = new Timer();
+				startGameTimer = new Timer(true);
 				startGameTimer.schedule(new TableTask( this, TableTask.StartGameTaskName ),
 						Variables.GameStartSecs*1000);
 			}
@@ -1594,7 +1594,7 @@ public class Table extends Room {
      * Schedules the wait for players timer
      */
     private synchronized void scheduleWaitForPlayers() {
-		waitForPlayersTimer = new Timer();
+		waitForPlayersTimer = new Timer(true);
 		waitForPlayersTimer.schedule(new TableTask( this, TableTask.WaitForPlayersTaskName),
 				Variables.WaitingForPlayersSecs*1000);
     }
@@ -1995,7 +1995,7 @@ public class Table extends Room {
 		out = out.replaceAll( "%hID", Integer.toString(handID) );
 		out = out.replaceAll( "%secs", Integer.toString(Variables.ShowCardSecs));
 		IrcClient.getBot().sendIRCMessage( IrcChannel, out );					
-        showCardsTimer = new Timer();
+        showCardsTimer = new Timer(true);
         showCardsTimer.schedule( new TableTask( this, TableTask.ShowCardTaskName), Variables.ShowCardSecs*1000 );
 	}
 	

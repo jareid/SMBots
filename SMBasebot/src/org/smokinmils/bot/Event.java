@@ -490,7 +490,7 @@ public class Event extends ListenerAdapter<IrcBot> implements Listener<IrcBot> {
 	 */
 	public void addValidChan(String[] channels) {
 		for (String chan: channels)  {
-			validChannels.add(chan.toLowerCase());
+			addValidChan(chan.toLowerCase());
 		}
 	}
 	

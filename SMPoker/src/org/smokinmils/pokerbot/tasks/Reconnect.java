@@ -47,10 +47,10 @@ public class Reconnect extends TimerTask {
 			}
 		} catch (NickAlreadyInUseException e) {
 			ircClient.disconnect();
-			rcnt_timer = new Timer();
+			rcnt_timer = new Timer(true);
 			rcnt_timer.schedule( new Reconnect( ircClient ), Variables.ReconnectMS );
 		} catch (IOException | IrcException e) {
-			rcnt_timer = new Timer();
+			rcnt_timer = new Timer(true);
 			rcnt_timer.schedule( new Reconnect( ircClient ), Variables.ReconnectMS );
 		}
 	}
