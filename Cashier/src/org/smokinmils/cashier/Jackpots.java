@@ -46,7 +46,7 @@ public class Jackpots extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {
+				message.toLowerCase().startsWith( Command ) ) {
 			String jackpotstr = "";
 			
 			int i = 0;

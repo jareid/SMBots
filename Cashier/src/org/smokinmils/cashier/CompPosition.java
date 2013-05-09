@@ -47,7 +47,7 @@ public class CompPosition extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
+				message.toLowerCase().startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 2 || msg.length == 3) {
 				String who = (msg.length == 2 ? sender : msg[2] );

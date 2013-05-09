@@ -12,6 +12,7 @@ import org.pircbotx.Channel;
 import org.smokinmils.Database;
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.Utils;
+import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -51,7 +52,7 @@ public class TransferChips extends Event {
 			
 			if ( isValidChannel( chan.getName() ) &&
 					bot.userIsIdentified( sender ) &&
-					message.startsWith( Command ) ) {			
+					message.toLowerCase().startsWith( Command ) ) {			
 				String[] msg = message.split(" ");
 	
 				if (msg.length == 4) {
@@ -61,7 +62,10 @@ public class TransferChips extends Event {
 					
 					if (!user.isEmpty() && amount != null) {
 						// Check valid profile
-						if (profile == null) {
+						if (!CheckIdentified.checkIdentified(bot, user)) {
+							String out = CheckIdentified.NotIdentified.replaceAll( "%user", user );
+							bot.sendIRCMessage(sender, out);
+						} else if (profile == null) {
 							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 						} else {
 							try {

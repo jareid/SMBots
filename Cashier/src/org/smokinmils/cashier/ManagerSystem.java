@@ -106,21 +106,21 @@ public class ManagerSystem extends Event {
 		Channel chan = event.getChannel();
 		
 		if ( isValidChannel( chan.getName() ) && bot.userIsIdentified( sender )) {
-			if (LoggedInUser != null && LoggedInUser.equalsIgnoreCase( sender ) &&
+			if ( sender.equalsIgnoreCase( LoggedInUser ) &&
 				chan.getName().equalsIgnoreCase(ActivityChan)) {
 				Inactive.cancel();
 				Inactive = new Timer();
-				Inactive.scheduleAtFixedRate( new InactiveTask(), 0, InactiveTime*60*1000);
+				Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 			}
 			
-			if (message.startsWith( OnCommand )) {
+			if (message.toLowerCase().startsWith( OnCommand )) {
 				if (LoggedInUser == null) {
 					bot.sendIRCMessage( event.getChannel(), NoLoggedOn );
 				} else {
 					bot.sendIRCMessage( event.getChannel(),
 									LoggedOn.replaceAll( "%who", LoggedInUser ) );
 				}
-			} else if (message.startsWith( LoginCommand ) &&
+			} else if (message.toLowerCase().startsWith( LoginCommand ) &&
 					   bot.userIsOp(event.getUser(), chan.getName())) {
 				if (LoggedInUser != null) {
 					bot.sendIRCNotice(sender, CantLogIn.replaceAll("%who", LoggedInUser));					
@@ -128,7 +128,7 @@ public class ManagerSystem extends Event {
 					managerLoggedIn( sender );
 					bot.sendIRCMessage(chan, LoggedIn.replaceAll("%who", sender));	
 				}
-			} else if (message.startsWith( LogoutCommand ) &&
+			} else if (message.toLowerCase().startsWith( LogoutCommand ) &&
 			   			bot.userIsOp(event.getUser(), chan.getName())) {
 				if (LoggedInUser == null || !LoggedInUser.equalsIgnoreCase(sender)) {
 					bot.sendIRCNotice(sender, NotLoggedIn);
@@ -167,7 +167,7 @@ public class ManagerSystem extends Event {
 			Double current = ManagerTimes.get(user);
 			if (current == null) current = 0.0;
 			current += (1.0 / 60.0);
-			ManagerTimes.put(user, current);
+			ManagerTimes.put(LoggedInUser, current);
 			saveData();
 		}
 	}

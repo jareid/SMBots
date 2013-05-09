@@ -45,7 +45,7 @@ public class Profile extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
+				message.toLowerCase().startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 2) {
 				ProfileType profile = ProfileType.fromString(msg[1]);

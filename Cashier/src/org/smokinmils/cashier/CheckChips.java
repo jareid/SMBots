@@ -58,7 +58,7 @@ public class CheckChips extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
+				message.toLowerCase().startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 			String user = "";
 			
@@ -90,7 +90,7 @@ public class CheckChips extends Event {
 					credstr = credstr.replaceAll("%creds", Integer.toString(active_creds));
 					credstr = credstr.replaceAll("%active", active.toString());
 					
-					if (creds.size() > 0) {
+					if (creds.size() > 1) {
 						credstr += " and ";
 						for (Entry<ProfileType, Integer> cred: creds.entrySet()) {
 							if (cred.getKey().compareTo(active) != 0) {

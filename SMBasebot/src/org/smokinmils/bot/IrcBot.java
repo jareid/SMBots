@@ -38,12 +38,16 @@ public class IrcBot extends PircBotX {
 	/** List of users identified with NickServ */
 	private List<String> IdentifiedUsers;
 	
+	/** List of channels */
+	private List<String> ValidChannels;
+	
 	/**
 	 * Constructor
 	 */
 	public IrcBot() {
 		super();
     	IdentifiedUsers = new ArrayList<String>();
+    	ValidChannels = new ArrayList<String>();
 	}
 	
 	/**
@@ -219,5 +223,13 @@ public class IrcBot extends PircBotX {
 		}
 		
 		return ret;
+	}
+
+	public void addValidChannel(String channel) {
+		ValidChannels.add(channel);
+	}
+
+	public List<String> getValidChannels() {
+		return ValidChannels;
 	}
  }

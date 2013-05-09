@@ -66,7 +66,7 @@ public class Help extends Event {
 			String[] msg = message.split(" ");
 			if (msg.length == 1) {
 				// list all questions
-				Map<String, Question> topics = Question.values();
+				Map<Integer, Question> topics = Question.values();
 				// for every question
 				for (Question q: topics.values()) {
 					bot.sendIRCNotice( sender, "%b%c12" + q.getQuestion() + "%c12 - Use %c04" + Command + " " + q.getTopic() );

@@ -42,7 +42,7 @@ public class Profiles extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
+				message.toLowerCase().startsWith( Command ) ) {			
 			bot.sendIRCMessage(chan, IrcBot.ValidProfiles);		
 			bot.sendIRCNotice(sender, IrcBot.ValidProfiles);
 		}

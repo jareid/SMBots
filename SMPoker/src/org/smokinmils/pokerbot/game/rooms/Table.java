@@ -1536,6 +1536,8 @@ public class Table extends Room {
 	            }
 	            playerList.add(player);
 	            winners.put(handValue, playerList);
+	            EventLog.log("Hand " + Integer.toString(handID) + " " + player.getName() + " has " + Integer.toString(handValue.getValue()), "Table", "getRankedPlayers");
+	            EventLog.log("Hand " + Integer.toString(handID) + " " + player.getName() + " has " + hand.toString(), "Table", "getRankedPlayers");
 		}
 		return winners;
     }

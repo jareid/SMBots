@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
 
 import org.pircbotx.Channel;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
+import org.smokinmils.bot.AutoJoin;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.ConnectEvents;
 import org.smokinmils.bot.Event;
@@ -132,6 +134,10 @@ public class SMBaseBot {
 		}
 	   
 	   bots.put(name, newbot);
+	   
+	   // check we are in all the channels we should be
+	   Timer rejoin = new Timer();
+	   rejoin.scheduleAtFixedRate( new AutoJoin(newbot) , 5000, 5000);
    }
    
    /**
@@ -145,6 +151,7 @@ public class SMBaseBot {
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
 		   bot.joinChannel(channel);
+		   bot.addValidChannel(channel);
 		   EventLog.debug("Joined " + channel + " on " + server, "SMBaseBot", "addChannel");
 		   ret = true;
 	   } else {

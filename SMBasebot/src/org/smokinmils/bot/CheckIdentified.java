@@ -20,6 +20,7 @@ import org.smokinmils.bot.events.Action;
 import org.smokinmils.bot.events.Join;
 import org.smokinmils.bot.events.Kick;
 import org.smokinmils.bot.events.Message;
+import org.smokinmils.bot.events.NickChange;
 import org.smokinmils.bot.events.Part;
 import org.smokinmils.bot.events.PrivateMessage;
 import org.smokinmils.bot.events.Quit;
@@ -49,7 +50,7 @@ public class CheckIdentified extends Event {
 	 * This string is output when the user does not meet the above status with NickServ
 	 */
 	public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
-	
+	public static final String NotIdentified = "%b%c12Sorry, %c04%user%c12 is not current identified.";
 	
 	@Override
 	public void action(Action event) {
@@ -96,6 +97,12 @@ public class CheckIdentified extends Event {
 	}
 	
 	@Override
+	public void nickChange(NickChange event) {
+		event.getBot().removeIdentifiedUser( event.getOldNick() );
+		sendStatusRequest( event.getBot(), event.getUser() );
+	}
+	
+	@Override
 	public void part(Part event) {
 		event.getBot().removeIdentifiedUser( event.getUser().getNick() );
 	}
@@ -126,14 +133,42 @@ public class CheckIdentified extends Event {
      * @param bot the IRC bot
      * @param user the username
      */
-    @SuppressWarnings("unchecked")
 	private void sendStatusRequest(IrcBot bot, User user) {
-	    EventLog.debug("Checking the status of " + user.getNick(), "CheckIdentified", "sendStatusRequest");
+		boolean identd = checkIdentified(bot, user.getNick());
+		// Only add users with the correct levels
+    	if (identd) {
+    		EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
+    		bot.addIdentifiedUser( user.getNick() );
+        	SentNoIdent.remove( user.getNick() );
+    		try {
+				boolean created = Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
+				if (!created) {
+					bot.sendIRCMessage(user.getNick(), "%b%c12You have too many accounts, speak to an admin if there is a problem");
+				}
+			} catch (Exception e) {
+				EventLog.log(e, "CheckIdentified", "sendStatusRequest");
+			}
+	    }
+    }
+    
+    /**
+     * Sends a request to NickServ to check a user's status with the server
+     * and waits for the response.
+     * 
+     * @param bot the IRC bot
+     * @param user the username
+     * 
+     * @return true if the user meets the required status
+     */
+	@SuppressWarnings("unchecked")
+	public static boolean checkIdentified(IrcBot bot, String user) {
+	    EventLog.debug("Checking the status of " + user, "CheckIdentified", "checkIdentified");
 	    
 	    WaitForQueue queue = new WaitForQueue( bot );
-		bot.sendRawLine( "PRIVMSG NickServ STATUS " + user.getNick() );
+		bot.sendRawLine( "PRIVMSG NickServ STATUS " + user );
 		
 	    boolean received = false;
+	    boolean ret = false;
 	    //Infinite loop since we might receive notices from non NickServ
 	    while (!received) {
 	        //Use the waitFor() method to wait for a MessageEvent.
@@ -143,7 +178,7 @@ public class CheckIdentified extends Event {
 			try {
 				currentEvent = queue.waitFor(NoticeEvent.class);
 			} catch (InterruptedException ex) {
-				EventLog.log(ex, "CheckIdentified", "sendStatusRequest");
+				EventLog.log(ex, "CheckIdentified", "checkIdentified");
 			}
 			
 	        //Check if this message is the response
@@ -151,23 +186,18 @@ public class CheckIdentified extends Event {
 	        if ( currentEvent.getMessage().startsWith(NickServStatus)
 	        	 && currentEvent.getUser().getNick().compareToIgnoreCase(NickServ) == 0
 	        	 && msg.length == 3
-	        	 && msg[1].compareToIgnoreCase( user.getNick() ) == 0 ) {
+	        	 && msg[1].compareToIgnoreCase( user ) == 0 ) {
     			Integer code = Utils.tryParse( msg[2] );
     			
     			// Only add users with the correct levels
     			if (code >= RequiredStatus) {
-    				EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
-    				bot.addIdentifiedUser( user.getNick() );
-        			SentNoIdent.remove( user.getNick() );
-    				try {
-    					Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
-    				} catch (Exception e) {
-    					EventLog.log(e, "CheckIdentified", "sendStatusRequest");
-    				}
+    				EventLog.info(user + " identified", "CheckIdentified", "sendStatusRequest");
+    				ret = true;
     			}
 	        	queue.close();
 	        	received = true;
 	        }
 	    }
+	    return ret;
     }
 }

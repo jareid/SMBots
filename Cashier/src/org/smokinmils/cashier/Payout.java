@@ -11,6 +11,7 @@ package org.smokinmils.cashier;
 import org.pircbotx.Channel;
 import org.smokinmils.Database;
 import org.smokinmils.Utils;
+import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -48,7 +49,7 @@ public class Payout extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.startsWith( Command ) ) {			
+				message.toLowerCase().startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 
 			if ( bot.userIsOp(event.getUser(), chan.getName()) ) {
@@ -65,7 +66,10 @@ public class Payout extends Event {
 							EventLog.log(e, "Payout", "message");
 						}
 
-						if ( profile == null ) {
+						if (!CheckIdentified.checkIdentified(bot, user)) {
+							String out = CheckIdentified.NotIdentified.replaceAll( "%user", user );
+							bot.sendIRCMessage(sender, out);
+						} else if ( profile == null ) {
 							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 						} else if ( chips < amount ) {
 							String out = NoChipsMsg.replaceAll( "%chips", Integer.toString(amount));

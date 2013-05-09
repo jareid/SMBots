@@ -210,18 +210,33 @@ public class Database {
     * @param username The user's nickname
     * @param hostmask
     */
-   public void checkUserExists(String username, String hostmask) throws DBException, SQLException {
+   public boolean checkUserExists(String username, String hostmask) throws DBException, SQLException {
 	   String sql = "SELECT COUNT(*) FROM " + UsersTable.Name +
   				" WHERE " + UsersTable.Col_Username + " LIKE " + "'" + username + "'";
+	   
+	   String hostsql = "SELECT COUNT(" + HostmasksTable.Col_UserID + ") FROM " + HostmasksTable.Name +
+ 				" WHERE " + HostmasksTable.Col_Host + " LIKE " + "'" + hostmask + "'";
 	   
 	   String ins_user_sql = "INSERT INTO " + UsersTable.Name + "(" 
 								+ UsersTable.Col_Username
 								+ ") VALUES('" + username + "')";
-	
-		if ( runGetIntQuery(sql) < 1) {
-			runBasicQuery(ins_user_sql);
+	   boolean ret = true;
+
+	   // check the user exists
+	   if ( runGetIntQuery(sql) < 1 ) {
+			// they don't so check they don't have more than 3 accounts
+		   if ( runGetIntQuery(hostsql) < 1 ) {			
+			   runBasicQuery(ins_user_sql);
+			   addHostmask(username, hostmask);
+		   } else {
+			   // too many accounts
+			   ret = false;
+		   }
+		} else {
+			addHostmask(username, hostmask);
 		}
-		addHostmask(username, hostmask);
+		
+		return ret;
    }
    
    /**
