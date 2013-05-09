@@ -29,7 +29,8 @@ public class CashierBot {
     	String swift_irc = "SwiftIRC";
     	basebot.addServer(swift_irc, "irc.SwiftIRC.net", 6667);
     	
-    	String[] all_swift_chans = {"#smokin_dice", "#sm_tournaments", "#sm_overunder", "#sm_roulette", "#sm_hosts"};
+    	String[] all_swift_chans = {"#smokin_dice", "#sm_tournaments", "#sm_overunder",
+    								"#sm_roulette", "#sm_hosts", "#managers"};
     	//String[] all_swift_chans = {"#testeroo"};
     	
     	for (String chan: all_swift_chans) {
@@ -65,7 +66,8 @@ public class CashierBot {
     	jp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, jp_event);
     	
-    	ManagerSystem ms_event = new ManagerSystem("#smokin_dice", "#managers", basebot.getBot(swift_irc));
+    	ManagerSystem ms_event = new ManagerSystem("#smokin_dice", "#managers",
+    												basebot.getBot(swift_irc));
     	ms_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, ms_event);
     	
