@@ -1,0 +1,2282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.2" icons="true" always-add-relationships="true" generalizations="true" realizations="true" 
+  associations="true" dependencies="true" nesting-relationships="true">  
+  <class id="1" language="java" name="org.smokinmils.poker.Utils" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/Utils.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="139" x="4818" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="org.smokinmils.poker.game.SidePot" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/SidePot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="351" width="153" x="9516" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="org.smokinmils.poker.game.Card" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/Card.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="747" width="151" x="9214" y="6402"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="org.smokinmils.poker.settings.DBSettings" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/settings/DBSettings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1341" width="229" x="5179" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="org.smokinmils.poker.tasks.TableTask" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/tasks/TableTask.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="182" x="9789" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="6" language="java" name="org.smokinmils.poker.enums.TransactionType" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/enums/TransactionType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="161" x="5776" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="7" language="java" name="org.smokinmils.poker.Client" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/Client.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="621" width="248" x="9295" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="org.smokinmils.poker.GameBot" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/GameBot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="113" x="5977" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="9" language="java" name="org.smokinmils.poker.enums.CommandType" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/enums/CommandType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="513" width="231" x="613" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="10" language="java" name="org.smokinmils.poker.settings.Variables" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/settings/Variables.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="639" width="163" x="8649" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="org.smokinmils.poker.game.events.Event" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/events/Event.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="235" x="8568" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="org.smokinmils.poker.tasks.SittingOut" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/tasks/SittingOut.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="138" x="9611" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="org.smokinmils.poker.settings.Strings" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/settings/Strings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="2511" width="207" x="3637" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="14" language="java" name="org.smokinmils.poker.enums.ActionType" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/enums/ActionType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="351" width="178" x="9721" y="6011"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="15" language="java" name="org.smokinmils.poker.game.Hand" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/Hand.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="261" width="185" x="9496" y="6011"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="16" language="java" name="org.smokinmils.poker.game.rooms.Room" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/rooms/Room.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="405" width="276" x="9295" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="17" language="java" name="org.smokinmils.poker.enums.HandValueType" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/enums/HandValueType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="333" width="202" x="9254" y="6011"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="18" language="java" name="org.smokinmils.poker.game.rooms.Table" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/rooms/Table.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1917" width="329" x="9753" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="19" language="java" name="org.smokinmils.poker.game.rooms.Lobby.AnnounceTask" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/rooms/Lobby.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="154" x="8843" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="20" language="java" name="org.smokinmils.poker.enums.EventType" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/enums/EventType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="148" x="8568" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="21" language="java" name="org.smokinmils.poker.game.HandEvaluator" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/HandEvaluator.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="621" width="159" x="9034" y="5188"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="22" language="java" name="org.smokinmils.poker.game.rooms.Lobby" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/rooms/Lobby.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="315" width="247" x="8843" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="23" language="java" name="org.smokinmils.poker.game.Player" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/Player.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="783" width="188" x="9711" y="5188"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="24" language="java" name="org.smokinmils.poker.game.Deck" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/Deck.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="179" x="9214" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="25" language="java" name="org.smokinmils.poker.enums.RoomType" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/enums/RoomType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="117" width="130" x="9583" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="26" language="java" name="org.smokinmils.poker.game.HandValue" project="Poker" 
+    file="/Poker/src/org/smokinmils/poker/game/HandValue.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="153" x="9375" y="5188"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="27" language="java" name="org.smokinmils.rockpaperscissors.RPSGame" project="RockPaperScissors" 
+    file="/RockPaperScissors/src/org/smokinmils/rockpaperscissors/RPSGame.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="891" width="479" x="11466" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="28" language="java" name="org.smokinmils.rockpaperscissors.GameLogic" project="RockPaperScissors" 
+    file="/RockPaperScissors/src/org/smokinmils/rockpaperscissors/GameLogic.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="169" x="7584" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="29" language="java" name="org.smokinmils.rockpaperscissors.GameLogicComparator" project="RockPaperScissors" 
+    file="/RockPaperScissors/src/org/smokinmils/rockpaperscissors/GameLogic.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="201" x="6130" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="30" language="java" name="org.smokinmils.rockpaperscissors.RPSGame.OpenBetsAnnounce" 
+    project="RockPaperScissors" file="/RockPaperScissors/src/org/smokinmils/rockpaperscissors/RPSGame.java" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="191" x="11461" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="31" language="java" name="org.smokinmils.rockpaperscissors.RPSGame.GetChoice" project="RockPaperScissors" 
+    file="/RockPaperScissors/src/org/smokinmils/rockpaperscissors/RPSGame.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="152" x="11692" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="32" language="java" name="org.smokingmils.help.Question" project="HelpSystem" 
+    file="/HelpSystem/src/org/smokingmils/help/Question.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="181" x="9064" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="33" language="java" name="org.smokingmils.help.Help" project="HelpSystem" 
+    file="/HelpSystem/src/org/smokingmils/help/Help.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="145" x="13989" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="34" language="java" name="org.smokinmils.logging.EventLog" project="EventLog" 
+    file="/EventLog/src/org/smokinmils/logging/EventLog.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="295" x="14425" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="35" language="java" name="org.smokinmils.logging.Logstream" project="EventLog" 
+    file="/EventLog/src/org/smokinmils/logging/Logstream.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="333" width="261" x="14425" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="36" language="java" name="org.smokinmils.casino.Accounts" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/Accounts.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="441" width="292" x="7242" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="37" language="java" name="org.smokinmils.casino.Casino.gameTrigger" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/Casino.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="214" x="9960" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="38" language="java" name="org.smokinmils.casino.Casino" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/Casino.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="197" x="10863" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="39" language="java" name="org.smokinmils.casino.DiceDuel" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/DiceDuel.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="387" width="285" x="10560" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <interface id="40" language="java" name="org.smokinmils.casino.IRCGame" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/IRCGame.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="171" width="285" x="10235" y="5188"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <class id="41" language="java" name="org.smokinmils.casino.OverUnder" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/OverUnder.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="405" width="285" x="10235" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="42" language="java" name="org.smokinmils.casino.Roulette" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/Roulette.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="603" width="285" x="10885" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="43" language="java" name="org.smokinmils.casino.Settings" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/Settings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="132" x="1503" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="44" language="java" name="org.smokinmils.casino.Strings" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/Strings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="172" x="8852" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="45" language="java" name="org.smokinmils.casino.TrueRandom" project="Casino" 
+    file="/Casino/src/org/smokinmils/casino/TrueRandom.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="117" width="165" x="1066" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="46" language="java" name="org.smokinmils.cashier.BetDetails" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/BetDetails.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="141" x="11285" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="47" language="java" name="org.smokinmils.cashier.CheckChips" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/CheckChips.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="157" x="13792" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="48" language="java" name="org.smokinmils.cashier.Competition" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/Competition.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="279" width="239" x="12559" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="49" language="java" name="org.smokinmils.cashier.CompPosition" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/CompPosition.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="145" x="11985" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="50" language="java" name="org.smokinmils.cashier.GiveChips" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/GiveChips.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="145" x="12838" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="51" language="java" name="org.smokinmils.cashier.JackpotAnnounce" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/JackpotAnnounce.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="171" width="180" x="13023" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="52" language="java" name="org.smokinmils.cashier.Jackpots" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/Jackpots.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="145" x="10678" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="53" language="java" name="org.smokinmils.cashier.InactiveTask" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/ManagerSystem.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="106" x="5630" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="54" language="java" name="org.smokinmils.cashier.IncreaseTime" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/ManagerSystem.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="106" x="6553" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="55" language="java" name="org.smokinmils.cashier.ManagerAnnounce" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/ManagerAnnounce.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="279" width="324" x="13243" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="56" language="java" name="org.smokinmils.cashier.Payout" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/Payout.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="145" x="13607" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="57" language="java" name="org.smokinmils.cashier.Profile" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/Profile.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="145" x="11100" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="58" language="java" name="org.smokinmils.cashier.Profiles" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/Profiles.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="145" x="12170" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="59" language="java" name="org.smokinmils.cashier.TransferChips" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/TransferChips.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="164" x="12355" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="60" language="java" name="org.smokinmils.cashier.ManagerSystem" project="Cashier" 
+    file="/Cashier/src/org/smokinmils/cashier/ManagerSystem.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="567" width="202" x="10436" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="61" language="java" name="org.smokinmils.SMBaseBot" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/SMBaseBot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="405" width="243" x="10122" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="62" language="java" name="org.smokinmils.Utils" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/Utils.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="139" x="6699" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="63" language="java" name="org.smokinmils.bot.AutoJoin" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/AutoJoin.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="104" x="9151" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="64" language="java" name="org.smokinmils.bot.Bet" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/Bet.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="297" width="154" x="1675" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="65" language="java" name="org.smokinmils.bot.CheckIdentified" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/CheckIdentified.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="387" width="211" x="14174" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="66" language="java" name="org.smokinmils.bot.ConnectEvents" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/ConnectEvents.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="242" x="8162" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="67" language="java" name="org.smokinmils.bot.Event" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/Event.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="14170" y="1093"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="68" language="java" name="org.smokinmils.bot.IrcBot" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/IrcBot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="423" width="211" x="11210" y="4545"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="69" language="java" name="org.smokinmils.bot.Random" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/Random.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="117" width="165" x="8444" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="70" language="java" name="org.smokinmils.bots.CashierBot" project="CashierBot" 
+    file="/CashierBot/src/org/smokinmils/bots/CashierBot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="102" width="113" x="11985" y="37"/>    
+    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="71" language="java" name="org.smokinmils.Database" project="Database" 
+    file="/Database/src/org/smokinmils/Database.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="999" width="373" x="2656" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="72" language="java" name="org.smokinmils.database.DBException" project="Database" 
+    file="/Database/src/org/smokinmils/database/DBException.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="194" x="4248" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="73" language="java" name="org.smokinmils.database.DBSettings" project="Database" 
+    file="/Database/src/org/smokinmils/database/DBSettings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="171" width="114" x="4482" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="74" language="java" name="org.smokinmils.database.tables.HostmasksTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/HostmasksTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="142" x="41" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="75" language="java" name="org.smokinmils.database.tables.TotalBetsView" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/TotalBetsView.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="142" x="3455" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="76" language="java" name="org.smokinmils.database.tables.CompetitionView" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/CompetitionView.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="142" x="3884" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="77" language="java" name="org.smokinmils.database.tables.PokerHandsTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/PokerHandsTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="142" x="6371" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="78" language="java" name="org.smokinmils.database.tables.UsersTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/UsersTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="142" x="223" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="79" language="java" name="org.smokinmils.database.tables.OrderedWinnersView" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/OrderedWinnersView.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="147" x="7793" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="80" language="java" name="org.smokinmils.database.tables.JackpotTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/JackpotTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="142" x="4997" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="81" language="java" name="org.smokinmils.database.tables.GamesTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/GamesTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="142" x="7980" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="82" language="java" name="org.smokinmils.database.tables.UsersView" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/UsersView.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="142" x="4066" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="83" language="java" name="org.smokinmils.database.tables.UserProfilesView" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/UserProfilesView.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="142" x="5448" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="84" language="java" name="org.smokinmils.database.tables.GameNamesTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/GameNamesTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="142" x="2474" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="85" language="java" name="org.smokinmils.database.tables.TransactionsTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/TransactionsTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="142" x="3079" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="86" language="java" name="org.smokinmils.database.tables.BetsTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/BetsTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="142" x="6878" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="87" language="java" name="org.smokinmils.database.tables.PokerBetsTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/PokerBetsTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="171" width="142" x="4636" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="88" language="java" name="org.smokinmils.database.tables.UserProfilesTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/UserProfilesTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="171" width="142" x="7060" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="89" language="java" name="org.smokinmils.database.tables.CompetitionIDTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/CompetitionIDTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="142" x="884" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="90" language="java" name="org.smokinmils.database.tables.ProfileTypeTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/ProfileTypeTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="142" x="2110" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="91" language="java" name="org.smokinmils.database.tables.OrderedBetsView" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/OrderedBetsView.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="171" width="142" x="2292" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="92" language="java" name="org.smokinmils.database.tables.TransactionTypesTable" project="Database" 
+    file="/Database/src/org/smokinmils/database/tables/TransactionTypesTable.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="135" width="154" x="3261" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="93" language="java" name="org.smokinmils.database.types.ProfileType" project="Database" 
+    file="/Database/src/org/smokinmils/database/types/ProfileType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="168" x="405" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="94" language="java" name="org.smokinmils.database.types.GamesType" project="Database" 
+    file="/Database/src/org/smokinmils/database/types/GamesType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="315" width="202" x="1271" y="2588"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="95" language="java" name="org.smokinmils.database.types.TransactionType" project="Database" 
+    file="/Database/src/org/smokinmils/database/types/TransactionType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="351" width="201" x="1869" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="96" language="java" name="org.smokinmils.database.types.BetterInfo" project="Database" 
+    file="/Database/src/org/smokinmils/database/types/BetterInfo.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="189" width="192" x="1271" y="37"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <dependency id="97">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="96"/>  
+  </dependency>  
+  <dependency id="98">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <association id="99">    
+    <bendpoint x="9133" y="6011"/>    
+    <end type="SOURCE" refId="21" navigable="false">      
+      <attribute id="100" name="cards"/>      
+      <multiplicity id="101" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="102">    
+    <end type="SOURCE" refId="51"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <realization id="103">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="40"/>  
+  </realization>  
+  <dependency id="104">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="105">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="60"/>  
+  </dependency>  
+  <generalization id="106">    
+    <end type="SOURCE" refId="47"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="107">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="108">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="94"/>  
+  </dependency>  
+  <association id="109">    
+    <end type="SOURCE" refId="32" navigable="false">      
+      <attribute id="110" name="_allQuestions"/>      
+      <multiplicity id="111" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="32" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="112">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="74"/>  
+  </dependency>  
+  <dependency id="113">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="59"/>  
+  </dependency>  
+  <dependency id="114">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="33"/>  
+  </dependency>  
+  <dependency id="115">    
+    <end type="SOURCE" refId="48"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="116">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="85"/>  
+  </dependency>  
+  <dependency id="117">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="90"/>  
+  </dependency>  
+  <association id="118">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="119" name="Type"/>      
+      <multiplicity id="120" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="20" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="121">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="56"/>  
+  </dependency>  
+  <dependency id="122">    
+    <end type="SOURCE" refId="54"/>    
+    <end type="TARGET" refId="60"/>  
+  </dependency>  
+  <association id="123">    
+    <end type="SOURCE" refId="61" navigable="false">      
+      <attribute id="124" name="bots"/>      
+      <multiplicity id="125" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="126">    
+    <bendpoint x="10204" y="4545"/>    
+    <end type="SOURCE" refId="38" navigable="false">      
+      <attribute id="127" name="games"/>      
+      <multiplicity id="128" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="40" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="129">    
+    <end type="SOURCE" refId="49"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="130">    
+    <end type="SOURCE" refId="65"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <realization id="131">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="40"/>  
+  </realization>  
+  <dependency id="132">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="133">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="38"/>  
+  </dependency>  
+  <dependency id="134">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <dependency id="135">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="9"/>  
+  </dependency>  
+  <dependency id="136">    
+    <end type="SOURCE" refId="60"/>    
+    <end type="TARGET" refId="53"/>  
+  </dependency>  
+  <dependency id="137">    
+    <end type="SOURCE" refId="55"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="138">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="80"/>  
+  </dependency>  
+  <dependency id="139">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="77"/>  
+  </dependency>  
+  <dependency id="140">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="65"/>  
+  </dependency>  
+  <dependency id="141">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="49"/>  
+  </dependency>  
+  <dependency id="142">    
+    <end type="SOURCE" refId="46"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="143">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="58"/>  
+  </dependency>  
+  <association id="144">    
+    <end type="SOURCE" refId="37" navigable="false">      
+      <attribute id="145" name="bot"/>      
+      <multiplicity id="146" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="147">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="148" name="players"/>      
+      <multiplicity id="149" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="150">    
+    <end type="SOURCE" refId="33"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="151">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <dependency id="152">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <generalization id="153">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="154">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="78"/>  
+  </dependency>  
+  <dependency id="155">    
+    <end type="SOURCE" refId="26"/>    
+    <end type="TARGET" refId="21"/>  
+  </dependency>  
+  <dependency id="156">    
+    <end type="SOURCE" refId="31"/>    
+    <end type="TARGET" refId="28"/>  
+  </dependency>  
+  <association id="157">    
+    <end type="SOURCE" refId="23" navigable="false">      
+      <attribute id="158" name="hand"/>      
+      <multiplicity id="159" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="160">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <association id="161">    
+    <end type="SOURCE" refId="48" navigable="false">      
+      <attribute id="162" name="Bot"/>      
+      <multiplicity id="163" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="164">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="44"/>  
+  </dependency>  
+  <association id="165">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="166" name="cards"/>      
+      <multiplicity id="167" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="168">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="19"/>  
+  </nesting>  
+  <dependency id="169">    
+    <end type="SOURCE" refId="36"/>    
+    <end type="TARGET" refId="43"/>  
+  </dependency>  
+  <dependency id="170">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="50"/>  
+  </dependency>  
+  <association id="171">    
+    <end type="SOURCE" refId="34" navigable="false">      
+      <attribute id="172" name="_eventLog"/>      
+      <multiplicity id="173" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="35" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="174">    
+    <end type="SOURCE" refId="23" navigable="false">      
+      <attribute id="175" name="action"/>      
+      <multiplicity id="176" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="14" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="177">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="178">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="47"/>  
+  </dependency>  
+  <dependency id="179">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="180">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="20"/>  
+  </dependency>  
+  <dependency id="181">    
+    <end type="SOURCE" refId="48"/>    
+    <end type="TARGET" refId="96"/>  
+  </dependency>  
+  <generalization id="182">    
+    <end type="SOURCE" refId="65"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="183">    
+    <end type="SOURCE" refId="49"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="184">    
+    <end type="SOURCE" refId="52"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <generalization id="185">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="186">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="39"/>  
+  </dependency>  
+  <dependency id="187">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="62"/>  
+  </dependency>  
+  <dependency id="188">    
+    <end type="SOURCE" refId="48"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="189">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="48"/>  
+  </dependency>  
+  <dependency id="190">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="75"/>  
+  </dependency>  
+  <association id="191">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="192" name="Bot"/>      
+      <multiplicity id="193" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="194">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <dependency id="195">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="196">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="73"/>  
+  </dependency>  
+  <generalization id="197">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="198">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="199">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="44"/>  
+  </dependency>  
+  <dependency id="200">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="201">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="202">    
+    <end type="SOURCE" refId="60"/>    
+    <end type="TARGET" refId="54"/>  
+  </dependency>  
+  <dependency id="203">    
+    <end type="SOURCE" refId="67"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="204">    
+    <end type="SOURCE" refId="61"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="205">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="5"/>  
+  </dependency>  
+  <association id="206">    
+    <bendpoint x="9223" y="5188"/>    
+    <bendpoint x="9223" y="6011"/>    
+    <end type="SOURCE" refId="24" navigable="false">      
+      <attribute id="207" name="cards"/>      
+      <multiplicity id="208" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="209">    
+    <end type="SOURCE" refId="33"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="210">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="46"/>  
+  </dependency>  
+  <dependency id="211">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <association id="212">    
+    <end type="SOURCE" refId="26" navigable="false">      
+      <attribute id="213" name="hand"/>      
+      <multiplicity id="214" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="215">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="62"/>  
+  </dependency>  
+  <association id="216">    
+    <end type="SOURCE" refId="31" navigable="false">      
+      <attribute id="217" name="Bot"/>      
+      <multiplicity id="218" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="219">    
+    <end type="SOURCE" refId="46"/>    
+    <end type="TARGET" refId="94"/>  
+  </dependency>  
+  <dependency id="220">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="25"/>  
+  </dependency>  
+  <dependency id="221">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="222">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="9"/>  
+  </dependency>  
+  <association id="223">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="224" name="Events"/>      
+      <multiplicity id="225" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="226">    
+    <end type="SOURCE" refId="51"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <nesting id="227">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="31"/>  
+  </nesting>  
+  <dependency id="228">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="229">    
+    <end type="SOURCE" refId="49"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="230">    
+    <end type="SOURCE" refId="49"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <association id="231">    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="232" name="sidePots"/>      
+      <multiplicity id="233" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="234">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="235">    
+    <end type="SOURCE" refId="61"/>    
+    <end type="TARGET" refId="66"/>  
+  </dependency>  
+  <association id="236">    
+    <bendpoint x="9783" y="4545"/>    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="237" name="players"/>      
+      <multiplicity id="238" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="239">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="27"/>  
+  </dependency>  
+  <generalization id="240">    
+    <end type="SOURCE" refId="58"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="241">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <association id="242">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="243" name="RoomType"/>      
+      <multiplicity id="244" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="25" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="245">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="246">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="247">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <dependency id="248">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <dependency id="249">    
+    <end type="SOURCE" refId="36"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <realization id="250">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="40"/>  
+  </realization>  
+  <dependency id="251">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="20"/>  
+  </dependency>  
+  <generalization id="252">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <association id="253">    
+    <end type="SOURCE" refId="39" navigable="false">      
+      <attribute id="254" name="openBets"/>      
+      <multiplicity id="255" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="256">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="82"/>  
+  </dependency>  
+  <dependency id="257">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="69"/>  
+  </dependency>  
+  <dependency id="258">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="62"/>  
+  </dependency>  
+  <dependency id="259">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="29"/>  
+  </dependency>  
+  <dependency id="260">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="25"/>  
+  </dependency>  
+  <dependency id="261">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="18"/>  
+  </dependency>  
+  <association id="262">    
+    <end type="SOURCE" refId="42" navigable="false">      
+      <attribute id="263" name="bot"/>      
+      <multiplicity id="264" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="265">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <nesting id="266">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="30"/>  
+  </nesting>  
+  <dependency id="267">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
+  <dependency id="268">    
+    <end type="SOURCE" refId="65"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="269">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="22"/>  
+  </dependency>  
+  <dependency id="270">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="36"/>  
+  </dependency>  
+  <dependency id="271">    
+    <end type="SOURCE" refId="32"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="272">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="273">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="36"/>  
+  </dependency>  
+  <association id="274">    
+    <end type="SOURCE" refId="51" navigable="false">      
+      <attribute id="275" name="Bot"/>      
+      <multiplicity id="276" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="277">    
+    <end type="SOURCE" refId="21" navigable="false">      
+      <attribute id="278" name="type"/>      
+      <multiplicity id="279" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="17" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="280">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="9"/>  
+  </dependency>  
+  <dependency id="281">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="36"/>  
+  </dependency>  
+  <dependency id="282">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="36"/>  
+  </dependency>  
+  <dependency id="283">    
+    <end type="SOURCE" refId="61"/>    
+    <end type="TARGET" refId="63"/>  
+  </dependency>  
+  <dependency id="284">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <dependency id="285">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="72"/>  
+  </dependency>  
+  <generalization id="286">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="287">    
+    <end type="SOURCE" refId="47"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="288">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="289">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="18"/>  
+  </dependency>  
+  <dependency id="290">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="62"/>  
+  </dependency>  
+  <dependency id="291">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="292">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="293">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <association id="294">    
+    <end type="SOURCE" refId="63" navigable="false">      
+      <attribute id="295" name="Irc"/>      
+      <multiplicity id="296" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="297">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="26"/>  
+  </dependency>  
+  <dependency id="298">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="51"/>  
+  </dependency>  
+  <dependency id="299">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="79"/>  
+  </dependency>  
+  <dependency id="300">    
+    <end type="SOURCE" refId="33"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <association id="301">    
+    <bendpoint x="9929" y="4545"/>    
+    <bendpoint x="9929" y="5188"/>    
+    <bendpoint x="9929" y="6011"/>    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="302" name="board"/>      
+      <multiplicity id="303" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="304">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="45"/>  
+  </dependency>  
+  <association id="305">    
+    <end type="SOURCE" refId="60" navigable="false">      
+      <attribute id="306" name="Bot"/>      
+      <multiplicity id="307" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="308">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="309">    
+    <end type="SOURCE" refId="66"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <dependency id="310">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="95"/>  
+  </dependency>  
+  <association id="311">    
+    <end type="SOURCE" refId="61" navigable="false">      
+      <attribute id="312" name="_instance"/>      
+      <multiplicity id="313" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="61" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="314">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <association id="315">    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="316" name="deck"/>      
+      <multiplicity id="317" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="24" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="318">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="319">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="86"/>  
+  </dependency>  
+  <dependency id="320">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="83"/>  
+  </dependency>  
+  <dependency id="321">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="20"/>  
+  </dependency>  
+  <dependency id="322">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="323">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="324">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="325">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="76"/>  
+  </dependency>  
+  <dependency id="326">    
+    <end type="SOURCE" refId="52"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="327">    
+    <end type="SOURCE" refId="61"/>    
+    <end type="TARGET" refId="65"/>  
+  </dependency>  
+  <dependency id="328">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="43"/>  
+  </dependency>  
+  <dependency id="329">    
+    <bendpoint x="10405" y="2588"/>    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="330">    
+    <end type="SOURCE" refId="46"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="331">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="95"/>  
+  </dependency>  
+  <dependency id="332">    
+    <end type="SOURCE" refId="58"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="333">    
+    <end type="SOURCE" refId="51"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="334">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="15"/>  
+  </dependency>  
+  <dependency id="335">    
+    <end type="SOURCE" refId="57"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="336">    
+    <end type="SOURCE" refId="61"/>    
+    <end type="TARGET" refId="67"/>  
+  </dependency>  
+  <generalization id="337">    
+    <end type="SOURCE" refId="57"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="338">    
+    <end type="SOURCE" refId="48"/>    
+    <end type="TARGET" refId="62"/>  
+  </dependency>  
+  <generalization id="339">    
+    <end type="SOURCE" refId="52"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="340">    
+    <end type="SOURCE" refId="36"/>    
+    <end type="TARGET" refId="64"/>  
+  </dependency>  
+  <dependency id="341">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="44"/>  
+  </dependency>  
+  <association id="342">    
+    <end type="SOURCE" refId="42" navigable="false">      
+      <attribute id="343" name="numberBets"/>      
+      <multiplicity id="344" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="345">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="91"/>  
+  </dependency>  
+  <dependency id="346">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="18"/>  
+  </dependency>  
+  <dependency id="347">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="94"/>  
+  </dependency>  
+  <dependency id="348">    
+    <end type="SOURCE" refId="49"/>    
+    <end type="TARGET" refId="96"/>  
+  </dependency>  
+  <dependency id="349">    
+    <end type="SOURCE" refId="53"/>    
+    <end type="TARGET" refId="60"/>  
+  </dependency>  
+  <dependency id="350">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="14"/>  
+  </dependency>  
+  <dependency id="351">    
+    <end type="SOURCE" refId="47"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <association id="352">    
+    <end type="SOURCE" refId="42" navigable="false">      
+      <attribute id="353" name="rowBets"/>      
+      <multiplicity id="354" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="355">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="28"/>  
+  </dependency>  
+  <dependency id="356">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <dependency id="357">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="358">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <association id="359">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="360" name="IrcClient"/>      
+      <multiplicity id="361" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="362">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="52"/>  
+  </dependency>  
+  <dependency id="363">    
+    <end type="SOURCE" refId="65"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="364">    
+    <end type="SOURCE" refId="30"/>    
+    <end type="TARGET" refId="64"/>  
+  </dependency>  
+  <association id="365">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="366" name="validChannels"/>      
+      <multiplicity id="367" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="16" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="368">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <association id="369">    
+    <end type="SOURCE" refId="41" navigable="false">      
+      <attribute id="370" name="openBets"/>      
+      <multiplicity id="371" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="372">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="373">    
+    <end type="SOURCE" refId="46"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="374">    
+    <end type="SOURCE" refId="57"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="375">    
+    <end type="SOURCE" refId="19"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <dependency id="376">    
+    <end type="SOURCE" refId="52"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <association id="377">    
+    <bendpoint x="9120" y="2588"/>    
+    <bendpoint x="9120" y="4545"/>    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="378" name="player"/>      
+      <multiplicity id="379" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="380">    
+    <end type="SOURCE" refId="47"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="381">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="382">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="383">    
+    <end type="SOURCE" refId="57"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="384">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="45"/>  
+  </dependency>  
+  <association id="385">    
+    <end type="SOURCE" refId="46" navigable="false">      
+      <attribute id="386" name="Bot"/>      
+      <multiplicity id="387" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="388">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="43"/>  
+  </dependency>  
+  <association id="389">    
+    <bendpoint x="9762" y="4545"/>    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="390" name="activePlayers"/>      
+      <multiplicity id="391" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="392">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <dependency id="393">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="394">    
+    <end type="SOURCE" refId="31"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="395">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="43"/>  
+  </dependency>  
+  <association id="396">    
+    <end type="SOURCE" refId="26" navigable="false">      
+      <attribute id="397" name="type"/>      
+      <multiplicity id="398" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="17" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="399">    
+    <end type="SOURCE" refId="60"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="400">    
+    <end type="SOURCE" refId="68"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <association id="401">    
+    <end type="SOURCE" refId="27" navigable="false">      
+      <attribute id="402" name="openBets"/>      
+      <multiplicity id="403" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="404">    
+    <end type="SOURCE" refId="37" navigable="false">      
+      <attribute id="405" name="game"/>      
+      <multiplicity id="406" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="40" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="407">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="92"/>  
+  </dependency>  
+  <association id="408">    
+    <end type="SOURCE" refId="71" navigable="false">      
+      <attribute id="409" name="instance"/>      
+      <multiplicity id="410" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="71" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="411">    
+    <end type="SOURCE" refId="48"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="412">    
+    <end type="SOURCE" refId="29"/>    
+    <end type="TARGET" refId="28"/>  
+  </dependency>  
+  <association id="413">    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="414" name="Profile"/>      
+      <multiplicity id="415" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="93" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="416">    
+    <end type="SOURCE" refId="61"/>    
+    <end type="TARGET" refId="35"/>  
+  </dependency>  
+  <dependency id="417">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="418">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="419">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="420">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="7"/>  
+  </dependency>  
+  <nesting id="421">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="37"/>  
+  </nesting>  
+  <dependency id="422">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="423">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="42"/>  
+  </dependency>  
+  <generalization id="424">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <association id="425">    
+    <end type="SOURCE" refId="30" navigable="false">      
+      <attribute id="426" name="Bot"/>      
+      <multiplicity id="427" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="428">    
+    <end type="SOURCE" refId="68"/>    
+    <end type="TARGET" refId="93"/>  
+  </dependency>  
+  <dependency id="429">    
+    <end type="SOURCE" refId="33"/>    
+    <end type="TARGET" refId="32"/>  
+  </dependency>  
+  <association id="430">    
+    <bendpoint x="9720" y="4545"/>    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="431" name="jackpotPlayers"/>      
+      <multiplicity id="432" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="433">    
+    <end type="SOURCE" refId="47"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <association id="434">    
+    <end type="SOURCE" refId="42" navigable="false">      
+      <attribute id="435" name="colourBets"/>      
+      <multiplicity id="436" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="437">    
+    <end type="SOURCE" refId="46"/>    
+    <end type="TARGET" refId="96"/>  
+  </dependency>  
+  <dependency id="438">    
+    <end type="SOURCE" refId="40"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="439">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <generalization id="440">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <association id="441">    
+    <end type="SOURCE" refId="36" navigable="false">      
+      <attribute id="442" name="instance"/>      
+      <multiplicity id="443" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="36" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="444">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <generalization id="445">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="446">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="447">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="12"/>  
+  </dependency>  
+  <dependency id="448">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="15"/>  
+  </dependency>  
+  <dependency id="449">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="87"/>  
+  </dependency>  
+  <dependency id="450">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="451">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="65"/>  
+  </dependency>  
+  <association id="452">    
+    <bendpoint x="9741" y="4545"/>    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="453" name="actor"/>      
+      <multiplicity id="454" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="455">    
+    <end type="SOURCE" refId="65"/>    
+    <end type="TARGET" refId="62"/>  
+  </dependency>  
+  <dependency id="456">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <dependency id="457">    
+    <end type="SOURCE" refId="56"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <association id="458">    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="459" name="table"/>      
+      <multiplicity id="460" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="461">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <dependency id="462">    
+    <end type="SOURCE" refId="52"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <dependency id="463">    
+    <end type="SOURCE" refId="66"/>    
+    <end type="TARGET" refId="34"/>  
+  </dependency>  
+  <association id="464">    
+    <end type="SOURCE" refId="55" navigable="false">      
+      <attribute id="465" name="Bot"/>      
+      <multiplicity id="466" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="68" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="467">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="41"/>  
+  </dependency>  
+  <dependency id="468">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="81"/>  
+  </dependency>  
+  <dependency id="469">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="13"/>  
+  </dependency>  
+  <dependency id="470">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <dependency id="471">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="57"/>  
+  </dependency>  
+  <dependency id="472">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <association id="473">    
+    <end type="SOURCE" refId="96" navigable="false">      
+      <attribute id="474" name="Game"/>      
+      <multiplicity id="475" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="94" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="476">    
+    <end type="SOURCE" refId="70"/>    
+    <end type="TARGET" refId="55"/>  
+  </dependency>  
+  <dependency id="477">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <association id="478">    
+    <end type="SOURCE" refId="42" navigable="false">      
+      <attribute id="479" name="evenOddBets"/>      
+      <multiplicity id="480" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="64" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="481">    
+    <end type="SOURCE" refId="57"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <dependency id="482">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="89"/>  
+  </dependency>  
+  <dependency id="483">    
+    <end type="SOURCE" refId="71"/>    
+    <end type="TARGET" refId="88"/>  
+  </dependency>  
+  <dependency id="484">    
+    <end type="SOURCE" refId="66"/>    
+    <end type="TARGET" refId="68"/>  
+  </dependency>  
+  <dependency id="485">    
+    <end type="SOURCE" refId="50"/>    
+    <end type="TARGET" refId="65"/>  
+  </dependency>  
+  <dependency id="486">    
+    <end type="SOURCE" refId="59"/>    
+    <end type="TARGET" refId="61"/>  
+  </dependency>  
+  <association id="487">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="488" name="table"/>      
+      <multiplicity id="489" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="490">    
+    <end type="SOURCE" refId="27"/>    
+    <end type="TARGET" refId="69"/>  
+  </dependency>  
+  <dependency id="491">    
+    <end type="SOURCE" refId="39"/>    
+    <end type="TARGET" refId="45"/>  
+  </dependency>  
+  <dependency id="492">    
+    <end type="SOURCE" refId="49"/>    
+    <end type="TARGET" refId="71"/>  
+  </dependency>  
+  <generalization id="493">    
+    <end type="SOURCE" refId="60"/>    
+    <end type="TARGET" refId="67"/>  
+  </generalization>  
+  <dependency id="494">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="3"/>  
+  </dependency>  
+  <association id="495">    
+    <bendpoint x="9699" y="4545"/>    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="496" name="satOutPlayers"/>      
+      <multiplicity id="497" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

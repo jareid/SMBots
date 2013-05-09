@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.2" icons="true" automaticImage="SVG" always-add-relationships="true" generalizations="true" 
+  realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
+  <enumeration id="1" language="java" name="org.smokinmils.pokerbot.enums.ActionType" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/enums/ActionType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="351" width="178" x="1266" y="5793"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="2" language="java" name="org.smokinmils.pokerbot.game.rooms.Lobby" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/rooms/Lobby.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="315" width="247" x="1829" y="2604"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="3" language="java" name="org.smokinmils.pokerbot.enums.HandValueType" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/enums/HandValueType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="333" width="202" x="799" y="5793"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="4" language="java" name="org.smokinmils.pokerbot.settings.DBSettings" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/settings/DBSettings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1341" width="229" x="384" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="org.smokinmils.pokerbot.game.rooms.Table" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/rooms/Table.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1971" width="329" x="1277" y="2604"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="org.smokinmils.pokerbot.GameBot" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/GameBot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="113" x="935" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="org.smokinmils.pokerbot.game.rooms.Lobby.AnnounceTask" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/rooms/Lobby.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="167" x="1829" y="4615"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="8" language="java" name="org.smokinmils.pokerbot.enums.TransactionType" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/enums/TransactionType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="161" x="1088" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="9" language="java" name="org.smokinmils.pokerbot.settings.Strings" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/settings/Strings.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="2511" width="207" x="1289" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="org.smokinmils.pokerbot.game.HandEvaluator" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/HandEvaluator.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="621" width="159" x="579" y="5006"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="org.smokinmils.pokerbot.tasks.SittingOut" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/tasks/SittingOut.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="138" x="1021" y="2159"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="org.smokinmils.pokerbot.Utils" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/Utils.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="139" x="1536" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="org.smokinmils.pokerbot.game.SidePot" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/SidePot.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="351" width="153" x="1061" y="4615"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="14" language="java" name="org.smokinmils.pokerbot.enums.CommandType" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/enums/CommandType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="513" width="231" x="2389" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="15" language="java" name="org.smokinmils.pokerbot.game.rooms.Room" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/rooms/Room.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="405" width="276" x="1715" y="2159"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="16" language="java" name="org.smokinmils.pokerbot.Database" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/Database.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="693" width="271" x="3149" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="17" language="java" name="org.smokinmils.pokerbot.game.Deck" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/Deck.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="179" x="759" y="4615"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="18" language="java" name="org.smokinmils.pokerbot.game.Hand" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/Hand.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="261" width="185" x="1041" y="5793"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="19" language="java" name="org.smokinmils.pokerbot.game.events.Event" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/events/Event.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="235" x="2116" y="2604"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="20" language="java" name="org.smokinmils.pokerbot.settings.Variables" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/settings/Variables.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="639" width="163" x="3470" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="21" language="java" name="org.smokinmils.pokerbot.Client" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/Client.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="693" width="265" x="1715" y="1426"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="22" language="java" name="org.smokinmils.pokerbot.game.HandValue" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/HandValue.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="243" width="153" x="920" y="5006"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="23" language="java" name="org.smokinmils.pokerbot.enums.RoomType" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/enums/RoomType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="1566" y="2517"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="24" language="java" name="org.smokinmils.pokerbot.tasks.TableTask" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/tasks/TableTask.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="207" width="182" x="1277" y="2159"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="25" language="java" name="org.smokinmils.pokerbot.tasks.Reconnect" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/tasks/Reconnect.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="138" x="1715" y="-1125"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="26" language="java" name="org.smokinmils.pokerbot.enums.EventType" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/enums/EventType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="225" width="148" x="2116" y="4615"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <class id="27" language="java" name="org.smokinmils.pokerbot.game.Card" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/Card.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="747" width="151" x="759" y="6184"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="28" language="java" name="org.smokinmils.pokerbot.game.Player" project="Poker_OLD" 
+    file="/Poker_OLD/src/org/smokinmils/pokerbot/game/Player.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="747" width="188" x="1256" y="5006"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <association id="29">    
+    <end type="SOURCE" refId="22" navigable="false">      
+      <attribute id="30" name="type"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="32">    
+    <bendpoint x="1244" y="4615"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="33" name="players"/>      
+      <multiplicity id="34" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="35">    
+    <bendpoint x="678" y="5793"/>    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="36" name="cards"/>      
+      <multiplicity id="37" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="38">    
+    <end type="SOURCE" refId="18" navigable="false">      
+      <attribute id="39" name="cards"/>      
+      <multiplicity id="40" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="41">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="7"/>  
+  </nesting>  
+  <association id="42">    
+    <bendpoint x="1307" y="4615"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="43" name="satOutPlayers"/>      
+      <multiplicity id="44" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="45">    
+    <bendpoint x="1030" y="2604"/>    
+    <bendpoint x="1030" y="4615"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="46" name="player"/>      
+      <multiplicity id="47" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="48">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="49" name="type"/>      
+      <multiplicity id="50" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="51">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="52" name="sidePots"/>      
+      <multiplicity id="53" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="54">    
+    <bendpoint x="1286" y="4615"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="55" name="jackpotPlayers"/>      
+      <multiplicity id="56" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="57">    
+    <bendpoint x="1265" y="4615"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="58" name="actor"/>      
+      <multiplicity id="59" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="60">    
+    <bendpoint x="1328" y="4615"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="61" name="activePlayers"/>      
+      <multiplicity id="62" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="63">    
+    <end type="SOURCE" refId="24" navigable="false">      
+      <attribute id="64" name="table"/>      
+      <multiplicity id="65" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="66">    
+    <end type="SOURCE" refId="28" navigable="false">      
+      <attribute id="67" name="action"/>      
+      <multiplicity id="68" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="69">    
+    <bendpoint x="1474" y="4615"/>    
+    <bendpoint x="1474" y="5006"/>    
+    <bendpoint x="1474" y="5793"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="70" name="board"/>      
+      <multiplicity id="71" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="72">    
+    <end type="SOURCE" refId="16" navigable="false">      
+      <attribute id="73" name="instance"/>      
+      <multiplicity id="74" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="16" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="75">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="76" name="deck"/>      
+      <multiplicity id="77" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="17" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="78">    
+    <bendpoint x="768" y="5006"/>    
+    <bendpoint x="768" y="5793"/>    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="79" name="cards"/>      
+      <multiplicity id="80" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="81">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="82" name="roomType"/>      
+      <multiplicity id="83" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="23" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="84">    
+    <end type="SOURCE" refId="28" navigable="false">      
+      <attribute id="85" name="hand"/>      
+      <multiplicity id="86" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="87">    
+    <end type="SOURCE" refId="21" navigable="false">      
+      <attribute id="88" name="validChannels"/>      
+      <multiplicity id="89" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="90">    
+    <end type="SOURCE" refId="22" navigable="false">      
+      <attribute id="91" name="hand"/>      
+      <multiplicity id="92" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="93">    
+    <end type="SOURCE" refId="25" navigable="false">      
+      <attribute id="94" name="ircClient"/>      
+      <multiplicity id="95" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="21" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="96">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="97" name="players"/>      
+      <multiplicity id="98" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="99">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="100" name="ircClient"/>      
+      <multiplicity id="101" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="21" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="102">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="103" name="Events"/>      
+      <multiplicity id="104" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="19" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="105">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="106" name="table"/>      
+      <multiplicity id="107" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="108">    
+    <end type="SOURCE" refId="19" navigable="false">      
+      <attribute id="109" name="Type"/>      
+      <multiplicity id="110" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="26" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="111">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="15"/>  
+  </generalization>  
+  <generalization id="112">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="15"/>  
+  </generalization>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
