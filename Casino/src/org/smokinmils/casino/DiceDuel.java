@@ -242,47 +242,35 @@ public class DiceDuel implements IRCGame {
 					openBets.remove(bet);
 
 					// jackpot stuff
-					if (bet.getAmount() >= 50) {
+					int amount = bet.getAmount();
+					if (amount >= 25 && p1Profile.equalsIgnoreCase(p2Profile)) {		
+						int jackpot_rake = (int) Math.floor((amount * 2) / 100 * Settings.DDRAKE);
 
-						if (p1Profile.equalsIgnoreCase(p2Profile)) { // same
-																		// profile
-							int jackpotRake = (int) Math
-									.floor((bet.getAmount() * 2) / 100
-											* Settings.DDRAKE);
-							if (DiceDuel.checkJackpot()) {
-								ArrayList<String> players = new ArrayList<String>();
-								players.add(p1);
-								players.add(p2);
-								this.jackpotWon(p1Profile, players, bot);
-							} else {
-								DiceDuel.updateJackpot(jackpotRake, p1Profile);
-							}
-						} else { // different profiles
-							int jackpotRake = (int) Math
-									.floor((bet.getAmount()) / 100
-											* Settings.DDRAKE);
-							if (DiceDuel.checkJackpot()) { // loser first? Let's
-															// be nice
-								ArrayList<String> players = new ArrayList<String>();
-								players.add(loser);
-								this.jackpotWon(loserProfile, players, bot);
-								DiceDuel.updateJackpot(jackpotRake,
-										winnerProfile);
-							} else if (DiceDuel.checkJackpot()) {
-								ArrayList<String> players = new ArrayList<String>();
-								players.add(winner);
-								this.jackpotWon(winnerProfile, players, bot);
-								DiceDuel.updateJackpot(jackpotRake,
-										loserProfile);
-							} else {
-								DiceDuel.updateJackpot(jackpotRake,
-										winnerProfile);
-								DiceDuel.updateJackpot(jackpotRake,
-										loserProfile);
-
-							}
+						if (DiceDuel.checkJackpot()) {
+							ArrayList<String> players = new ArrayList<String>();
+							players.add(p1);
+							players.add(p2);
+							this.jackpotWon(p1Profile, players, bot);
+							updateJackpot(jackpot_rake, p1Profile);
+						} else {
+							DiceDuel.updateJackpot(jackpot_rake, p1Profile);
 						}
-
+					} else if (amount >= 50) {
+						int jackpot_rake = (int) Math.floor((amount) / 100 * Settings.DDRAKE);
+						if (DiceDuel.checkJackpot()) { // loser first? Let's be nice
+							ArrayList<String> players = new ArrayList<String>();
+							players.add(loser);
+							jackpotWon(loserProfile, players, bot);
+							DiceDuel.updateJackpot(jackpot_rake, winnerProfile);
+						} else if (DiceDuel.checkJackpot()) {
+							ArrayList<String> players = new ArrayList<String>();
+							players.add(winner);
+							jackpotWon(winnerProfile, players, bot);
+							DiceDuel.updateJackpot(jackpot_rake, loserProfile);
+						} else {
+							DiceDuel.updateJackpot(jackpot_rake, winnerProfile);
+							DiceDuel.updateJackpot(jackpot_rake, loserProfile);
+						}
 					}
 
 					return (List<String>) Arrays.asList(BLD + VAR + winner

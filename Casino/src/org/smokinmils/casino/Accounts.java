@@ -182,11 +182,6 @@ public class Accounts {
 							+ ",(SELECT id FROM profile_type WHERE name='"
 							+ profile + "' LIMIT 1)," + amount + ");");
 
-					// gratis 10k chips now done as a stored proc
-					// stmt.executeUpdate("INSERT INTO user_profiles (user_id, type_id, amount) VALUES ((SELECT id FROM users WHERE username='"+username+"' LIMIT 1)"
-					// +
-					// ",(SELECT id FROM profile_type WHERE name='play' LIMIT 1),10000);");
-
 				} catch (SQLException e2) {
 					System.out.println("Error in SQL query INSERTING NEW USER");
 					System.out.println(e2.getMessage());

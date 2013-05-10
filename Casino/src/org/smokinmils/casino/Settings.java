@@ -16,7 +16,7 @@ public class Settings {
 	public static String DBNAME = "live";
 	public static String BOTNAME = "SM_BOT";
 
-	public static int JACKPOTCHANCE = 10000;
+	public static int JACKPOTCHANCE = 2000;
 
 	public static int OURAKE = 2; // %
 	public static int DDRAKE = 2; // %

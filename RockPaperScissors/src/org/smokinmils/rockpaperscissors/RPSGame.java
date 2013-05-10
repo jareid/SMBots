@@ -75,7 +75,7 @@ public class RPSGame extends Event {
 	private static final String OpenBets = "%c12%bCurrent open RPS wagers: %bets To call a wager type %c04" + CallCommand + " <name>";
 	private static final String EachOpenBet = "%c04%user%c12(%c04%amount %profile%c12)";
 	
-	private static final int JACKPOTCHANCE = 10000;
+	private static final int JACKPOTCHANCE = 2000;
 	
 	private static final int RAKE = 3;
 	private static final int JACKPOTRAKE = 2;
@@ -439,8 +439,8 @@ public class RPSGame extends Event {
 		}
 		
 		// jackpot stuff
-		if (win_prof == lose_prof && amount >= 25) {		
-			int jackpot_rake = (int) Math.floor((amount * 2) / 100 * RAKE);
+		if (amount >= 25) {		
+			int jackpot_rake = (int) Math.floor((amount * 2) / 100 * JACKPOTRAKE);
 
 			updateJackpot(jackpot_rake, win_prof);
 			
@@ -449,22 +449,6 @@ public class RPSGame extends Event {
 				players.add(winner);
 				players.add(loser);
 				jackpotWon(win_prof, players, bot, JackpotChannel);
-			}
-		} else if (amount >= 50) {
-			int jackpot_rake = (int) Math.floor((amount * 2) / 100 * RAKE);
-			if (checkJackpot()) {
-				ArrayList<String> players = new ArrayList<String>();
-				players.add(loser);
-				jackpotWon(lose_prof, players, bot, JackpotChannel);
-				updateJackpot(jackpot_rake, win_prof);
-			} else if (checkJackpot()) {
-				ArrayList<String> players = new ArrayList<String>();
-				players.add(winner);
-				jackpotWon(win_prof, players, bot, JackpotChannel);
-				updateJackpot(jackpot_rake, lose_prof);
-			} else {
-				updateJackpot(jackpot_rake, win_prof);
-				updateJackpot(jackpot_rake, lose_prof);
 			}
 		}
 	}
