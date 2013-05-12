@@ -59,15 +59,13 @@ public class RPSGame extends Event {
 	private static final String OpenedWager = "%b%c04%who%c12: has opened a new RPS wager of %c04%amount%c12 %profile chips! To call this wager type %c04" + CallCommand + " %who";
 	private static final String CancelledWager = "%b%c04%who%c12: Cancelled your open wager";
 	private static final String NoChips = "%b%c12Sorry, you do not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
-	private static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a Rock Paper Scissors game! " +
-											 "Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
 	private static final String RealChipsOnly = "%b%c04%who%c12: : you need to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
 	private static final String NoBet = "%b%c04%who%c12: I can't find a record of that wager";
 	private static final String SelfBet =  "%b%c04%who%c12: You can't play against yourself!";
 	private static final String Win = "%b%c12%winstring. %c04%loser%c12 loses and %c04%winner%c12 wins %c04%chips%c12!";
 	private static final String Draw = "%b%c04%better%c12 and %c04%caller%c12 draw with %c04%choice%c12! Attempting to replay...";
 	private static final String ReplayFail = "%b%c12Replay between %c04%better%c12 and %c04%caller%c12 failed as %c04%who%c12 didn't respond. Both users have been refunded %c04%chips%c12 chips!";
-	private static final String ValidChoices = "%b%c12Please choose an option and enter it here. Valid choices are: %c04%choices%c12!";
+	private static final String ValidChoices = "%b%c04%who%c12: Please choose an option and enter it here. Valid choices are: %c04%choices%c12!";
 	private static final String PleaseChoose = "%b%c12You have received a query asking for your choice. Please send your choice in the query and not in this channel.";
 	private static final String ValidChoice = "%b%c12You have chosen %c04%choice%c12!";
 	private static final String InvalidChoice = "%b%c04%what%c12 is invalid. Valid choices are: %c04%choices%c12!";
@@ -75,14 +73,15 @@ public class RPSGame extends Event {
 	private static final String OpenBets = "%c12%bCurrent open RPS wagers: %bets To call a wager type %c04" + CallCommand + " <name>";
 	private static final String EachOpenBet = "%c04%user%c12(%c04%amount %profile%c12)";
 	
-	private static final int JACKPOTCHANCE = 2000;
-	
 	private static final int RAKE = 3;
-	private static final int JACKPOTRAKE = 2;
 	
 	private static final int AnnounceMins = 3;
 	
 	private String JackpotChannel;
+	private static final int JACKPOTCHANCE = 2000;
+	private static final int JACKPOTRAKE = 2;
+	private static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a Rock Paper Scissors game! " +
+			 "Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
 	
 	private List<Bet> openBets;
 	
@@ -357,7 +356,7 @@ public class RPSGame extends Event {
 				jackpot -= remainder;
 
 				if (jackpot != 0) {
-					int win = jackpot;// / players.size();
+					int win = jackpot / players.size();
 					for (String player : players) {
 						db.jackpot(player, win, profile);
 					}
@@ -539,7 +538,7 @@ public class RPSGame extends Event {
 			choices = choices.substring(1, choices.length()-1);
 			
 			Bot.sendIRCMessage(User,
-					ValidChoices.replaceAll("%choices", choices));
+					ValidChoices.replaceAll("%choices", choices).replaceAll("%who", User));
 			Bot.sendIRCNotice(User, PleaseChoose);
 			
     	    //Loop until we receive the correct message

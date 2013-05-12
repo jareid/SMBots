@@ -1,11 +1,11 @@
 /**
- * This file is part of a commercial IRC bot that 
+ * This file is part of a commercial IRC bot that
  * allows users to play online IRC games.
  * 
  * The project was commissioned by Julian Clark
  * 
- * Copyright (C) 2013 Jamie Reid
- */ 
+ * Copyright (C) 2013 Jamie Reid 
+ */
 package org.smokinmils;
 
 import java.io.IOException;
@@ -23,13 +23,14 @@ import org.smokinmils.bot.ConnectEvents;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
+
 /**
  * A singleton Database access system for the poker bot
  * 
  * @author Jamie Reid
  */
-public class SMBaseBot {	
-	/** Instance variable */
+public class SMBaseBot {
+	/** Instance variable. */
 	private static SMBaseBot _instance = new SMBaseBot();
 
 	/** Static 'instance' method */
@@ -46,8 +47,8 @@ public class SMBaseBot {
    
 	/** The bot nickname */
 	private static String _nick;
-	
-	/** The bot nickserv password */
+
+	/** The bot nickserv password. */
 	private static String _password;
    
 	/** The bot ident string */
@@ -66,7 +67,7 @@ public class SMBaseBot {
     */
    private SMBaseBot() {
 	   bots = new HashMap<String,IrcBot>();
-   }   
+   }
    
    /**
     * Sets up the bot with the correct servers and channels

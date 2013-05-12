@@ -37,9 +37,11 @@ public class Competition extends TimerTask {
 	private static final String WinnerUserLine = "%c04%who%c12";
 	private static final int NumberWinners = 5;
 	
+	private static final int AnnounceMins = 45;
 	
 	private IrcBot Bot;
 	private String Channel;
+	private int Runs;
 	
 	/**
 	 * Constructor
@@ -48,7 +50,8 @@ public class Competition extends TimerTask {
 	 */
 	public Competition(IrcBot bot, String chan) {
 		Bot = bot;
-		Channel = chan;		
+		Channel = chan;
+		Runs = 0;
 	}
 	
 	/**
@@ -56,6 +59,7 @@ public class Competition extends TimerTask {
 	 * @see java.util.TimerTask#run()
 	 */
 	public void run() {
+		Runs++;
 		// check whether to announce or end
 		boolean over = false;
 		try {
@@ -66,8 +70,9 @@ public class Competition extends TimerTask {
 		
 		if (over) {
 			end();
-		} else {
+		} else if (Runs == AnnounceMins) {
 			announce();
+			Runs = 0;
 		}
 	}
 	

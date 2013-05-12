@@ -10,6 +10,13 @@ package org.smokinmils.bot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
@@ -33,16 +40,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie
  */
-public class CheckIdentified extends Event {
-	/** A string to store the response from a nickserv status command */
-	private static final String NickServStatus = "STATUS";
-	
-	/** A string to store username of nickserv */
-	private static final String NickServ = "NickServ";
-	
-	/** The required nickserv status value */
-	private static final int RequiredStatus = 3;
-	
+public class CheckIdentified extends Event {	
 	/** A list of users already sent a no identification message */
 	private static List<String> SentNoIdent = new ArrayList<String>();
 	
@@ -134,9 +132,11 @@ public class CheckIdentified extends Event {
      * @param user the username
      */
 	private void sendStatusRequest(IrcBot bot, User user) {
-		boolean identd = checkIdentified(bot, user.getNick());
+		Boolean identd = checkIdentified(bot, user.getNick());
 		// Only add users with the correct levels
-    	if (identd) {
+    	if (identd == null) {
+    	    bot.sendIRCMessage(user.getNick(), "%b%c12The IRC Network Services appear to be down, please try again shortly.");
+    	} else if (identd) {
     		EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
     		bot.addIdentifiedUser( user.getNick() );
         	SentNoIdent.remove( user.getNick() );
@@ -160,44 +160,81 @@ public class CheckIdentified extends Event {
      * 
      * @return true if the user meets the required status
      */
-	@SuppressWarnings("unchecked")
 	public static boolean checkIdentified(IrcBot bot, String user) {
-	    EventLog.debug("Checking the status of " + user, "CheckIdentified", "checkIdentified");
-	    
-	    WaitForQueue queue = new WaitForQueue( bot );
-		bot.sendRawLine( "PRIVMSG NickServ STATUS " + user );
-		
-	    boolean received = false;
-	    boolean ret = false;
-	    //Infinite loop since we might receive notices from non NickServ
-	    while (!received) {
-	        //Use the waitFor() method to wait for a MessageEvent.
-	        //This will block (wait) until a message event comes in, ignoring
-	        //everything else	  
-	    	NoticeEvent<IrcBot> currentEvent = null;
-			try {
-				currentEvent = queue.waitFor(NoticeEvent.class);
-			} catch (InterruptedException ex) {
-				EventLog.log(ex, "CheckIdentified", "checkIdentified");
-			}
-			
-	        //Check if this message is the response
-       		String[] msg = currentEvent.getMessage().split(" ");
-	        if ( currentEvent.getMessage().startsWith(NickServStatus)
-	        	 && currentEvent.getUser().getNick().compareToIgnoreCase(NickServ) == 0
-	        	 && msg.length == 3
-	        	 && msg[1].compareToIgnoreCase( user ) == 0 ) {
-    			Integer code = Utils.tryParse( msg[2] );
-    			
-    			// Only add users with the correct levels
-    			if (code >= RequiredStatus) {
-    				EventLog.info(user + " identified", "CheckIdentified", "sendStatusRequest");
-    				ret = true;
-    			}
-	        	queue.close();
-	        	received = true;
-	        }
-	    }
-	    return ret;
+        Boolean ret = null;        
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        FutureTask<Boolean> choicetask = new FutureTask<Boolean>( new CheckUser(bot, user) );
+        executor.execute(choicetask);
+        try {
+            ret = choicetask.get(5, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            // Do nothing, we expect this.
+            ret = null;
+        } catch (InterruptedException | ExecutionException e) {
+            EventLog.log(e, "CheckIdentified", "checkIdentified");
+        }   
+        executor.shutdown();
+        
+        return ret;
+    }
+}
+
+class CheckUser implements Callable<Boolean> {
+    /** A string to store the response from a nickserv status command */
+    private static final String NickServStatus = "STATUS";
+    
+    /** A string to store username of nickserv */
+    private static final String NickServ = "NickServ";
+    
+    /** The required nickserv status value */
+    private static final int RequiredStatus = 3;
+    
+    private IrcBot Bot;
+    private String User;
+    
+    public CheckUser(IrcBot bot, String user) {
+        Bot = bot;
+        User = user;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Boolean call() {
+        EventLog.debug("Checking the status of " + User, "CheckUser::CheckIdentified", "call");
+        
+        WaitForQueue queue = new WaitForQueue( Bot );
+        Bot.sendRawLine( "PRIVMSG NickServ " + NickServStatus + " " + User );
+        
+        boolean received = false;
+        Boolean ret = null;
+        //Infinite loop since we might receive notices from non NickServ
+        while (!received) {
+            //Use the waitFor() method to wait for a MessageEvent.
+            //This will block (wait) until a message event comes in, ignoring
+            //everything else     
+            NoticeEvent<IrcBot> currentEvent = null;
+            try {
+                currentEvent = queue.waitFor(NoticeEvent.class);
+            } catch (InterruptedException ex) {
+                EventLog.log(ex, "CheckUser::CheckIdentified", "call");
+            }
+            
+            //Check if this message is the response
+            String[] msg = currentEvent.getMessage().split(" ");
+            if ( currentEvent.getMessage().startsWith(NickServStatus)
+                 && currentEvent.getUser().getNick().compareToIgnoreCase(NickServ) == 0
+                 && msg.length == 3
+                 && msg[1].compareToIgnoreCase( User ) == 0 ) {
+                Integer code = Utils.tryParse( msg[2] );
+                
+                // Only add users with the correct levels
+                if (code >= RequiredStatus) {
+                    EventLog.info(User + " identified", "CheckUser::CheckIdentified", "call");
+                    ret = true;
+                }
+                queue.close();
+                received = true;
+            }
+        }
+        return ret;
     }
 }

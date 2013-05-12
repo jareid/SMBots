@@ -18,6 +18,7 @@ public enum GamesType {
 	DICE_DUEL("Dice Duel"),
 	OVER_UNDER("Over Under"),
 	POKER("Poker"),
+	ROULETTE("Roulette"),
 	ROULETTE_COLOUR("Roulette Colour"),
 	ROULETTE_EVENODD("Roulette Even/Odd"),
 	ROULETTE_NUMBER("Roulette Number"),

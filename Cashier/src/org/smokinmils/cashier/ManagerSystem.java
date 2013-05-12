@@ -168,7 +168,7 @@ public class ManagerSystem extends Event {
 			Double current = ManagerTimes.get(user);
 			if (current == null) current = 0.0;
 			current += (1.0 / 60.0);
-			ManagerTimes.put(LoggedInUser, current);
+			ManagerTimes.put(user, current);
 			saveData();
 		}
 	}
