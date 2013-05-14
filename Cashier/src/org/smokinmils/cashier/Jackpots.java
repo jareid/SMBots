@@ -9,12 +9,10 @@
 package org.smokinmils.cashier;
 
 import org.pircbotx.Channel;
-import org.smokinmils.Database;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.Jackpot;
 import org.smokinmils.bot.events.Message;
-import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.logging.EventLog;
 
 /**
  * Provides the functionality to give a user some chips
@@ -27,7 +25,6 @@ public class Jackpots extends Event {
 	public static final String Format = "%b%c12" + Command + "";
 	
 	public static final String JackpotInfo = "%b%c12The current jackpot sizes are: %jackpots. Every poker hand and bet has a chance to win the jackpot.";
-	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12)";
 	
 	/**
 	 * This method handles the chips command
@@ -47,29 +44,7 @@ public class Jackpots extends Event {
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
 				message.toLowerCase().startsWith( Command ) ) {
-			String jackpotstr = "";
-			
-			int i = 0;
-			for (ProfileType profile: ProfileType.values()) {
-				int jackpot = 0;
-				try {
-					jackpot = Database.getInstance().getJackpot(profile); 
-				} catch (Exception e) {
-					EventLog.log(e, "Jackpots", "message");
-				}
-				
-				jackpotstr += JackpotAmount.replaceAll("%profile",
-								profile.toString()).replaceAll("%amount", Integer.toString(jackpot));
-				if (i == (ProfileType.values().length - 2)) {
-					jackpotstr += " and ";
-				} else if (i < (ProfileType.values().length - 2)) {
-					jackpotstr += ", ";
-				}
-				i++;
-			}
-			
-			String out = JackpotInfo.replaceAll("%jackpots", jackpotstr);
-			bot.sendIRCMessage(chan.getName(), out);
+			bot.sendIRCMessage(chan, Jackpot.getAnnounceString());
 		}
 	}
 }

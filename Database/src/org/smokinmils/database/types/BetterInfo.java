@@ -22,6 +22,8 @@ public class BetterInfo {
 	
 	public int Position;
 	
+	private static final String UserLine = "%c04%who%c12(%c04%chips%c12)";
+	
 	public BetterInfo(String user, long amount) {
 		User = user;
 		Amount = amount;
@@ -48,5 +50,12 @@ public class BetterInfo {
 		Game = null;
 		Amount = amount;
 		Position = position;
+	}
+	
+	public String toString() {
+		String out = UserLine.replaceAll("%who", User);
+		out = out.replaceAll("%chips", Long.toString(Amount));
+		out = out.replaceAll("%position", Integer.toString(Position));
+		return out;
 	}
 }

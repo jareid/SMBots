@@ -132,7 +132,7 @@ public class CheckIdentified extends Event {
      * @param bot the IRC bot
      * @param user the username
      */
-	private void sendStatusRequest(IrcBot bot, User user) {
+	private synchronized void sendStatusRequest(IrcBot bot, User user) {
 		Boolean identd = checkIdentified(bot, user.getNick());
 		// Only add users with the correct levels
     	if (identd == null) {

@@ -31,7 +31,6 @@ import org.smokinmils.logging.EventLog;
 public class Competition extends TimerTask {
 	/** The output message for the statistics */
 	private static final String AnnounceLine = "%b%c12[%c04Weekly Top Better Competition%c12] | [%c04%profile%c12] | Prizes: %c04%prizes %c12| Current leaders: %players | Time left: %c04%timeleft";
-	private static final String UserLine = "%c04%who%c12(%c04%chips%c12)";
 
 	private static final String WinnerAnnounceLine = "%b%c12[%c04Weekly Top Better Competition%c12] | [%c04%profile%c12] The weekly competition has ended! Congratulations to %players on their prizes";
 	private static final String WinnerUserLine = "%c04%who%c12";
@@ -103,38 +102,12 @@ public class Competition extends TimerTask {
 					continue;
 				}
 				
-				String prizestr = "";
-				int i = 0;
-				for (Integer prize: prizes) {
-					if (prize == null) prize = 0;
-					prizestr += Integer.toString( prize );
-					if (i == (betters.size() - 2)) {
-						prizestr += " and ";
-					} else if (i < (betters.size() - 2)) {
-						prizestr += ", ";
-					}
-					i++;					
-				}
+				String prizestr = Utils.ListToString(prizes);
+				String all_wins = Utils.ListToString(betters);
 				
 				String out = AnnounceLine.replaceAll("%profile", profile.toString() );
 				out = out.replaceAll("%timeleft", duration );
 				out = out.replaceAll("%prizes", prizestr );
-				String all_wins = "";
-				
-				i = 0;
-				for (BetterInfo player: betters) {
-					String winner = UserLine.replaceAll("%who", player.User);
-					winner = winner.replaceAll("%chips", Long.toString(player.Amount));
-					winner = winner.replaceAll("%position", Integer.toString(i+1));
-					all_wins += winner;
-					if (i == (betters.size() - 2)) {
-						all_wins += " and ";
-					} else if (i < (betters.size() - 2)) {
-						all_wins += ", ";
-					}
-					i++;
-				}
-				
 				out = out.replaceAll("%players", all_wins);
 				
 				Bot.sendIRCMessage(Channel, out);

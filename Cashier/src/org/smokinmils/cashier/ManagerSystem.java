@@ -41,7 +41,7 @@ public class ManagerSystem extends Event {
 	private static final String NotLoggedIn = "%b%c12[%c04Login%c12]%c04 You are not currently logged in...";
 	private static final String LoggedIn = "%b%c12[%c04Login%c12]%c04 %who%c12, you have sucessfully been logged in!";
 	private static final String LoggedOut = "%b%c12[%c04Login%c12]%c04 %who%c12, you have sucessfully been logged out!";
-	private static final String InactiveLoggedOut = "%b%c12[%c04Inactive%c12]%c04 %who%c12, you has been logged out!";
+	private static final String InactiveLoggedOut = "%b%c12[%c04Inactive%c12]%c04 %who%c12, you have been logged out for inactivity in %c04%actchan%c12!";
 	private static final String CantLogIn = "%b%c12[%c04Login%c12]%c04 %b%c04%who%c12 is currently logged in, please wait until they finish their shift";
 	
 	private static String LoggedInUser;
@@ -74,10 +74,12 @@ public class ManagerSystem extends Event {
 		        InactiveTime = (temp == null ? DefaultInactiveTime : temp);
 		        
 		        Ini.Section section = ini.get("times");
-		        for (String user: section.keySet()) {
-		        	Double val = section.get(user, Double.class);
-		        	if (val == null) val = 0.0;
-		        	ManagerTimes.put(user, val);
+		        if (section != null) {
+			        for (String user: section.keySet()) {
+			        	Double val = section.get(user, Double.class);
+			        	if (val == null) val = 0.0;
+			        	ManagerTimes.put(user, val);
+			        }
 		        }
 			}
 		} catch (IOException e) {
@@ -158,7 +160,9 @@ public class ManagerSystem extends Event {
 	public static void inactive() {
 		if (Inactive != null) Inactive.cancel();
 		if (LoggedInUser != null) {
-			Bot.sendIRCMessage(ManagerChan, InactiveLoggedOut.replaceAll("%who", LoggedInUser));	
+			String out = InactiveLoggedOut.replaceAll("%who", LoggedInUser);
+			out = InactiveLoggedOut.replaceAll("%actchan", ActivityChan);
+			Bot.sendIRCMessage(ManagerChan, out);	
 			managerLoggedOut();
 		}
 	}

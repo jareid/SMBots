@@ -25,6 +25,7 @@ public enum GamesType {
 	ROULETTE_NUMBER("Roulette Number"),
 	ROULETTE_ROW("Roulette Row"),
 	ROCKPAPERSCISSORS("Rock Paper Scissors"),
+	TIMEDROLL("Timed Roll"),
 	;
 	
 	/** The text. */

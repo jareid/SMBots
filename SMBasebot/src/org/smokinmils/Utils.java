@@ -8,6 +8,8 @@
  */ 
 package org.smokinmils;
 
+import java.util.List;
+
 /**
  * A utility class that provides useful functions to the entire project
  * 
@@ -28,5 +30,25 @@ public class Utils {
 		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+	
+	public static <E> String ListToString(List<E> list)
+	        throws IllegalArgumentException {
+        String out = "";
+        int i = 0;
+        for (E item: list) {
+            if (item == null) out += "NULL";
+            else out += item.toString();
+            
+            if (list.size() > 1) {
+                if (i == (list.size() - 2)) {
+                    out += " and ";
+                } else if (i < (list.size() - 2)) {
+                    out += ", ";
+                }
+            }
+            i++;                    
+        }
+        return out;
 	}
 }

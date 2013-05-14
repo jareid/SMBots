@@ -55,21 +55,6 @@ public class Lottery extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( "test" ) ) {	
-			endLottery(bot, chan.getName());
-			try {
-				announceReset(bot, chan.getName());
-			} catch (DBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		if ( isValidChannel( chan.getName() ) &&
-				bot.userIsIdentified( sender ) &&
 				message.toLowerCase().startsWith( Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 2) {

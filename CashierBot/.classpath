@@ -7,5 +7,7 @@
 	<classpathentry kind="src" path="/Casino"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HelpSystem"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/RockPaperScissors"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/HourlyRoll"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Database"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

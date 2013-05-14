@@ -247,7 +247,7 @@ public class IrcBot extends PircBotX {
 	}
 
 	public void addValidChannel(String channel) {
-		ValidChannels.add(channel);
+		ValidChannels.add(channel.toLowerCase());
 	}
 
 	public List<String> getValidChannels() {
