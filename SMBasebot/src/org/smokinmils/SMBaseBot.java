@@ -111,7 +111,7 @@ public class SMBaseBot {
 
 	   newbot.setName(_nick);
 	   newbot.setLogin(_ident);
-	   newbot.setVerbose(_debug);
+	   newbot.setVerbose(false);// TODO: sync with actual _debug setting
 	   newbot.setAutoNickChange(true);
 	   newbot.useShutdownHook(false);
 	   newbot.setVersion(Version);
@@ -138,7 +138,7 @@ public class SMBaseBot {
 	   
 	   // check we are in all the channels we should be
 	   Timer rejoin = new Timer(true);
-	   rejoin.scheduleAtFixedRate( new AutoJoin(newbot) , 5000, 5000);
+	   rejoin.scheduleAtFixedRate( new AutoJoin(newbot) , 30000, 30000);
    }
    
    /**

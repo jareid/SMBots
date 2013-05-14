@@ -145,7 +145,9 @@ public class IrcBot extends PircBotX {
 	 * @param nick	The nickname to check
 	 */
 	public void removeIdentifiedUser(String nick) {
-		IdentifiedUsers.remove(nick.toLowerCase());
+	    synchronized (IdentifiedUsers) {
+	        IdentifiedUsers.remove(nick.toLowerCase());
+	    }
 	}
 	
 	/**
@@ -154,7 +156,9 @@ public class IrcBot extends PircBotX {
 	 * @param nick	The nickname to check
 	 */
 	public void addIdentifiedUser(String nick) {
-		IdentifiedUsers.add(nick.toLowerCase());
+        synchronized (IdentifiedUsers) {
+            IdentifiedUsers.add(nick.toLowerCase());
+        }
 	}
 	
 	/**
@@ -172,6 +176,23 @@ public class IrcBot extends PircBotX {
 		}
 		return ret;
 	}
+	
+	   /**
+     * Checks if a user is an op for a channel
+     * @param user
+     * @param chan
+     */
+    public boolean userIsHalfOp(User user, String chan) {
+        boolean ret = false;
+        for (Channel opchans: user.getChannelsOpIn()) {
+            if (chan.equalsIgnoreCase(opchans.getName())) {
+                ret = true;
+                break;
+            }
+        }
+        return ret;
+    }
+    
 	/**
 	 * Checks if a user is an op for a channel
 	 * @param user

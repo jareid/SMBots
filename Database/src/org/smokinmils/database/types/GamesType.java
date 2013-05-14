@@ -16,6 +16,7 @@ package org.smokinmils.database.types;
 public enum GamesType {
 	ADMIN("admin"),
 	DICE_DUEL("Dice Duel"),
+	LOTTERY("Lottery"),
 	OVER_UNDER("Over Under"),
 	POKER("Poker"),
 	ROULETTE("Roulette"),

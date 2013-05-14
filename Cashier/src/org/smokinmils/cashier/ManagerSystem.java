@@ -63,27 +63,29 @@ public class ManagerSystem extends Event {
 		ActivityChan = active_chan;
 		ManagerChan = manager_chan;
 		Bot = bot;
-		
-		checkData();
-		// read from the file
+
 		try {
-			Ini ini = new Ini( new FileReader( FileName ) );
-	        LoggedInUser = ini.get("loggedin", "who");
-	        Integer temp = ini.get("inactive", "maxtime", Integer.class);
-	        InactiveTime = (temp == null ? DefaultInactiveTime : temp);
-	        
-	        Ini.Section section = ini.get("times");
-	        for (String user: section.keySet()) {
-	        	Double val = section.get(user, Double.class);
-	        	if (val == null) val = 0.0;
-	        	ManagerTimes.put(user, val);
-	        }
+			File inifile = new File( FileName );
+			if(inifile.exists()) {
+			// read from the file
+				Ini ini = new Ini( new FileReader( FileName ) );
+		        LoggedInUser = ini.get("loggedin", "who");
+		        Integer temp = ini.get("inactive", "maxtime", Integer.class);
+		        InactiveTime = (temp == null ? DefaultInactiveTime : temp);
+		        
+		        Ini.Section section = ini.get("times");
+		        for (String user: section.keySet()) {
+		        	Double val = section.get(user, Double.class);
+		        	if (val == null) val = 0.0;
+		        	ManagerTimes.put(user, val);
+		        }
+			}
 		} catch (IOException e) {
 			EventLog.log(e, "ManagerSystem", "ManagerSystem");
 		}
 		
 		NextMin = new Timer(true);
-		NextMin.schedule(new IncreaseTime(), 60*1000);
+		NextMin.scheduleAtFixedRate(new IncreaseTime(), 60*1000, 60*1000);
 		
 		if (LoggedInUser != null) {			
 			Inactive = new Timer(true);
@@ -106,7 +108,7 @@ public class ManagerSystem extends Event {
 		String sender = event.getUser().getNick();
 		Channel chan = event.getChannel();
 		
-		if ( isValidChannel( chan.getName() ) && bot.userIsIdentified( sender )) {
+		if ( bot.userIsIdentified( sender )) {
 			if ( sender.equalsIgnoreCase( LoggedInUser ) &&
 				chan.getName().equalsIgnoreCase(ActivityChan)) {
 				Inactive.cancel();
@@ -114,23 +116,23 @@ public class ManagerSystem extends Event {
 				Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 			}
 			
-			if (message.toLowerCase().startsWith( OnCommand )) {
+			if (isValidChannel( chan.getName() ) && message.toLowerCase().startsWith( OnCommand )) {
 				if (LoggedInUser == null) {
 					bot.sendIRCMessage( event.getChannel(), NoLoggedOn );
 				} else {
 					bot.sendIRCMessage( event.getChannel(),
 									LoggedOn.replaceAll( "%who", LoggedInUser ) );
 				}
-			} else if (message.toLowerCase().startsWith( LoginCommand ) &&
-					   bot.userIsOp(event.getUser(), chan.getName())) {
+			} else if (ManagerChan.equalsIgnoreCase( chan.getName() ) &&
+					   message.toLowerCase().startsWith( LoginCommand )) {
 				if (LoggedInUser != null) {
 					bot.sendIRCNotice(sender, CantLogIn.replaceAll("%who", LoggedInUser));					
 				} else {
 					managerLoggedIn( sender );
 					bot.sendIRCMessage(chan, LoggedIn.replaceAll("%who", sender));	
 				}
-			} else if (message.toLowerCase().startsWith( LogoutCommand ) &&
-			   			bot.userIsOp(event.getUser(), chan.getName())) {
+			} else if (ManagerChan.equalsIgnoreCase( chan.getName() ) &&
+					   message.toLowerCase().startsWith( LogoutCommand )) {
 				if (LoggedInUser == null || !LoggedInUser.equalsIgnoreCase(sender)) {
 					bot.sendIRCNotice(sender, NotLoggedIn);
 				} else {
@@ -177,15 +179,17 @@ public class ManagerSystem extends Event {
 		File inifile = new File( FileName );
 		if(!inifile.exists()) {
 			ManagerTimes.clear();
+			try {
+				if(!inifile.createNewFile()) return;
+			} catch (IOException e) {
+				EventLog.log(e, "ManagerSystem", "checkData");
+			}
 		}
 	}
 	
 	private static void saveData() {
 	    try {
 			File inifile = new File( FileName );
-			if(!inifile.exists()) {
-				if(!inifile.createNewFile()) return;
-			}
 			Wini ini = new Wini(inifile);
 			
 	        ini.put("loggedin", "who", LoggedInUser);	   

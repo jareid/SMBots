@@ -66,6 +66,10 @@ public class CashierBot {
     	jp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, jp_event);
     	
+    	Lottery lottery_event = new Lottery();
+    	lottery_event.addValidChan(all_swift_chans);
+    	basebot.addListener(swift_irc, lottery_event);
+    	
     	ManagerSystem ms_event = new ManagerSystem("#smokin_dice", "#managers",
     												basebot.getBot(swift_irc));
     	ms_event.addValidChan(all_swift_chans);

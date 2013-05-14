@@ -18,6 +18,8 @@ public enum TransactionType {
 	BET("bet"),
 	CANCEL("cancel"),
 	CREDIT("credit"),
+	LOTTERY("lottery"),
+	LOTTERY_WIN("lotterywin"),	
 	PAYOUT("payout"),
 	JACKPOT("pkrjackpot"),
 	POKER_BUYIN("pokerbuy"),

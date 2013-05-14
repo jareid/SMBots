@@ -1,6 +1,7 @@
 package org.smokinmils.casino;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,6 +13,7 @@ import org.smokinmils.SMBaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
+import org.smokinmils.logging.EventLog;
 
 public class Casino extends Event {
 
@@ -105,10 +107,15 @@ public class Casino extends Event {
 							if (g.getChannel().equalsIgnoreCase(chan)
 									&& g.isValidCommand(command)) {
 								// should check if is valid here
-								for (String reply : g.processCommand(words, e
+								List<String> replies = g.processCommand(words, e
 										.getUser(), this.getUserLevel(sender, chan,
-										e.getUser()), e.getBot()))
-									e.getBot().sendIRCMessage(chan, reply);
+										e.getUser()), e.getBot());
+								if (replies != null) {
+									for (String reply : replies)
+										e.getBot().sendIRCMessage(chan, reply);
+								} else {
+									EventLog.log("Casino reply is null", "Casino", "message");
+								}
 							}
 						}
 					}

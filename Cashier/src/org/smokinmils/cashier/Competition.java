@@ -84,6 +84,9 @@ public class Competition extends TimerTask {
 		Map<ProfileType, List<Integer>> all_prizes = readPrizes();
 		for (ProfileType profile: ProfileType.values()) {
 			try {
+				// Announce the current lottery
+				Lottery.announceLottery(Bot, profile, Channel);
+				
 				List<BetterInfo> betters = db.getCompetition(profile, NumberWinners);
 				int secs = db.getCompetitionTimeLeft();
 				
@@ -145,6 +148,10 @@ public class Competition extends TimerTask {
 	 * End the competition
 	 */
 	private void end() {
+		// End weekly lottery
+		Lottery.endLottery(Bot, Channel);
+		
+		// End the competition
 		Database db = Database.getInstance();
 		Map<ProfileType, List<Integer>> all_prizes = readPrizes();
 		for (ProfileType profile: ProfileType.values()) {
@@ -190,6 +197,7 @@ public class Competition extends TimerTask {
 		// Update the database for next competition
 		try {
 			db.competitionEnd();
+			Lottery.announceReset(Bot, Channel);
 		} catch (Exception e) {
 			EventLog.log(e, "Competition", "end");
 		}

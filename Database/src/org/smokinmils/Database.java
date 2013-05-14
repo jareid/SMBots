@@ -1047,6 +1047,95 @@ public class Database {
 		return new BetterInfo(user, game, total);
 	}
 	
+   /**
+    * Buys a number of lottery ticket.
+    * 
+    * @param user	The user buying the tickets.
+    * @param profile The profile being used
+    * @param amount	 The number of tickets to buy
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public boolean buyLotteryTickets(String username, ProfileType profile, int amount)
+				  throws DBException, SQLException {
+		adjustChips( username, (0-amount), profile, GamesType.LOTTERY, TransactionType.LOTTERY );
+
+		String sql = "INSERT INTO " + LotteryTicketsTable.Name + " (" +
+								LotteryTicketsTable.Col_ID + ", " +
+								LotteryTicketsTable.Col_UserID + ", " +
+								LotteryTicketsTable.Col_ProfileID + ") VALUES ";
+		
+		int user_id = runGetIntQuery( getUserIDSQL(username) );
+		int profile_id = runGetIntQuery( getProfileIDSQL(profile) );
+		
+		boolean ret = true;
+		
+		if (user_id != -1 && profile_id != -1) {
+			String values = "(NULL, '" + user_id + "', '" + profile_id + "')";
+		
+			for (int i = 1; i <= amount; i++) { 
+				sql += values;
+				if (i != amount) sql += ", ";
+			}
+		
+			ret = (runBasicQuery(sql) > 0);
+		}
+		
+		return ret;
+	}
+	
+   /**
+    * Returns the size of the lottery
+    * 
+    * @param profile The profile being used
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public int getLotteryTickets(ProfileType profile)
+				  throws DBException, SQLException {
+		String sql = "SELECT COUNT(*) FROM " + LotteryTicketsTable.Name +
+	  				" WHERE " + LotteryTicketsTable.Col_ProfileID + " = " + "(" + getProfileIDSQL(profile) + ")";
+		
+		return runGetIntQuery(sql);
+	}
+	
+	
+   /**
+    * Returns the size of the lottery
+    * 
+    * @param profile The profile being used
+    * 
+    * return The random winner.
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public String getLotteryWinner(ProfileType profile)
+				  throws DBException, SQLException {
+		String sql = "SELECT u." + UsersTable.Col_Username + " FROM " + LotteryTicketsTable.Name + " l " +
+				  	 "JOIN " + UsersTable.Name + " u ON l." + LotteryTicketsTable.Col_UserID + " = u." + UsersTable.Col_ID + 
+	  				" WHERE " + LotteryTicketsTable.Col_ProfileID + " = " + "(" + getProfileIDSQL(profile) + ")" +
+	  				" ORDER BY RAND() LIMIT 1";
+		
+		return runGetStringQuery(sql);
+	}
+
+   /**
+    * Starts a new lottery by wiping the current tickets.
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+	public void endLottery()
+				  throws DBException, SQLException {
+		String sql = "DELETE FROM " + LotteryTicketsTable.Name;
+		
+		runBasicQuery(sql);
+	}
+		
+	
    
    /**
     * Adds a new transaction to the transaction table

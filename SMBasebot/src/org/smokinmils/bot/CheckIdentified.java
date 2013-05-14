@@ -118,6 +118,7 @@ public class CheckIdentified extends Event {
 	@Override
 	public void userList(UserList event) {
 		IrcBot bot = event.getBot();
+		// TODO: fix concurrent issue here
 		for (User usr: event.getUsers()) {
 			bot.removeIdentifiedUser( usr.getNick() );
 			sendStatusRequest( bot, usr );
@@ -160,13 +161,13 @@ public class CheckIdentified extends Event {
      * 
      * @return true if the user meets the required status
      */
-	public static boolean checkIdentified(IrcBot bot, String user) {
+	public static Boolean checkIdentified(IrcBot bot, String user) {
         Boolean ret = null;        
         ExecutorService executor = Executors.newFixedThreadPool(1);
         FutureTask<Boolean> choicetask = new FutureTask<Boolean>( new CheckUser(bot, user) );
         executor.execute(choicetask);
         try {
-            ret = choicetask.get(5, TimeUnit.SECONDS);
+            ret = choicetask.get(15, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Do nothing, we expect this.
             ret = null;
@@ -205,7 +206,7 @@ class CheckUser implements Callable<Boolean> {
         Bot.sendRawLine( "PRIVMSG NickServ " + NickServStatus + " " + User );
         
         boolean received = false;
-        Boolean ret = null;
+        Boolean ret = false;
         //Infinite loop since we might receive notices from non NickServ
         while (!received) {
             //Use the waitFor() method to wait for a MessageEvent.
