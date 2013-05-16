@@ -514,7 +514,7 @@ public class Roulette implements IRCGame {
 	private boolean addToJackpot(int amount, String profile) {
 		boolean ret = false;
 		if (amount >= 50) {
-			Roulette.updateJackpot((int)((amount / 100.0) * Settings.ROULETTERAKE), profile);
+			Roulette.updateJackpot((int)(amount * (0.01 * Settings.ROULETTERAKE)), profile);
 			ret = true;
 		}
 		return ret;

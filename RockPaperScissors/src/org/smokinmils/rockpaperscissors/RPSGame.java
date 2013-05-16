@@ -414,9 +414,7 @@ public class RPSGame extends Event {
 		Database db = Database.getInstance();
 		// Take the rake and give chips to winner
 		int rake = 1;
-		int tmp = (int)(((JACKPOTRAKE + RAKE) / 100.0) * (amount * 2));
-		if (tmp > 1)
-			rake = (int)(((RAKE) / 100.0) * (amount * 2));
+		rake = (int)(((JACKPOTRAKE + RAKE) * 0.01) * (amount * 2));
 		int win = (amount*2) - rake;
 		
 		try {
@@ -439,7 +437,7 @@ public class RPSGame extends Event {
 		
 		// jackpot stuff
 		if (amount >= 25) {		
-			int jackpot_rake = (int) Math.floor((amount * 2) / 100 * JACKPOTRAKE);
+			int jackpot_rake = (int) Math.floor((amount * 2) * (0.01 * JACKPOTRAKE));
 
 			updateJackpot(jackpot_rake, win_prof);
 			

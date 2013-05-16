@@ -899,12 +899,17 @@ public class Database {
     * @throws SQLException
     */
 	public BetterInfo getTopBetter(ProfileType profile) throws DBException, SQLException {
+		return getTopBetter(profile, null);
+	}
+	public BetterInfo getTopBetter(ProfileType profile, String who) throws DBException, SQLException {
 		String sql = "SELECT " + TotalBetsView.Col_Username + ","
 				   			   + TotalBetsView.Col_Total + 
 					 " FROM " + TotalBetsView.Name +
-					 " WHERE " + TotalBetsView.Col_Profile + " LIKE '" + profile.toString() + "'" +
-					 " ORDER BY " + TotalBetsView.Col_Total + " DESC " +
-					 " LIMIT 1";
+					 " WHERE " + TotalBetsView.Col_Profile + " LIKE '" + profile.toString() + "'";
+		
+		if (who != null) sql += " AND " + TotalBetsView.Col_Username + " LIKE '" + who + "'";
+		
+		sql += " ORDER BY " + TotalBetsView.Col_Total + " DESC LIMIT 1";
 		
 	   Connection conn = null;
 	   Statement stmt = null;
@@ -941,58 +946,6 @@ public class Database {
 	}
 	
    /**
-    * Gets the highest winner for a profile
-    * 
-    * @param profile	The profile to check
-    * 
-    * @return The username of the highest better for the provided profile
-    * 
-    * @throws DBException
-    * @throws SQLException
-    */
-	public BetterInfo getTopWinner(ProfileType profile) throws DBException, SQLException {
-		String sql = "SELECT " + OrderedWinnersView.Col_Username + ","
-				   			   + OrderedWinnersView.Col_Total + 
-					 " FROM " + OrderedWinnersView.Name +
-					 " WHERE " + OrderedWinnersView.Col_Profile + " LIKE '" + profile.toString() + "'" +
-					 " ORDER BY " + OrderedWinnersView.Col_Total + " DESC " +
-					 " LIMIT 1";
-		
-	   Connection conn = null;
-	   Statement stmt = null;
-	   ResultSet rs = null;
-	   String user = null;
-	   long total = -1;
-	   try {
-		   try {
-			   conn = getConnection();
-			   stmt = conn.createStatement();
-			   stmt.setMaxRows(1);
-			   rs = stmt.executeQuery(sql);
-			   
-			   if ( rs.next() ) {
-				   user = rs.getString(OrderedWinnersView.Col_Username);
-				   total = rs.getLong(OrderedWinnersView.Col_Total);
-			   }
-		   } catch (SQLException e) {
-			   throw new DBException(e.getMessage(), sql);
-		   }
-	   } catch (DBException ex) {
-		   throw ex;
-	   } finally {
-		   try {
-			   if (rs != null) rs.close();
-			   if (stmt != null) stmt.close();
-			   if (conn != null) conn.close();
-		   } catch (SQLException e) {
-				throw e;
-		   }
-	   }
-
-		return new BetterInfo(user, total);
-	}
-	
-   /**
     * Gets the highest single bet for a profile
     * 
     * @param profile	The profile to check
@@ -1003,13 +956,18 @@ public class Database {
     * @throws SQLException
     */
 	public BetterInfo getHighestBet(ProfileType profile) throws DBException, SQLException {
+		return getHighestBet(profile, null);
+	}
+	public BetterInfo getHighestBet(ProfileType profile, String who) throws DBException, SQLException {
 		String sql = "SELECT " + OrderedBetsView.Col_Username + ","
 							   + OrderedBetsView.Col_Game + ","
 							   + OrderedBetsView.Col_Total + 
 					 " FROM " + OrderedBetsView.Name +
-					 " WHERE " + OrderedBetsView.Col_Profile + " LIKE '" + profile.toString() + "'" +
-					 " ORDER BY " + OrderedBetsView.Col_Total + " DESC " +
-					 " LIMIT 1";
+					 " WHERE " + OrderedBetsView.Col_Profile + " LIKE '" + profile.toString() + "'";
+		
+		if (who != null) sql += " AND " + OrderedBetsView.Col_Username + " LIKE '" + who + "'";
+		
+		sql += " ORDER BY " + OrderedBetsView.Col_Total + " DESC LIMIT 1";
 		
 	   Connection conn = null;
 	   Statement stmt = null;

@@ -14,10 +14,8 @@ import org.smokingmils.help.Help;
 import org.smokinmils.SMBaseBot;
 import org.smokinmils.cashier.*;
 import org.smokinmils.casino.Casino;
-import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.rockpaperscissors.RPSGame;
 import org.smokinmils.timedrollcomp.CreateTimedRoll;
-import org.smokinmils.timedrollcomp.TimedRollComp;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -98,11 +96,11 @@ public class CashierBot {
     	ctr_event.addValidChan("#sm_hosts");
     	basebot.addListener(swift_irc, ctr_event);  
     	
-    	// add timed roll for Smoking_Dice every 24hours with a 100chip prize
+    	/* add timed roll for Smoking_Dice every 24hours with a 100chip prize
     	@SuppressWarnings("unused")
 		TimedRollComp trc_event = new TimedRollComp(basebot.getBot(swift_irc),
     												"#smokin_dice", ProfileType.EOC,
-    												100, 60*24);
+    												100, 60*24);*/
     	
     	ManagerAnnounce mgr_ano = new ManagerAnnounce( basebot.getBot(swift_irc), "#smokin_dice" );
     	mgr_ano.begin(0);

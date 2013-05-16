@@ -161,7 +161,7 @@ public class ManagerSystem extends Event {
 		if (Inactive != null) Inactive.cancel();
 		if (LoggedInUser != null) {
 			String out = InactiveLoggedOut.replaceAll("%who", LoggedInUser);
-			out = InactiveLoggedOut.replaceAll("%actchan", ActivityChan);
+			out = out.replaceAll("%actchan", ActivityChan);
 			Bot.sendIRCMessage(ManagerChan, out);	
 			managerLoggedOut();
 		}

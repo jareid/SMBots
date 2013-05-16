@@ -225,10 +225,10 @@ public class DiceDuel implements IRCGame {
 						winnerProfile = p2Profile;
 					}
 					int rake = 1;
+					// TODO: rake should be in a setting.
 					if (0.05 * bet.getAmount() * 2 > 1)
-						rake = (int) Math.round(0.02 * bet.getAmount() * 2);
-					db.addChips(winner, winnerProfile, (bet.getAmount() * 2)
-							- rake, null);
+						rake = (int) Math.round(0.05 * bet.getAmount() * 2);
+					db.addChips(winner, winnerProfile, (bet.getAmount() * 2) - rake, null);
 
 					// log everything to db
 					// db.recordLoss(loser);
@@ -236,15 +236,14 @@ public class DiceDuel implements IRCGame {
 					db.recordBet(p1, bet.getAmount());
 					db.recordBet(p2, bet.getAmount());
 					db.delBet(bet, 2);
-					db.addTransaction(winner, winnerProfile, 4,
-							(bet.getAmount() * 2) - rake, this.ID);
+					db.addTransaction(winner, winnerProfile, 4, (bet.getAmount() * 2) - rake, this.ID);
 					// //bot.sendMessage(bet.getUser(), message)
 					openBets.remove(bet);
 
 					// jackpot stuff
 					int amount = bet.getAmount();
 					if (amount >= 25 && p1Profile.equalsIgnoreCase(p2Profile)) {		
-						int jackpot_rake = (int) Math.floor((amount * 2) / 100 * Settings.DDRAKE);
+						int jackpot_rake = (int) Math.floor((amount * 2) * (0.01 * Settings.DDRAKE));
 
 						if (DiceDuel.checkJackpot()) {
 							ArrayList<String> players = new ArrayList<String>();
@@ -256,7 +255,7 @@ public class DiceDuel implements IRCGame {
 							DiceDuel.updateJackpot(jackpot_rake, p1Profile);
 						}
 					} else if (amount >= 50) {
-						int jackpot_rake = (int) Math.floor((amount) / 100 * Settings.DDRAKE);
+						int jackpot_rake = (int) Math.floor((amount) / (0.01 * Settings.DDRAKE));
 						if (DiceDuel.checkJackpot()) { // loser first? Let's be nice
 							ArrayList<String> players = new ArrayList<String>();
 							players.add(loser);

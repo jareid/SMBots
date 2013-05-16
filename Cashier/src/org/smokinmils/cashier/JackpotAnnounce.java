@@ -11,7 +11,6 @@ package org.smokinmils.cashier;
 import java.util.TimerTask;
 
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.bot.Jackpot;
 /**
  * Provides announcements about the betting on an irc server
  * 
@@ -42,6 +41,6 @@ public class JackpotAnnounce extends TimerTask {
 	 * @see java.util.TimerTask#run()
 	 */
 	public void run() {
-		Bot.sendIRCMessage(Channel, Jackpot.getAnnounceString());
+		Bot.sendIRCMessage(Channel, Rake.getAnnounceString());
 	}
 }

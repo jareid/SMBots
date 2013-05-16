@@ -153,13 +153,11 @@ public class OverUnder implements IRCGame {
 							winners.add(bet.getUser());
 							this.jackpotWon(bet.getProfile(), winners, bot);
 
-							int rake = (int) Math.floor(bet.getAmount() / 100
-									* Settings.OURAKE);
+							int rake = (int) Math.floor(bet.getAmount() * (0.01 * Settings.OURAKE));
 							OverUnder.updateJackpot(rake, bet.getProfile());
 						} else {
 							// we lose
-							int rake = (int) Math.floor(bet.getAmount() / 100
-									* Settings.OURAKE);
+							int rake = (int) Math.floor(bet.getAmount() * (0.01 * Settings.OURAKE));
 							OverUnder.updateJackpot(rake, bet.getProfile());
 						}
 					}

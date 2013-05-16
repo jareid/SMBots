@@ -30,6 +30,10 @@ public class CompPosition extends Event {
 	private static final String Position = "%b%c04%sender:%c12 %c04%who%c12 is currently in position %c04%position%c12 for the %c04%profile%c12 competition with %c04%chips%c12 chips bet";
 	private static final String NotRanked = "%b%c04%sender:%c12 %c04%who%c12 is currently in %c04unranked%c12 for the %c04%profile%c12 competition";
 	
+	private static final String Last30Days = "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 " +
+	 										 "Your highest bet was %c04%hb_chips%c12 on %c04%hb_game%c12 | " +
+	 										 "Your bet total is %c04%hbt_chips%c12";
+	private static final String Last30Days_NoData = "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 There is no data for you on this profile.";
 	/**
 	 * This method handles the chips command
 	 * 
@@ -73,6 +77,28 @@ public class CompPosition extends Event {
 					out = out.replaceAll("%who", who);
 					
 					bot.sendIRCMessage(chan.getName(), out);
+					
+					Database db = Database.getInstance();
+					for (ProfileType prof: ProfileType.values()) {
+						try {
+							BetterInfo high_bet = db.getHighestBet(prof, sender);
+							BetterInfo top_better = db.getTopBetter(prof, sender);
+							
+							if (high_bet.User == null || top_better.User == null) {		
+								out = Last30Days_NoData;
+							} else {		
+								out = Last30Days.replaceAll("%hb_game", high_bet.Game.toString());
+								out = out.replaceAll("%hb_chips", Long.toString(high_bet.Amount));
+								out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
+							}
+							out = out.replaceAll("%profile", prof.toString() );
+
+							bot.sendIRCNotice(sender, out);
+						} catch (Exception e) {
+							EventLog.log(e, "BetDetails", "run");
+						}
+					}
+					
 				} else {
 					bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 				}
