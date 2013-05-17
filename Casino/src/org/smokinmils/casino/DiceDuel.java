@@ -255,7 +255,7 @@ public class DiceDuel implements IRCGame {
 							DiceDuel.updateJackpot(jackpot_rake, p1Profile);
 						}
 					} else if (amount >= 50) {
-						int jackpot_rake = (int) Math.floor((amount) / (0.01 * Settings.DDRAKE));
+						int jackpot_rake = (int) Math.floor((amount) * (0.01 * Settings.DDRAKE));
 						if (DiceDuel.checkJackpot()) { // loser first? Let's be nice
 							ArrayList<String> players = new ArrayList<String>();
 							players.add(loser);

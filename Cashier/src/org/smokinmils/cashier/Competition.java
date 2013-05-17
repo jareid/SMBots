@@ -80,19 +80,32 @@ public class Competition extends TimerTask {
 	 */
 	private void announce() {
 		Database db = Database.getInstance();
-		Map<ProfileType, List<Integer>> all_prizes = readPrizes();
+		
+		String duration = "";
+		try {
+			int secs = db.getCompetitionTimeLeft();
+			
+			duration = String.format("%%c04%d%%c12 day(s) %%c04%d%%c12 hour(s) %%c04%d%%c12 min(s)",
+											secs/(60*60*24),
+											(secs%(60*60*24))/(60*60),
+											((secs%(60*60*24))%(60*60))/60);
+		} catch (Exception e) {
+			EventLog.log(e, "Competition", "run");
+		}
+		
 		for (ProfileType profile: ProfileType.values()) {
 			try {
 				// Announce the current lottery
 				Lottery.announceLottery(Bot, profile, Channel);
-				
+			} catch (Exception e) {
+				EventLog.log(e, "Competition", "run");
+			}
+		}
+		
+		Map<ProfileType, List<Integer>> all_prizes = readPrizes();
+		for (ProfileType profile: ProfileType.values()) {
+			try {				
 				List<BetterInfo> betters = db.getCompetition(profile, NumberWinners);
-				int secs = db.getCompetitionTimeLeft();
-				
-				String duration = String.format("%%c04%d%%c12 day(s) %%c04%d%%c12 hour(s) %%c04%d%%c12 min(s)",
-												secs/(60*60*24),
-												(secs%(60*60*24))/(60*60),
-												((secs%(60*60*24))%(60*60))/60);
 				
 				List<Integer> prizes = all_prizes.get(profile);
 				// check there are enough prizes
@@ -112,7 +125,7 @@ public class Competition extends TimerTask {
 				
 				Bot.sendIRCMessage(Channel, out);
 			} catch (Exception e) {
-				EventLog.log(e, "BetDetails", "run");
+				EventLog.log(e, "Competition", "run");
 			}
 		}
 	}
