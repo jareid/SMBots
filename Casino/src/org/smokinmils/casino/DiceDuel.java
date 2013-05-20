@@ -9,8 +9,11 @@ import java.util.List;
 import org.pircbotx.User;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.logging.EventLog;
-import org.smokinmils.pokerbot.Database;
+import org.smokinmils.cashier.Rake;
+import org.smokinmils.database.types.GamesType;
+import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.Database;
+import org.smokinmils.pokerbot.Utils;
 
 public class DiceDuel implements IRCGame {
 
@@ -61,8 +64,7 @@ public class DiceDuel implements IRCGame {
 	 * org.pircbotx.User, int, org.pircbotx.PircBotX)
 	 */
 	@Override
-	public List<String> processCommand(String[] commands, User user,
-			int userlevel, IrcBot bot) {
+	public List<String> processCommand(String[] commands, User user, int userlevel, IrcBot bot) {
 		String command = commands[0];
 
 		String username = user.getNick();
@@ -70,241 +72,237 @@ public class DiceDuel implements IRCGame {
 		Database db_new = Database.getInstance();
 
 		if (command.equalsIgnoreCase("dd")) {
-			if (commands.length < 2) // if they have done "!dd" with nothing
-										// else
-				return s_invalidBetString;
+			dd(commands, user, userlevel, bot);
+		} else if (command.equalsIgnoreCase("call")) {
+			call(commands, user, userlevel, bot);
+		} else if ( command.equalsIgnoreCase("ddcancel") ){
+			cancel(commands, user, userlevel, bot);
+		} else {
+			// TODO: something went wrong... LOG THIS AND CRY!
+			return null;
+		}
+	}
+	
+	private List<String> dd(String[] commands, User user, int userlevel, IrcBot bot) {
+		List<String> ret;
+		String username = user.getNick();
 
+		Database db_new = Database.getInstance();
+		
+		if (commands.length < 2) {
+			ret = s_invalidBetString;
+		} else {		
 			// check if they already have an openbet
 			for (Bet bet : openBets) {
 				if (bet.getUser().equalsIgnoreCase(username))
 					return (List<String>) Arrays.asList(BLD + VAR + username
-							+ MSG + ": You already have a wager open, Type "
-							+ VAR + "!ddcancel " + MSG + "to cancel it");
-
+								+ MSG + ": You already have a wager open, Type "
+								+ VAR + "!ddcancel " + MSG + "to cancel it");
+			
 			}
+			
 			// attempt to parse the amount
-			int amount;
-
-			try {
-				amount = Integer.parseInt(commands[1]); // we need some
-														// exception handling
-														// here
-			} catch (Exception e) {
-				return s_invalidBetString;
-			}
-			// if we make it this far, bet will be legit, so add it to open
-			// bets.
-			if (amount <= 0)
-				return (List<String>) Arrays.asList(BLD + MSG
-						+ "You have to bet more than 0!");
+			Integer amount = Utils.tryParse(commands[1]);
+			if (amount == null) {
+				ret = s_invalidBetString;
+			} else if (amount <= 0) {
+				ret = (List<String>) Arrays.asList(BLD + MSG + "You have to bet more than 0!");
+			} else {
 			// choice is null as DiceDuels done have one.
 			if (db_new.checkCredits(username) >= amount) { // add bet, remove chips,
-														// notify channel
-				String profile = db.getActiveProfile(username);
-				Bet bet = new Bet(username, profile, amount, "");
+											// notify channel
+				ProfileType profile = db_new.getActiveProfile(username);
+				Bet bet = new Bet(username, profile.toString(), amount, "");
 				openBets.add(bet);
-				db.removeChips(username, profile, amount);
+				db_new.adjustChips(username, profile, (0-amount));
 				db.addBet(bet, 2);
 				db.addTransaction(username, profile, 1, -amount, this.ID);
 				// System.out.println("post adding bet");
-				return (List<String>) Arrays.asList(BLD
-						+ VAR
-						+ username
-						+ MSG
-						+ " has opened a new dice duel wager of "
-						+ VAR
-						+ amount
-						+ " "
-						+ MSG
-						+ ((bet.getProfile().equalsIgnoreCase("play")) ? "play"
-								: "real") + " chips! To call this wager type "
-						+ VAR + "!call " + username);
+				ret = (List<String>) Arrays.asList(BLD + VAR+ username	+ MSG
+													+ " has opened a new dice duel wager of "
+													+ VAR + amount + " " + MSG
+													+ ((bet.getProfile().equalsIgnoreCase("play")) ? "play"
+															: "real") + " chips! To call this wager type "
+													+ VAR + "!call " + username);
 			} else {
-				return (List<String>) Arrays.asList(BLD + VAR + username + MSG
-						+ ": Not enough chips!");
-				// not enough chips
-			}
-		} // </dd>
-		else if (command.equalsIgnoreCase("call")) {
-			String p1 = user.getNick(); // use rwho is calling
-			String p2 = commands[1];
-
-			// check to see if someone is playing themselves...
-			if (p1.equalsIgnoreCase(p2))
-				return (List<String>) Arrays.asList(BLD + VAR + username + MSG
-						+ ": You can't play against yourself!");
-			for (Bet bet : openBets) {
-				if (bet.getUser().equalsIgnoreCase(p2) && bet.isValid()) // if
-																			// the
-																			// bet
-																			// is
-																			// valid
-																			// and
-																			// it's
-																			// the
-																			// bet
-																			// we
-																			// are
-																			// looking
-																			// for
-				{
-					// first lock it to stop two people form calling it as this
-					// is processing -- Shouldn't be possible with thread
-					// locking now
-					bet.invalidate();
-
-					// quick hax to check if play chips vs non-play chips!
-					if (!db.getActiveProfile(p1).equalsIgnoreCase("play")
-							&& bet.getProfile().equalsIgnoreCase("play")) {
-						bet.reset();
-						return (List<String>) Arrays
-								.asList(BLD
-										+ VAR
-										+ username
-										+ MSG
-										+ ": you need to use play chips to call a play chips dd!");
-
-					} else if (db.getActiveProfile(p1).equalsIgnoreCase("play")
-							&& !bet.getProfile().equalsIgnoreCase("play")) {
-						bet.reset();
-						return (List<String>) Arrays
-								.asList(BLD
-										+ VAR
-										+ username
-										+ MSG
-										+ ": you need to use real chips to call a real chips dd!");
-
-					}
-
-					// make sure they have enough chips to call said bet
-					if (db_new.checkCredits(p1) >= bet.getAmount())
-						db.removeChips(p1, db.getActiveProfile(p1),
-								bet.getAmount());
-					else {
-						// unlock
-						bet.reset();
-						return (List<String>) Arrays.asList(BLD + VAR
-								+ username + MSG
-								+ ": You don't have enough for that wager");
-					}
-					// play this wager
-					// add a transaction for the 2nd player to call
-					String p1Profile = db.getActiveProfile(p1);
-					String p2Profile = bet.getProfile();
-
-					db.addTransaction(p1, p1Profile, 1, -bet.getAmount(),
-							this.ID);
-
-					int d1 = (TrueRandom.nextInt(6) + 1)
-							+ (TrueRandom.nextInt(6) + 1); // p1
-					int d2 = (TrueRandom.nextInt(6) + 1)
-							+ (TrueRandom.nextInt(6) + 1); // p2
-					while (d1 == d2) // see what he wants to do for now just
-										// reroll
-					{
-						d1 = (TrueRandom.nextInt(6) + 1)
-								+ (TrueRandom.nextInt(6) + 1); // p1
-						d2 = (TrueRandom.nextInt(6) + 1)
-								+ (TrueRandom.nextInt(6) + 1); // p2
-					}
-					String winner = "";
-					String loser = "";
-					String winnerProfile = "";
-					String loserProfile = "";
-					if (d1 > d2) // p1 wins
-					{
-						winner = p1;
-						loser = p2;
-						winnerProfile = p1Profile;
-						loserProfile = p2Profile;
-					} else // p2 wins, use his profile
-					{
-						loser = p1;
-						winner = p2;
-						loserProfile = p1Profile;
-						winnerProfile = p2Profile;
-					}
-					int rake = 1;
-					// TODO: rake should be in a setting.
-					if (0.05 * bet.getAmount() * 2 > 1)
-						rake = (int) Math.round(0.05 * bet.getAmount() * 2);
-					db.addChips(winner, winnerProfile, (bet.getAmount() * 2) - rake, null);
-
-					// log everything to db
-					// db.recordLoss(loser);
-					// db.recordWin(winner);
-					db.recordBet(p1, bet.getAmount());
-					db.recordBet(p2, bet.getAmount());
-					db.delBet(bet, 2);
-					db.addTransaction(winner, winnerProfile, 4, (bet.getAmount() * 2) - rake, this.ID);
-					// //bot.sendMessage(bet.getUser(), message)
-					openBets.remove(bet);
-
-					// jackpot stuff
-					int amount = bet.getAmount();
-					if (amount >= 25 && p1Profile.equalsIgnoreCase(p2Profile)) {		
-						int jackpot_rake = (int) Math.floor((amount * 2) * (0.01 * Settings.DDRAKE));
-
-						if (DiceDuel.checkJackpot()) {
-							ArrayList<String> players = new ArrayList<String>();
-							players.add(p1);
-							players.add(p2);
-							this.jackpotWon(p1Profile, players, bot);
-							updateJackpot(jackpot_rake, p1Profile);
-						} else {
-							DiceDuel.updateJackpot(jackpot_rake, p1Profile);
-						}
-					} else if (amount >= 50) {
-						int jackpot_rake = (int) Math.floor((amount) * (0.01 * Settings.DDRAKE));
-						if (DiceDuel.checkJackpot()) { // loser first? Let's be nice
-							ArrayList<String> players = new ArrayList<String>();
-							players.add(loser);
-							jackpotWon(loserProfile, players, bot);
-							DiceDuel.updateJackpot(jackpot_rake, winnerProfile);
-						} else if (DiceDuel.checkJackpot()) {
-							ArrayList<String> players = new ArrayList<String>();
-							players.add(winner);
-							jackpotWon(winnerProfile, players, bot);
-							DiceDuel.updateJackpot(jackpot_rake, loserProfile);
-						} else {
-							DiceDuel.updateJackpot(jackpot_rake, winnerProfile);
-							DiceDuel.updateJackpot(jackpot_rake, loserProfile);
-						}
-					}
-
-					return (List<String>) Arrays.asList(BLD + VAR + winner
-							+ MSG + " rolled " + VAR + (d1 > d2 ? d1 : d2)
-							+ MSG + ", " + VAR + loser + MSG + " rolled " + VAR
-							+ (d1 < d2 ? d1 : d2) + ". " + VAR + winner + MSG
-							+ " wins the " + VAR + (bet.getAmount() * 2 - rake)
-							+ MSG + " chip pot!");
-
-				}
-
-			}
-			// if we reach here the game doesn't exist
-			return (List<String>) Arrays.asList(BLD + VAR + username + MSG
-					+ ": I can't find a record of that wager");
-		} else if (command.equalsIgnoreCase("ddcancel"))// ||
-														// command.equalsIgnoreCase("cancel"))
-		{
-			// try to locate and cancel the bet else ignore
-			for (Bet bet : openBets) {
-				if (bet.getUser().equalsIgnoreCase(username) && bet.isValid()) {
-					bet.invalidate();
-					db.addChips(username, bet.getProfile(), bet.getAmount(),
-							null);
-					openBets.remove(bet);
-
-					db.delBet(bet, 2);
-					db.addTransaction(username, bet.getProfile(), 3,
-							bet.getAmount(), this.ID);
-					return (List<String>) Arrays.asList(BLD + VAR + username
-							+ MSG + ": Cancelled your open wager");
-				}
+				ret = (List<String>) Arrays.asList(BLD + VAR + username + MSG + ": Not enough chips!");
 			}
 		}
-		return null;
+		
+		return ret;
+	}
+
+	private List<String> call(String[] commands, User user, int userlevel, IrcBot bot) {
+		List<String> ret;
+		String username = user.getNick();
+
+		Database db_new = Database.getInstance();
+		String p1 = user.getNick(); // use rwho is calling
+		String p2 = commands[1];
+
+		// check to see if someone is playing themselves...
+		if (p1.equalsIgnoreCase(p2))
+			ret = (List<String>) Arrays.asList(BLD + VAR + username + MSG
+					+ ": You can't play against yourself!");
+		for (Bet bet : openBets) {
+			if (bet.getUser().equalsIgnoreCase(p2) && bet.isValid()) // if
+																		// the
+																		// bet
+																		// is
+																		// valid
+																		// and
+																		// it's
+																		// the
+																		// bet
+																		// we
+																		// are
+																		// looking
+																		// for
+			{
+				// first lock it to stop two people form calling it as this
+				// is processing -- Shouldn't be possible with thread
+				// locking now
+				bet.invalidate();
+
+				// quick hax to check if play chips vs non-play chips!
+				if (!db.getActiveProfile(p1).equalsIgnoreCase("play")
+						&& bet.getProfile().equalsIgnoreCase("play")) {
+					bet.reset();
+					return (List<String>) Arrays
+							.asList(BLD
+									+ VAR
+									+ username
+									+ MSG
+									+ ": you need to use play chips to call a play chips dd!");
+
+				} else if (db.getActiveProfile(p1).equalsIgnoreCase("play")
+						&& !bet.getProfile().equalsIgnoreCase("play")) {
+					bet.reset();
+					return (List<String>) Arrays
+							.asList(BLD
+									+ VAR
+									+ username
+									+ MSG
+									+ ": you need to use real chips to call a real chips dd!");
+
+				}
+
+				// make sure they have enough chips to call said bet
+				if (db_new.checkCredits(p1) >= bet.getAmount())
+					db.removeChips(p1, db.getActiveProfile(p1),
+							bet.getAmount());
+				else {
+					// unlock
+					bet.reset();
+					return (List<String>) Arrays.asList(BLD + VAR
+							+ username + MSG
+							+ ": You don't have enough for that wager");
+				}
+				// play this wager
+				// add a transaction for the 2nd player to call
+				String p1Profile = db.getActiveProfile(p1);
+				String p2Profile = bet.getProfile();
+
+				db.addTransaction(p1, p1Profile, 1, -bet.getAmount(),
+						this.ID);
+
+				int d1 = (TrueRandom.nextInt(6) + 1)
+						+ (TrueRandom.nextInt(6) + 1); // p1
+				int d2 = (TrueRandom.nextInt(6) + 1)
+						+ (TrueRandom.nextInt(6) + 1); // p2
+				while (d1 == d2) // see what he wants to do for now just
+									// reroll
+				{
+					d1 = (TrueRandom.nextInt(6) + 1)
+							+ (TrueRandom.nextInt(6) + 1); // p1
+					d2 = (TrueRandom.nextInt(6) + 1)
+							+ (TrueRandom.nextInt(6) + 1); // p2
+				}
+				String winner = "";
+				String loser = "";
+				String winnerProfile = "";
+				String loserProfile = "";
+				if (d1 > d2) { // p1 wins
+					winner = p1;
+					loser = p2;
+					winnerProfile = p1Profile;
+					loserProfile = p2Profile;
+				} else { // p2 wins, use his profile
+					loser = p1;
+					winner = p2;
+					loserProfile = p1Profile;
+					winnerProfile = p2Profile;
+				}
+				
+				double rake = Rake.getRake(winner, bet.getAmount(), ProfileType.fromString(winnerProfile)) + 
+							  Rake.getRake(loser, bet.getAmount(), ProfileType.fromString(loserProfile));
+				double win = ((bet.getAmount() * 2) - rake);
+				db.addChips(winner, winnerProfile, win, null);
+
+				// log everything to db
+				db.recordBet(p1, bet.getAmount());
+				db.recordBet(p2, bet.getAmount());
+				db.delBet(bet, 2);
+				db.addTransaction(winner, winnerProfile, 4, win, this.ID);
+				// //bot.sendMessage(bet.getUser(), message)
+				openBets.remove(bet);
+
+				// jackpot stuff
+				if (p1Profile.equalsIgnoreCase(p2Profile) && Rake.checkJackpot()) {
+						ArrayList<String> players = new ArrayList<String>();
+						players.add(p1);
+						players.add(p2);
+						Rake.jackpotWon(ProfileType.fromString(p1Profile),
+								 		GamesType.DICE_DUEL, players, bot, null);
+				} else {
+					if (Rake.checkJackpot()) { // loser first? Let's be nice
+						ArrayList<String> players = new ArrayList<String>();
+						players.add(loser);
+						Rake.jackpotWon(ProfileType.fromString(loserProfile),
+						 		GamesType.DICE_DUEL, players, bot, null);
+					} else if (Rake.checkJackpot()) {
+						ArrayList<String> players = new ArrayList<String>();
+						players.add(winner);
+						Rake.jackpotWon(ProfileType.fromString(winnerProfile),
+						 		GamesType.DICE_DUEL, players, bot, null);
+					}
+				}
+
+				return (List<String>) Arrays.asList(BLD + VAR + winner
+						+ MSG + " rolled " + VAR + (d1 > d2 ? d1 : d2)
+						+ MSG + ", " + VAR + loser + MSG + " rolled " + VAR
+						+ (d1 < d2 ? d1 : d2) + ". " + VAR + winner + MSG
+						+ " wins the " + VAR + (bet.getAmount() * 2 - rake)
+						+ MSG + " chip pot!");
+
+			}
+
+		}
+		// if we reach here the game doesn't exist
+		return (List<String>) Arrays.asList(BLD + VAR + username + MSG
+				+ ": I can't find a record of that wager");
+	}
+	
+	private List<String> cancel(String[] commands, User user, int userlevel, IrcBot bot) {
+		List<String> ret;
+		String username = user.getNick();
+
+		Database db_new = Database.getInstance();
+		// try to locate and cancel the bet else ignore
+		for (Bet bet : openBets) {
+			if (bet.getUser().equalsIgnoreCase(username) && bet.isValid()) {
+				bet.invalidate();
+				db.addChips(username, bet.getProfile(), bet.getAmount(),
+						null);
+				openBets.remove(bet);
+
+				db.delBet(bet, 2);
+				db.addTransaction(username, bet.getProfile(), 3,
+						bet.getAmount(), this.ID);
+				return (List<String>) Arrays.asList(BLD + VAR + username
+						+ MSG + ": Cancelled your open wager");
+			}
+		}
 	}
 
 	/*
@@ -369,96 +367,5 @@ public class DiceDuel implements IRCGame {
 	public String getChannel() {
 		// TODO Auto-generated method stub
 		return this.channel;
-	}
-
-	/**
-	 * Save the new jackpot value
-	 */
-	private static synchronized boolean updateJackpot(int rake, String profile) {
-		boolean added = false;
-		int jackpot = Database.getInstance().getJackpot(profile);
-
-		int incrint = rake;
-
-		EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
-				+ Integer.toString(incrint) + " (" + Integer.toString(rake)
-				+ ")", "DiceDuel", "updateJackpot");
-
-		if (incrint > 0) {
-			added = true;
-			jackpot += incrint;
-			// Announce to lobbyChan
-			// String out = Strings.JackpotIncreased.replaceAll("%chips",
-			// Integer.toString(jackpot));
-			// out = out.replaceAll("%profile", profile);
-			// irc.sendIRCMessage(out);
-
-			Database.getInstance().updateJackpot(profile, incrint);
-		}
-		return added;
-	}
-
-	/**
-	 * Check if the jackpot has been won
-	 */
-	private static synchronized boolean checkJackpot() {
-		return (TrueRandom.nextInt(Settings.JACKPOTCHANCE + 1) == Settings.JACKPOTCHANCE);
-	}
-
-	/**
-	 * Jackpot has been won, split between all players on the table
-	 */
-	private void jackpotWon(String profileName, ArrayList<String> players,
-			IrcBot bot) {
-		int jackpot = Database.getInstance().getJackpot(profileName);
-
-		if (jackpot > 0) {
-			int remainder = jackpot % players.size();
-			jackpot -= remainder;
-
-			if (jackpot != 0) {
-				int win = jackpot / players.size();
-				for (String player : players) {
-					Database.getInstance().jackpot(player, win, profileName);
-				}
-
-				// Announce to channel
-
-				String out = Strings.JackpotWonDiceDuel.replaceAll("%chips",
-						Integer.toString(jackpot));
-				out = out.replaceAll("%profile", profileName);
-				out = out.replaceAll("%winners", players.toString());
-
-				bot.sendIRCMessage(this.channel, out);
-				bot.sendIRCMessage(this.channel, out);
-				bot.sendIRCMessage(this.channel, out);
-				
-				bot.sendIRCMessage("#smokin_dice", out);
-				bot.sendIRCMessage("#smokin_dice", out);
-				bot.sendIRCMessage("#smokin_dice", out);
-				/*
-				 * ircClient.sendIRCMessage(out); ircClient.sendIRCMessage(out);
-				 * ircClient.sendIRCMessage(out);
-				 * 
-				 * // Announce to table out =
-				 * Strings.JackpotWonTable.replaceAll("%chips",
-				 * Integer.toString(win)); out = out.replaceAll("%profile",
-				 * profileName); out = out.replaceAll("%winners",
-				 * jackpotPlayers.toString());
-				 * ircClient.sendIRCMessage(ircChannel, out);
-				 * ircClient.sendIRCMessage(ircChannel, out);
-				 * ircClient.sendIRCMessage(ircChannel, out);
-				 *
-				 * // Update jackpot with remainder if (remainder > 0) { out =
-				 * Strings.JackpotIncreased.replaceAll("%chips",
-				 * Integer.toString(remainder)); out =
-				 * out.replaceAll("%profile", profileName);
-				 * ircClient.sendIRCMessage(out); }
-				 */
-				Database.getInstance().updateJackpot(profileName, remainder);
-
-			}
-		}
-
 	}
 }

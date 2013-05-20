@@ -29,9 +29,9 @@ import org.smokinmils.SMBaseBot;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.bot.Random;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.bot.Bet;
+import org.smokinmils.cashier.Rake;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
@@ -73,16 +73,8 @@ public class RPSGame extends Event {
 	private static final String OpenBets = "%c12%bCurrent open RPS wagers: %bets To call a wager type %c04" + CallCommand + " <name>";
 	private static final String EachOpenBet = "%c04%user%c12(%c04%amount %profile%c12)";
 	
-	private static final int RAKE = 3;
-	
 	private static final int AnnounceMins = 3;
-	
-	private String JackpotChannel;
-	private static final int JACKPOTCHANCE = 2000;
-	private static final int JACKPOTRAKE = 2;
-	private static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a Rock Paper Scissors game! " +
-			 "Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
-	
+
 	private List<Bet> openBets;
 	
 	/**
@@ -90,8 +82,7 @@ public class RPSGame extends Event {
 	 * 
 	 * @param chan The channel where jackpots are announce
 	 */
-	public RPSGame(String chan) {
-		JackpotChannel = chan;
+	public RPSGame() {
 		openBets = new ArrayList<Bet>();
 	}
 	
@@ -305,85 +296,6 @@ public class RPSGame extends Event {
 		return choice;
 	}
 	
-	/**
-	 * Save the new jackpot value
-	 */
-	private static synchronized boolean updateJackpot(int rake, ProfileType profile) {
-		boolean added = false;
-		int jackpot = 0;
-		try {
-			jackpot = Database.getInstance().getJackpot(profile);
-		} catch (Exception e) {
-			EventLog.log(e, "Game", "updateJackpot");
-		}
-
-		int incrint = rake;
-
-		EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
-				+ Integer.toString(incrint) + " (" + Integer.toString(rake)
-				+ ")", "Game", "updateJackpot");
-
-		if (incrint > 0) {
-			added = true;
-			jackpot += incrint;
-			try {
-				Database.getInstance().updateJackpot(profile, incrint);
-			} catch (Exception e) {
-				EventLog.log(e, "Game", "updateJackpot");
-			}
-		}
-		return added;
-	}
-
-	/**
-	 * Check if the jackpot has been won
-	 */
-	private static synchronized boolean checkJackpot() {
-		return (Random.nextInt(JACKPOTCHANCE + 1) == JACKPOTCHANCE);
-	}
-
-	/**
-	 * Jackpot has been won, split between all players on the table
-	 */
-	private void jackpotWon(ProfileType profile, ArrayList<String> players,
-							IrcBot bot, String channel) {
-		try {
-			Database db = Database.getInstance();
-			int jackpot = db.getJackpot(profile);
-
-			if (jackpot > 0) {
-				int remainder = jackpot % players.size();
-				jackpot -= remainder;
-
-				if (jackpot != 0) {
-					int win = jackpot / players.size();
-					for (String player : players) {
-						db.jackpot(player, win, profile);
-					}
-
-					// Announce to channel
-					String out = JackpotWon.replaceAll("%chips", Integer.toString(jackpot));
-					out = out.replaceAll("%profile", profile.toString());
-					out = out.replaceAll("%winners", players.toString());
-
-					if (!channel.equalsIgnoreCase(JackpotChannel)) {
-						bot.sendIRCMessage(channel, out);
-						bot.sendIRCMessage(channel, out);
-						bot.sendIRCMessage(channel, out);
-					}
-				
-					bot.sendIRCMessage(JackpotChannel, out);
-					bot.sendIRCMessage(JackpotChannel, out);
-					bot.sendIRCMessage(JackpotChannel, out);
-					
-					db.updateJackpot(profile, remainder);
-				}
-			}
-		} catch (Exception e) {
-			EventLog.log(e, "Game", "updateJackpot");
-		}
-	}
-	
 	private void endGame(String better, ProfileType better_prof, GameLogic better_choice,
 			   			 String caller, ProfileType caller_prof, GameLogic caller_choice,
 			   			 int amount, IrcBot bot, String chan) {
@@ -413,9 +325,8 @@ public class RPSGame extends Event {
 					   int amount, String winstring, IrcBot bot, String chan) {
 		Database db = Database.getInstance();
 		// Take the rake and give chips to winner
-		int rake = 1;
-		rake = (int)(((JACKPOTRAKE + RAKE) * 0.01) * (amount * 2));
-		int win = (amount*2) - rake;
+		double rake = Rake.getRake(winner, amount, win_prof) + Rake.getRake(loser, amount, lose_prof);
+		double win = (amount*2) - rake;
 		
 		try {
 			db.adjustChips(winner, win, win_prof, 
@@ -425,7 +336,7 @@ public class RPSGame extends Event {
 			String out = Win.replaceAll("%winstring", winstring);
 			out = out.replaceAll("%winner", winner);
 			out = out.replaceAll("%loser", loser);
-			out = out.replaceAll("%chips", Integer.toString(win));
+			out = out.replaceAll("%chips", Integer.toString( (int)Math.floor(win) ) );
 			bot.sendIRCMessage(chan, out);
 	
 			// Record the bet
@@ -435,18 +346,13 @@ public class RPSGame extends Event {
 			EventLog.log(e, "Game", "updateJackpot");
 		}
 		
-		// jackpot stuff
-		if (amount >= 25) {		
-			int jackpot_rake = (int) Math.floor((amount * 2) * (0.01 * JACKPOTRAKE));
-
-			updateJackpot(jackpot_rake, win_prof);
-			
-			if (checkJackpot()) {
-				ArrayList<String> players = new ArrayList<String>();
-				players.add(winner);
-				players.add(loser);
-				jackpotWon(win_prof, players, bot, JackpotChannel);
-			}
+		// jackpot stuff	
+		if (Rake.checkJackpot()) {
+			ArrayList<String> players = new ArrayList<String>();
+			players.add(winner);
+			players.add(loser);
+			Rake.jackpotWon(win_prof, GamesType.ROCKPAPERSCISSORS,
+							players, bot, chan);
 		}
 	}
 	

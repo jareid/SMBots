@@ -23,13 +23,11 @@ import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.NoticeEvent;
 import org.smokinmils.Database;
 import org.smokinmils.Utils;
-import org.smokinmils.bot.events.Action;
 import org.smokinmils.bot.events.Join;
 import org.smokinmils.bot.events.Kick;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.bot.events.NickChange;
 import org.smokinmils.bot.events.Part;
-import org.smokinmils.bot.events.PrivateMessage;
 import org.smokinmils.bot.events.Quit;
 import org.smokinmils.bot.events.UserList;
 import org.smokinmils.logging.EventLog;
@@ -40,90 +38,90 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie
  */
-public class CheckIdentified extends Event {	
-	/** A list of users already sent a no identification message */
-	private static List<String> SentNoIdent = new ArrayList<String>();
-	
-	/**
-	 * This string is output when the user does not meet the above status with NickServ
-	 */
-	public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
-	public static final String NotIdentified = "%b%c12Sorry, %c04%user%c12 is not current identified.";
-	
-	@Override
-	public void action(Action event) {
-		IrcBot bot = event.getBot();
-		User user = event.getUser();
-		if ( !bot.userIsIdentified( user.getNick() ) ) {
-			sendStatusRequest( bot, user );
-		}
-	}
-	
-	@Override
-	public void message(Message event) {
-		IrcBot bot = event.getBot();
-		User user = event.getUser();
-		if ( !bot.userIsIdentified( user.getNick() ) ) {
-			sendStatusRequest( bot, user );
-			if ( event.getMessage().startsWith("!") ) {
-    			// If we already told this user, don't tell them again
-    			if ( !SentNoIdent.contains( user.getNick() ) ) {
-        			bot.sendIRCMessage( user.getNick(), NotIdentifiedMsg );
-        			SentNoIdent.add( user.getNick() );
-    			}
-			}
-		}
-	}
-	
-	@Override
-	public void privateMessage(PrivateMessage event) {
-		IrcBot bot = event.getBot();
-		User user = event.getUser();
-		if ( !bot.userIsIdentified( user.getNick() ) ) {
-			sendStatusRequest( bot, user );
-		}
-	}
-	
-	@Override
-	public void join(Join event) {
-		User user = event.getUser();
-		// (Re-)Check the user's status with NickServ
-		if (user.getNick().compareToIgnoreCase( event.getBot().getNick() ) != 0) {
-			event.getBot().removeIdentifiedUser( user.getNick() );
-			sendStatusRequest( event.getBot(), user );
-		}
-	}
-	
-	@Override
-	public void nickChange(NickChange event) {
-		event.getBot().removeIdentifiedUser( event.getOldNick() );
-		sendStatusRequest( event.getBot(), event.getUser() );
-	}
-	
-	@Override
-	public void part(Part event) {
-		event.getBot().removeIdentifiedUser( event.getUser().getNick() );
-	}
-	
-	@Override
-	public void kick(Kick event) {
-		event.getBot().removeIdentifiedUser( event.getRecipient().getNick() );
-	}	
-	
-	@Override
-	public void quit(Quit event) {
-		event.getBot().removeIdentifiedUser( event.getUser().getNick() );
-	}
-	
-	@Override
-	public void userList(UserList event) {
-		IrcBot bot = event.getBot();
-		// TODO: fix concurrent issue here
-		for (User usr: event.getUsers()) {
-			bot.removeIdentifiedUser( usr.getNick() );
-			sendStatusRequest( bot, usr );
-		}
-	}
+public class CheckIdentified extends Event {    
+    /** A list of users already sent a no identification message */
+    private static List<String> SentNoIdent = new ArrayList<String>();
+    
+    /**
+     * This string is output when the user does not meet the above status with NickServ
+     */
+    public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
+    public static final String NotIdentified = "%b%c12Sorry, %c04%user%c12 is not current identified.";
+    
+    /*@Override
+    public void action(Action event) {
+        IrcBot bot = event.getBot();
+        User user = event.getUser();
+        if ( !bot.userIsIdentified( user.getNick() ) ) {
+            sendStatusRequest( bot, user );
+        }
+    }*/
+    
+    @Override
+    public void message(Message event) {
+        IrcBot bot = event.getBot();
+        User user = event.getUser();
+        if ( !bot.userIsIdentified( user.getNick() ) ) {
+            if ( event.getMessage().startsWith("!") ) {
+                sendStatusRequest( bot, user );
+                // If we already told this user, don't tell them again
+                if ( !SentNoIdent.contains( user.getNick() ) ) {
+                    bot.sendIRCMessage( user.getNick(), NotIdentifiedMsg );
+                    SentNoIdent.add( user.getNick() );
+                }
+            }
+        }
+    }
+    
+    /*@Override
+    public void privateMessage(PrivateMessage event) {
+        IrcBot bot = event.getBot();
+        User user = event.getUser();
+        if ( !bot.userIsIdentified( user.getNick() ) ) {
+            sendStatusRequest( bot, user );
+        }
+    }*/
+    
+    @Override
+    public void join(Join event) {
+        User user = event.getUser();
+        // (Re-)Check the user's status with NickServ
+        if (user.getNick().compareToIgnoreCase( event.getBot().getNick() ) != 0) {
+            event.getBot().removeIdentifiedUser( user.getNick() );
+            sendStatusRequest( event.getBot(), user );
+        }
+    }
+    
+    @Override
+    public void nickChange(NickChange event) {
+        event.getBot().removeIdentifiedUser( event.getOldNick() );
+        sendStatusRequest( event.getBot(), event.getUser() );
+    }
+    
+    @Override
+    public void part(Part event) {
+        event.getBot().removeIdentifiedUser( event.getUser().getNick() );
+    }
+    
+    @Override
+    public void kick(Kick event) {
+        event.getBot().removeIdentifiedUser( event.getRecipient().getNick() );
+    }   
+    
+    @Override
+    public void quit(Quit event) {
+        event.getBot().removeIdentifiedUser( event.getUser().getNick() );
+    }
+    
+    @Override
+    public void userList(UserList event) {
+        IrcBot bot = event.getBot();
+        // TODO: fix concurrent issue here
+        for (User usr: event.getUsers()) {
+            bot.removeIdentifiedUser( usr.getNick() );
+            sendStatusRequest( bot, usr );
+        }
+    }
     
     /**
      * Sends a request to NickServ to check a user's status with the server
@@ -132,25 +130,25 @@ public class CheckIdentified extends Event {
      * @param bot the IRC bot
      * @param user the username
      */
-	// TODO: syncronize without lag
-	private void sendStatusRequest(IrcBot bot, User user) {
-		Boolean identd = checkIdentified(bot, user.getNick());
-		// Only add users with the correct levels
-    	if (identd == null) {
-    	    bot.sendIRCMessage(user.getNick(), "%b%c12The IRC Network Services appear to be down, please try again shortly.");
-    	} else if (identd) {
-    		EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
-    		bot.addIdentifiedUser( user.getNick() );
-        	SentNoIdent.remove( user.getNick() );
-    		try {
-				boolean created = Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
-				if (!created) {
-					bot.sendIRCMessage(user.getNick(), "%b%c12You have too many accounts, speak to an admin if there is a problem");
-				}
-			} catch (Exception e) {
-				EventLog.log(e, "CheckIdentified", "sendStatusRequest");
-			}
-	    }
+    // TODO: syncronize without lag
+    private void sendStatusRequest(IrcBot bot, User user) {
+        Boolean identd = checkIdentified(bot, user.getNick());
+        // Only add users with the correct levels
+        if (identd == null) {
+            bot.sendIRCMessage(user.getNick(), "%b%c12The IRC Network Services appear to be down, please try again shortly.");
+        } else if (identd) {
+            EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
+            bot.addIdentifiedUser( user.getNick() );
+            SentNoIdent.remove( user.getNick() );
+            try {
+                boolean created = Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
+                if (!created) {
+                    bot.sendIRCMessage(user.getNick(), "%b%c12You have too many accounts, speak to an admin if there is a problem");
+                }
+            } catch (Exception e) {
+                EventLog.log(e, "CheckIdentified", "sendStatusRequest");
+            }
+        }
     }
     
     /**
@@ -162,13 +160,13 @@ public class CheckIdentified extends Event {
      * 
      * @return true if the user meets the required status
      */
-	public static Boolean checkIdentified(IrcBot bot, String user) {
+    public static Boolean checkIdentified(IrcBot bot, String user) {
         Boolean ret = null;        
         ExecutorService executor = Executors.newFixedThreadPool(1);
         FutureTask<Boolean> choicetask = new FutureTask<Boolean>( new CheckUser(bot, user) );
         executor.execute(choicetask);
         try {
-            ret = choicetask.get(15, TimeUnit.SECONDS);
+            ret = choicetask.get(2, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             // Do nothing, we expect this.
             ret = null;

@@ -2006,7 +2006,7 @@ public class Table extends Room {
 	 */
 	private static synchronized boolean updateJackpot(Client irc, int rake, ProfileType profile) {
 		boolean added = false;
-		int jackpot = 0;
+		double jackpot = 0;
 		try {
 			jackpot = Database.getInstance().getJackpot(profile);
 		} catch (Exception e) {
@@ -2016,7 +2016,7 @@ public class Table extends Room {
 		double incr = (rake * (Variables.JackpotRakePercentage / 100.0));
 		int incrint = (int) Math.round(incr);
 		
-		EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
+		EventLog.log(profile + " jackpot: " + Integer.toString( (int)Math.floor(jackpot) ) + " + "
 					 + Integer.toString(incrint) + " (" + Integer.toString(rake) + ")",
 					 "Table", "updateJackpot");
 		
@@ -2024,7 +2024,7 @@ public class Table extends Room {
 			added = true;
 			jackpot += incrint;
 			// Announce to lobbyChan
-			String out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString(jackpot));
+			String out = Strings.JackpotIncreased.replaceAll("%chips", Integer.toString( (int)Math.floor(jackpot) ) );
 			out = out.replaceAll("%profile", profile.toString());
 			irc.sendIRCMessage(out);
 			 

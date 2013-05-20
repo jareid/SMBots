@@ -643,7 +643,7 @@ public class Database {
     * @param prof_type	The profile the jackpot is for
     * @param amount		The amount to increase it by
     */
-   public void updateJackpot(ProfileType prof_type, int amount)
+   public void updateJackpot(ProfileType prof_type, double amount)
 		   throws DBException, SQLException {
 	   String sql = "INSERT INTO " + JackpotTable.Name + "("
 			   							+ JackpotTable.Col_Profile + ","
@@ -660,7 +660,7 @@ public class Database {
     * @param prof_type	The profile the jackpot is for
     * @param amount		The amount to increase it by
     */
-   public int getJackpot(ProfileType prof_type) throws DBException, SQLException {
+   public double getJackpot(ProfileType prof_type) throws DBException, SQLException {
 	   String sql = "SELECT " + JackpotTable.Col_Total + " FROM " + JackpotTable.Name +
 			   		" WHERE " + JackpotTable.Col_Profile + " = (" + getProfileIDSQL(prof_type) + ")";
 	   int res = runGetIntQuery(sql);

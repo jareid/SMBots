@@ -11,7 +11,9 @@ import org.pircbotx.User;
 import org.smokinmils.pokerbot.Database;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.logging.EventLog;
+import org.smokinmils.cashier.Rake;
+import org.smokinmils.database.types.GamesType;
+import org.smokinmils.database.types.ProfileType;
 
 public class OverUnder implements IRCGame {
 
@@ -145,21 +147,15 @@ public class OverUnder implements IRCGame {
 					openBets.remove(bet);
 					db.delBet(bet, 1);
 
-					// do jackpot
-					if (bet.getAmount() >= 50) {
-						if (OverUnder.checkJackpot()) {
-							// we win
-							ArrayList<String> winners = new ArrayList<String>();
-							winners.add(bet.getUser());
-							this.jackpotWon(bet.getProfile(), winners, bot);
-
-							int rake = (int) Math.floor(bet.getAmount() * (0.01 * Settings.OURAKE));
-							OverUnder.updateJackpot(rake, bet.getProfile());
-						} else {
-							// we lose
-							int rake = (int) Math.floor(bet.getAmount() * (0.01 * Settings.OURAKE));
-							OverUnder.updateJackpot(rake, bet.getProfile());
-						}
+					// Generate "rake"
+					Rake.getRake(bet.getUser(), bet.getAmount(), ProfileType.fromString(bet.getProfile()));
+					
+					//check if jackpot won
+					if (Rake.checkJackpot()) {
+						ArrayList<String> winners = new ArrayList<String>();
+						winners.add(bet.getUser());
+						Rake.jackpotWon(ProfileType.fromString(bet.getProfile()),
+										GamesType.OVER_UNDER, winners, bot, null);
 					}
 					return (List<String>) retList;
 				}
@@ -300,97 +296,5 @@ public class OverUnder implements IRCGame {
 	@Override
 	public String getChannel() {
 		return this.channel;
-	}
-
-	/**
-	 * Save the new jackpot value
-	 */
-	private static synchronized boolean updateJackpot(int rake, String profile) {
-
-		boolean added = false;
-		int jackpot = Database.getInstance().getJackpot(profile);
-
-		int incrint = rake;
-
-		EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
-				+ Integer.toString(incrint) + " (" + Integer.toString(rake)
-				+ ")", "OverUnder", "updateJackpot");
-
-		if (incrint > 0) {
-			added = true;
-			jackpot += incrint;
-			// Announce to lobbyChan
-			// String out = Strings.JackpotIncreased.replaceAll("%chips",
-			// Integer.toString(jackpot));
-			// out = out.replaceAll("%profile", profile);
-			// irc.sendIRCMessage(out);
-
-			Database.getInstance().updateJackpot(profile, incrint);
-		}
-		return added;
-	}
-
-	/**
-	 * Check if the jackpot has been won
-	 */
-	private static synchronized boolean checkJackpot() {
-		return (TrueRandom.nextInt(Settings.JACKPOTCHANCE + 1) == Settings.JACKPOTCHANCE);
-	}
-
-	/**
-	 * Jackpot has been won, split between all players on the table
-	 */
-	private void jackpotWon(String profileName, ArrayList<String> players,
-			IrcBot bot) {
-		int jackpot = Database.getInstance().getJackpot(profileName);
-
-		if (jackpot > 0) {
-			int remainder = jackpot % players.size();
-			jackpot -= remainder;
-
-			if (jackpot != 0) {
-				int win = jackpot / players.size();
-				for (String player : players) {
-					Database.getInstance().jackpot(player, win, profileName);
-				}
-
-				// Announce to channel
-
-				String out = Strings.JackpotWonOverUnder.replaceAll("%chips",
-						Integer.toString(jackpot));
-				out = out.replaceAll("%profile", profileName);
-				out = out.replaceAll("%winners", players.toString());
-
-				bot.sendIRCMessage(this.channel, out);
-				bot.sendIRCMessage(this.channel, out);
-				bot.sendIRCMessage(this.channel, out);
-				
-				bot.sendIRCMessage("#smokin_dice", out);
-				bot.sendIRCMessage("#smokin_dice", out);
-				bot.sendIRCMessage("#smokin_dice", out);
-				/*
-				 * ircClient.sendIRCMessage(out); ircClient.sendIRCMessage(out);
-				 * ircClient.sendIRCMessage(out);
-				 * 
-				 * // Announce to table out =
-				 * Strings.JackpotWonTable.replaceAll("%chips",
-				 * Integer.toString(win)); out = out.replaceAll("%profile",
-				 * profileName); out = out.replaceAll("%winners",
-				 * jackpotPlayers.toString());
-				 * ircClient.sendIRCMessage(ircChannel, out);
-				 * ircClient.sendIRCMessage(ircChannel, out);
-				 * ircClient.sendIRCMessage(ircChannel, out);
-				 * 
-				 * // Update jackpot with remainder if (remainder > 0) { out =
-				 * Strings.JackpotIncreased.replaceAll("%chips",
-				 * Integer.toString(remainder)); out =
-				 * out.replaceAll("%profile", profileName);
-				 * //ircClient.sendIRCMessage(out); }
-				 */
-				Database.getInstance().updateJackpot(profileName, remainder);
-
-			}
-		}
-
 	}
 }

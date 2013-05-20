@@ -10,7 +10,9 @@ import org.pircbotx.Colors;
 import org.pircbotx.User;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.logging.EventLog;
+import org.smokinmils.cashier.Rake;
+import org.smokinmils.database.types.GamesType;
+import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.pokerbot.Database;
 
 public class Roulette implements IRCGame {
@@ -88,8 +90,6 @@ public class Roulette implements IRCGame {
 		if (command.equalsIgnoreCase("bet")) {
 			// if we are not accepting bets
 			if (this.state == CLOSE) {
-				;
-
 				return (List<String>) Arrays
 						.asList(BLD
 								+ MSG
@@ -335,16 +335,6 @@ public class Roulette implements IRCGame {
 				db.recordBet(bet.getUser(), bet.getAmount());
 				db.addTransaction(bet.getUser(), bet.getProfile(), 4,
 						bet.getAmount() * winamount, 4);
-				// bot.sendMessage(bet.getUser(), "You bet "+
-				// bet.getAmount()+" on Roulette and won! Your chips total is "+db.checkChips(bet.getUser())
-				// + ".");
-
-			} else if (bet.isValid()) {
-				// the bet didn't win, so tell them they lost (hah loser!)
-				// bot.sendMessage(bet.getUser(), "You bet "+
-				// bet.getAmount()+" on Roulette and lost! Your chips total is "+db.checkChips(bet.getUser())
-				// + ".");
-
 			}
 			db.delBet(bet, 4);
 		}
@@ -360,16 +350,7 @@ public class Roulette implements IRCGame {
 				db.recordBet(bet.getUser(), bet.getAmount());
 				db.addTransaction(bet.getUser(), bet.getProfile(), 4,
 						bet.getAmount() * 2, 3);
-				// bot.sendMessage(bet.getUser(), "You bet "+
-				// bet.getAmount()+" on Roulette and won! Your chips total is "+db.checkChips(bet.getUser())
-				// + ".");
-
-			} else if (bet.isValid()) {
-				// the bet didn't win, so tell them they lost (hah loser!)
-				// bot.sendMessage(bet.getUser(), "You bet "+
-				// bet.getAmount()+" on Roulette and lost! Your chips total is "+db.checkChips(bet.getUser())
-				// + ".");
-
+				
 			}
 
 			db.delBet(bet, 3);
@@ -387,23 +368,12 @@ public class Roulette implements IRCGame {
 				db.recordBet(bet.getUser(), bet.getAmount());
 				db.addTransaction(bet.getUser(), bet.getProfile(), 4,
 						bet.getAmount() * 3, 5);
-				// bot.sendMessage(bet.getUser(), "You bet "+
-				// bet.getAmount()+" on Roulette and won! Your chips total is "+db.checkChips(bet.getUser())
-				// + ".");
-
-			} else if (bet.isValid()) {
-				// the bet didn't win, so tell them they lost (hah loser!)
-				// bot.sendMessage(bet.getUser(), "You bet "+
-				// bet.getAmount()+" on Roulette and lost! Your chips total is "+db.checkChips(bet.getUser())
-				// + ".");
-
 			}
 
 			db.delBet(bet, 5);
 
 		}
 		for (Bet bet : evenOddBets) {
-
 			if (bet.isValid()) {
 				int mod = 1;
 				if (bet.getChoice().equalsIgnoreCase("even"))
@@ -417,16 +387,6 @@ public class Roulette implements IRCGame {
 					db.recordBet(bet.getUser(), bet.getAmount());
 					db.addTransaction(bet.getUser(), bet.getProfile(), 4,
 							bet.getAmount() * 2, 6);
-					// bot.sendMessage(bet.getUser(), "You bet "+
-					// bet.getAmount()+" on Roulette and won! Your chips total is "+db.checkChips(bet.getUser())
-					// + ".");
-
-				} else if (bet.isValid()) {
-					// the bet didn't win, so tell them they lost (hah loser!)
-					// bot.sendMessage(bet.getUser(), "You bet "+
-					// bet.getAmount()+" on Roulette and lost! Your chips total is "+db.checkChips(bet.getUser())
-					// + ".");
-
 				}
 			}
 			db.delBet(bet, 6);
@@ -461,36 +421,38 @@ public class Roulette implements IRCGame {
 		allBets.addAll(rowBets);
 
 		// find all profiles
-		Map<String, Integer> profbets = new HashMap<String, Integer>();
-		ArrayList<String> profiles = new ArrayList<String>();
+		Map<ProfileType, Integer> profbets = new HashMap<ProfileType, Integer>();
+		ArrayList<ProfileType> profiles = new ArrayList<ProfileType>();
 		for (Bet bet : allBets) {
-			String prof = bet.getProfile();
+			ProfileType prof = ProfileType.fromString(bet.getProfile());
 			int amount = bet.getAmount();
-			if (!profiles.contains(bet.getProfile())) {
+			if (!profiles.contains(prof)) {
 				profiles.add(prof);
 				profbets.put(prof, amount);
 			} else {
 				profbets.put(prof, profbets.get(prof) + amount);
 			}
+			Rake.getRake(bet.getUser(), amount, prof);
 		}
+		
 		// then each user per profile
 		// check if they win
-		for (String profile : profiles) {
+		for (ProfileType profile : profiles) {
 			ArrayList<String> users = new ArrayList<String>();
 			for (Bet bet : allBets) {
-				if (bet.getProfile().equalsIgnoreCase(profile)
+				if (ProfileType.fromString(bet.getProfile()).equals(profile)
 						&& !users.contains(bet.getUser())) {
 					// user is on the correct profile AND not already added
 					users.add(bet.getUser());
 				}
 			}
+			
 			Integer amount = profbets.get(profile);
-			if (amount != 0) {
-				boolean can_win = addToJackpot(amount, profile);
-				// now check if this profile wins
-				if (can_win && Roulette.checkJackpot()) {
+			if (amount != null && amount != 0) {
+				// Check if jackpot won
+				if (Rake.checkJackpot()) {
 					// winner
-					this.jackpotWon(profile, users, bot);
+					Rake.jackpotWon(profile, GamesType.ROULETTE, users, bot, null);
 				}
 			}
 		}
@@ -509,15 +471,6 @@ public class Roulette implements IRCGame {
 
 		return retList;
 
-	}
-
-	private boolean addToJackpot(int amount, String profile) {
-		boolean ret = false;
-		if (amount >= 50) {
-			Roulette.updateJackpot((int)(amount * (0.01 * Settings.ROULETTERAKE)), profile);
-			ret = true;
-		}
-		return ret;
 	}
 
 	@Override
@@ -547,72 +500,5 @@ public class Roulette implements IRCGame {
 	@Override
 	public String getChannel() {
 		return this.channel;
-	}
-
-	/**
-	 * Save the new jackpot value
-	 */
-	private static synchronized boolean updateJackpot(int rake, String profile) {
-		boolean added = false;
-		int jackpot = Database.getInstance().getJackpot(profile);
-
-		int incrint = rake;
-
-		EventLog.log(profile + " jackpot: " + Integer.toString(jackpot) + " + "
-				+ Integer.toString(incrint) + " (" + Integer.toString(rake)
-				+ ")", "roulette", "updateJackpot");
-
-		if (incrint > 0) {
-			added = true;
-			jackpot += incrint;
-
-			Database.getInstance().updateJackpot(profile, incrint);
-		}
-		return added;
-	}
-
-	/**
-	 * Check if the jackpot has been won
-	 */
-	private static synchronized boolean checkJackpot() {
-		return (TrueRandom.nextInt(Settings.JACKPOTCHANCE + 1) == Settings.JACKPOTCHANCE);
-	}
-
-	/**
-	 * Jackpot has been won, split between all players on the table
-	 */
-	private void jackpotWon(String profileName, ArrayList<String> players,
-			IrcBot bot) {
-		int jackpot = Database.getInstance().getJackpot(profileName);
-
-		if (jackpot > 0) {
-			int remainder = jackpot % players.size();
-			jackpot -= remainder;
-
-			if (jackpot != 0) {
-				int win = jackpot / players.size();
-				for (String player : players) {
-					Database.getInstance().jackpot(player, win, profileName);
-				}
-
-				// Announce to channel
-				String out = Strings.JackpotWonRoulette.replaceAll("%chips",
-						Integer.toString(jackpot));
-				out = out.replaceAll("%profile", profileName);
-				out = out.replaceAll("%winners", players.toString());
-
-				bot.sendIRCMessage(this.channel, out);
-				bot.sendIRCMessage(this.channel, out);
-				bot.sendIRCMessage(this.channel, out);
-				
-				bot.sendIRCMessage("#smokin_dice", out);
-				bot.sendIRCMessage("#smokin_dice", out);
-				bot.sendIRCMessage("#smokin_dice", out);
-				
-				Database.getInstance().updateJackpot(profileName, remainder);
-
-			}
-		}
-
 	}
 }

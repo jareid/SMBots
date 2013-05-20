@@ -1,6 +1,5 @@
 package org.smokinmils.bot;
 
-
 public class Bet {
 
 	private String user;
@@ -9,8 +8,7 @@ public class Bet {
 	private boolean valid;
 	private String profile;
 	
-	public Bet(String user, String profile, int amount, String choice)
-	{
+	public Bet(String user, String profile, int amount, String choice) {
 		this.user = user;
 		this.amount = amount;
 		this.choice = choice;
@@ -18,18 +16,17 @@ public class Bet {
 		this.profile = profile;
 	}
 	
-	public void invalidate()
-	{
+	public void invalidate() {
 		this.valid = false;
 	}
 	
-	public void reset()
-	{
+	public void reset() {
 		this.valid = true;
 	}
-	public String getUser() { return this.user; }
-	public int getAmount()	{ return this.amount; }
-	public String getChoice() { return this.choice; }
-	public boolean isValid() { return this.valid; }
-	public String getProfile() { return this.profile; }
+	
+	public String getUser() { return user; }
+	public int getAmount()	{ return amount; }
+	public String getChoice() { return choice; }
+	public boolean isValid() { return valid; }
+	public String getProfile() { return profile; }
 }

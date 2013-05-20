@@ -52,7 +52,7 @@ public class CashierBot {
     	cp_event.addValidChan(all_swift_chans);
     	basebot.addListener(swift_irc, cp_event);
     	
-    	RPSGame rps_event = new RPSGame("#smokin_dice");
+    	RPSGame rps_event = new RPSGame();
     	rps_event.addValidChan(all_swift_chans);
     	rps_event.addAnnounce("#smokin_dice", basebot.getBot(swift_irc));
     	basebot.addListener(swift_irc, rps_event); 	
