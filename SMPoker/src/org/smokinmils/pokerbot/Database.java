@@ -708,7 +708,6 @@ public class Database {
 			   				" WHERE " + DBSettings.Col_UserProfiles_Name + " LIKE " + "'" + profile + "'" +
 			   					" AND " + DBSettings.Col_UserProfiles_Username + " LIKE " + "'" + username + "'";
 	   
-	   //TODO: remove ignore
 	   String ins_sql = "INSERT IGNORE INTO " + DBSettings.Table_UserProfiles + "(" 
   							+ DBSettings.Col_UserProfiles_UserID + ", " 
 			   				+ DBSettings.Col_UserProfiles_TypeID + ", "			

@@ -1,14 +1,16 @@
 package org.smokinmils.bot;
 
+import org.smokinmils.database.types.ProfileType;
+
 public class Bet {
 
 	private String user;
 	private int amount;
 	private String choice;
 	private boolean valid;
-	private String profile;
+	private ProfileType profile;
 	
-	public Bet(String user, String profile, int amount, String choice) {
+	public Bet(String user, ProfileType profile, int amount, String choice) {
 		this.user = user;
 		this.amount = amount;
 		this.choice = choice;
@@ -28,5 +30,5 @@ public class Bet {
 	public int getAmount()	{ return amount; }
 	public String getChoice() { return choice; }
 	public boolean isValid() { return valid; }
-	public String getProfile() { return profile; }
+	public ProfileType getProfile() { return profile; }
 }

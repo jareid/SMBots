@@ -111,18 +111,16 @@ public class SMBaseBot {
 
 	   newbot.setName(_nick);
 	   newbot.setLogin(_ident);
-	   newbot.setVerbose(false);// TODO: sync with actual _debug setting
+	   newbot.setVerbose(false);
 	   newbot.setAutoNickChange(true);
 	   newbot.useShutdownHook(false);
 	   newbot.setVersion(Version);
 	   newbot.setFinger(FingerMessage);
-	   // TODO: check what the two lines below do
 	   newbot.setAutoReconnect(true);
 	   newbot.setAutoReconnectChannels(true);
 	   newbot.startIdentServer();
 	   
-	   // TODO: move to settings?
-	   newbot.setMessageDelay(1);
+	   newbot.setMessageDelay(0);
 	   
 	   newbot.setListenerManager( new ThreadedListenerManager<IrcBot>() );
 	   newbot.getListenerManager().addListener( new CheckIdentified() );	   
@@ -180,6 +178,13 @@ public class SMBaseBot {
 		   ret = false;
 	   }
 	   return ret;
+   }
+
+   public void addListener(String server,
+                           Event listener,
+                           String[] channels) {
+       listener.addValidChan(channels);
+       addListener(server, listener);
    }
 
    /**

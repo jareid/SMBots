@@ -21,7 +21,6 @@ import java.util.concurrent.TimeoutException;
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.NoticeEvent;
-import org.smokinmils.Database;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.events.Join;
 import org.smokinmils.bot.events.Kick;
@@ -30,6 +29,7 @@ import org.smokinmils.bot.events.NickChange;
 import org.smokinmils.bot.events.Part;
 import org.smokinmils.bot.events.Quit;
 import org.smokinmils.bot.events.UserList;
+import org.smokinmils.database.DB;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -116,7 +116,7 @@ public class CheckIdentified extends Event {
     @Override
     public void userList(UserList event) {
         IrcBot bot = event.getBot();
-        // TODO: fix concurrent issue here
+        // TODO: fix concurrency issue here
         for (User usr: event.getUsers()) {
             bot.removeIdentifiedUser( usr.getNick() );
             sendStatusRequest( bot, usr );
@@ -138,12 +138,13 @@ public class CheckIdentified extends Event {
             bot.sendIRCMessage(user.getNick(), "%b%c12The IRC Network Services appear to be down, please try again shortly.");
         } else if (identd) {
             EventLog.info(user.getNick() + " identified", "CheckIdentified", "sendStatusRequest");
-            bot.addIdentifiedUser( user.getNick() );
             SentNoIdent.remove( user.getNick() );
             try {
-                boolean created = Database.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
+                boolean created = DB.getInstance().checkUserExists( user.getNick(), user.getHostmask() );
                 if (!created) {
                     bot.sendIRCMessage(user.getNick(), "%b%c12You have too many accounts, speak to an admin if there is a problem");
+                } else {
+                    bot.addIdentifiedUser( user.getNick() );
                 }
             } catch (Exception e) {
                 EventLog.log(e, "CheckIdentified", "sendStatusRequest");

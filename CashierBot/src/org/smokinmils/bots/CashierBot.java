@@ -10,14 +10,19 @@ package org.smokinmils.bots;
 
 import java.util.Timer;
 
-import org.smokingmils.help.Help;
 import org.smokinmils.SMBaseBot;
-import org.smokinmils.cashier.*;
-import org.smokinmils.casino.Casino;
+import org.smokinmils.bot.IrcBot;
+import org.smokinmils.cashier.ManagerSystem;
+import org.smokinmils.cashier.commands.*;
+import org.smokinmils.cashier.tasks.*;
+import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.rockpaperscissors.RPSGame;
-import org.smokinmils.timedrollcomp.CreateTimedRoll;
-import org.smokinmils.timedrollcomp.TimedRollComp;
+import org.smokinmils.games.casino.*;
+import org.smokinmils.games.poker.*;
+import org.smokinmils.games.rockpaperscissors.*;
+import org.smokinmils.games.timedrollcomp.*;
+import org.smokinmils.help.Help;
+import org.smokinmils.logging.EventLog;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -26,77 +31,67 @@ import org.smokinmils.timedrollcomp.TimedRollComp;
  */
 public class CashierBot {
     public static void main(String[] args) throws Exception {
+	    try {
+	        DB.getInstance().processRefunds();
+	    } catch (Exception e) {
+	        EventLog.fatal(e, "Casino", "Casino");
+	        System.exit(0);
+	    }
+    	
     	SMBaseBot basebot = SMBaseBot.getInstance();
     	boolean debug = true;
     	basebot.initialise("SM_BOT", "5w807", "smokinmils", debug);
     	String swift_irc = "SwiftIRC";
     	basebot.addServer(swift_irc, "irc.SwiftIRC.net", 6667);
+    	IrcBot swift_bot = basebot.getBot(swift_irc);
     	
     	String[] all_swift_chans = {"#smokin_dice", "#sm_tournaments", "#sm_overunder",
-    								"#sm_roulette", "#sm_hosts", "#managers"};
+    								"#sm_roulette", "#sm_ranks", "#managers"};
+		String[] oudd_swift_chans = {"#smokin_dice", "#sm_tournaments"};
+		String[] host_swift_chans = {"#sm_ranks", "#managers"};
+		String[] mgrs_swift_chans = {"#managers"};
+		String   poker_lobby_swift = "#smokin_dice";
+		// To test uncomment below/comment above and change other channel references below.
     	//String[] all_swift_chans = {"#testeroo"};
+    	//String[] oudd_swift_chans = {"#testeroo"};
+    	//String[] host_swift_chans = {"#testeroo"};
+		//String[] mgrs_swift_chans = {"#testeroo"};
+		//String   poker_lobby_swift = "#testeroo";
     	
     	for (String chan: all_swift_chans) {
     		basebot.addChannel(swift_irc, chan);
     	}
     	
-    	Casino casino = new Casino(basebot.getBot(swift_irc));
-    	casino.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, casino);
+    	basebot.addListener(swift_irc, new Referral(), all_swift_chans);
+    	basebot.addListener(swift_irc, new GroupReferal(), host_swift_chans);
+    	basebot.addListener(swift_irc, new RankGroups(), mgrs_swift_chans);
     	
-    	CheckChips cc_event = new CheckChips();
-    	cc_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, cc_event);
-    	
-    	CompPosition cp_event = new CompPosition();
-    	cp_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, cp_event);
+    	basebot.addListener(swift_irc, new Roulette(5, "#smokin_dice", swift_bot) );
+    	basebot.addListener(swift_irc, new Roulette(1, "#sm_roulette", swift_bot) );
+    	basebot.addListener(swift_irc, new Roulette(2, "#sm_tournaments", swift_bot) );
+		
+    	basebot.addListener(swift_irc, new OverUnder(), oudd_swift_chans);	
+    	basebot.addListener(swift_irc, new DiceDuel(swift_bot, "#smokin_dice"), oudd_swift_chans);
+    	basebot.addListener(swift_irc, new CheckChips(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new CompPosition(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new GiveChips(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new Help(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new Jackpots(), all_swift_chans);
+    	//basebot.addListener(swift_irc, new Lottery(), all_swift_chans);	
+    	basebot.addListener(swift_irc,
+    					    new ManagerSystem("#smokin_dice", "#managers", swift_bot),
+    					    all_swift_chans);
+    	basebot.addListener(swift_irc, new Client(swift_irc, poker_lobby_swift));
+    	basebot.addListener(swift_irc, new Payout(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new Profile(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new Profiles(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new TransferChips(), all_swift_chans);	
+    	basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);
     	
     	RPSGame rps_event = new RPSGame();
     	rps_event.addValidChan(all_swift_chans);
-    	rps_event.addAnnounce("#smokin_dice", basebot.getBot(swift_irc));
-    	basebot.addListener(swift_irc, rps_event); 	
-    	
-    	GiveChips gc_event = new GiveChips();
-    	gc_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, gc_event); 	
-
-    	Help h_event = new Help();
-    	h_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, h_event);
-    	
-    	Jackpots jp_event = new Jackpots();
-    	jp_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, jp_event);
-    	
-    	Lottery lottery_event = new Lottery();
-    	lottery_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, lottery_event);
-    	
-    	ManagerSystem ms_event = new ManagerSystem("#smokin_dice", "#managers",
-    												basebot.getBot(swift_irc));
-    	ms_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, ms_event);
-    	
-    	Payout p_event = new Payout();
-    	p_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, p_event);
-    	
-    	Profile prf_event = new Profile();
-    	prf_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, prf_event);
-    	
-    	Profiles prfs_event = new Profiles();
-    	prfs_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, prfs_event);
-    	
-    	TransferChips tc_event = new TransferChips();
-    	tc_event.addValidChan(all_swift_chans);
-    	basebot.addListener(swift_irc, tc_event);
-    	
-    	CreateTimedRoll ctr_event = new CreateTimedRoll();
-    	ctr_event.addValidChan("#sm_hosts");
-    	basebot.addListener(swift_irc, ctr_event);  
+    	rps_event.addAnnounce("#smokin_dice", swift_bot);
+    	basebot.addListener(swift_irc, rps_event);
     	
     	// add timed roll for Smoking_Dice every 24hours with a 100chip prize
 		@SuppressWarnings("unused") /* suppresed as this doesn't need to be refered to */

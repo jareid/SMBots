@@ -19,12 +19,6 @@ public class HandValue implements Comparable<HandValue> {
  
 	/** The hand. */
 	private final Hand hand;
-	
-	/** The maximum number of cards in a hand. 
-	public static final int MAX_WIN_CARDS = 5;
-	 TODO
-	/** Winning cards 
-	private Card[] cards = new Card[MAX_WIN_CARDS];*/
 	 
 	/** The hand value type. */
 	private final HandValueType type;

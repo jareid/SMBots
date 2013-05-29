@@ -258,9 +258,6 @@ public class Client extends PircBot {
     		
     		// Check the user meets the NickServ status requirement
     		if ( identifiedUsers.contains( sender ) ) {
-    			// Add hostmask for the user
-				Database.getInstance().addHostmask(sender, "*!*@" + hostname);
-				
 	    		// Notify the correct room if required
 	    		Room room = validChannels.get( channel.toLowerCase() );
 	    		if ( room != null ) {

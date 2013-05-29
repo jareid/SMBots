@@ -16,8 +16,6 @@ import org.smokinmils.pokerbot.game.rooms.Table;
 /**
  * A task that handles a poker table while the game is in progress
  * 
- * TODO: change to event?
- * 
  * @author Jamie Reid
  */
 public class SittingOut extends TimerTask {
