@@ -130,7 +130,8 @@
   <package id="15" language="java" name="org.smokinmils.games.poker" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="190" x="9698" y="-3"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="16" language="java" name="org.smokinmils.bot.events.RemoveSecret" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events/RemoveSecret.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -198,7 +199,8 @@
   <package id="23" language="java" name="org.smokinmils.database.tables" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/tables" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="206" x="169" y="-3"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="24" language="java" name="org.smokinmils.cashier.commands.Profiles" project="Basebot" 
     file="/Basebot/src/org/smokinmils/cashier/commands/Profiles.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -221,7 +223,8 @@
   <package id="26" language="java" name="org.smokinmils.database.types" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/types" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="202" x="12149" y="869"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="27" language="java" name="org.smokinmils.database.tables.GamesTable" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/tables/GamesTable.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -253,7 +256,8 @@
   <package id="30" language="java" name="org.smokinmils.games.poker.tasks" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/tasks" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="224" x="11416" y="-3"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="31" language="java" name="org.smokinmils.games.poker.game.Hand" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/game/Hand.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -285,7 +289,8 @@
   <package id="34" language="java" name="org.smokinmils.cashier.rake" project="Basebot" 
     file="/Basebot/src/org/smokinmils/cashier/rake" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="186" x="11992" y="334"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="35" language="java" name="org.smokinmils.database.tables.PokerHandsTable" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/tables/PokerHandsTable.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -335,7 +340,8 @@
   <package id="40" language="java" name="org.smokinmils.games.rockpaperscissors" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/rockpaperscissors" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="266" x="9759" y="244"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="41" language="java" name="org.smokinmils.games.casino.OverUnder" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/casino/OverUnder.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -412,7 +418,8 @@
   <package id="49" language="java" name="org.smokinmils.games.timedrollcomp" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/timedrollcomp" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="239" x="11318" y="334"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="50" language="java" name="org.smokinmils.database.types.BetterInfo" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/types/BetterInfo.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -471,7 +478,8 @@
   <package id="56" language="java" name="org.smokinmils.logging" project="Basebot" 
     file="/Basebot/src/org/smokinmils/logging" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="156" x="8093" y="1224"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="57" language="java" name="org.smokinmils.bot.events.RemoveInviteOnly" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events/RemoveInviteOnly.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -656,7 +664,8 @@
   <package id="77" language="java" name="org.smokinmils.cashier" project="Basebot" 
     file="/Basebot/src/org/smokinmils/cashier" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="158" x="8133" y="334"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="78" language="java" name="org.smokinmils.bot.events.Connect" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events/Connect.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -679,7 +688,8 @@
   <package id="80" language="java" name="org.smokinmils.bot" project="Basebot" file="/Basebot/src/org/smokinmils/bot" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="133" x="10088" y="424"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="81" language="java" name="org.smokinmils.bot.events.Mode" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events/Mode.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -792,7 +802,8 @@
   <package id="93" language="java" name="org.smokinmils" project="Basebot" file="/Basebot/src/org/smokinmils" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="112" x="10768" y="869"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="94" language="java" name="org.smokinmils.games.poker.game.Card" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/game/Card.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -806,7 +817,8 @@
   <package id="95" language="java" name="org.smokinmils.help" project="Basebot" file="/Basebot/src/org/smokinmils/help" 
     binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="139" x="8373" y="334"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="96" language="java" name="org.smokinmils.games.rockpaperscissors.RPSGame" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/rockpaperscissors/RPSGame.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -820,7 +832,8 @@
   <package id="97" language="java" name="org.smokinmils.games.poker.game.rooms" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/game/rooms" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="264" x="11026" y="244"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <enumeration id="98" language="java" name="org.smokinmils.games.rockpaperscissors.GameLogic" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/rockpaperscissors/GameLogic.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -834,7 +847,8 @@
   <package id="99" language="java" name="org.smokinmils.bot.events" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="174" x="8636" y="869"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="100" language="java" name="org.smokinmils.bot.events.Op" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events/Op.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -875,7 +889,8 @@
   <package id="104" language="java" name="org.smokinmils.games.casino" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/casino" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="195" x="10560" y="244"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="105" language="java" name="org.smokinmils.logging.Logstream" project="Basebot" 
     file="/Basebot/src/org/smokinmils/logging/Logstream.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -1016,12 +1031,14 @@
   <package id="120" language="java" name="org.smokinmils.games.poker.game" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/game" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="224" x="13772" y="869"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <package id="121" language="java" name="org.smokinmils.games.poker.enums" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/enums" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="231" x="10510" y="1224"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="122" language="java" name="org.smokinmils.database.tables.UsersView" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/tables/UsersView.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -1062,7 +1079,8 @@
   <package id="126" language="java" name="org.smokinmils.database" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="168" x="8289" y="1224"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="127" language="java" name="org.smokinmils.games.poker.game.rooms.Table" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/game/rooms/Table.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -1229,7 +1247,8 @@
   <package id="145" language="java" name="org.smokinmils.games" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="154" x="7612" y="-3"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="146" language="java" name="org.smokinmils.database.tables.UserProfilesTable" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/tables/UserProfilesTable.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -1280,7 +1299,8 @@
   <package id="151" language="java" name="org.smokinmils.games.poker.game.events" project="Basebot" 
     file="/Basebot/src/org/smokinmils/games/poker/game/events" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="265" x="11004" y="869"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="152" language="java" name="org.smokinmils.bot.events.Invite" project="Basebot" 
     file="/Basebot/src/org/smokinmils/bot/events/Invite.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -1366,12 +1386,14 @@
   <package id="161" language="java" name="org.smokinmils.cashier.commands" project="Basebot" 
     file="/Basebot/src/org/smokinmils/cashier/commands" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="224" x="10275" y="244"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <package id="162" language="java" name="org.smokinmils.cashier.tasks" project="Basebot" 
     file="/Basebot/src/org/smokinmils/cashier/tasks" binary="false" corner="BOTTOM_RIGHT">    
     <position height="50" width="192" x="10776" y="-3"/>    
-    <display autosize="true" stereotype="true" accessors="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
+      visibility="true"/>  
   </package>  
   <class id="163" language="java" name="org.smokinmils.database.types.ReferalUser" project="Basebot" 
     file="/Basebot/src/org/smokinmils/database/types/ReferalUser.java" binary="false" corner="BOTTOM_RIGHT">    
@@ -1382,8 +1404,8 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="164" language="java" name="org.smokinmils.bots.CashierBot" project="SMBot" 
-    file="/SMBot/src/org/smokinmils/bots/CashierBot.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="164" language="java" name="org.smokinmils.bots.CashierBot" project="Bot" 
+    file="/Bot/src/org/smokinmils/bots/CashierBot.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="16554" y="8210"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" accessors="true" 
       visibility="true">      

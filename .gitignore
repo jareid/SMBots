@@ -1,1 +1,2 @@
-/SMBasebot
+*.class
+bin/*
