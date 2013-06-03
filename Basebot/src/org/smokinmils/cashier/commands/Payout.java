@@ -61,7 +61,7 @@ public class Payout extends Event {
 					if (amount != null && amount > 0) {
 						int chips = 0;
 						try {
-							chips = DB.getInstance().checkCredits( user, profile );
+							chips = DB.getInstance().checkCreditsAsInt( user, profile );
 						} catch (Exception e) {
 							EventLog.log(e, "Payout", "message");
 						}

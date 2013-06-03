@@ -20,6 +20,7 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
+import org.smokinmils.BaseBot;
 import org.smokinmils.Utils;
 
 public class Roulette extends Event {
@@ -34,7 +35,7 @@ public class Roulette extends Event {
     private static final String NO_CHIPS = "%b%c12You do not have enough chips for that!";
     private static final String INVALID_BET = "%b%c12\"%c04!bet <amount> <choice>%c12\" You have entered an invalid choice. Please enter %c04black%c12, %c04red%c12, %c041-36%c12, %c041st%c12, %c042nd%c12, %c043rd%c12, %c04even%c12 or %c04odd%c12 as your choice.";
     private static final String INVALID_BETSIZE = "%b%c12You have to bet more than %c040%c12!";
-    private static final String BET_MADE = "%b%c04%username%c12: You have bet %c04%amount%c12 on %c04choice";
+    private static final String BET_MADE = "%b%c04%username%c12: You have bet %c04%amount%c12 on %c04%choice";
     private static final String BETS_CANCELLED = "%b%c12All bets cancelled for %c04%username";
     private static final String CANT_END = "%b%c12You don't have the required permissions for that";
     private static final String NEW_GAME = "%b%c12A new roulette game is starting! Type %c04!info %c12for instructions on how to play.";
@@ -76,20 +77,22 @@ public class Roulette extends Event {
     public void message(Message event) {
         String message = event.getMessage();
         String sender = event.getUser().getNick();
-        
-        if ( channel.equalsIgnoreCase( event.getChannel().getName() ) &&
-                bot.userIsIdentified( sender ) ) {
-    		try {
-    			if (message.toLowerCase().startsWith( BET_CMD )) {
-    				bet(event);
-    			} else if (message.toLowerCase().startsWith( CXL_CMD )) {
-    				cancel(event);
-    			} else if (message.toLowerCase().startsWith( END_CMD )) {
-    				end(event);
-    			}
-    		} catch (Exception e) {
-    			EventLog.log(e, "Roulette", "message");
-    		}
+
+        synchronized (BaseBot.lockObject) {
+            if ( channel.equalsIgnoreCase( event.getChannel().getName() ) &&
+                    bot.userIsIdentified( sender ) ) {
+        		try {
+        			if (message.toLowerCase().startsWith( BET_CMD )) {
+        				bet(event);
+        			} else if (message.toLowerCase().startsWith( CXL_CMD )) {
+        				cancel(event);
+        			} else if (message.toLowerCase().startsWith( END_CMD )) {
+        				end(event);
+        			}
+        		} catch (Exception e) {
+        			EventLog.log(e, "Roulette", "message");
+        		}
+            }
         }
 	}
 	
@@ -103,33 +106,33 @@ public class Roulette extends Event {
 		if (state == CLOSE) {
 			bot.sendIRCMessage(channel, BETS_CLOSED);
 		} else if (msg.length < 3) {
-            bot.sendIRCMessage(channel, INVALID_BET);
+            bot.sendIRCNotice(username, INVALID_BET);
 		} else {
 			Integer amount = Utils.tryParse(msg[1]);
 			String choice = msg[2].toLowerCase();
 			Integer choicenum = Utils.tryParse(msg[2]);
 			ProfileType profile = db.getActiveProfile(username);
 			if (amount == null) {
-	            bot.sendIRCMessage(channel, INVALID_BET);
+	            bot.sendIRCNotice(username, INVALID_BET);
 			} else if (amount <= 0) {
-				bot.sendIRCMessage(channel, INVALID_BETSIZE);
-			} else if ((!choice.equalsIgnoreCase("red") && !choice.equalsIgnoreCase("black")
-                    && !choice.equalsIgnoreCase("1st") && !choice.equalsIgnoreCase("2nd")
-                    && !choice.equalsIgnoreCase("3rd")
-                    && !choice.equalsIgnoreCase("even") && !choice.equalsIgnoreCase("odd"))
-                    || choicenum == null || choicenum < 0 || choicenum > 36) {
-			    bot.sendIRCMessage(channel, INVALID_BET);
+				bot.sendIRCNotice(username, INVALID_BETSIZE);
+			} else if (!((choice.equalsIgnoreCase("red") || choice.equalsIgnoreCase("black") ||
+			            choice.equalsIgnoreCase("1st") || choice.equalsIgnoreCase("2nd") ||
+                        choice.equalsIgnoreCase("3rd") || choice.equalsIgnoreCase("even") || 
+                        choice.equalsIgnoreCase("odd")) ||
+                       (choicenum != null && choicenum > 0 && choicenum < 36))) {
+			    bot.sendIRCNotice(username, INVALID_BET);
 			} else if (db.checkCredits(username) < amount) {
-                bot.sendIRCMessage(channel, NO_CHIPS);
+                bot.sendIRCNotice(username, NO_CHIPS);
 			} else {
 				Bet bet = new Bet(username, profile, amount, choice);
 				allBets.add(bet);
-				db.adjustChips(username, amount, profile, GamesType.ROULETTE, TransactionType.BET);
+				db.adjustChips(username, -amount, profile, GamesType.ROULETTE, TransactionType.BET);
 				db.addBet(username, choice, amount, profile, GamesType.ROULETTE);
 	
 				String out = BET_MADE.replaceAll("%username", username);
-				out = BET_MADE.replaceAll("%choice", choice);
-				out = BET_MADE.replaceAll("%amount", Integer.toString(amount));
+				out = out.replaceAll("%choice", choice);
+				out = out.replaceAll("%amount", Integer.toString(amount));
                 bot.sendIRCMessage(channel, out);				
 			}
 		}
@@ -225,7 +228,7 @@ public class Roulette extends Event {
 			String user = bet.getUser();
 			ProfileType profile = bet.getProfile();
 			
-			if (bet.isValid()) {
+			if (bet.isValid()) {                
 				int winamount = 0;
 				boolean win = false;
 				if ((choice.equalsIgnoreCase("red") || choice.equalsIgnoreCase("black")) &&
@@ -241,7 +244,7 @@ public class Roulette extends Event {
 						  && choice.equalsIgnoreCase(getRow(winner))) {
 					win = true;
 					winamount = 3;
-				} else if (winner == choicenum) {
+				} else if (choicenum != null && winner == choicenum) {
 					win = true;
 					winamount = ((bet.getChoice() == "0") ? 12 : 36);
 				}
@@ -289,10 +292,10 @@ public class Roulette extends Event {
 		win_line = win_line.replaceAll( "%number", Integer.toString(winner) );
 		
 		String board = "";
-		if (this.getColour(winner).equalsIgnoreCase("red")) board = "0,4";
-		else if (this.getColour(winner).equalsIgnoreCase("black")) board = "0,1";
-		else board = "0,3";
-		board += winner;
+		if (getColour(winner).equalsIgnoreCase("red")) board = "00,04 ";
+		else if (getColour(winner).equalsIgnoreCase("black")) board = "00,01 ";
+		else board = "00,03 ";
+		board += winner + " ";
 
         win_line = win_line.replaceAll("%board", board);
 		bot.sendIRCMessage(channel, win_line);

@@ -31,9 +31,12 @@ public class CompPosition extends Event {
 	private static final String NotRanked = "%b%c04%sender:%c12 %c04%who%c12 is currently in %c04unranked%c12 for the %c04%profile%c12 competition";
 	
 	private static final String Last30Days = "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 " +
-	 										 "Your highest bet was %c04%hb_chips%c12 on %c04%hb_game%c12 | " +
-	 										 "Your bet total is %c04%hbt_chips%c12";
-	private static final String Last30Days_NoData = "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 There is no data for you on this profile.";
+	 										 "%c04%who%c12 highest bet was %c04%hb_chips%c12 on %c04%hb_game%c12 | " +
+	 										 "%c04%who%c12 bet total is %c04%hbt_chips%c12";
+	private static final String Last30Days_NoData = "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 There is no data for %c04%who%c12 on this profile.";
+	
+	private static final String NoCompetition = "%b%c04%sender:%c12 There is no competition running for the %c04%profile%c12 profile";
+	
 	/**
 	 * This method handles the chips command
 	 * 
@@ -56,7 +59,13 @@ public class CompPosition extends Event {
 			if (msg.length == 2 || msg.length == 3) {
 				String who = (msg.length == 2 ? sender : msg[2] );
 				ProfileType profile = ProfileType.fromString(msg[1]);
-				if (profile != null) {
+				if (profile == null) {
+                    bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
+				} else if (!profile.hasComps()) {
+                    String out = NoCompetition.replaceAll("%sender", sender);
+                    out = out.replaceAll("%profile", profile.toString());
+                    bot.sendIRCMessage(chan.getName(), out);
+				} else {
 					BetterInfo better = null;
 					try {
 						better = DB.getInstance().competitionPosition(profile, who);
@@ -71,7 +80,7 @@ public class CompPosition extends Event {
 						out = Position.replaceAll("%profile", profile.toString());
 						out = out.replaceAll("%position", Integer.toString(better.Position));
 						out = out.replaceAll("%chips", Long.toString(better.Amount));
-					}					
+					}
 
 					out = out.replaceAll("%sender", sender);
 					out = out.replaceAll("%who", who);
@@ -80,27 +89,27 @@ public class CompPosition extends Event {
 					
 					DB db = DB.getInstance();
 					for (ProfileType prof: ProfileType.values()) {
-						try {
-							BetterInfo high_bet = db.getHighestBet(prof, sender);
-							BetterInfo top_better = db.getTopBetter(prof, sender);
-							
-							if (high_bet.User == null || top_better.User == null) {		
-								out = Last30Days_NoData;
-							} else {		
-								out = Last30Days.replaceAll("%hb_game", high_bet.Game.toString());
-								out = out.replaceAll("%hb_chips", Long.toString(high_bet.Amount));
-								out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
-							}
-							out = out.replaceAll("%profile", prof.toString() );
-
-							bot.sendIRCNotice(sender, out);
-						} catch (Exception e) {
-							EventLog.log(e, "BetDetails", "run");
-						}
+					    if (profile.hasComps()) {
+    						try {
+    							BetterInfo high_bet = db.getHighestBet(prof, sender);
+    							BetterInfo top_better = db.getTopBetter(prof, sender);
+    							
+    							if (high_bet.User == null || top_better.User == null) {		
+    								out = Last30Days_NoData;
+    							} else {		
+    								out = Last30Days.replaceAll("%hb_game", high_bet.Game.toString());
+    								out = out.replaceAll("%hb_chips", Long.toString(high_bet.Amount));
+    								out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
+    			                    out = out.replaceAll("%who", high_bet.User);
+    							}
+    							out = out.replaceAll("%profile", prof.toString() );
+    
+    							bot.sendIRCNotice(sender, out);
+    						} catch (Exception e) {
+    							EventLog.log(e, "BetDetails", "run");
+    						}
+					    }
 					}
-					
-				} else {
-					bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 				}
 			} else {
 				bot.invalidArguments( sender, Format );

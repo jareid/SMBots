@@ -27,10 +27,10 @@ public class Referral extends Event {
     private static final String Command = "!refer";
     private static final String Format = "%b%c12" + Command + " <user>";
 	
-    private static final String NO_USER = "%c04%sender%c12: %c04%who%c12 does not exist as a user.";
-    private static final String NO_SELF = "%c04%sender%c12: You can not be your own referrer.";
-    private static final String SUCCESS = "%c04%sender%c12: Succesfully added %c04%who%c12 as your referer.";
-    private static final String FAILED = "%c04%sender%c12: You already have a referrer.";
+    private static final String NO_USER = "%b%c04%sender%c12: %c04%who%c12 does not exist as a user.";
+    private static final String NO_SELF = "%b%c04%sender%c12: You can not be your own referrer.";
+    private static final String SUCCESS = "%b%c04%sender%c12: Succesfully added %c04%who%c12 as your referer.";
+    private static final String FAILED = "%b%c04%sender%c12: You already have a referrer.";
     
 	/**
 	 * This method handles the chips command
@@ -79,7 +79,7 @@ public class Referral extends Event {
                 } else {
                     db.addReferer(sender, referrer);
                     String out = SUCCESS.replaceAll("%sender", sender);
-                    out = out.replaceAll("%who", sender);
+                    out = out.replaceAll("%who", referrer);
                     bot.sendIRCMessage(channel, out);
                 }
             } else {

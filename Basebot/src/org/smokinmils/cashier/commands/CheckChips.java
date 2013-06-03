@@ -11,6 +11,7 @@ package org.smokinmils.cashier.commands;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -64,7 +65,7 @@ public class CheckChips extends Event {
 			
 			if (msg.length == 1 || msg.length == 2) {
 				user = (msg.length > 1 ? msg[1] : sender);
-				Map<ProfileType, Integer> creds = null;
+				Map<ProfileType, Double> creds = null;
 				try {
 					creds = DB.getInstance().checkAllCredits( user );
 				} catch (Exception e) {
@@ -85,17 +86,18 @@ public class CheckChips extends Event {
 					} else  {
 						credstr = CheckCreditMsg;
 					}
-					Integer active_creds = creds.get(active);
-					if (active_creds == null) active_creds = 0;
-					credstr = credstr.replaceAll("%creds", Integer.toString(active_creds));
+					
+					Double active_creds = creds.get(active);
+					if (active_creds == null) active_creds = 0.0;
+					credstr = credstr.replaceAll("%creds", Utils.chipsToString(active_creds));
 					credstr = credstr.replaceAll("%active", active.toString());
 					
 					if (creds.size() > 1) {
 						credstr += " and ";
-						for (Entry<ProfileType, Integer> cred: creds.entrySet()) {
+						for (Entry<ProfileType, Double> cred: creds.entrySet()) {
 							if (cred.getKey().compareTo(active) != 0) {
 								String othercred = CreditsOtherProfiles.replaceAll("%name", cred.getKey().toString());
-								othercred = othercred.replaceAll("%amount",Integer.toString(cred.getValue()));
+								othercred = othercred.replaceAll("%amount",Utils.chipsToString(cred.getValue()));
 								credstr += othercred + " ";
 							}
 						}

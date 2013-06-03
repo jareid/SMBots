@@ -10,13 +10,13 @@ package org.smokinmils.database.tables;
 
 public class FullReferersView {
     /** The name of the table */
-    public static final String Name = "full_referers_text";
+    public static final String Name = "full_referers";
     
     /** Column for the unique id */
     public static final String Col_UserID = "user_id";
     
     /** Column for the name of the game */
-    public static final String Col_RefererID = "referer_id";
+    public static final String Col_RefererID = "referrer_id";
     
     public static final String Col_GroupID = "group_id";
 }

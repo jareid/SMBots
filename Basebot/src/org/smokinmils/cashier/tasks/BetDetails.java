@@ -49,21 +49,23 @@ public class BetDetails extends TimerTask {
 	public void run() {
 		DB db = DB.getInstance();
 		for (ProfileType profile: ProfileType.values()) {
-			try {
-				BetterInfo high_bet = db.getHighestBet(profile);
-				BetterInfo top_better = db.getTopBetter(profile);
-				
-				String out = AnnounceLine.replaceAll("%profile", profile.toString() );
-				out = out.replaceAll("%hb_user", high_bet.User);
-				out = out.replaceAll("%hb_game", high_bet.Game.toString());
-				out = out.replaceAll("%hb_chips", Long.toString(high_bet.Amount));
-				out = out.replaceAll("%hbt_user", top_better.User);
-				out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
-				
-				Bot.sendIRCMessage(Channel, out);
-			} catch (Exception e) {
-				EventLog.log(e, "BetDetails", "run");
-			}
+		    if (profile.hasComps()) {
+    			try {
+    				BetterInfo high_bet = db.getHighestBet(profile);
+    				BetterInfo top_better = db.getTopBetter(profile);
+    				
+    				String out = AnnounceLine.replaceAll("%profile", profile.toString() );
+    				out = out.replaceAll("%hb_user", high_bet.User);
+    				out = out.replaceAll("%hb_game", high_bet.Game.toString());
+    				out = out.replaceAll("%hb_chips", Long.toString(high_bet.Amount));
+    				out = out.replaceAll("%hbt_user", top_better.User);
+    				out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
+    				
+    				Bot.sendIRCMessage(Channel, out);
+    			} catch (Exception e) {
+    				EventLog.log(e, "BetDetails", "run");
+    			}
+		    }
 		}
 	}
 }

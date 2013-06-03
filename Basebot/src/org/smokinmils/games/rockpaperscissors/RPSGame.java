@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException;
 import org.pircbotx.Channel;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.smokinmils.SMBaseBot;
+import org.smokinmils.BaseBot;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -100,7 +100,7 @@ public class RPSGame extends Event {
 		String message = event.getMessage();
 		String sender = event.getUser().getNick();
 		Channel chan = event.getChannel();
-		synchronized (SMBaseBot.lockObject) {
+		synchronized (BaseBot.lockObject) {
 			if ( isValidChannel( chan.getName() ) &&
 					bot.userIsIdentified( sender ) ) {			
 				if ( message.startsWith( CxlCommand ) ) {
@@ -146,7 +146,7 @@ public class RPSGame extends Event {
 		Channel chan = event.getChannel();			
 		String[] msg = message.split(" ");
 		
-		if(msg.length == 2) {
+		if (msg.length == 2) {
 			String better = msg[1];
 
 			// check to see if someone is playing themselves...
@@ -212,7 +212,9 @@ public class RPSGame extends Event {
 					bot.sendIRCMessage(chan, out);
 				}
 			}
-		}
+        } else {
+            bot.invalidArguments( caller, Format );
+        }
 	}
 
 	private void newGame(Message event) {
@@ -324,8 +326,8 @@ public class RPSGame extends Event {
 		DB db = DB.getInstance();
 		// Take the rake and give chips to winner
 		double rake = Rake.getRake(winner, amount, win_prof) + Rake.getRake(loser, amount, lose_prof);
-		double win = (amount*2) - rake;
-		
+        double win = (amount*2) - rake;
+        
 		try {
 			db.adjustChips(winner, win, win_prof, 
 					   GamesType.ROCKPAPERSCISSORS, TransactionType.WIN);
@@ -334,7 +336,7 @@ public class RPSGame extends Event {
 			String out = Win.replaceAll("%winstring", winstring);
 			out = out.replaceAll("%winner", winner);
 			out = out.replaceAll("%loser", loser);
-			out = out.replaceAll("%chips", Integer.toString( (int)Math.floor(win) ) );
+			out = out.replaceAll("%chips", Utils.chipsToString(win) );
 			bot.sendIRCMessage(chan, out);
 		} catch (Exception e) {
 			EventLog.log(e, "RPSGame", "updateJackpot");

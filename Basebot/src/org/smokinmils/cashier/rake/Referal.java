@@ -39,24 +39,19 @@ public class Referal extends Thread {
     private static Deque<Event> Events;
 
     /** Instance variable */
-    public static Referal instance;
-    static {
-        try {
-            instance = new Referal();
-        } catch (Exception e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    private static final Referal instance = new Referal();
 
-   /** Static 'instance' method */
-   public static Referal getInstance() { return instance; }
+    /** Static 'instance' method */
+    public static Referal getInstance() {
+       return instance;
+    }
 
     /**
      * Constructor.
      */
 	private Referal() {
 		Events = new ArrayDeque<Event>();
-		this.run();
+		this.start();
 	}
 	
 	/**
@@ -84,7 +79,7 @@ public class Referal extends Thread {
      * Save the new jackpot value
      * @return 
      */
-    private static void updateJackpot(double amount,
+    private void updateJackpot(double amount,
                                       ProfileType profile) {
         double jackpot = amount * JACKPOT_PERCENT;
         try {
@@ -97,7 +92,7 @@ public class Referal extends Thread {
     /**
      * Take the referal amounts
      */
-    private static void doReferal(Event event) {
+    private void doReferal(Event event) {
         DB db = DB.getInstance();
         
         try {
@@ -105,10 +100,10 @@ public class Referal extends Thread {
 
             double house_percent = 1.0 - (Rake.JackpotEnabled ? JACKPOT_PERCENT : 0.0);
             if (reftype == ReferrerType.GROUP) {
-                house_percent -= USER_PERCENT;
+                house_percent -= (GROUP_PERCENT + USER_PERCENT);
                 doGroupReferal(event);
             } else if (reftype == ReferrerType.PUBLIC) {
-                house_percent -= GROUP_PERCENT - USER_PERCENT;
+                house_percent -= USER_PERCENT;
                 doPublicReferal(event);
             } else {
                 // do nothing
@@ -130,7 +125,7 @@ public class Referal extends Thread {
      * @throws SQLException 
      * @throws DBException 
      */
-    private static void doPublicReferal(Event event) throws DBException, SQLException {
+    private void doPublicReferal(Event event) throws DBException, SQLException {
         DB db = DB.getInstance();
 
         double ref_fee = event.amount * USER_PERCENT;
@@ -145,7 +140,7 @@ public class Referal extends Thread {
      * @throws SQLException 
      * @throws DBException 
      */
-    private static void doGroupReferal(Event event) throws DBException, SQLException {
+    private void doGroupReferal(Event event) throws DBException, SQLException {
         DB db = DB.getInstance();
 
         double ref_fee = event.amount * USER_PERCENT;
@@ -180,7 +175,7 @@ public class Referal extends Thread {
 	/**
 	 * Adds an event to be handled by this Room's thread
 	 */
-	public static void addEvent(String user, ProfileType profile, double amount) {
+	public void addEvent(String user, ProfileType profile, double amount) {
 		Events.addLast( new Event(user, profile, amount) );		
 	}
 }

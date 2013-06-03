@@ -22,6 +22,7 @@ import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.ConnectEvents;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.database.DB;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -29,12 +30,12 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie Reid
  */
-public class SMBaseBot {
+public class BaseBot {
 	/** Instance variable. */
-	private static SMBaseBot _instance = new SMBaseBot();
+	private static BaseBot _instance = new BaseBot();
 
 	/** Static 'instance' method */
-	public static SMBaseBot getInstance() { return _instance; }
+	public static BaseBot getInstance() { return _instance; }
    
 	/** The pircbotx instance */
 	private static Map<String,IrcBot> bots;
@@ -65,7 +66,7 @@ public class SMBaseBot {
    /**
     * Constructor
     */
-   private SMBaseBot() {
+   private BaseBot() {
 	   bots = new HashMap<String,IrcBot>();
    }
    
@@ -89,6 +90,13 @@ public class SMBaseBot {
 	       _initialised = true;
 	       EventLog.create(_nick, _debug);
 	       ret = true;
+	       
+	       try {
+	           DB.getInstance().processRefunds();
+	       } catch (Exception e) {
+	           EventLog.fatal(e, "SMBaseBot", "initialise");
+	           System.exit(0);
+	       }
 	   }
 	   return ret;
    }

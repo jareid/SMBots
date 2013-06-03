@@ -9,7 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
-import org.smokinmils.SMBaseBot;
+import org.smokinmils.BaseBot;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
@@ -44,7 +44,7 @@ public class TransferChips extends Event {
 	 */
 	@Override
 	public void message(Message event) {
-		synchronized (SMBaseBot.lockObject) {
+		synchronized (BaseBot.lockObject) {
 			IrcBot bot = event.getBot();
 			String message = event.getMessage();
 			String sender = event.getUser().getNick();
@@ -60,7 +60,7 @@ public class TransferChips extends Event {
 					Integer amount = Utils.tryParse(msg[2]);
 					ProfileType profile = ProfileType.fromString(msg[3]);
 					
-					if (!user.isEmpty() && amount != null) {
+					if (!user.isEmpty() && !user.equals(sender) && amount != null) {
 						// Check valid profile
 						if (!CheckIdentified.checkIdentified(bot, user)) {
 							String out = CheckIdentified.NotIdentified.replaceAll( "%user", user );
@@ -69,7 +69,7 @@ public class TransferChips extends Event {
 							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 						} else {
 							try {
-								int chips = DB.getInstance().checkCredits( sender, profile );
+								int chips = DB.getInstance().checkCreditsAsInt( sender, profile );
 								if ( amount > chips || amount < 0 ) {
 									bot.NoChips(sender, amount, profile);
 								} else if ( !DB.getInstance().checkUserExists( user ) ) {

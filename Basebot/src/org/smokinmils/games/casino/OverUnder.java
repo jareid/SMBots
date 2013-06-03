@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.smokinmils.logging.EventLog;
+import org.smokinmils.BaseBot;
 import org.smokinmils.Utils;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
@@ -22,15 +23,15 @@ public class OverUnder extends Event {
     private static final String CXL_CMD = "!oucancel";
     private static final String ROLL_CMD = "!ouroll";
 
-    private static final String INVALID_BET = "%b%c12\"%c04!ou <amount> <choice>\". You have entered an invalid choice. Please use %c04over%c12, %c04under%c12 or %c047";
+    private static final String INVALID_BET = "%b%c12\"%c04!ou <amount> <choice>%c12\". You have entered an invalid choice. Please use %c04over%c12, %c04under%c12 or %c047";
     private static final String INVALID_BETSIZE = "%b%c12You have to bet more than %c040%c12!";
     private static final String OPEN_WAGER = "%b%c04%username%c12: You already have a wager open. Type %c04!ouroll %c12to roll! Type %c04!oucancel %c12to cancel it";
     private static final String NO_CHIPS = "%b%c04%username%c12: You do not have enough chips for that!";
     private static final String NO_WAGER = "%b%c04%username%c12: I can't find a record of that wager";
     private static final String BET_CANCELLED = "%b%c04%username%c12: Cancelled your open OverUnder wager";
     private static final String NEW_WAGER = "%b%c04%username%c12 has bet %c04%amount%c12 on %c04%choice%c12. Type %c04!ouroll %c12to roll!";
-    private static final String ROLL_WIN = "%b%c12%bonus%Rolling... %c04%total%c12. Congratulations on your win %c04%username%c12!";
-    private static final String ROLL_LOSE = "%b%c12%bonus%Rolling... %c04%total%c12. Better luck next time %c04%username%c12!";
+    private static final String ROLL_WIN = "%b%c12%bonusRolling... %c04%total%c12. Congratulations on your win %c04%username%c12!";
+    private static final String ROLL_LOSE = "%b%c12%bonusRolling... %c04%total%c12. Better luck next time %c04%username%c12!";
     private static final String BONUS_ROLL = "BONUS ROLL! ";
           
     private ArrayList<Bet> openBets;
@@ -49,18 +50,20 @@ public class OverUnder extends Event {
         String message = event.getMessage();
         String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
-        
-        if ( isValidChannel( channel ) && event.getBot().userIsIdentified( sender ) ) {
-            try {
-                if (message.toLowerCase().startsWith( ROLL_CMD )) {
-                    roll(event);
-                } else if (message.toLowerCase().startsWith( CXL_CMD )) {
-                    cancel(event);
-                } else if (message.toLowerCase().startsWith( BET_CMD )) {
-                    ou(event);
+
+        synchronized (BaseBot.lockObject) {
+            if ( isValidChannel( channel ) && event.getBot().userIsIdentified( sender ) ) {
+                try {
+                    if (message.toLowerCase().startsWith( ROLL_CMD )) {
+                        roll(event);
+                    } else if (message.toLowerCase().startsWith( CXL_CMD )) {
+                        cancel(event);
+                    } else if (message.toLowerCase().startsWith( BET_CMD )) {
+                        ou(event);
+                    }
+                } catch (Exception e) {
+                    EventLog.log(e, "OverUnder", "message");
                 }
-            } catch (Exception e) {
-                EventLog.log(e, "Roulette", "message");
             }
         }
     }
@@ -69,7 +72,7 @@ public class OverUnder extends Event {
 		// make sure they don't have an open bet otherwise let them know to
 		// roll or cancel.		
 		DB db = DB.getInstance();
-		String[] msg = event.getMessage().split("");
+		String[] msg = event.getMessage().split(" ");
 		IrcBot bot = event.getBot();
 		String username = event.getUser().getNick();
         String channel = event.getChannel().getName();
@@ -94,9 +97,9 @@ public class OverUnder extends Event {
                 bot.sendIRCMessage(channel, INVALID_BET);
             } else if (amount <= 0) {
                 bot.sendIRCMessage(channel, INVALID_BETSIZE);
-			} else if (!choice.equalsIgnoreCase("over")
-						&& !choice.equalsIgnoreCase("under")
-						&& !choice.equalsIgnoreCase("7")) {
+			} else if (!choice.equalsIgnoreCase("over") &&
+			           !choice.equalsIgnoreCase("under") &&
+					   !choice.equalsIgnoreCase("7")) {
                 bot.sendIRCMessage(channel, INVALID_BET);
 			} else if (db.checkCredits(username) < amount) {
                 bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));

@@ -61,14 +61,13 @@ public class CheckIdentified extends Event {
     public void message(Message event) {
         IrcBot bot = event.getBot();
         User user = event.getUser();
-        if ( !bot.userIsIdentified( user.getNick() ) ) {
-            if ( event.getMessage().startsWith("!") ) {
-                sendStatusRequest( bot, user );
-                // If we already told this user, don't tell them again
-                if ( !SentNoIdent.contains( user.getNick() ) ) {
-                    bot.sendIRCMessage( user.getNick(), NotIdentifiedMsg );
-                    SentNoIdent.add( user.getNick() );
-                }
+        if ( !bot.userIsIdentified( user.getNick() ) && 
+              event.getMessage().startsWith("!") ) {
+            sendStatusRequest( bot, user );
+            // If we already told this user, don't tell them again
+            if ( !SentNoIdent.contains( user.getNick() ) ) {
+                bot.sendIRCMessage( user.getNick(), NotIdentifiedMsg );
+                SentNoIdent.add( user.getNick() );
             }
         }
     }
@@ -85,8 +84,10 @@ public class CheckIdentified extends Event {
     @Override
     public void join(Join event) {
         User user = event.getUser();
+        String nick = user.getNick();
         // (Re-)Check the user's status with NickServ
-        if (user.getNick().compareToIgnoreCase( event.getBot().getNick() ) != 0) {
+        if (!nick.equalsIgnoreCase( event.getBot().getNick() ) &&
+            !nick.equalsIgnoreCase( "X" )) {
             event.getBot().removeIdentifiedUser( user.getNick() );
             sendStatusRequest( event.getBot(), user );
         }
@@ -118,8 +119,12 @@ public class CheckIdentified extends Event {
         IrcBot bot = event.getBot();
         // TODO: fix concurrency issue here
         for (User usr: event.getUsers()) {
-            bot.removeIdentifiedUser( usr.getNick() );
-            sendStatusRequest( bot, usr );
+            String nick = usr.getNick();
+            if (!nick.equalsIgnoreCase( bot.getNick() ) &&
+                !nick.equalsIgnoreCase( "X" )) {
+                bot.removeIdentifiedUser( usr.getNick() );
+                sendStatusRequest( bot, usr );
+            }
         }
     }
     
@@ -167,7 +172,7 @@ public class CheckIdentified extends Event {
         FutureTask<Boolean> choicetask = new FutureTask<Boolean>( new CheckUser(bot, user) );
         executor.execute(choicetask);
         try {
-            ret = choicetask.get(2, TimeUnit.SECONDS);
+            ret = choicetask.get(2500, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
             // Do nothing, we expect this.
             ret = null;

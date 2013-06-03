@@ -8,6 +8,7 @@
  */ 
 package org.smokinmils;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -16,7 +17,6 @@ import java.util.List;
  * @author Jamie Reid
  */
 public class Utils {
-	
 	/*
 	 * A method that will handle parsing of integers without throwing an exception
 	 * 
@@ -50,5 +50,10 @@ public class Utils {
             i++;                    
         }
         return out;
+	}
+	
+	public static String chipsToString(double chips) {
+	    DecimalFormat df = new DecimalFormat("#.#");
+	    return df.format(chips);
 	}
 }

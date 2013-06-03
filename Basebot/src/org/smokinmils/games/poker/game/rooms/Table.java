@@ -745,7 +745,7 @@ public class Table extends Room {
 		    	IrcClient.getBot().sendIRCMessage( IrcChannel, out );
 			   
 			   if (actionTimer != null) actionTimer.cancel();
-			   actionTimer = new Timer();
+			   actionTimer = new Timer(true);
 			   actionTimer.schedule( new TableTask( this, TableTask.ActionWarningTaskName), Variables.ActionWarningTimeSecs*1000);
 		   }
 		   break;
@@ -1066,7 +1066,7 @@ public class Table extends Room {
 		actionReceived = false;
 		
 		// Schedule time out
-		actionTimer = new Timer();
+		actionTimer = new Timer(true);
 		actionTimer.schedule( new TableTask( this, TableTask.ActionTaskName ),
 				(Variables.ActionTimeSecs-Variables.ActionWarningTimeSecs)*1000 );
 	}

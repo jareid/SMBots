@@ -239,7 +239,10 @@ public class DB {
     * 
     * @return			The amount of credits
     */
-   public int checkCredits(String username) throws DBException, SQLException  {
+   public int checkCreditsAsInt(String username) throws DBException, SQLException  {
+       return (int)Math.floor(checkCredits(username));
+   }
+   public double checkCredits(String username) throws DBException, SQLException  {
 	   ProfileType active = getActiveProfile( username );
 	   return checkCredits(username, active);
    }
@@ -254,14 +257,18 @@ public class DB {
     * 
     * @return			The amount of credits
     */
-   public int checkCredits(String username, ProfileType profile)
+   public int checkCreditsAsInt(String username, ProfileType profile)
+           throws DBException, SQLException  {
+       return (int)Math.floor(checkCredits(username, profile));
+   }
+   public double checkCredits(String username, ProfileType profile)
 		   throws DBException, SQLException  {
 	   String sql = "SELECT " + UserProfilesView.Col_Amount +
 			   		" FROM " + UserProfilesView.Name +
 				 	" WHERE " + UserProfilesView.Col_Username + " = '" + username + "' AND "
 				 			  + UserProfilesView.Col_Profile + " = '" + profile.toString() + "'";
 	   
-	   int credits = runGetIntQuery( sql );
+	   int credits = (int)Math.floor(runGetDblQuery( sql ));
 	   if (credits < 0) credits = 0;
 	   return credits;
    }
@@ -275,9 +282,9 @@ public class DB {
     * 
     * @return			The amount of credits
     */
-   public Map<ProfileType,Integer> checkAllCredits(String username)
+   public Map<ProfileType,Double> checkAllCredits(String username)
 		   throws DBException, SQLException {
-	   Map<ProfileType,Integer> res = new HashMap<ProfileType,Integer>();
+	   Map<ProfileType,Double> res = new HashMap<ProfileType,Double>();
 	   Connection conn = null;
 	   Statement stmt = null;
 	   ResultSet rs = null;
@@ -293,7 +300,7 @@ public class DB {
 		   
 		   while ( rs.next() ) {
 			   res.put(ProfileType.fromString(rs.getString(UserProfilesView.Col_Profile)), 
-					   rs.getInt(UserProfilesView.Col_Amount));
+					   rs.getDouble(UserProfilesView.Col_Amount));
 		   }
 	   } catch (SQLException e) {
 		  throw new DBException(e, sql);
@@ -377,7 +384,14 @@ public class DB {
 	 * @throws SQLException 
 	 */
 	public void processOtherRefunds() throws DBException, SQLException {
-	    String sql_select = "SELECT username, amount, profile FROM bets";
+	    String sql_select = "SELECT ut." + UsersTable.Col_Username + ", "
+	                                     + BetsTable.Col_Amount + ", " +
+	                              " pt." + ProfileTypeTable.Col_Name +
+	                        " FROM " + BetsTable.Name + " bt" +
+	                        " JOIN " + UsersTable.Name + " ut ON ut."
+	                                 + UsersTable.Col_ID + " = bt." + BetsTable.Col_UserID +
+	                        " JOIN " + ProfileTypeTable.Name + " pt ON pt."
+	                                 + ProfileTypeTable.Col_ID + " = bt." + BetsTable.Col_Profile;
 	    String sql_delete = "DELETE FROM bets WHERE 1";
 	    
 	    Connection conn = null;
@@ -386,15 +400,15 @@ public class DB {
 		try {
 			conn = getConnection();
 			stmt = conn.createStatement();
-			// cache user ids in a HashMap for ease
             try {
                 rs = stmt.executeQuery(sql_select);
             } catch (SQLException e) {
                 throw new DBException(e.getMessage(), sql_select);
             }
 			while (rs.next()) {
-				adjustChips(rs.getString("username"), rs.getInt("amount"),
-						 	ProfileType.fromString(rs.getString("profile")), 
+				adjustChips(rs.getString("ut." + UsersTable.Col_Username),
+				            rs.getInt(BetsTable.Col_Amount),
+						 	ProfileType.fromString(rs.getString(ProfileTypeTable.Col_Name)), 
 						 	GamesType.ADMIN, TransactionType.ADMIN);
 			}
             try {
@@ -488,12 +502,12 @@ public class DB {
     * 
     * @return			The list of profile types
     */
-   public String getProfileName(int id) throws DBException, SQLException {
+   public ProfileType getProfileName(int id) throws DBException, SQLException {
 	   String sql = "SELECT " + ProfileTypeTable.Col_Name +
 			   		" FROM " + ProfileTypeTable.Name +
 			   		" WHERE "  + ProfileTypeTable.Col_ID + " = '" + id + "'";
 	   
-	   return runGetStringQuery( sql );
+	   return ProfileType.fromString(runGetStringQuery( sql ));
    }
    
    /**
@@ -1129,7 +1143,7 @@ public class DB {
     
     public boolean isRank(String user) throws DBException, SQLException {
         String sql = "SELECT COUNT(*) FROM " + HostGroupUsersTable.Name +
-                " WHERE " + HostGroupUsersTable.Col_UserID + " = " + getUserIDSQL(user);
+                " WHERE " + HostGroupUsersTable.Col_UserID + " = (" + getUserIDSQL(user) + ")";
 
         return (runGetIntQuery(sql) > 0);
     }
@@ -1138,8 +1152,8 @@ public class DB {
     public void addRank(String user, String group) throws DBException, SQLException {
         String sql = "INSERT INTO " + HostGroupUsersTable.Name +
                         "(" + HostGroupUsersTable.Col_UserID + ", " 
-                            + HostGroupUsersTable.Col_GroupID + ")" +
-                     "VALUES(" + getUserIDSQL(user) + ", " + getRankGroupIDSQL(group) + ")";
+                             + HostGroupUsersTable.Col_GroupID + ")" +
+                     " VALUES((" + getUserIDSQL(user) + "), (" + getRankGroupIDSQL(group) + "))";
         runBasicQuery(sql);
     }
     
@@ -1149,20 +1163,20 @@ public class DB {
                         + " JOIN " + HostGroupsTable.Name + " hg ON "
                            + "hg." + HostGroupsTable.Col_ID + " = "
                            + "hgu." + HostGroupUsersTable.Col_GroupID
-                     + " WHERE hgu." + HostGroupUsersTable.Col_UserID + " = " + getUserIDSQL(user);
+                     + " WHERE hgu." + HostGroupUsersTable.Col_UserID + " = (" + getUserIDSQL(user) + ")";
         return runGetStringQuery(sql);        
     }
     
     public void updateRank(String user, String group) throws DBException, SQLException {
         String sql = "UPDATE " + HostGroupUsersTable.Name +
-                " SET " + HostGroupUsersTable.Col_GroupID + " = '" + getRankGroupIDSQL(group) + "'" +
-                " WHERE " + HostGroupUsersTable.Col_UserID + " = " + getUserIDSQL(user);
+                " SET " + HostGroupUsersTable.Col_GroupID + " = (" + getRankGroupIDSQL(group) + ")" +
+                " WHERE " + HostGroupUsersTable.Col_UserID + " = (" + getUserIDSQL(user) + ")";
         runBasicQuery(sql);
     }
 
     public void kickRank(String user) throws DBException, SQLException {
         String sql = "DELETE FROM " + HostGroupUsersTable.Name +
-                     " WHERE " + HostGroupUsersTable.Col_UserID + " = " + getUserIDSQL(user);
+                     " WHERE " + HostGroupUsersTable.Col_UserID + " = (" + getUserIDSQL(user) + ")";
         runBasicQuery(sql);
     }
 
@@ -1182,7 +1196,8 @@ public class DB {
     public void newRankGroup(String group) throws DBException, SQLException {
         String sql = "INSERT INTO " + HostGroupsTable.Name + "(" + HostGroupsTable.Col_Name + ")" +
                      " VALUES('" + group + "')";
-                       
+
+        checkUserExists(group, group + "!" + group + "@" + group);
         runBasicQuery(sql);
     }
 
@@ -1195,9 +1210,9 @@ public class DB {
     
     public void addReferer(String user, String referrer) throws DBException, SQLException {
         String sql = "INSERT INTO " + ReferersTable.Name
-                            + "(" + ReferersTable.Col_UserID
+                            + "(" + ReferersTable.Col_UserID + ", "
                                   + ReferersTable.Col_RefererID + ")" +
-                     " VALUES(" + getUserIDSQL(user) + ", " + getUserIDSQL(referrer) + ")";
+                     " VALUES((" + getUserIDSQL(user) + "), (" + getUserIDSQL(referrer) + "))";
                        
         runBasicQuery(sql);
     }
@@ -1266,12 +1281,12 @@ public class DB {
 	
 	public void giveReferalFee(double fee, String user, ProfileType profile)
 	        throws DBException, SQLException {
-	    adjustChips(user, fee, profile, GamesType.ADMIN, TransactionType.REFERAL);	    
+	    adjustChips(user, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);	    
 	}
 	
 	public void houseFees(double fee, ProfileType profile) throws DBException, SQLException {
-	    checkUserExists("HOUSE", "");
-        adjustChips("HOUSE", fee, profile, GamesType.ADMIN, TransactionType.REFERAL);   
+	    checkUserExists("HOUSE", "HOUSE!HOUSE@HOUSE");
+        adjustChips("HOUSE", fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);   
 	}
    
    /**
@@ -1390,6 +1405,48 @@ public class DB {
 		   }
 	   }
 	   return ret;
+   }
+   
+   /**
+    * Runs a single query that returns a single column and row
+    * 
+    * @param query  The query to execute
+    * 
+    * @return       The resulting integer
+    * 
+    * @throws DBException
+    * @throws SQLException
+    */
+   private double runGetDblQuery(String query) throws DBException, SQLException {
+       Connection conn = null;
+       Statement stmt = null;
+       ResultSet rs = null;
+       double ret = -1;
+       try {
+           try {
+               conn = getConnection();
+               stmt = conn.createStatement();
+               stmt.setMaxRows(1);
+               rs = stmt.executeQuery(query);
+               
+               if ( rs.next() ) {
+                   ret = rs.getDouble(1);
+               }
+           } catch (SQLException e) {
+               throw new DBException(e.getMessage(), query);
+           }
+       } catch (DBException ex) {
+           throw ex;
+       } finally {
+           try {
+               if (rs != null) rs.close();
+               if (stmt != null) stmt.close();
+               if (conn != null) conn.close();
+           } catch (SQLException e) {
+                throw e;
+           }
+       }
+       return ret;
    }
    
    /**
@@ -1566,7 +1623,7 @@ public class DB {
     * Provides the SQL for getting a host group ID
     */
    private static final String getRankGroupIDSQL(String group) {
-       String out = "(SELECT hg." + HostGroupsTable.Col_ID + " FROM " + HostGroupsTable.Name +
+       String out = "(SELECT hg." + HostGroupsTable.Col_ID + " FROM " + HostGroupsTable.Name + " hg" +
                     " WHERE hg." + HostGroupsTable.Col_Name + " LIKE '" + group + "')";
        return out;
    }

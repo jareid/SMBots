@@ -32,10 +32,10 @@ public class GroupReferal extends Event {
     private static final String Format = "%b%c12" + Command + " <user> <referrers>";
     
     private static final String NOT_RANKED = "%b%c04%sender%c12: %c04%who%c12 is currently not a member of any rank group.";
-    private static final String NO_USER = "%c04%sender%c12: %c04%who%c12 does not exist as a user.";
-    private static final String NO_SELF = "%c04%sender%c12: You can not be your own referrer.";
-    private static final String SUCCESS = "%c04%sender%c12: Succesfully added %c04%referrers%c12 as %c04%who%c12's referer(s).";
-    private static final String FAILED = "%c04%sender%c12: %c04%who%c12 is a public referral and can't be given to ranks.";
+    private static final String NO_USER = "%b%c04%sender%c12: %c04%who%c12 does not exist as a user.";
+    private static final String NO_SELF = "%b%c04%sender%c12: You can not be your own referrer.";
+    private static final String SUCCESS = "%b%c04%sender%c12: Succesfully added %c04%referrers%c12 as %c04%who%c12's referer(s).";
+    private static final String FAILED = "%b%c04%sender%c12: %c04%who%c12 is a public referral and can't be given to ranks.";
     
 	/**
 	 * This method handles the chips command
@@ -95,10 +95,11 @@ public class GroupReferal extends Event {
                         bot.sendIRCMessage(channel, out);
                         
                         is_ok = false;
-                    }
+                    } 
                     
                     // break from the loop if we had a problem.
                     if (!is_ok) break;
+                    else refs.add(ref);
                 }
                 
                 if (is_ok) {

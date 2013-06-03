@@ -10,7 +10,7 @@ package org.smokinmils.games.poker;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
-import org.smokinmils.SMBaseBot;
+import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Action;
@@ -65,10 +65,26 @@ public class Client extends Event {
 	
 	public Client( String server, String lobby ) {
 		ServerName = server;
-		Bot = SMBaseBot.getInstance().getBot(ServerName);
+		Bot = BaseBot.getInstance().getBot(ServerName);
     	validChannels = new HashMap<String, Room>();
     	validTables = new HashMap<Integer, String>();
     	lobbyChan = lobby;
+	}
+	
+	public void initialise() {
+	       // At a minimum, we should exist in a lobby
+        if ( validChannels.isEmpty() ) {
+            Bot.joinChannel( lobbyChan );
+            Lobby lobby = new Lobby( Bot.getChannel(lobbyChan), this );
+            lobby.start();
+            validChannels.put( lobbyChan.toLowerCase(), lobby );
+        }
+        
+        // Request invites from Chanserv and attempt to join all channels
+        for (Entry<String, Room> entry : validChannels.entrySet() ) {
+            Bot.sendMessage("ChanServ", "INVITE " + entry.getKey() );
+            Bot.joinChannel( entry.getKey() );
+        }
 	}
 	
 	/**
@@ -78,19 +94,7 @@ public class Client extends Event {
 	 * @see org.jibble.pircbot.PircBot#onConnect()
 	 */
 	public void connect(Connect event) {
-		// At a minimum, we should exist in a lobby
-		if ( validChannels.isEmpty() ) {
-			event.getBot().joinChannel( lobbyChan );
-			Lobby lobby = new Lobby( Bot.getChannel(lobbyChan), this );
-			lobby.start();
-			validChannels.put( lobbyChan.toLowerCase(), lobby );
-		}
-		
-		// Request invites from Chanserv and attempt to join all channels
-		for (Entry<String, Room> entry : validChannels.entrySet() ) {
-			event.getBot().sendMessage("ChanServ", "INVITE " + entry.getKey() );
-			event.getBot().joinChannel( entry.getKey() );
-		}
+	    initialise();
 	}
 	
 	/**
@@ -435,7 +439,7 @@ public class Client extends Event {
 	public boolean userHasCredits( String username, int credits ) {
 		int usercred = 0;
 		try {
-			usercred = DB.getInstance().checkCredits( username );
+			usercred = DB.getInstance().checkCreditsAsInt( username );
 		} catch (Exception e) {
 			EventLog.log(e, "Client", "userHasCredits");
 		}
@@ -453,7 +457,7 @@ public class Client extends Event {
 	public boolean userHasCredits( String username, int credits, ProfileType profile ) {
 		int usercred = 0;
 		try {
-			usercred = DB.getInstance().checkCredits( username, profile );
+			usercred = DB.getInstance().checkCreditsAsInt( username, profile );
 		} catch (Exception e) {
 			EventLog.log(e, "Client", "userHasCredits");
 		}

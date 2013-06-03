@@ -48,12 +48,12 @@ public class Rake {
 	
    public static synchronized double getRake(String user, int bet, ProfileType profile) {
        double rake = RAKE * bet;
-       Referal.addEvent(user, profile, rake);       
+       Referal.getInstance().addEvent(user, profile, rake);       
        return rake;
    }
    
    public static synchronized double getRake(String user, double rake, ProfileType profile) {
-       Referal.addEvent(user, profile, rake);       
+       Referal.getInstance().addEvent(user, profile, rake);       
        return rake;
    }
 

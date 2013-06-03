@@ -10,35 +10,26 @@ package org.smokinmils.bots;
 
 import java.util.Timer;
 
-import org.smokinmils.SMBaseBot;
+import org.smokinmils.BaseBot;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.cashier.commands.*;
 import org.smokinmils.cashier.tasks.*;
-import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.*;
 import org.smokinmils.games.poker.*;
 import org.smokinmils.games.rockpaperscissors.*;
 import org.smokinmils.games.timedrollcomp.*;
 import org.smokinmils.help.Help;
-import org.smokinmils.logging.EventLog;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
  * 
  * @author Jamie Reid
  */
-public class CashierBot {
+public class Bot {
     public static void main(String[] args) throws Exception {
-	    try {
-	        DB.getInstance().processRefunds();
-	    } catch (Exception e) {
-	        EventLog.fatal(e, "Casino", "Casino");
-	        System.exit(0);
-	    }
-    	
-    	SMBaseBot basebot = SMBaseBot.getInstance();
+    	BaseBot basebot = BaseBot.getInstance();
     	boolean debug = true;
     	basebot.initialise("SM_BOT", "5w807", "smokinmils", debug);
     	String swift_irc = "SwiftIRC";

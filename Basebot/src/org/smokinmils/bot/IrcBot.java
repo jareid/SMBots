@@ -16,7 +16,7 @@ import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.smokinmils.SMBaseBot;
+import org.smokinmils.BaseBot;
 import org.smokinmils.database.types.ProfileType;
 
 /**
@@ -56,7 +56,7 @@ public class IrcBot extends PircBotX {
 	 * @return The name of the server
 	 */
 	public String getServer() {
-		return SMBaseBot.getInstance().getServer(this);
+		return BaseBot.getInstance().getServer(this);
 	}
 	
 	/**

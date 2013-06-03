@@ -32,11 +32,13 @@ public class Lottery extends Event {
 	public static final String Description = "%b%c12Buys a quantity of lottery tickets for the active profile";
 	public static final String Format = "%b%c12" + Command + " <quantity>";
 	
-	private static final String BoughtTickets = "%b%c12The %c04%profile%c12 Weekly Lottery is now at a total of %c04%amount%c12 chips! It's 1 chip per ticket, %c04%percent%%c12 of the pot is paid out. Time to draw: %c04%timeleft%c12. To buy 1 ticket with your active profile type %c04%cmd 1";
-	private static final String LotteryEnded = "%b%c12The %c04%profile%c12 Weekly Lottery has now ended! This week's winner was %c04%winner%c12 and they won %c04%amount%c12 chips!";
-	private static final String Reset = "%b%c12A new weekly lottery has begun! It's 1 chip per ticket, %c04%percent%%c12 of the pot is paid out. Time to draw: %c04%timeleft%c12. To buy 1 ticket with your active profile type %c04%cmd 1";
+	private static final String BoughtTickets = "%b%c01The %c04%profile%c01 Weekly Lottery is now at a total of %c04%amount%c01 chips! It's 1 chip per ticket, %c04%percent%%c01 of the pot is paid out. Time to draw: %c04%timeleft%c01. To buy 1 ticket with your active profile type %c04%cmd 1";
+	private static final String LotteryEnded = "%b%c01The %c04%profile%c01 Weekly Lottery has now ended! This week's winner was %c04%winner%c01 and they won %c04%amount%c01 chips!";
+	private static final String Reset = "%b%c01A new weekly lottery has begun! It's 1 chip per ticket, %c04%percent%%c01 of the pot is paid out. Time to draw: %c04%timeleft%c01. To buy 1 ticket with your active profile type %c04%cmd 1";
 
 	private static final int LotteryPercent = 90;
+	
+	private static final boolean Enabled = false;
 	
 	/**
 	 * This method handles the chips command
@@ -63,7 +65,7 @@ public class Lottery extends Event {
 				if (amount != null && amount > 0) {						
 					try {
 						DB db = DB.getInstance();
-						int chips = db.checkCredits( sender );
+						int chips = db.checkCreditsAsInt( sender );
 						ProfileType profile = db.getActiveProfile(sender);
 						if ( amount > chips ) {
 							bot.NoChips(sender, amount, profile);
@@ -89,25 +91,31 @@ public class Lottery extends Event {
 	
 	public static void announceLottery(IrcBot bot, ProfileType profile, String channel)
 			throws DBException, SQLException {
+	    if (!Enabled) return;
+	    
 		DB db = DB.getInstance();
-		int secs = db.getCompetitionTimeLeft();
 		int amount = db.getLotteryTickets(profile);
+		if (amount > 0) {
+	        int secs = db.getCompetitionTimeLeft();
 		
-		String duration = String.format("%%c04%d%%c12 day(s) %%c04%d%%c12 hour(s) %%c04%d%%c12 min(s)",
-				secs/(60*60*24),
-				(secs%(60*60*24))/(60*60),
-				((secs%(60*60*24))%(60*60))/60);
-	
-		String out = BoughtTickets.replaceAll("%profile", profile.toString() );
-		out = out.replaceAll("%timeleft", duration );
-		out = out.replaceAll("%amount", Integer.toString(amount) );
-		out = out.replaceAll("%percent", Integer.toString(LotteryPercent) );
-		out = out.replaceAll("%cmd", Command );
-		
-		bot.sendIRCMessage(channel, out);
+    		String duration = String.format("%%c04%d%%c12 day(s) %%c04%d%%c12 hour(s) %%c04%d%%c12 min(s)",
+    				secs/(60*60*24),
+    				(secs%(60*60*24))/(60*60),
+    				((secs%(60*60*24))%(60*60))/60);
+    	
+    		String out = BoughtTickets.replaceAll("%profile", profile.toString() );
+    		out = out.replaceAll("%timeleft", duration );
+    		out = out.replaceAll("%amount", Integer.toString(amount) );
+    		out = out.replaceAll("%percent", Integer.toString(LotteryPercent) );
+    		out = out.replaceAll("%cmd", Command );
+    		
+    		bot.sendIRCMessage(channel, out);
+		}
 	}
 	
 	public static void endLottery(IrcBot bot, String channel) {
+        if (!Enabled) return;
+        
 		try {
 			DB db = DB.getInstance();
 			for (ProfileType profile: ProfileType.values()) {				
@@ -135,6 +143,8 @@ public class Lottery extends Event {
 	
 	public static void announceReset(IrcBot bot, String channel)
 			throws DBException, SQLException {
+	    if (!Enabled) return;
+	    
 		int secs = DB.getInstance().getCompetitionTimeLeft();
 		
 		String duration = String.format("%%c04%d%%c12 day(s) %%c04%d%%c12 hour(s) %%c04%d%%c12 min(s)",

@@ -19,20 +19,24 @@ import org.smokinmils.database.DBException;
 * @author Jamie Reid
 */
 public enum ProfileType {
-	_07("07"),
-	EOC("eoc"),
-	PLAY("play"),
+	_07("07",true),
+	EOC("eoc",true),
+	PLAY("play",false),
 	;
 	
 	/** The text. */
 	private final String text;
 	
+	/** Value that stores whether this has competitions */
+	private final boolean comps;
+	
 	/**
 	 * Constructor.
 	 * @param text  textual representation.
 	 */
-	ProfileType(String text) {
+	ProfileType(String text, boolean comps) {
 		this.text = text;
+		this.comps = comps;
 	}
 	
 	/**
@@ -41,6 +45,8 @@ public enum ProfileType {
 	 * @return The textual representation.
 	 */
 	public String getText() { return text; }
+	
+    public boolean hasComps() { return comps; }
 	
 	/**
 	 * (non-Javadoc)

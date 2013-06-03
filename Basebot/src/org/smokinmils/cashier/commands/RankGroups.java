@@ -40,9 +40,9 @@ public class RankGroups extends Event {
     
     private static final String NOT_RANKED = "%b%c04%who%c12 is currently not a member of any rank group.";
     private static final String NO_USER = "%b%c04%who%c12 does not exist as a user.";
-    private static final String KICKED = "%b%c04%who%c12 has beened kicked from the %c04%group%c12 rank group.";
-    private static final String ADDED = "%b%c04%who%c12 has beened added to the %c04%group%c12 rank group.";
-    private static final String MOVED = "%b%c04%who%c12 has beened moved from %c04%oldgroup%c12 to %c04%group%c12.";
+    private static final String KICKED = "%b%c04%who%c12 has been kicked from the %c04%group%c12 rank group.";
+    private static final String ADDED = "%b%c04%who%c12 has been added to the %c04%group%c12 rank group.";
+    private static final String MOVED = "%b%c04%who%c12 has been moved from %c04%oldgroup%c12 to %c04%group%c12.";
     private static final String NO_GROUP = "%b%c04%group%c12 does not exist as a rank group.";
     private static final String GROUP_EXISTS = "%b%c04%group%c12 already exists as a rank group.";
     private static final String GROUP_CREATED = "%b%c04%group%c12 rank group has been created.";
@@ -121,17 +121,15 @@ public class RankGroups extends Event {
             String group = msg[2];
             if ( !db.checkUserExists(who) ) {
                 bot.sendIRCMessage(channel, NO_USER.replaceAll("%who",who));
-             } else if ( !db.isRank( who ) ) {
-                 bot.sendIRCMessage(channel, NOT_RANKED.replaceAll("%who",who));
             } else {
                 String out = null;
-                if ( db.isRank( who ) ) {
+                if ( !db.isRank( who ) ) {
+                    out = ADDED;                    
+                    db.addRank(who, group);
+                } else if ( db.isRank( who ) ) {
                     String oldgroup = db.getRankGroup(who);
                     out = MOVED.replaceAll("%oldgroup", oldgroup);                    
                     db.updateRank(who, group);
-                } else {
-                    out = ADDED;                    
-                    db.addRank(who, group);
                 }
                 
                 out = out.replaceAll("%who", who);
@@ -189,10 +187,10 @@ public class RankGroups extends Event {
         String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
         
-        if (msg.length == 2) {
+        if (msg.length == 3) {
             DB db = DB.getInstance();
             String oldgroup = msg[1];
-            String newgroup = msg[1];
+            String newgroup = msg[2];
             if ( !db.isRankGroup( oldgroup ) ) {
                 bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", oldgroup));
             } else if ( db.isRankGroup( newgroup ) ) {

@@ -17,5 +17,5 @@ public class ReferersTable {
 	public static final String Col_UserID = "user_id";
 	
 	/** Column for the name of the game */
-    public static final String Col_RefererID = "referer_id";
+    public static final String Col_RefererID = "referrer_id";
 }

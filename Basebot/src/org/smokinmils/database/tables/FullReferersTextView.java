@@ -10,7 +10,7 @@ package org.smokinmils.database.tables;
 
 public class FullReferersTextView {
     /** The name of the table */
-    public static final String Name = "full_referers";
+    public static final String Name = "full_referers_text";
     
     /** Column for the unique id */
     public static final String Col_Username = "username";

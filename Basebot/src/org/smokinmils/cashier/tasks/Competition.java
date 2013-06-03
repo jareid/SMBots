@@ -105,29 +105,31 @@ public class Competition extends TimerTask {
 		
 		Map<ProfileType, List<Integer>> all_prizes = readPrizes();
 		for (ProfileType profile: ProfileType.values()) {
-			try {				
-				List<BetterInfo> betters = db.getCompetition(profile, NumberWinners);
-				
-				List<Integer> prizes = all_prizes.get(profile);
-				// check there are enough prizes
-				if (prizes == null || prizes.size() < betters.size()) {
-					EventLog.log("Not enough prizes for " + profile.toString(), "Competition", "end");
-					Bot.sendIRCMessage(Channel,"%b%c04No competition prizes set for + " + profile.toString() + ", please talk to an admin");
-					continue;
-				}
-				
-				String prizestr = Utils.ListToString(prizes);
-				String all_wins = Utils.ListToString(betters);
-				
-				String out = AnnounceLine.replaceAll("%profile", profile.toString() );
-				out = out.replaceAll("%timeleft", duration );
-				out = out.replaceAll("%prizes", prizestr );
-				out = out.replaceAll("%players", all_wins);
-				
-				Bot.sendIRCMessage(Channel, out);
-			} catch (Exception e) {
-				EventLog.log(e, "Competition", "run");
-			}
+		    if (profile.hasComps()) {
+    			try {				
+    				List<BetterInfo> betters = db.getCompetition(profile, NumberWinners);
+    				
+    				List<Integer> prizes = all_prizes.get(profile);
+    				// check there are enough prizes
+    				if (prizes == null || prizes.size() < betters.size()) {
+    					EventLog.log("Not enough prizes for " + profile.toString(), "Competition", "end");
+    					Bot.sendIRCMessage(Channel,"%b%c04No competition prizes set for + " + profile.toString() + ", please talk to an admin");
+    					continue;
+    				}
+    				
+    				String prizestr = Utils.ListToString(prizes);
+    				String all_wins = Utils.ListToString(betters);
+    				
+    				String out = AnnounceLine.replaceAll("%profile", profile.toString() );
+    				out = out.replaceAll("%timeleft", duration );
+    				out = out.replaceAll("%prizes", prizestr );
+    				out = out.replaceAll("%players", all_wins);
+    				
+    				Bot.sendIRCMessage(Channel, out);
+    			} catch (Exception e) {
+    				EventLog.log(e, "Competition", "run");
+    			}
+		    }
 		}
 	}
 	
@@ -142,43 +144,45 @@ public class Competition extends TimerTask {
 		DB db = DB.getInstance();
 		Map<ProfileType, List<Integer>> all_prizes = readPrizes();
 		for (ProfileType profile: ProfileType.values()) {
-			try {
-				List<BetterInfo> betters = db.getCompetition(profile, NumberWinners);
-				
-				String out = WinnerAnnounceLine.replaceAll("%profile", profile.toString() );
-				String all_wins = "";
-				
-				List<Integer> prizes = all_prizes.get(profile);
-				// check there are enough prizes
-				if (prizes == null || prizes.size() < betters.size()) {
-					EventLog.log("Not enough prizes for " + profile.toString(), "Competition", "end");
-					Bot.sendIRCMessage(Channel,"%b%c04No competition prizes set for + " + profile.toString() + ", please talk to an admin");
-					continue;
-				}
-				
-				int i = 0;
-				for (BetterInfo player: betters) {
-					int prize = prizes.get(i);
-					
-					String winner = WinnerUserLine.replaceAll("%who", player.User);
-					all_wins += winner;
-					if (i == (betters.size() - 2)) {
-						all_wins += " and ";
-					} else if (i < (betters.size() - 2)) {
-						all_wins += ", ";
-					}
-					
-					db.giveChips(player.User, prize, profile);
-					
-					i++;
-				}
-				
-				out = out.replaceAll("%players", all_wins);
-				
-				Bot.sendIRCMessage(Channel,out);
-			} catch (Exception e) {
-				EventLog.log(e, "Competition", "end");
-			}
+		    if (profile.hasComps()) {
+    			try {
+    				List<BetterInfo> betters = db.getCompetition(profile, NumberWinners);
+    				
+    				String out = WinnerAnnounceLine.replaceAll("%profile", profile.toString() );
+    				String all_wins = "";
+    				
+    				List<Integer> prizes = all_prizes.get(profile);
+    				// check there are enough prizes
+    				if (prizes == null || prizes.size() < betters.size()) {
+    					EventLog.log("Not enough prizes for " + profile.toString(), "Competition", "end");
+    					Bot.sendIRCMessage(Channel,"%b%c04No competition prizes set for + " + profile.toString() + ", please talk to an admin");
+    					continue;
+    				}
+    				
+    				int i = 0;
+    				for (BetterInfo player: betters) {
+    					int prize = prizes.get(i);
+    					
+    					String winner = WinnerUserLine.replaceAll("%who", player.User);
+    					all_wins += winner;
+    					if (i == (betters.size() - 2)) {
+    						all_wins += " and ";
+    					} else if (i < (betters.size() - 2)) {
+    						all_wins += ", ";
+    					}
+    					
+    					db.giveChips(player.User, prize, profile);
+    					
+    					i++;
+    				}
+    				
+    				out = out.replaceAll("%players", all_wins);
+    				
+    				Bot.sendIRCMessage(Channel,out);
+    			} catch (Exception e) {
+    				EventLog.log(e, "Competition", "end");
+    			}
+		    }
 		}
 		
 		// Update the database for next competition
@@ -193,22 +197,24 @@ public class Competition extends TimerTask {
 	private Map<ProfileType, List<Integer>> readPrizes() {
 		Map<ProfileType, List<Integer>> results = new HashMap<ProfileType, List<Integer>>();
 		for (ProfileType profile: ProfileType.values()) {
-			List<Integer> prizes = new ArrayList<Integer>();
-			// read the prizes from a file
-			try {
-				BufferedReader readFile = new BufferedReader(new FileReader("comp_prizes." + profile.toString()));
-				String line = "";
-				while ((line = readFile.readLine()) != null) {
-					prizes.add( Utils.tryParse(line) );
-				}
-				readFile.close();
-			} catch (IOException e) {
-				EventLog.log(e, "Competition", "end");
-				EventLog.log("No data for " + profile.toString(), "Competition", "end");
-				Bot.sendIRCMessage(Channel,"%b%c04No competition prizes set for + " + profile.toString() + " please talk to an admin");
-				continue;
-			}
-			results.put(profile, prizes);
+		    if (profile.hasComps()) {
+    			List<Integer> prizes = new ArrayList<Integer>();
+    			// read the prizes from a file
+    			try {
+    				BufferedReader readFile = new BufferedReader(new FileReader("comp_prizes." + profile.toString()));
+    				String line = "";
+    				while ((line = readFile.readLine()) != null) {
+    					prizes.add( Utils.tryParse(line) );
+    				}
+    				readFile.close();
+    			} catch (IOException e) {
+    				EventLog.log(e, "Competition", "end");
+    				EventLog.log("No data for " + profile.toString(), "Competition", "end");
+    				Bot.sendIRCMessage(Channel,"%b%c04No competition prizes set for + " + profile.toString() + " please talk to an admin");
+    				continue;
+    			}
+    			results.put(profile, prizes);
+		    }
 		}
 		return results;
 	}

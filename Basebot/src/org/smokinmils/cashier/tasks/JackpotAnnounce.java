@@ -42,6 +42,8 @@ public class JackpotAnnounce extends TimerTask {
 	 * @see java.util.TimerTask#run()
 	 */
 	public void run() {
-		Bot.sendIRCMessage(Channel, Rake.getAnnounceString());
+	    if (Rake.JackpotEnabled) {
+	        Bot.sendIRCMessage(Channel, Rake.getAnnounceString());
+	    }
 	}
 }

@@ -24,7 +24,7 @@ public enum TransactionType {
 	JACKPOT("pkrjackpot"),
 	POKER_BUYIN("pokerbuy"),
 	POKER_CASHOUT("pokercash"),
-    REFERAL("referal"),
+    REFERRAL("referral"),
 	RESET("reset"),
 	TRANSFER("transfer"),
 	WIN("win"),

@@ -85,7 +85,7 @@ public class TimedRollComp extends Event {
 			bot.getListenerManager().addListener( this );	
 	
 			// Start the timer
-			Timer = new java.util.Timer();
+			Timer = new Timer(true);
 			Timer.scheduleAtFixedRate( new TimedRollTask(), mins*60*1000, mins*60*1000);
 		}
 	}

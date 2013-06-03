@@ -20,12 +20,9 @@ public enum GamesType {
 	OVER_UNDER("Over Under"),
 	POKER("Poker"),
 	ROULETTE("Roulette"),
-	ROULETTE_COLOUR("Roulette Colour"),
-	ROULETTE_EVENODD("Roulette Even/Odd"),
-	ROULETTE_NUMBER("Roulette Number"),
-	ROULETTE_ROW("Roulette Row"),
 	ROCKPAPERSCISSORS("Rock Paper Scissors"),
 	TIMEDROLL("Timed Roll"),
+	OTHER("other"), /* Added for historical reasons */
 	;
 	
 	/** The text. */
@@ -67,6 +64,6 @@ public enum GamesType {
         		}
         	}
         }
-        return null;
+        return OTHER;
     }
 }

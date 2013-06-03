@@ -60,7 +60,7 @@ public final class Strings {
 	/**
 	 * This string is output the poker announcement
 	 */
-	public static final String PokerAnnounce = "%b%c12Poker games now running. Use %c04!tables%c12 for a list of open tables. Use %c04!poker%c12 for a list of commands.";
+	public static final String PokerAnnounce = "%b%c01Poker games now running. Use %c04!tables%c01 for a list of open tables. Use %c04!poker%c01 for a list of commands.";
 	
 	
 	/**
