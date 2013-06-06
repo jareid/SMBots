@@ -29,4 +29,8 @@ public class Random {
 		secureRand = new SecureRandom();
 		return secureRand.nextInt(max);
 	}
+	
+	public static Double nextDouble() {
+        return secureRand.nextDouble();
+	}
 }

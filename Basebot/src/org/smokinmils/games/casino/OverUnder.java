@@ -89,7 +89,7 @@ public class OverUnder extends Event {
 				}
 			}
 			
-			Integer amount = Utils.tryParse(msg[1]);
+			Double amount = Utils.tryParseDbl(msg[1]);
 			String choice = msg[2];
 			if (found) {
                 bot.sendIRCMessage(channel, OPEN_WAGER.replaceAll("%username", username));
@@ -112,7 +112,7 @@ public class OverUnder extends Event {
 				
 				String out = NEW_WAGER.replaceAll("%username", username);
 				out = out.replaceAll("%choice", choice);
-                out = out.replaceAll("%amount", Integer.toString(amount));
+                out = out.replaceAll("%amount", Utils.chipsToString(amount));
                 bot.sendIRCMessage(channel, out);                
 			}
 		}
@@ -133,7 +133,7 @@ public class OverUnder extends Event {
 				int total = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1);
 
 				if ( doesBetWin(bet, total) ) {
-					int winnings = 2 * bet.getAmount();
+					double winnings = 2 * bet.getAmount();
 					if (bet.getChoice().equalsIgnoreCase("7")) {
 						winnings = 5 * bet.getAmount();
 					}
@@ -162,7 +162,7 @@ public class OverUnder extends Event {
 					if (Math.random() > r) {
 						total = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1);
 						if (doesBetWin(bet, total)) {
-							int winnings = 2 * bet.getAmount();
+						    double winnings = 2 * bet.getAmount();
 							if (bet.getChoice().equalsIgnoreCase("7")) {
 								winnings = 5 * bet.getAmount();
 							}
@@ -193,7 +193,7 @@ public class OverUnder extends Event {
 				Rake.getRake(bet.getUser(), bet.getAmount(), bet.getProfile());
 				
 				//check if jackpot won
-				if (Rake.checkJackpot()) {
+				if (Rake.checkJackpot(bet.getAmount())) {
 					ArrayList<String> winners = new ArrayList<String>();
 					winners.add(bet.getUser());
 					Rake.jackpotWon(bet.getProfile(), GamesType.OVER_UNDER, winners, bot, null);

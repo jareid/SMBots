@@ -1584,20 +1584,17 @@ public class Table extends Room {
     }
     	
     private void doRake(int rake) {
-        List<String> players = new ArrayList<String>();
         double ind_rake = ((double)rake) / jackpotPlayers.size();
         for (Player player: jackpotPlayers) {
             if (player.getBet() >= bigBlind) {
-                players.add(player.getName());
+                
+                if (Rake.checkJackpot((double)player.getBet())) {
+                    List<String> players = new ArrayList<String>();
+                    players.add(player.getName());
+                    Rake.jackpotWon(Profile, GamesType.POKER, players, IrcClient.getBot(), IrcChannel.getName());
+                }
             }
-        }
-        
-        for (String player: players) {
-            Rake.getRake(player, ind_rake, Profile);
-        }
-        
-        if (Rake.checkJackpot()) {
-            Rake.jackpotWon(Profile, GamesType.POKER, players, IrcClient.getBot(), IrcChannel.getName());
+            Rake.getPokerRake(player.getName(), ind_rake, Profile);
         }
     }
 

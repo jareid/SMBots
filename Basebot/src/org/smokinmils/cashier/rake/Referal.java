@@ -31,7 +31,7 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie Reid
  */
 public class Referal extends Thread {
-    private static final double JACKPOT_PERCENT = 0.20;
+    private static final double JACKPOT_PERCENT = 0.10;
     private static final double GROUP_PERCENT = 0.20;
     private static final double USER_PERCENT = 0.20;
     

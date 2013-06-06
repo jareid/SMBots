@@ -83,169 +83,163 @@ public class DiceDuel extends Event {
     }
 	
 	private void dd(Message event) throws DBException, SQLException {
-        synchronized (BaseBot.lockObject) {
-    		String username = event.getUser().getNick();
-    		DB db = DB.getInstance();
-            String[] msg = event.getMessage().split(" ");
-            IrcBot bot = event.getBot();
-            String channel = event.getChannel().getName();
-            
-    		if (msg.length < 2) {
-                bot.sendIRCMessage(channel, INVALID_BET);
-    		} else {		
-    			// check if they already have an openbet
-    			for (Bet bet : openBets) {
-    				if (bet.getUser().equalsIgnoreCase(username)) {
-    					bot.sendIRCMessage(channel, OPEN_WAGER.replaceAll("%username", username));
-    				}			
-    			}
-    			
-    			// attempt to parse the amount
-    			Integer amount = Utils.tryParse(msg[1]);
-    			if (amount == null) {
-    	            bot.sendIRCMessage(channel, INVALID_BET);
-    			} else if (amount <= 0) {
-                    bot.sendIRCMessage(channel, INVALID_BETSIZE);
-    			} else if (db.checkCredits(username) >= amount) { // add bet, remove chips,notify channel
-    				ProfileType profile = db.getActiveProfile(username);
-    				Bet bet = new Bet(username, profile, amount, "");
-    				openBets.add(bet);
-    				db.adjustChips(username, -amount, profile,
-    							   GamesType.DICE_DUEL, TransactionType.BET);
-    				db.addBet(username, "", amount, profile, GamesType.DICE_DUEL);
-    				
-    				String out = NEW_WAGER.replaceAll("%username", username);
-    				out = out.replaceAll("%amount", Integer.toString(amount) );
-    				out = out.replaceAll("%proftype", (bet.getProfile() == ProfileType.PLAY ? "play" : "real") );
-                    bot.sendIRCMessage(channel, out);
-    			} else {
-                    bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
-    			}
-    		}
-        }
+		String username = event.getUser().getNick();
+		DB db = DB.getInstance();
+        String[] msg = event.getMessage().split(" ");
+        IrcBot bot = event.getBot();
+        String channel = event.getChannel().getName();
+        
+		if (msg.length < 2) {
+            bot.sendIRCMessage(channel, INVALID_BET);
+		} else {		
+			// check if they already have an openbet
+			for (Bet bet : openBets) {
+				if (bet.getUser().equalsIgnoreCase(username)) {
+					bot.sendIRCMessage(channel, OPEN_WAGER.replaceAll("%username", username));
+				}			
+			}
+			
+			// attempt to parse the amount
+			Double amount = Utils.tryParseDbl(msg[1]);
+			if (amount == null) {
+	            bot.sendIRCMessage(channel, INVALID_BET);
+			} else if (amount <= 0) {
+                bot.sendIRCMessage(channel, INVALID_BETSIZE);
+			} else if (db.checkCredits(username) >= amount) { // add bet, remove chips,notify channel
+				ProfileType profile = db.getActiveProfile(username);
+				Bet bet = new Bet(username, profile, amount, "");
+				openBets.add(bet);
+				db.adjustChips(username, -amount, profile,
+							   GamesType.DICE_DUEL, TransactionType.BET);
+				db.addBet(username, "", amount, profile, GamesType.DICE_DUEL);
+				
+				String out = NEW_WAGER.replaceAll("%username", username);
+				out = out.replaceAll("%amount", Utils.chipsToString(amount) );
+				out = out.replaceAll("%proftype", (bet.getProfile() == ProfileType.PLAY ? "play" : "real") );
+                bot.sendIRCMessage(channel, out);
+			} else {
+                bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
+			}
+		}
 	}
 
 	private void call(Message event) throws DBException, SQLException {
-        synchronized (BaseBot.lockObject) {
-        	String username = event.getUser().getNick();
-        	IrcBot bot = event.getBot();
-        	String[] msg = event.getMessage().split(" ");
-            String channel = event.getChannel().getName();
-            
-        	DB db = DB.getInstance();
-        	String p1 = username; // user who is calling
-        	String p2 = msg.length < 2 ? null : msg[1];
+    	String username = event.getUser().getNick();
+    	IrcBot bot = event.getBot();
+    	String[] msg = event.getMessage().split(" ");
+        String channel = event.getChannel().getName();
         
-        	// check to see if someone is playing themselves...
-        	if (p1.equalsIgnoreCase(p2))  {
-                bot.sendIRCMessage(channel, NO_SELFPLAY.replaceAll("%username", username));
-        	} else if (p2 != null) {
-        		boolean found = false;
-        		for (Bet bet : openBets) {
-        			if (bet.getUser().equalsIgnoreCase(p2) && bet.isValid()) {
-        				found = true;
-        				// first lock it to stop two people form calling it as this
-        				// is processing -- Shouldn't be possible with thread
-        				// locking now
-        				bet.invalidate();
-        				ProfileType p1prof = db.getActiveProfile(p1);
-        
-        				// quick hax to check if play chips vs non-play chips!
-        				if (p1prof != ProfileType.PLAY 
-        						&& bet.getProfile() == ProfileType.PLAY) {
-        					bet.reset();
-        		            bot.sendIRCMessage(channel, PLAY_VS.replaceAll("%username", username));
-        				} else if (p1prof == ProfileType.PLAY
-        							&& bet.getProfile() != ProfileType.PLAY) {
-        					bet.reset();
-        		            bot.sendIRCMessage(channel, REAL_VS.replaceAll("%username", username));
-        				} else if (db.checkCredits(p1) < bet.getAmount()) {
-        					// unlock
-        					bet.reset();
-        		            bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
-        				} else {
-        					// play this wager
-        					// add a transaction for the 2nd player to call
-        					db.adjustChips(p1, -bet.getAmount(), p1prof, GamesType.DICE_DUEL, TransactionType.BET);
-        	
-        					int d1 = 0; int d2 = 0;
-        					do {
-        						d1 = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1); // p1
-        						d2 = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1); // p2
-        					} while (d1 == d2); // re-roll until winner
-        					
-        					String winner = ""; String loser = "";
-        					ProfileType winnerProfile;	ProfileType loserProfile;
-        					if (d1 > d2) { // p1 wins
-        						winner = p1; loser = p2;
-        						winnerProfile = p1prof; loserProfile = bet.getProfile();
-        					} else { // p2 wins, use his profile
-        						winner = p2; loser = p1;
-        						loserProfile = p1prof; winnerProfile = bet.getProfile();
-        					}
-        					
-        					double rake = Rake.getRake(winner, bet.getAmount(), winnerProfile) + 
-        								  Rake.getRake(loser, bet.getAmount(), loserProfile);
-        					double win = (bet.getAmount() * 2) - rake;
-        					db.adjustChips(winner, win, winnerProfile, GamesType.DICE_DUEL, TransactionType.WIN);
-        	
-        					db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
-        					openBets.remove(bet);
-        	
-        					// jackpot stuff
-        					if (winnerProfile == loserProfile && Rake.checkJackpot()) {
-        						ArrayList<String> players = new ArrayList<String>();
-        						players.add(p1);
-        						players.add(p2);
-        						Rake.jackpotWon(loserProfile, GamesType.DICE_DUEL, players, bot, null);
-        					} else if (Rake.checkJackpot()) { // loser first? Let's be nice
-        						ArrayList<String> players = new ArrayList<String>();
-        						players.add(loser);
-        						Rake.jackpotWon(loserProfile, GamesType.DICE_DUEL, players, bot, null);
-        					} else if (Rake.checkJackpot()) {
-        						ArrayList<String> players = new ArrayList<String>();
-        						players.add(winner);
-        						Rake.jackpotWon(winnerProfile, GamesType.DICE_DUEL, players, bot, null);
-        					}
-     
-        					String out = ROLL.replaceAll("%winner", winner);
-        					out = out.replaceAll("%loser", loser);
-                            out = out.replaceAll("%amount", Utils.chipsToString(win) );
-                            out = out.replaceAll("%windice", Integer.toString((d1 > d2 ? d1 : d2)) );
-                            out = out.replaceAll("%losedice", Integer.toString((d1 < d2 ? d1 : d2)) );
-        				    bot.sendIRCMessage(channel, out);    				            
-        				}
-        			}
-        		}
-        		
-        		if (!found) {
-        			// if we reach here the game doesn't exist
-        			bot.sendIRCMessage(channel, NO_WAGER.replaceAll("%username", username));
-        		}
-        	}
-        }
+    	DB db = DB.getInstance();
+    	String p1 = username; // user who is calling
+    	String p2 = msg.length < 2 ? null : msg[1];
+    
+    	// check to see if someone is playing themselves...
+    	if (p1.equalsIgnoreCase(p2))  {
+            bot.sendIRCMessage(channel, NO_SELFPLAY.replaceAll("%username", username));
+    	} else if (p2 != null) {
+    		Bet found = null;
+    		for (Bet bet : openBets) {
+    			if (bet.getUser().equalsIgnoreCase(p2) && bet.isValid()) {
+    				found = bet;
+    				// first lock it to stop two people form calling it as this
+    				// is processing -- Shouldn't be possible with thread
+    				// locking now
+    				bet.invalidate();
+    				ProfileType p1prof = db.getActiveProfile(p1);
+    
+    				// quick hax to check if play chips vs non-play chips!
+    				if (p1prof != ProfileType.PLAY 
+    						&& bet.getProfile() == ProfileType.PLAY) {
+    					bet.reset();
+    		            bot.sendIRCMessage(channel, PLAY_VS.replaceAll("%username", username));
+    				} else if (p1prof == ProfileType.PLAY
+    							&& bet.getProfile() != ProfileType.PLAY) {
+    					bet.reset();
+    		            bot.sendIRCMessage(channel, REAL_VS.replaceAll("%username", username));
+    				} else if (db.checkCredits(p1) < bet.getAmount()) {
+    					// unlock
+    					bet.reset();
+    		            bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
+    				} else {
+    					// play this wager
+    					// add a transaction for the 2nd player to call
+    					db.adjustChips(p1, -bet.getAmount(), p1prof, GamesType.DICE_DUEL, TransactionType.BET);
+    	
+    					int d1 = 0; int d2 = 0;
+    					do {
+    						d1 = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1); // p1
+    						d2 = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1); // p2
+    					} while (d1 == d2); // re-roll until winner
+    					
+    					String winner = ""; String loser = "";
+    					ProfileType winnerProfile;	ProfileType loserProfile;
+    					if (d1 > d2) { // p1 wins
+    						winner = p1; loser = p2;
+    						winnerProfile = p1prof; loserProfile = bet.getProfile();
+    					} else { // p2 wins, use his profile
+    						winner = p2; loser = p1;
+    						loserProfile = p1prof; winnerProfile = bet.getProfile();
+    					}
+    					
+    					double rake = Rake.getRake(winner, bet.getAmount(), winnerProfile) + 
+    								  Rake.getRake(loser, bet.getAmount(), loserProfile);
+    					double win = (bet.getAmount() * 2) - rake;
+    					db.adjustChips(winner, win, winnerProfile, GamesType.DICE_DUEL, TransactionType.WIN);
+    	
+    					db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
+    	
+    					// jackpot stuff
+    					if (Rake.checkJackpot(bet.getAmount())) { // loser first? Let's be nice
+    						ArrayList<String> players = new ArrayList<String>();
+    						players.add(loser);
+    						Rake.jackpotWon(loserProfile, GamesType.DICE_DUEL, players, bot, null);
+    					} else if (Rake.checkJackpot(bet.getAmount())) {
+    						ArrayList<String> players = new ArrayList<String>();
+    						players.add(winner);
+    						Rake.jackpotWon(winnerProfile, GamesType.DICE_DUEL, players, bot, null);
+    					}
+ 
+    					String out = ROLL.replaceAll("%winner", winner);
+    					out = out.replaceAll("%loser", loser);
+                        out = out.replaceAll("%amount", Utils.chipsToString(win) );
+                        out = out.replaceAll("%windice", Integer.toString((d1 > d2 ? d1 : d2)) );
+                        out = out.replaceAll("%losedice", Integer.toString((d1 < d2 ? d1 : d2)) );
+    				    bot.sendIRCMessage(channel, out);    				            
+    				}
+    			}
+    		}
+    		
+    		if (found == null) {
+    			// if we reach here the game doesn't exist
+    			bot.sendIRCMessage(channel, NO_WAGER.replaceAll("%username", username));
+    		} else {
+    		    openBets.remove(found);
+    		}
+    	}
 	}
 	
 	private void cancel(Message event) throws DBException, SQLException {
-        synchronized (BaseBot.lockObject) {
-    		String username = event.getUser().getNick();
-            String channel = event.getChannel().getName();
-    
-    		DB db = DB.getInstance();
-    		// try to locate and cancel the bet else ignore
-    		for (Bet bet : openBets) {
-    			if (bet.getUser().equalsIgnoreCase(username) && bet.isValid()) {
-    				bet.invalidate();
-    				db.adjustChips(username, bet.getAmount(), bet.getProfile(),
-    						GamesType.DICE_DUEL, TransactionType.CANCEL);
-    				openBets.remove(bet);
-    
-    				db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
-    				
-    				event.getBot().sendIRCMessage(channel, BET_CANCELLED.replaceAll("%username", username));
-    			}
-    		}
-        }
+		String username = event.getUser().getNick();
+        String channel = event.getChannel().getName();
+
+		DB db = DB.getInstance();
+		// try to locate and cancel the bet else ignore
+		Bet found = null;
+		for (Bet bet : openBets) {
+			if (bet.getUser().equalsIgnoreCase(username) && bet.isValid()) {
+				bet.invalidate();
+				db.adjustChips(username, bet.getAmount(), bet.getProfile(),
+						GamesType.DICE_DUEL, TransactionType.CANCEL);
+				found = bet;
+
+				db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
+				
+				event.getBot().sendIRCMessage(channel, BET_CANCELLED.replaceAll("%username", username));
+				break;
+			}
+		}
+		if (found != null) 
+            openBets.remove(found);
 	}
 	
 	/**
@@ -268,7 +262,7 @@ public class DiceDuel extends Event {
                 for (Bet bet : openBets) {
                     wagers += WAGER.replaceAll("%proftype", (bet.getProfile() == ProfileType.PLAY) ? "play" : "real");
                     wagers = wagers.replaceAll("%username", bet.getUser());
-                    wagers = wagers.replaceAll("%amount", Integer.toString(bet.getAmount()));
+                    wagers = wagers.replaceAll("%amount", Utils.chipsToString(bet.getAmount()));
                 }
                 String line = OPEN_WAGERS.replaceAll("%wagers", wagers);
                 

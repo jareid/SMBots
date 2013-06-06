@@ -27,4 +27,8 @@ public class ReferalUser {
 	    this.user = user;
 	    this.group = group;
 	}
+	
+	public String toString() {
+	    return this.user;
+	}
 }

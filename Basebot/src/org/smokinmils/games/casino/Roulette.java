@@ -40,7 +40,7 @@ public class Roulette extends Event {
     private static final String CANT_END = "%b%c12You don't have the required permissions for that";
     private static final String NEW_GAME = "%b%c12A new roulette game is starting! Type %c04!info %c12for instructions on how to play.";
     private static final String PLACE_BETS = "%b%c12Place your bets now!";
-    private static final String WIN_LINE = "%b%c12The winning number is: %c04%number %c12%colour %board";
+    private static final String WIN_LINE = "%b%c12The winning number is: %c04%number %c12%colour %board%n";
     private static final String CONGRATULATIONS = "%b%c12Congratulations to %c04%names";
 
 	ArrayList<String> validCommands;	
@@ -108,7 +108,7 @@ public class Roulette extends Event {
 		} else if (msg.length < 3) {
             bot.sendIRCNotice(username, INVALID_BET);
 		} else {
-			Integer amount = Utils.tryParse(msg[1]);
+			Double amount = Utils.tryParseDbl(msg[1]);
 			String choice = msg[2].toLowerCase();
 			Integer choicenum = Utils.tryParse(msg[2]);
 			ProfileType profile = db.getActiveProfile(username);
@@ -120,7 +120,7 @@ public class Roulette extends Event {
 			            choice.equalsIgnoreCase("1st") || choice.equalsIgnoreCase("2nd") ||
                         choice.equalsIgnoreCase("3rd") || choice.equalsIgnoreCase("even") || 
                         choice.equalsIgnoreCase("odd")) ||
-                       (choicenum != null && choicenum > 0 && choicenum < 36))) {
+                       (choicenum != null && choicenum >= 0 && choicenum <= 36))) {
 			    bot.sendIRCNotice(username, INVALID_BET);
 			} else if (db.checkCredits(username) < amount) {
                 bot.sendIRCNotice(username, NO_CHIPS);
@@ -132,7 +132,7 @@ public class Roulette extends Event {
 	
 				String out = BET_MADE.replaceAll("%username", username);
 				out = out.replaceAll("%choice", choice);
-				out = out.replaceAll("%amount", Integer.toString(amount));
+				out = out.replaceAll("%amount", Utils.chipsToString(amount));
                 bot.sendIRCMessage(channel, out);				
 			}
 		}
@@ -239,7 +239,8 @@ public class Roulette extends Event {
 						   (choice.equalsIgnoreCase("odd") && !isEven)) {
 					win = true;
 					winamount = 2;
-				} else if ((choice.equalsIgnoreCase("1st") || choice.equalsIgnoreCase("2nd")
+				} else if (winner != 0 &&
+				           (choice.equalsIgnoreCase("1st") || choice.equalsIgnoreCase("2nd")
 					   		|| choice.equalsIgnoreCase("3rd"))
 						  && choice.equalsIgnoreCase(getRow(winner))) {
 					win = true;
@@ -257,19 +258,12 @@ public class Roulette extends Event {
 				}
 				Rake.getRake(user, bet.getAmount(), profile);
 				
-				int amount = bet.getAmount();
-				if (!profiles.contains(profile)) {
-					profiles.add(profile);
-					profbets.put(profile, amount);
-					List<String> users = new ArrayList<String>();
-					users.add(user);
-					profusers.put(profile, users);
-				} else {
-					List<String> users = profusers.get(profile);
-					users.add(user);
-					profusers.put(profile, users);
-					profbets.put(profile, profbets.get(profile) + amount);
-				}
+				double amount = bet.getAmount();
+                if (Rake.checkJackpot(amount)) {
+                    ArrayList<String> players = new ArrayList<String>();
+                    players.add(user);
+                    Rake.jackpotWon(profile, GamesType.ROULETTE, players, bot, null);
+                }
 			}
 			db.deleteBet(bet.getUser(), GamesType.ROULETTE);
 		}
@@ -280,10 +274,6 @@ public class Roulette extends Event {
 			List<String> users = profusers.get(profile);
 			if (amount != null && amount != 0 && users.size() > 0) {
 				// Check if jackpot won
-				if (Rake.checkJackpot()) {
-					// winner
-					Rake.jackpotWon(profile, GamesType.ROULETTE, users, bot, null);
-				}
 			}
 		}
 		
@@ -292,9 +282,9 @@ public class Roulette extends Event {
 		win_line = win_line.replaceAll( "%number", Integer.toString(winner) );
 		
 		String board = "";
-		if (getColour(winner).equalsIgnoreCase("red")) board = "00,04 ";
-		else if (getColour(winner).equalsIgnoreCase("black")) board = "00,01 ";
-		else board = "00,03 ";
+		if (getColour(winner).equalsIgnoreCase("red")) board = "%c00,04 ";
+		else if (getColour(winner).equalsIgnoreCase("black")) board = "%c00,01 ";
+		else board = "%c00,03 ";
 		board += winner + " ";
 
         win_line = win_line.replaceAll("%board", board);

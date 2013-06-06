@@ -108,7 +108,7 @@ public class DB {
     * 
     * @return	true if the query was run successfully.
     */
-	public boolean addBet(String username, String choice, int amount,
+	public boolean addBet(String username, String choice, double amount,
 						ProfileType profile, GamesType game)
 								   throws DBException, SQLException {
 		String sql = "INSERT INTO " + BetsTable.Name + "("
@@ -118,7 +118,7 @@ public class DB {
 										+ BetsTable.Col_Gameid + ", "									
 										+ BetsTable.Col_Profile + ") " +
 					 " VALUES((" + getUserIDSQL(username) + "), "
-					 			+ "'" + Integer.toString(amount) + "', "
+					 			+ "'" + Double.toString(amount) + "', "
 							 	+ "'" + choice + "', "
 							 	+ "(" + getGameIDSQL(game) + "), "
 							 	+ "(" + getProfileIDSQL(profile) + "))";
@@ -577,9 +577,9 @@ public class DB {
     * 
     * @return true if it succeeded
     */
-	public boolean giveChips(String username, int amount, ProfileType profile)
+	public boolean giveChips(String username, double amount, ProfileType profile)
 			throws DBException, SQLException {
-		return adjustChips(username, amount, profile, GamesType.POKER, TransactionType.CREDIT);
+		return adjustChips(username, amount, profile, GamesType.ADMIN, TransactionType.CREDIT);
 	}
 	
    /**
@@ -591,7 +591,7 @@ public class DB {
     * 
     * @return true if it succeeded
     */
-	public boolean payoutChips(String username, int amount, ProfileType profile)
+	public boolean payoutChips(String username, double amount, ProfileType profile)
 			throws DBException, SQLException {
 		return adjustChips(username, (0-amount), profile, GamesType.POKER, TransactionType.PAYOUT);
 	}
@@ -1334,6 +1334,7 @@ public class DB {
     * @throws SQLException
     */
    private String runGetStringQuery(String query) throws DBException, SQLException {
+       query = query.replaceAll("_", "\\_");
 	   Connection conn = null;
 	   Statement stmt = null;
 	   ResultSet rs = null;
@@ -1376,6 +1377,7 @@ public class DB {
     * @throws SQLException
     */
    private int runGetIntQuery(String query) throws DBException, SQLException {
+       query = query.replaceAll("_", "\\_");
 	   Connection conn = null;
 	   Statement stmt = null;
 	   ResultSet rs = null;
@@ -1418,6 +1420,7 @@ public class DB {
     * @throws SQLException
     */
    private double runGetDblQuery(String query) throws DBException, SQLException {
+       query = query.replaceAll("_", "\\_");
        Connection conn = null;
        Statement stmt = null;
        ResultSet rs = null;
@@ -1460,6 +1463,7 @@ public class DB {
     * @throws SQLException
     */
    private long runGetLongQuery(String query) throws DBException, SQLException {
+       query = query.replaceAll("_", "\\_");
 	   Connection conn = null;
 	   Statement stmt = null;
 	   ResultSet rs = null;
@@ -1502,6 +1506,7 @@ public class DB {
     * @throws SQLException
     */
    private int runGetIDQuery(String query) throws DBException, SQLException {
+       query = query.replaceAll("_", "\\_");
 	   Connection conn = null;
 	   Statement stmt = null;
 	   ResultSet rs = null;
@@ -1545,6 +1550,7 @@ public class DB {
     * @throws SQLException
     */
    private int runBasicQuery(String query) throws DBException, SQLException {
+       query = query.replaceAll("_", "\\_");
 	   Connection conn = null;
 	   Statement stmt = null;
 	   int numrows = -1;

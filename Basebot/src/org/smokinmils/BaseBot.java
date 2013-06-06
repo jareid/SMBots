@@ -119,7 +119,7 @@ public class BaseBot {
 
 	   newbot.setName(_nick);
 	   newbot.setLogin(_ident);
-	   newbot.setVerbose(false);
+	   newbot.setVerbose(true);
 	   newbot.setAutoNickChange(true);
 	   newbot.useShutdownHook(false);
 	   newbot.setVersion(Version);

@@ -55,13 +55,13 @@ public class Payout extends Event {
 			if ( bot.userIsOp(event.getUser(), chan.getName()) ) {
 				if (msg.length == 4) {
 					String user = msg[1];
-					Integer amount = Utils.tryParse(msg[2]);
+					Double amount = Utils.tryParseDbl(msg[2]);
 					ProfileType profile = ProfileType.fromString(msg[3]);
 						
 					if (amount != null && amount > 0) {
-						int chips = 0;
+						double chips = 0;
 						try {
-							chips = DB.getInstance().checkCreditsAsInt( user, profile );
+							chips = DB.getInstance().checkCredits( user, profile );
 						} catch (Exception e) {
 							EventLog.log(e, "Payout", "message");
 						}
@@ -72,7 +72,7 @@ public class Payout extends Event {
 						} else if ( profile == null ) {
 							bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
 						} else if ( chips < amount ) {
-							String out = NoChipsMsg.replaceAll( "%chips", Integer.toString(amount));
+							String out = NoChipsMsg.replaceAll( "%chips", Utils.chipsToString(amount));
 							out = out.replaceAll( "%profile", profile.toString() );
 							out = out.replaceAll( "%user", user );
 							bot.sendIRCMessage(chan.getName(), out);
@@ -85,13 +85,13 @@ public class Payout extends Event {
 							}
 							
 							if (success) {
-								String out = PayoutChips.replaceAll("%amount", Integer.toString(amount));
+								String out = PayoutChips.replaceAll("%amount", Utils.chipsToString(amount));
 								out = out.replaceAll("%who", user);
 								out = out.replaceAll("%sender", sender);
 								out = out.replaceAll("%profile", profile.toString());
 								bot.sendIRCMessage(chan.getName(), out);
 								
-								out = PayoutChipsPM.replaceAll("%amount", Integer.toString(amount));
+								out = PayoutChipsPM.replaceAll("%amount", Utils.chipsToString(amount));
 								out = out.replaceAll("%who", user);
 								out = out.replaceAll("%sender", sender);
 								out = out.replaceAll("%profile", profile.toString());

@@ -39,7 +39,7 @@ public class CheckChips extends Event {
 	 */
 	public static final String CheckCreditMsg =  "%b%c04%sender%c12: %user %c12currently has %c04%creds%c12 chips on the active profile(%c04%active%c12)";
 	public static final String CheckCreditSelfMsg =  "%b%c04%sender%c12: You %c12currently have %c04%creds%c12 chips on the active profile(%c04%active%c12)";
-	public static final String CreditsOtherProfiles = "%c04%name%c12(%c04%amount%c12)";
+	public static final String CreditsOtherProfiles = "%c04%name%c12 (%c04%amount%c12)";
 	public static final String NoCredits = "%b%c04%sender: %user %c12currently has %c04no%c12 available chips.";
 	public static final String NoCreditsSelf = "%b%c04%sender%c12: %c04You %c12currently has %c04no%c12 available chips.";
 	

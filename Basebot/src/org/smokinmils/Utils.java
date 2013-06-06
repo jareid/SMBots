@@ -32,6 +32,21 @@ public class Utils {
 		}
 	}
 	
+	   /*
+     * A method that will handle parsing of integers without throwing an exception
+     * 
+     * @param text The input string
+     * 
+     * @return The resulting integer
+     */
+    public static Double tryParseDbl(String text) {
+        try {
+            return new Double(text);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+	
 	public static <E> String ListToString(List<E> list)
 	        throws IllegalArgumentException {
         String out = "";

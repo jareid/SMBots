@@ -54,7 +54,7 @@ public class GiveChips extends Event {
 			if ( bot.userIsOp(event.getUser(), chan.getName()) ) {
 				if (msg.length == 4) {
 					String user = msg[1];
-					Integer amount = Utils.tryParse(msg[2]);
+					Double amount = Utils.tryParseDbl(msg[2]);
 					ProfileType profile = ProfileType.fromString(msg[3]);
 					
 					if (amount != null && amount > 0) {						
@@ -71,13 +71,13 @@ public class GiveChips extends Event {
 							}
 							
 							if (success) {
-								String out = GiveChips.replaceAll("%amount", Integer.toString(amount));
+								String out = GiveChips.replaceAll("%amount", Utils.chipsToString(amount));
 								out = out.replaceAll("%who", user);
 								out = out.replaceAll("%sender", sender);
 								out = out.replaceAll("%profile", profile.toString());
 								bot.sendIRCMessage(chan.getName(), out);
 								
-								out = GiveChipsPM.replaceAll("%amount", Integer.toString(amount));
+								out = GiveChipsPM.replaceAll("%amount", Utils.chipsToString(amount));
 								out = out.replaceAll("%who", user);
 								out = out.replaceAll("%sender", sender);
 								out = out.replaceAll("%profile", profile.toString());

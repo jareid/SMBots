@@ -24,9 +24,9 @@ import org.smokinmils.logging.EventLog;
  */
 public class Rake {	
 	private static String JackpotChannel;
-	private static final int JACKPOTCHANCE = 500;
+	private static final int JACKPOTCHANCE = 50000;
 	private static final double RAKE = 0.05;
-	public static final boolean JackpotEnabled = false;
+	public static final boolean JackpotEnabled = true;
 	
 	private static final String JackpotWon = "%b%c01The %c04%profile%c01 jackpot of %c04%chips%c01 chips has been won in a %c04%game%c01 game! " +
 			 "Congratulations to the winner(s):%c04 %winners %c01who have shared the jackpot";
@@ -46,23 +46,27 @@ public class Rake {
 		JackpotChannel = chan;
  	}
 	
-   public static synchronized double getRake(String user, int bet, ProfileType profile) {
+   public static synchronized double getRake(String user, double bet, ProfileType profile) {
        double rake = RAKE * bet;
        Referal.getInstance().addEvent(user, profile, rake);       
        return rake;
    }
    
-   public static synchronized double getRake(String user, double rake, ProfileType profile) {
-       Referal.getInstance().addEvent(user, profile, rake);       
-       return rake;
+   public static synchronized void getPokerRake(String user, double rake, ProfileType profile) {
+       Referal.getInstance().addEvent(user, profile, rake);
    }
 
 	/**
 	 * Check if the jackpot has been won
 	 */
-	public static synchronized boolean checkJackpot() {
-	    // TODO: add code for JACKPOT Sundays
-		return (JackpotEnabled ? (Random.nextInt(JACKPOTCHANCE + 1) == JACKPOTCHANCE) : false);
+	public static synchronized boolean checkJackpot(double amount) {
+	    boolean won = false;
+	    if (JackpotEnabled) {
+	        double chance = (1.0 / JACKPOTCHANCE) * amount;
+	        double random = Random.nextDouble();
+	        won = (random <= chance ? true : false);
+	    }
+		return won;
 	}
 	
 	/**

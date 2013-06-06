@@ -161,7 +161,7 @@ public class RPSGame extends Event {
 							found = true;
 							ProfileType caller_prof = db.getActiveProfile(caller);
 							ProfileType better_prof = bet.getProfile();
-							int amount = bet.getAmount();
+							double amount = bet.getAmount();
 							
 							// first lock it to stop two people form calling it as this
 							// is processing -- Shouldn't be possible with thread
@@ -176,7 +176,7 @@ public class RPSGame extends Event {
 								bot.sendIRCMessage(chan, out);
 							} else if (db.checkCredits(caller) < amount) {
 								bet.reset();
-								String out = NoChips.replaceAll( "%chips", Integer.toString(amount));
+								String out = NoChips.replaceAll( "%chips", Utils.chipsToString(amount));
 								out = out.replaceAll( "%profile", caller_prof.toString() );
 								bot.sendIRCMessage(chan, out);
 							} else {
@@ -237,10 +237,9 @@ public class RPSGame extends Event {
 				String out = OpenWager.replaceAll("%who", sender);
 				bot.sendIRCNotice(sender, out);
 			} else {
-				Integer amount = Utils.tryParse(msg[1]);
+				Double amount = Utils.tryParseDbl(msg[1]);
 				if (amount != null && amount != 0) {
 					DB db = DB.getInstance();
-					// choice is null as DiceDuels done have one.
 					try {
 						ProfileType profile = db.getActiveProfile(sender);
 						if(db.checkCredits(sender) >= amount) {
@@ -255,13 +254,13 @@ public class RPSGame extends Event {
 								
 								String out = OpenedWager.replaceAll("%who", sender);
 								out = out.replaceAll("%profile", profile.toString());
-								out = out.replaceAll("%amount", Integer.toString(amount));
+								out = out.replaceAll("%amount", Utils.chipsToString(amount));
 								bot.sendIRCMessage(chan, out);
 							} else {
 								bot.sendIRCMessage(chan, NoChoice.replaceAll("%who", event.getUser().getNick()));
 							}
 						} else {
-							String out = NoChips.replaceAll( "%chips", Integer.toString(amount));
+							String out = NoChips.replaceAll( "%chips", Utils.chipsToString(amount));
 							out = out.replaceAll( "%profile", profile.toString() );
 							bot.sendIRCMessage(chan, out);
 						}
@@ -298,7 +297,7 @@ public class RPSGame extends Event {
 	
 	private void endGame(String better, ProfileType better_prof, GameLogic better_choice,
 			   			 String caller, ProfileType caller_prof, GameLogic caller_choice,
-			   			 int amount, IrcBot bot, String chan) {
+			   			 double amount, IrcBot bot, String chan) {
 		GameLogicComparator c = new GameLogicComparator();
 		int order = c.compare(better_choice, caller_choice);
 		String winstr = c.getWinString();
@@ -322,7 +321,7 @@ public class RPSGame extends Event {
 	
 	private void doWin(String winner, ProfileType win_prof, GameLogic win_choice,
 					   String loser, ProfileType lose_prof, GameLogic lose_choice,
-					   int amount, String winstring, IrcBot bot, String chan) {
+					   double amount, String winstring, IrcBot bot, String chan) {
 		DB db = DB.getInstance();
 		// Take the rake and give chips to winner
 		double rake = Rake.getRake(winner, amount, win_prof) + Rake.getRake(loser, amount, lose_prof);
@@ -343,18 +342,23 @@ public class RPSGame extends Event {
 		}
 		
 		// jackpot stuff	
-		if (Rake.checkJackpot()) {
+		if (Rake.checkJackpot(amount)) {
 			ArrayList<String> players = new ArrayList<String>();
-			players.add(winner);
 			players.add(loser);
 			Rake.jackpotWon(win_prof, GamesType.ROCKPAPERSCISSORS,
 							players, bot, chan);
+		} else if (Rake.checkJackpot(amount)) {
+            ArrayList<String> players = new ArrayList<String>();
+            players.add(loser);
+            players.add(winner);
+            Rake.jackpotWon(win_prof, GamesType.ROCKPAPERSCISSORS,
+                            players, bot, chan);
 		}
 	}
 	
 	private void doDraw(String better, ProfileType better_prof,
 						String caller, ProfileType caller_prof,						
-  			 			int amount, IrcBot bot, String chan, GameLogic choice) {
+  			 			double amount, IrcBot bot, String chan, GameLogic choice) {
 		//Announce winner and give chips			
 		String out = Draw.replaceAll("%choice", choice.toString());
 		out = out.replaceAll("%better", better);
@@ -401,7 +405,7 @@ public class RPSGame extends Event {
 				String fail = ReplayFail.replaceAll("%better", better);
 				fail = fail.replaceAll("%caller", caller);
 				fail = fail.replaceAll("%who", who);
-				fail = fail.replaceAll("%chips", Integer.toString(amount) );
+				fail = fail.replaceAll("%chips", Utils.chipsToString(amount) );
 				bot.sendIRCMessage(chan, fail);
 			} catch (Exception e) {
 				EventLog.log(e, "RPSGame", "doDraw");
@@ -486,7 +490,7 @@ public class RPSGame extends Event {
 				String bets = "";
 				for (Bet bet : openBets) {
 					String betstr = EachOpenBet.replaceAll("%user", bet.getUser());
-					betstr = betstr.replaceAll("%amount", Integer.toString(bet.getAmount()));
+					betstr = betstr.replaceAll("%amount", Utils.chipsToString(bet.getAmount()));
 					betstr = betstr.replaceAll("%profile", bet.getProfile().toString());
 					bets += betstr;
 				}

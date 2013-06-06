@@ -109,8 +109,11 @@ public class SidePot implements Comparable<SidePot> {
 		int perc = (int)Math.round(pot * (Variables.RakePercentage / 100.0));
 		if (perc < Variables.MinimumRake)
 			rake = Variables.MinimumRake;
-		else if (perc > Variables.MaximumRake)
-			rake = Variables.MaximumRake;
+		/* removed maximum rake
+		 * 
+		 * else if (perc > Variables.MaximumRake)
+		 *	rake = Variables.MaximumRake;
+		 **/
 		else
 			rake = perc;
 		pot -= rake;
