@@ -107,7 +107,7 @@ public class TimedRollComp extends Event {
 		String sender = event.getUser().getNick();
 		
 		synchronized (this) {			 
-			if ( message.startsWith( Command ) &&
+			if ( Utils.startsWith(message, Command ) &&
 				 ValidChan.equalsIgnoreCase(chan.getName()) ) {
 				if ( !Users.contains( sender.toLowerCase() ) ) {
 					int user_roll = Random.nextInt(MaxRoll);

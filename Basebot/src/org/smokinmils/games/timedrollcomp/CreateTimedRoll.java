@@ -55,9 +55,9 @@ public class CreateTimedRoll extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				event.getBot().userIsIdentified( sender )) {
-			if (message.startsWith( Command ) ) {
+			if ( Utils.startsWith(message, Command ) ) {
 				createGame(event);
-			} else if (message.startsWith( EndCommand ) ) {
+			} else if ( Utils.startsWith(message, EndCommand ) ) {
 				endGame(event);
 			}
 		}

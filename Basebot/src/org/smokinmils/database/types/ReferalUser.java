@@ -31,4 +31,19 @@ public class ReferalUser {
 	public String toString() {
 	    return this.user;
 	}
+	
+	@Override
+    public boolean equals(Object object) {
+        boolean ret = false;
+
+        if (object != null) {
+            if (object instanceof String) {
+                ret = (this.user == ((String) object));
+            } else if (object != null && object instanceof String) {
+                ret = (this.user == ((ReferalUser) object).user);
+            }
+        }           
+
+        return ret;
+    }
 }

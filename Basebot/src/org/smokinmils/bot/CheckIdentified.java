@@ -47,6 +47,7 @@ public class CheckIdentified extends Event {
      */
     public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
     public static final String NotIdentified = "%b%c12Sorry, %c04%user%c12 is not current identified.";
+    public static final String WelcomeMsg = "%b%c01Hello %c04%user%c01, welcome to our channel! For information on our games and systems please type %c04!info%c01 and use further commands for specific topics listed. If you need any help just ask in the channel. We hope that you enjoy your stay!";
     
     /*@Override
     public void action(Action event) {
@@ -150,6 +151,8 @@ public class CheckIdentified extends Event {
                     bot.sendIRCMessage(user.getNick(), "%b%c12You have too many accounts, speak to an admin if there is a problem");
                 } else {
                     bot.addIdentifiedUser( user.getNick() );
+                    // TODO: 
+                    //bot.sendIRCNotice(user.getNick(), WelcomeMsg.replaceAll("%user", user.getNick()));
                 }
             } catch (Exception e) {
                 EventLog.log(e, "CheckIdentified", "sendStatusRequest");
@@ -226,7 +229,7 @@ class CheckUser implements Callable<Boolean> {
             
             //Check if this message is the response
             String[] msg = currentEvent.getMessage().split(" ");
-            if ( currentEvent.getMessage().startsWith(NickServStatus)
+            if ( Utils.startsWith(currentEvent.getMessage(), NickServStatus)
                  && currentEvent.getUser().getNick().compareToIgnoreCase(NickServ) == 0
                  && msg.length == 3
                  && msg[1].compareToIgnoreCase( User ) == 0 ) {

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.ini4j.InvalidFileFormatException;
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -62,7 +63,7 @@ public class Help extends Event {
 		String sender = event.getUser().getNick();
 		String chan = event.getChannel().getName();
 		
-		if ( isValidChannel( chan ) &&	message.startsWith( Command ) ) {			
+		if ( isValidChannel( chan ) && Utils.startsWith(message, Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 1) {
 				// list all questions

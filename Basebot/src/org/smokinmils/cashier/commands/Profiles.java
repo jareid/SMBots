@@ -8,6 +8,7 @@
  */ 
 package org.smokinmils.cashier.commands;
 
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -42,7 +43,7 @@ public class Profiles extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {			
+				Utils.startsWith(message, Command ) ) {			
 			bot.sendIRCMessage(chan, IrcBot.ValidProfiles);		
 			bot.sendIRCNotice(sender, IrcBot.ValidProfiles);
 		}

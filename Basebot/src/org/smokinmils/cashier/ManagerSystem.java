@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import org.ini4j.Ini;
 import org.ini4j.Wini;
 import org.pircbotx.Channel;
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -118,7 +119,7 @@ public class ManagerSystem extends Event {
 				Inactive.schedule( new InactiveTask(), InactiveTime*60*1000);
 			}
 			
-			if (isValidChannel( chan.getName() ) && message.toLowerCase().startsWith( OnCommand )) {
+			if (isValidChannel( chan.getName() ) && Utils.startsWith(message, OnCommand )) {
 				if (LoggedInUser == null) {
 					bot.sendIRCMessage( event.getChannel(), NoLoggedOn );
 				} else {
@@ -126,7 +127,7 @@ public class ManagerSystem extends Event {
 									LoggedOn.replaceAll( "%who", LoggedInUser ) );
 				}
 			} else if (ManagerChan.equalsIgnoreCase( chan.getName() ) &&
-					   message.toLowerCase().startsWith( LoginCommand )) {
+			            Utils.startsWith(message, LoginCommand )) {
 				if (LoggedInUser != null) {
 					bot.sendIRCNotice(sender, CantLogIn.replaceAll("%who", LoggedInUser));					
 				} else {
@@ -134,7 +135,7 @@ public class ManagerSystem extends Event {
 					bot.sendIRCMessage(chan, LoggedIn.replaceAll("%who", sender));	
 				}
 			} else if (ManagerChan.equalsIgnoreCase( chan.getName() ) &&
-					   message.toLowerCase().startsWith( LogoutCommand )) {
+			            Utils.startsWith(message, LogoutCommand )) {
 				if (LoggedInUser == null || !LoggedInUser.equalsIgnoreCase(sender)) {
 					bot.sendIRCNotice(sender, NotLoggedIn);
 				} else {

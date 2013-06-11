@@ -362,7 +362,7 @@ public class Lobby extends Room {
 					IrcClient.sendIRCNotice(sender, out);
 				} else {
 					if (table != null && table.canPlay( sender )) {
-						IrcClient.newPlayer( IrcClient.getBot().getUser(sender), table_id, buy_in );	
+						IrcClient.newPlayer( sender, table_id, buy_in );	
 					} else {
 						IrcClient.sendIRCNotice( sender, 
 								Strings.AlreadyPlayingMsg.replaceAll("%id", Integer.toString(table_id)) );

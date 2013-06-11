@@ -103,11 +103,11 @@ public class RPSGame extends Event {
 		synchronized (BaseBot.lockObject) {
 			if ( isValidChannel( chan.getName() ) &&
 					bot.userIsIdentified( sender ) ) {			
-				if ( message.startsWith( CxlCommand ) ) {
+				if ( Utils.startsWith(message, CxlCommand ) ) {
 					cancel(event);
-				} else if ( message.startsWith( CallCommand ) ) {
+				} else if ( Utils.startsWith(message, CallCommand ) ) {
 					call(event);
-				} else if ( message.startsWith( Command ) ) {
+				} else if ( Utils.startsWith(message, Command ) ) {
 					newGame(event);
 				}
 			}
@@ -242,19 +242,20 @@ public class RPSGame extends Event {
 					DB db = DB.getInstance();
 					try {
 						ProfileType profile = db.getActiveProfile(sender);
-						if(db.checkCredits(sender) >= amount) {
+						double betsize = db.checkCredits(sender, amount);
+						if (betsize > 0.0) {
 							// add bet, remove chips, notify channel
 							GameLogic choice = getChoice( event.getUser().getNick(), event.getBot() );
 							if (choice != null) {
-								Bet bet = new Bet(sender, profile, amount, choice.toString());
+								Bet bet = new Bet(sender, profile, betsize, choice.toString());
 								openBets.add(bet);
-								db.adjustChips(sender, (0-amount), profile, 
+								db.adjustChips(sender, -betsize, profile, 
 											   GamesType.ROCKPAPERSCISSORS, TransactionType.BET);
-								db.addBet(sender, choice.toString(), amount, profile, GamesType.ROCKPAPERSCISSORS);
+								db.addBet(sender, choice.toString(), betsize, profile, GamesType.ROCKPAPERSCISSORS);
 								
 								String out = OpenedWager.replaceAll("%who", sender);
 								out = out.replaceAll("%profile", profile.toString());
-								out = out.replaceAll("%amount", Utils.chipsToString(amount));
+								out = out.replaceAll("%amount", Utils.chipsToString(betsize));
 								bot.sendIRCMessage(chan, out);
 							} else {
 								bot.sendIRCMessage(chan, NoChoice.replaceAll("%who", event.getUser().getNick()));

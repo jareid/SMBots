@@ -246,6 +246,24 @@ public class DB {
 	   ProfileType active = getActiveProfile( username );
 	   return checkCredits(username, active);
    }
+   public double checkCredits(String username, Double amount) throws DBException, SQLException  {
+       ProfileType active = getActiveProfile( username );
+       double chips = checkCredits(username, active);
+       double chip_diff = chips - amount;
+       double ret = 0.0;
+       if (amount <= 1.0) {
+           if (chips >= 1.0) ret = 1.0;
+           else if (chips <= 1.0) ret = chips;
+       } else if (amount > chips) {
+           if (-chip_diff <= 1.0) ret = chips;
+           else ret = 0.0;
+       } else if (amount <= chips) {
+           if (chip_diff <= 0.5) ret = chips;
+           else ret = amount;
+       }
+       
+       return ret;
+   }
    
    /**
     * Getter method for a user's credit count on the DB
@@ -268,10 +286,12 @@ public class DB {
 				 	" WHERE " + UserProfilesView.Col_Username + " = '" + username + "' AND "
 				 			  + UserProfilesView.Col_Profile + " = '" + profile.toString() + "'";
 	   
-	   int credits = (int)Math.floor(runGetDblQuery( sql ));
+	   double credits = runGetDblQuery( sql );
 	   if (credits < 0) credits = 0;
 	   return credits;
    }
+   
+   
    
    /**
     * Getter method for a user's credit count on the DB for all profiles
@@ -593,7 +613,7 @@ public class DB {
     */
 	public boolean payoutChips(String username, double amount, ProfileType profile)
 			throws DBException, SQLException {
-		return adjustChips(username, (0-amount), profile, GamesType.POKER, TransactionType.PAYOUT);
+		return adjustChips(username, (0-amount), profile, GamesType.ADMIN, TransactionType.PAYOUT);
 	}
    
    /**
@@ -711,8 +731,8 @@ public class DB {
    public double getJackpot(ProfileType prof_type) throws DBException, SQLException {
 	   String sql = "SELECT " + JackpotTable.Col_Total + " FROM " + JackpotTable.Name +
 			   		" WHERE " + JackpotTable.Col_Profile + " = (" + getProfileIDSQL(prof_type) + ")";
-	   int res = runGetIntQuery(sql);
-	   return (res <= 0 ? 0 : res);
+	   double res = runGetDblQuery(sql);
+	   return (res <= 0.0 ? 0.0 : res);
    }
    
    /**
@@ -1206,6 +1226,77 @@ public class DB {
                      " SET " + HostGroupsTable.Col_Name + " = '" + newgroup + "'" +
                      " WHERE " + HostGroupsTable.Col_Name + " LIKE '" + oldgroup + "'";
         runBasicQuery(sql);
+        
+        sql = "UPDATE " + UsersTable.Name +
+                " SET " + UsersTable.Col_Username + " = '" + newgroup + "'" +
+                " WHERE " + UsersTable.Col_Username + " LIKE '" + oldgroup + "'";
+        runBasicQuery(sql);
+    }
+    
+    public List<String> listRankGroupUsers(String group)
+            throws DBException, SQLException {
+        List<String> res = new ArrayList<String>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT u." + UsersTable.Col_Username +
+                     " FROM " + HostGroupUsersTable.Name + " hgu" +
+                     " JOIN " + UsersTable.Name + " u ON u." + UsersTable.Col_ID + " = "
+                                                + "hgu." + HostGroupUsersTable.Col_UserID +
+                     " WHERE " + HostGroupUsersTable.Col_GroupID + " = ("
+                                 + getRankGroupIDSQL(group) + ")";
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            while ( rs.next() ) {
+                res.add(rs.getString("u." + UsersTable.Col_Username));
+            }
+        } catch (SQLException e) {
+           throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                   throw e;
+            }
+        }
+        return res;
+    }
+    
+    public List<String> listRankGroups() throws DBException, SQLException {
+        List<String> res = new ArrayList<String>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT " + HostGroupsTable.Col_Name +
+                     " FROM " + HostGroupsTable.Name +
+                     " WHERE 1";
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            while ( rs.next() ) {
+                res.add(rs.getString(HostGroupsTable.Col_Name));
+            }
+        } catch (SQLException e) {
+           throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                   throw e;
+            }
+        }
+        return res;
     }
     
     public void addReferer(String user, String referrer) throws DBException, SQLException {
@@ -1213,6 +1304,14 @@ public class DB {
                             + "(" + ReferersTable.Col_UserID + ", "
                                   + ReferersTable.Col_RefererID + ")" +
                      " VALUES((" + getUserIDSQL(user) + "), (" + getUserIDSQL(referrer) + "))";
+                       
+        runBasicQuery(sql);
+    }
+    
+    public void delReferer(String user, String referrer) throws DBException, SQLException {
+        String sql = "DELETE FROM " + ReferersTable.Name + " WHERE "
+                      + ReferersTable.Col_UserID + " = (" + getUserIDSQL(user) + ")"
+                      + ReferersTable.Col_RefererID + " = (" + getUserIDSQL(referrer) + ")";
                        
         runBasicQuery(sql);
     }
@@ -1240,10 +1339,10 @@ public class DB {
 	}
 	
 	public List<ReferalUser> getReferalUsers(String user) throws DBException, SQLException {
-        String sql = "SELECT " + FullReferersTextView.Col_Referer + ","
-                + FullReferersTextView.Col_Group + 
-      " FROM " + FullReferersTextView.Name +
-      " WHERE " + FullReferersTextView.Col_Username + " LIKE '" + user + "'";
+        String sql = "SELECT " + "t." + FullReferersTextView.Col_Username + ","
+                                + "t." + FullReferersTextView.Col_Group + 
+                     " FROM " + FullReferersTextView.Name + " t" +
+                     " WHERE " + FullReferersTextView.Col_Referer + " LIKE '" + user + "'";
 
         Connection conn = null;
         Statement stmt = null;
@@ -1258,8 +1357,8 @@ public class DB {
                 rs = stmt.executeQuery(sql);
     
                 while ( rs.next() ) {
-                    ref = rs.getString(FullReferersTextView.Col_Referer);
-                    group = rs.getString(FullReferersTextView.Col_Group);
+                    ref = rs.getString("t." + FullReferersTextView.Col_Username);
+                    group = rs.getString("t." + FullReferersTextView.Col_Group);
                     referers.add( new ReferalUser(ref, group) );
                 }
             } catch (SQLException e) {
@@ -1278,7 +1377,7 @@ public class DB {
         }
 	    return referers;
 	}
-	
+   
 	public void giveReferalFee(double fee, String user, ProfileType profile)
 	        throws DBException, SQLException {
 	    adjustChips(user, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);	    

@@ -54,11 +54,11 @@ public class OverUnder extends Event {
         synchronized (BaseBot.lockObject) {
             if ( isValidChannel( channel ) && event.getBot().userIsIdentified( sender ) ) {
                 try {
-                    if (message.toLowerCase().startsWith( ROLL_CMD )) {
+                    if ( Utils.startsWith(message, ROLL_CMD ) ) {
                         roll(event);
-                    } else if (message.toLowerCase().startsWith( CXL_CMD )) {
+                    } else if ( Utils.startsWith(message, CXL_CMD ) ) {
                         cancel(event);
-                    } else if (message.toLowerCase().startsWith( BET_CMD )) {
+                    } else if ( Utils.startsWith(message, BET_CMD ) ) {
                         ou(event);
                     }
                 } catch (Exception e) {
@@ -91,6 +91,7 @@ public class OverUnder extends Event {
 			
 			Double amount = Utils.tryParseDbl(msg[1]);
 			String choice = msg[2];
+            double betsize = db.checkCredits(username, amount);
 			if (found) {
                 bot.sendIRCMessage(channel, OPEN_WAGER.replaceAll("%username", username));
 			} else if (amount == null) {
@@ -101,18 +102,18 @@ public class OverUnder extends Event {
 			           !choice.equalsIgnoreCase("under") &&
 					   !choice.equalsIgnoreCase("7")) {
                 bot.sendIRCMessage(channel, INVALID_BET);
-			} else if (db.checkCredits(username) < amount) {
+			} else if (betsize <= 0.0) {
                 bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
 			} else {
 				ProfileType prof = db.getActiveProfile(username);
-				Bet bet = new Bet(username, prof, amount, choice);
+				Bet bet = new Bet(username, prof, betsize, choice);
 				openBets.add(bet);
-				db.adjustChips(username, -amount, prof, GamesType.OVER_UNDER, TransactionType.BET);
-				db.addBet(username, choice, amount, prof, GamesType.OVER_UNDER);
+				db.adjustChips(username, -betsize, prof, GamesType.OVER_UNDER, TransactionType.BET);
+				db.addBet(username, choice, betsize, prof, GamesType.OVER_UNDER);
 				
 				String out = NEW_WAGER.replaceAll("%username", username);
 				out = out.replaceAll("%choice", choice);
-                out = out.replaceAll("%amount", Utils.chipsToString(amount));
+                out = out.replaceAll("%amount", Utils.chipsToString(betsize));
                 bot.sendIRCMessage(channel, out);                
 			}
 		}
@@ -126,9 +127,11 @@ public class OverUnder extends Event {
         String channel = event.getChannel().getName();
 		
 		boolean found = false;
+		Bet foundbet = null;
 		for (Bet bet : openBets) {
 			if (bet.isValid() && bet.getUser().equalsIgnoreCase(username)) {
 				found = true;
+				foundbet = bet;
 				// generate some die rolls
 				int total = (Random.nextInt(6) + 1) + (Random.nextInt(6) + 1);
 
@@ -186,7 +189,6 @@ public class OverUnder extends Event {
 
 				// remove the bet
 				bet.invalidate();
-				openBets.remove(bet);
 				db.deleteBet(bet.getUser(), GamesType.OVER_UNDER);
 
 				// Generate "rake"
@@ -205,25 +207,29 @@ public class OverUnder extends Event {
 		if (!found) {
 		    bot.sendIRCMessage(channel, NO_WAGER.replaceAll("%username", username));
 		}
+		
+		if (foundbet != null) {
+            openBets.remove(foundbet);
+		}
 	}
 
 	private void cancel(Message event) throws DBException, SQLException {
     	DB db = DB.getInstance();
         String username = event.getUser().getNick();
         String channel = event.getChannel().getName();
-        
+        Bet found = null;
     	for (Bet bet : openBets) {
     		if (bet.isValid() && bet.getUser().equalsIgnoreCase(username)) {
     			bet.invalidate();
+    			found = bet;
     			db.deleteBet(bet.getUser(), GamesType.OVER_UNDER);
     			db.adjustChips(bet.getUser(), bet.getAmount(), bet.getProfile(),
     							GamesType.OVER_UNDER, TransactionType.CANCEL);
-    
-    			openBets.remove(bet);
     			
                 event.getBot().sendIRCMessage(channel, BET_CANCELLED.replaceAll("%username", username));
     		}
     	}
+    	if (found != null) openBets.remove(found);
     }
 
     private boolean doesBetWin(Bet bet, int total) {

@@ -20,7 +20,6 @@ import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.DBException;
 import org.smokinmils.database.types.ReferalUser;
-import org.smokinmils.database.types.ReferrerType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -32,13 +31,13 @@ public class GroupReferal extends Event {
 	private static final String Command = "!grefer";
     private static final String Format = "%b%c12" + Command + " <user> <referrers>";
     private static final String ChkCommand = "!rcheck";
-    private static final String ChkFormat = "%b%c12" + Command + " <user>";
+    private static final String ChkFormat = "%b%c12" + ChkCommand + " <user>";
     
     private static final String NOT_RANKED = "%b%c04%sender%c12: %c04%who%c12 is currently not a member of any rank group.";
     private static final String NO_USER = "%b%c04%sender%c12: %c04%who%c12 does not exist as a user.";
     private static final String NO_SELF = "%b%c04%sender%c12: You can not be your own referrer.";
     private static final String SUCCESS = "%b%c04%sender%c12: Succesfully added %c04%referrers%c12 as %c04%who%c12's referer(s).";
-    private static final String FAILED = "%b%c04%sender%c12: %c04%who%c12 is a public referral and can't be given to ranks.";
+    //private static final String FAILED = "%b%c04%sender%c12: %c04%who%c12 is a public referral and can't be given to ranks.";
     
     private static final String REFER_CHECK_LINE = "%b%c04";
     private static final String REFER_CHECK_FLINE = "%b%c04%sender%c12: %c04%user%c12 is refered by: %c04";
@@ -62,9 +61,9 @@ public class GroupReferal extends Event {
 		if ( bot.userIsIdentified( sender ) &&
 		     isValidChannel( chan.getName() )) {
             try {
-    		    if (message.toLowerCase().startsWith( Command ) ) {
+    		    if ( Utils.startsWith(message, Command ) ) {
     		        refer(event);
-    		    } else if (message.toLowerCase().startsWith( ChkCommand ) ) {
+    		    } else if ( Utils.startsWith(message, ChkCommand ) ) {
                     check(event);
     		    }
             } catch (Exception e) {
@@ -82,8 +81,11 @@ public class GroupReferal extends Event {
 	    if (msg.length >= 3) {
 	        DB db = DB.getInstance();
             String user = msg[1];
-            ReferrerType reftype = db.getRefererType(user);
+            /*ReferrerType reftype = db.getRefererType(user);
+
+             TODO: check with J if this should be removed?
             if (reftype == ReferrerType.NONE || reftype == ReferrerType.GROUP) {
+            */
                 List<String> refs = new ArrayList<String>();
                 boolean is_ok = true;
                 for (int i = 2; i < msg.length; i++) {
@@ -121,11 +123,12 @@ public class GroupReferal extends Event {
                     out = out.replaceAll("%referrers", Utils.ListToString(refs));
                     bot.sendIRCMessage(channel, out);
                 }
-            } else {
+            /* TODO: check with J if this should be removed?
+             * } else {
                 String out = FAILED.replaceAll("%sender", sender);
                 out = out.replaceAll("%who", user);
                 bot.sendIRCMessage(channel, out);
-            }
+            }*/
 	    } else {
             bot.invalidArguments( sender, Format );
 	    }

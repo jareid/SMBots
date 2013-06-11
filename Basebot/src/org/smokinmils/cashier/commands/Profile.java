@@ -8,6 +8,7 @@
  */ 
 package org.smokinmils.cashier.commands;
 
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -45,7 +46,7 @@ public class Profile extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {			
+				Utils.startsWith(message, Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 2) {
 				ProfileType profile = ProfileType.fromString(msg[1]);

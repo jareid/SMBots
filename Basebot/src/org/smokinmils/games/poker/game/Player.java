@@ -11,7 +11,6 @@ package org.smokinmils.games.poker.game;
 import java.util.List;
 import java.util.Timer;
 
-import org.pircbotx.User;
 import org.smokinmils.games.poker.enums.ActionType;
 import org.smokinmils.games.poker.game.rooms.Table;
 import org.smokinmils.games.poker.tasks.SittingOut;
@@ -27,9 +26,6 @@ import org.smokinmils.settings.poker.Variables;
 public class Player {
     /** Name. */
 	private String name;
-	
-	/** User */
-	private User user;
     
     /** Players hand */
     private final Hand hand;
@@ -70,20 +66,12 @@ public class Player {
      * @param name 		The player's username.
      * @param cash 		The player's buy in.
      */
-	public Player(User user, String nick, int buy_in) {
-		this.user = user;
+	public Player(String nick, int buy_in) {
 		name = nick;
 		chips = buy_in;
         hand = new Hand();
         sittingOut = false;
 	}
-	
-    /**
-     * Returns the player's irc user object.
-     *
-     * @return The name.
-     */
-    public User getUser() { return user; }
     
     /**
      * Returns the player's name.

@@ -11,6 +11,7 @@ package org.smokinmils.cashier.commands;
 import java.sql.SQLException;
 
 import org.pircbotx.Channel;
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -47,7 +48,7 @@ public class Referral extends Event {
 		String sender = event.getUser().getNick();
 		Channel chan = event.getChannel();
 		
-		if ( message.toLowerCase().startsWith( Command ) &&
+		if ( Utils.startsWith(message, Command ) &&
 		     bot.userIsIdentified( sender ) &&
 		     isValidChannel( chan.getName() )) {
 		    try {

@@ -415,12 +415,12 @@ public class Table extends Room {
      * 
      * @param player  The player.
      */
-	public synchronized void playerJoins(User sender, Integer buy_in) {
-		Player player = new Player(sender, sender.getNick(), buy_in);
+	public synchronized void playerJoins(String sender, Integer buy_in) {
+		Player player = new Player(sender, buy_in);
 		boolean found = false;
 		Set<User> users = IrcClient.getBot().getUsers(IrcChannel);
 		for (User user: users) {
-			if (user.compareTo(sender) == 0) {
+			if (user.getNick().equalsIgnoreCase(sender)) {
 				found = true;
 			}
 		}
@@ -435,8 +435,8 @@ public class Table extends Room {
 		
 		// Remove chips from db
 		try {
-			DB.getInstance().buyIn(sender.getNick(), buy_in, Profile);
-			DB.getInstance().addPokerTableCount(sender.getNick(), tableID, Profile, buy_in);
+			DB.getInstance().buyIn(sender, buy_in, Profile);
+			DB.getInstance().addPokerTableCount(sender, tableID, Profile, buy_in);
 		} catch (Exception e) {
 			EventLog.log(e, "Table", "playerJoins");
 		}
@@ -445,7 +445,9 @@ public class Table extends Room {
 		IrcClient.getBot().sendInvite( sender, IrcChannel.getName() );
 		
 		// Try to voice the user incase they were watching
-		IrcClient.getBot().voice( IrcChannel, sender );
+        User user = IrcClient.getBot().getUser(sender);
+        if (user != null)
+            IrcClient.getBot().voice( IrcChannel, user );
 		observers.remove( sender );
 		
 		// Announce
@@ -463,17 +465,18 @@ public class Table extends Room {
      * @param sat_out true if the player was sat out prior to leaving
      */
     public synchronized void playerLeaves(Player player, boolean sat_out) {
-    	User user = player.getUser();
     	String name = player.getName();
     	int chips = player.getChips() + player.getRebuy();
     	
     	// Ensure user has left the table
-    	if (createdManually) {
-    		IrcClient.getBot().kick( IrcChannel, user );
-    	} else {
-    		IrcClient.getBot().deVoice( IrcChannel, user );
+    	User user = IrcClient.getBot().getUser(name);
+    	if (user != null) {
+        	if (createdManually) {
+        		IrcClient.getBot().kick( IrcChannel, user );
+        	} else {
+        		IrcClient.getBot().deVoice( IrcChannel, user );
+        	}
     	}
-    	
     	// Cash out
     	if (!player.isBroke()) {
     		player.cashOut();
@@ -568,7 +571,7 @@ public class Table extends Room {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
      */
-	protected synchronized void onMessage(User sender, String login, String hostname, String message) {
+	protected synchronized void onMessage(String sender, String login, String hostname, String message) {
 		int fSpace = message.indexOf(" ");
 		if(fSpace == -1) fSpace = message.length();
 		String firstWord = message.substring(0, fSpace).toLowerCase();
@@ -579,7 +582,7 @@ public class Table extends Room {
 		
 		CommandType cmd = CommandType.fromString( firstWord );
 		if (cmd != null) {
-			boolean isActor = (actor != null ? (actor.getUser().compareTo( sender ) == 0) : false);
+			boolean isActor = (actor != null ? (actor.getName().equalsIgnoreCase( sender )) : false);
 			switch (cmd) {
 			case CHECK:
 				if ((msg.length == 0 || msg[0].compareTo("") == 0) && isActor) {
@@ -588,7 +591,7 @@ public class Table extends Room {
 				} else if (!isActor) {
 					invalidAction( sender );
 				} else {
-					invalidArguments( sender.getNick(), cmd.getFormat() );
+					invalidArguments( sender, cmd.getFormat() );
 				}
 				break;
 			case RAISE:
@@ -598,7 +601,7 @@ public class Table extends Room {
 				} else if (!isActor) {
 					invalidAction( sender );
 				} else {
-					invalidArguments( sender.getNick(), cmd.getFormat() );
+					invalidArguments( sender, cmd.getFormat() );
 				}
 				break;
 			case FOLD:
@@ -607,7 +610,7 @@ public class Table extends Room {
 				} else if (!isActor) {
 					invalidAction( sender );
 				} else {
-					invalidArguments( sender.getNick(), cmd.getFormat() );
+					invalidArguments( sender, cmd.getFormat() );
 				}
 				break;
 			case SHOW:
@@ -651,21 +654,23 @@ public class Table extends Room {
      * @param login The login of the user who joined the channel.
      * @param hostname The hostname of the user who joined the channel.
      */
-	protected synchronized void onJoin(User sender, String login, String hostname) {
-    	if ( sender.getNick().compareToIgnoreCase( IrcClient.getBot().getNick() ) != 0) {
+	protected synchronized void onJoin(String sender, String login, String hostname) {
+    	if ( sender.compareToIgnoreCase( IrcClient.getBot().getNick() ) != 0) {
     		Player found = null;
     		for (Player plyr: satOutPlayers) {
-    			if (plyr.getUser().compareTo( sender ) == 0) {
+    			if (plyr.getName().equalsIgnoreCase( sender )) {
     				found = plyr;
     				break;
     			}
     		}
     		
     		if ( found != null) {
-    			IrcClient.getBot().voice( IrcChannel, sender );
+    		    User user = IrcClient.getBot().getUser(sender);
+    		    if (user != null)
+    		        IrcClient.getBot().voice( IrcChannel, user );
     			playerSitsDown( found );
     		} else {
-    			observers.add( sender.getNick().toLowerCase() );
+    			observers.add( sender.toLowerCase() );
     		}
     	} else {
     		IrcClient.getBot().setMode( IrcChannel, "+m");
@@ -818,8 +823,8 @@ public class Table extends Room {
     * @param hostname The hostname of the person who sent the message.
     * @param message The actual message sent to the channel.
 	*/	
-	private synchronized void onChips(User sender, String login, String hostname, String message) {
-		String sender_nick = sender.getNick();
+	private synchronized void onChips(String sender, String login, String hostname, String message) {
+		String sender_nick = sender;
 		String[] msg = message.split(" ");
 		if ((msg.length == 0 || msg[0].compareTo("") == 0)) {		
 			Player found = findPlayer( sender_nick );
@@ -858,8 +863,8 @@ public class Table extends Room {
     * @param hostname The hostname of the person who sent the message.
     * @param message The actual message sent to the channel.
 	*/	
-	private synchronized void onShow(User sender, String login, String hostname, String message) {
-		String sender_nick = sender.getNick();
+	private synchronized void onShow(String sender, String login, String hostname, String message) {
+		String sender_nick = sender;
 		Player found = findPlayer( sender_nick );
 		
 		if (found == null) {
@@ -900,19 +905,19 @@ public class Table extends Room {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
 	 */	
-	private synchronized void onRebuy(User sender, String login, String hostname, String message) {
+	private synchronized void onRebuy(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		Integer buy_in = Utils.tryParse( msg[0] );
 		if ((msg.length == 1 && msg[0].compareTo("") != 0) || buy_in != null) {
 			int maxbuy = (bigBlind*Variables.MaxBuyIn);
 			int minbuy = (bigBlind*Variables.MinBuyIn);
 			
-			if (buy_in != null && !IrcClient.userHasCredits( sender.getNick(), buy_in, Profile ) ) {
+			if (buy_in != null && !IrcClient.userHasCredits( sender, buy_in, Profile ) ) {
 				String out = Strings.NoChipsMsg.replaceAll( "%chips", Integer.toString(buy_in));
 				out = out.replaceAll( "%profile", Profile.toString() );
-				IrcClient.getBot().sendIRCNotice(sender.getNick(), out);
+				IrcClient.getBot().sendIRCNotice(sender, out);
 			} else if (buy_in != null) {
-				Player found = findPlayer(sender.getNick());
+				Player found = findPlayer(sender);
 				
 				if (found != null) {
 					int total = buy_in + found.getRebuy() + found.getChips();
@@ -922,18 +927,18 @@ public class Table extends Room {
 						String out = Strings.RebuyFailure.replaceAll( "%id", Integer.toString(tableID) );
 						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
 						out = out.replaceAll( "%total", Integer.toString(found.getChips() + found.getRebuy()) );		
-						IrcClient.getBot().sendIRCNotice( sender.getNick(), out );
+						IrcClient.getBot().sendIRCNotice( sender, out );
 					} else if (diff < 0) {
 						String out = Strings.IncorrectBuyInMsg.replaceAll("%buyin", Integer.toString(buy_in) );
 						out = out.replaceAll( "%maxbuy", Integer.toString(maxbuy) );
 						out = out.replaceAll( "%minbuy", Integer.toString(minbuy) );
 						out = out.replaceAll( "%maxBB", Integer.toString(Variables.MaxBuyIn) );
 						out = out.replaceAll( "%minBB", Integer.toString(Variables.MinBuyIn) );
-						IrcClient.getBot().sendIRCNotice(sender.getNick(), out);
+						IrcClient.getBot().sendIRCNotice(sender, out);
 					} else {
 						// Remove chips from db
 						try  {
-							DB.getInstance().buyIn(sender.getNick(), buy_in, Profile);
+							DB.getInstance().buyIn(sender, buy_in, Profile);
 				    		DB.getInstance().addPokerTableCount(found.getName(), tableID, Profile, buy_in);
 				        } catch (Exception e) {
 				        	EventLog.log(e, "Table", "nextHand");
@@ -951,12 +956,16 @@ public class Table extends Room {
 					}
 				} else {
 					EventLog.log("RECOVERABLE: User tried to rebuy but is not on the table", "Table", "onRebuy");
-					IrcClient.getBot().deVoice(IrcChannel, sender);
-					observers.add(sender.getNick().toLowerCase());
+
+	                User user = IrcClient.getBot().getUser(sender);
+	                if (user != null)
+	                    IrcClient.getBot().deVoice(IrcChannel, user);
+	                
+					observers.add(sender.toLowerCase());
 				}
 			}	
 		} else {
-			invalidArguments( sender.getNick(), CommandType.REBUY.getFormat() );
+			invalidArguments( sender, CommandType.REBUY.getFormat() );
 		}
 	}
 	
@@ -968,20 +977,22 @@ public class Table extends Room {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
 	 */	
-	private synchronized void onLeave(User sender, String login, String hostname, String message) {
+	private synchronized void onLeave(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
-			Player found = findPlayer( sender.getNick() );
+			Player found = findPlayer( sender );
 			boolean is_active = (found != null ? players.contains(found) : false);
 
 			if (found != null) { 
 				playerLeaves(found, is_active);
 			} else {
 				EventLog.log(sender + "failed to leave as they should not have been voiced.", "Table", "onLeave");
-				IrcClient.getBot().deVoice(IrcChannel, sender);
+				User user = IrcClient.getBot().getUser(sender);
+				if (user != null)
+				    IrcClient.getBot().deVoice(IrcChannel, user);
 			}
 		} else {
-			invalidArguments( sender.getNick(), CommandType.LEAVE.getFormat() );
+			invalidArguments( sender, CommandType.LEAVE.getFormat() );
 		}
 	}
 	
@@ -993,24 +1004,24 @@ public class Table extends Room {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
 	 */	
-	private synchronized void onSitDown(User sender, String login, String hostname, String message) {
+	private synchronized void onSitDown(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
 			Player found = null;
 			for (Player plyr: satOutPlayers) {
-				if (plyr.getUser().compareTo( sender ) == 0) {
+				if (plyr.getName().equalsIgnoreCase( sender )) {
 					found = plyr;
 					break;
 				}
 			}
 			
 			if (found != null && (found.isBroke() && found.getRebuy() == 0)) {
-				IrcClient.getBot().sendIRCNotice( sender.getNick(), Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
+				IrcClient.getBot().sendIRCNotice( sender, Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
 			} else if (found != null) {
 				playerSitsDown(found);
 			}
 		} else {
-			invalidArguments( sender.getNick(), CommandType.SITDOWN.getFormat() );
+			invalidArguments( sender, CommandType.SITDOWN.getFormat() );
 		}
 	}
 	
@@ -1022,12 +1033,12 @@ public class Table extends Room {
      * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
 	 */	
-	private synchronized void onSitOut(User sender, String login, String hostname, String message) {
+	private synchronized void onSitOut(String sender, String login, String hostname, String message) {
 		String[] msg = message.split(" ");
 		if (msg.length == 0 || msg[0].compareTo("") == 0) {
 			Player found = null;
 			for (Player plyr: players) {
-				if (plyr.getUser().compareTo( sender ) == 0) {
+				if (plyr.getName().equalsIgnoreCase( sender )) {
 					found = plyr;
 					break;
 				}
@@ -1036,11 +1047,11 @@ public class Table extends Room {
 			if (found != null) {
 				playerSitsOut(found);
 			} else {
-				IrcClient.getBot().sendIRCNotice( sender.getNick(),
+				IrcClient.getBot().sendIRCNotice( sender,
 						Strings.SitOutFailed.replaceAll("%id", Integer.toString(tableID)) );
 			}
 		} else {
-			invalidArguments( sender.getNick(), CommandType.SITOUT.getFormat() );
+			invalidArguments( sender, CommandType.SITOUT.getFormat() );
 		}
 	}
 	
@@ -1269,7 +1280,7 @@ public class Table extends Room {
 	 * 
 	 * @param sender.getNick() the user who tried to act
 	 */
-	private synchronized void invalidAction(User sender) {
+	private synchronized void invalidAction(String sender) {
 		String out;
 		if (actor == null) out = Strings.InvalidActTime;
 		else {
@@ -1277,7 +1288,7 @@ public class Table extends Room {
 			out = out.replaceAll("%hID", Integer.toString(handID));
 		}
 		
-		out = out.replaceAll( "%user", sender.getNick() );
+		out = out.replaceAll( "%user", sender );
 		IrcClient.getBot().sendIRCMessage( IrcChannel, out );
 	}
     
@@ -1870,7 +1881,7 @@ public class Table extends Room {
 		
 		for (int i = 0; i < users.length; i++) {
 			for (Player player: playerlist) {
-				if (player.getUser().compareTo(users[i]) == 0) {
+				if (player.getName().equalsIgnoreCase(users[i].getNick())) {
 					IrcClient.getBot().voice(IrcChannel, users[i]);
 					if ( satOutPlayers.contains(player ) ) { playerSitsDown( player ); }
 					break;

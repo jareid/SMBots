@@ -48,7 +48,7 @@ public class GiveChips extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {			
+				Utils.startsWith(message, Command ) ) {			
 			String[] msg = message.split(" ");
 
 			if ( bot.userIsOp(event.getUser(), chan.getName()) ) {

@@ -59,7 +59,7 @@ public class CheckChips extends Event {
 		
 		if ( isValidChannel( event.getChannel().getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {			
+				Utils.startsWith(message, Command ) ) {			
 			String[] msg = message.split(" ");
 			String user = "";
 			

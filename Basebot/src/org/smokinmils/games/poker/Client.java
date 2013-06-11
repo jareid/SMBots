@@ -54,7 +54,7 @@ public class Client extends Event {
 	private IrcBot Bot;
 	
 	/** A mapping of channel to Room objects */
-	private Map<String, Room> validChannels;
+	private Map<String, Room> pokerValidChannels;
 	
 	/** A mapping of table ID to table channel   */
 	private Map<Integer, String> validTables;
@@ -66,22 +66,22 @@ public class Client extends Event {
 	public Client( String server, String lobby ) {
 		ServerName = server;
 		Bot = BaseBot.getInstance().getBot(ServerName);
-    	validChannels = new HashMap<String, Room>();
+    	pokerValidChannels = new HashMap<String, Room>();
     	validTables = new HashMap<Integer, String>();
     	lobbyChan = lobby;
 	}
 	
 	public void initialise() {
 	       // At a minimum, we should exist in a lobby
-        if ( validChannels.isEmpty() ) {
+        if ( pokerValidChannels.isEmpty() ) {
             Bot.joinChannel( lobbyChan );
             Lobby lobby = new Lobby( Bot.getChannel(lobbyChan), this );
             lobby.start();
-            validChannels.put( lobbyChan.toLowerCase(), lobby );
+            pokerValidChannels.put( lobbyChan.toLowerCase(), lobby );
         }
         
         // Request invites from Chanserv and attempt to join all channels
-        for (Entry<String, Room> entry : validChannels.entrySet() ) {
+        for (Entry<String, Room> entry : pokerValidChannels.entrySet() ) {
             Bot.sendMessage("ChanServ", "INVITE " + entry.getKey() );
             Bot.joinChannel( entry.getKey() );
         }
@@ -105,7 +105,7 @@ public class Client extends Event {
 	 */
 	public void disconnect(Disconnect event) {		
 		EventLog.info("Disconnected, cancelling all table hands", "Client", "onDisconnect");
-		for (Entry<String,Room> entry: validChannels.entrySet()) {
+		for (Entry<String,Room> entry: pokerValidChannels.entrySet()) {
 			if (validTables.containsValue(entry.getKey().toLowerCase())) {
 				Table table = (Table)entry.getValue();
 				table.cancelHand();
@@ -121,7 +121,7 @@ public class Client extends Event {
 	 */
 	public void invite(Invite event) {
 		String chan = event.getChannel();
-		if (validChannels.containsKey( chan ) ) {
+		if (pokerValidChannels.containsKey( chan ) ) {
 			event.getBot().joinChannel(chan);
 		}		
 	}
@@ -150,10 +150,14 @@ public class Client extends Event {
 		}
 		
 		// Notify the correct room if required
-		Room room = validChannels.get( channel.toLowerCase() );
+		Room room = pokerValidChannels.get( channel.toLowerCase() );
 		if ( room != null ) {
-			room.addEvent( joinee, event.getUser().getLogin(),
-							event.getUser().getHostmask(), "", EventType.JOIN );
+		    if (room instanceof Table)
+		        ((Table)room).addEvent( joinee, event.getUser().getLogin(),
+							            event.getUser().getHostmask(), "", EventType.JOIN );
+		    else if (room instanceof Lobby)
+                ((Lobby)room).addEvent( joinee, event.getUser().getLogin(),
+                                        event.getUser().getHostmask(), "", EventType.JOIN );
 		}
 	}
 	
@@ -165,7 +169,7 @@ public class Client extends Event {
 	 */
 	public void part(Part event) {
 		// Notify the correct room if required
-		Room room = validChannels.get( event.getChannel().getName().toLowerCase() );
+		Room room = pokerValidChannels.get( event.getChannel().getName().toLowerCase() );
 		if ( room != null ) {
 			room.addEvent( event.getUser().getNick(), event.getUser().getLogin(),
 					       event.getUser().getHostmask(), "", EventType.PART );
@@ -182,7 +186,7 @@ public class Client extends Event {
 		String nick = event.getUser().getNick();
 		if ( nick.compareToIgnoreCase( event.getBot().getNick() ) != 0 ) {
 			// Notify the correct room if required
-			for (Room room: validChannels.values()) {
+			for (Room room: pokerValidChannels.values()) {
 				room.addEvent( nick, event.getUser().getLogin(),
 							   event.getUser().getHostmask(), "", EventType.PART );
 			}
@@ -196,7 +200,7 @@ public class Client extends Event {
 	 */
 	public void nickChange(NickChange event) {
 		// Notify the correct rooms
-		for ( Entry<String, Room> room: validChannels.entrySet() )  {
+		for ( Entry<String, Room> room: pokerValidChannels.entrySet() )  {
 			room.getValue().addEvent( event.getOldNick(), event.getUser().getLogin(),
 					   				  event.getUser().getHostmask(), event.getNewNick(),
 					   				  EventType.NICKCHANGE );
@@ -216,7 +220,7 @@ public class Client extends Event {
 		
 		channel = channel.toLowerCase();
 		if (validTables.containsValue(channel))  {
-			Table table = (Table)validChannels.get(channel);
+			Table table = (Table)pokerValidChannels.get(channel);
 			table.joinedChannel(users);
 		}
 	}
@@ -240,7 +244,7 @@ public class Client extends Event {
     	if (fChar == Strings.CommandChar) {
     		if ( bot.userIsIdentified( sender ) ) {				
 	    		// Notify the correct room if required
-	    		Room room = validChannels.get( chan.getName().toLowerCase() );
+	    		Room room = pokerValidChannels.get( chan.getName().toLowerCase() );
 	    		if ( room != null ) {
 					room.addEvent( sender, user.getLogin(), user.getHostmask(),
 								   message, EventType.MESSAGE );
@@ -257,7 +261,7 @@ public class Client extends Event {
 	 */
 	public void action(Action event) {
 		// Notify the correct room if required
-		Room room = validChannels.get( event.getChannel().getName().toLowerCase() );
+		Room room = pokerValidChannels.get( event.getChannel().getName().toLowerCase() );
 		if ( room != null ) {
 			room.addEvent( event.getUser().getNick(), event.getUser().getLogin(),
 					   	   event.getUser().getHostmask(), event.getAction(), EventType.ACTION );
@@ -275,7 +279,7 @@ public class Client extends Event {
      */
 	public void notice(Notice event)  {		
 		// Notify the correct room if required
-		Room room = validChannels.get( event.getChannel() );
+		Room room = pokerValidChannels.get( event.getChannel() );
 		if ( room != null ) {
 			room.addEvent( event.getUser().getNick(), event.getUser().getLogin(),
 						   event.getUser().getHostmask(), event.getNotice(), EventType.NOTICE );
@@ -291,7 +295,7 @@ public class Client extends Event {
      */
     public void op(Op event) {
 		// Notify the correct room if required
-		Room room = validChannels.get( event.getChannel().getName().toLowerCase() );
+		Room room = pokerValidChannels.get( event.getChannel().getName().toLowerCase() );
 		if ( room != null ) {
 			room.addEvent( event.getSource().getNick(), event.getSource().getLogin(),
 						   event.getSource().getHostmask(), event.getRecipient().getNick(),
@@ -338,7 +342,7 @@ public class Client extends Event {
 		Bot.joinChannel( chan );
 		Bot.sendMessage("ChanServ", "INVITE " + chan );
 		Table table = new Table(Bot.getChannel(chan), this, tableid, stake, players, profile, manual);
-		validChannels.put( chan.toLowerCase(), table );
+		pokerValidChannels.put( chan.toLowerCase(), table );
 		validTables.put( tableid, chan.toLowerCase() );
 		table.start();
 		
@@ -358,7 +362,7 @@ public class Client extends Event {
 	 */
 	public Table getTable(int id) {
 		String chan = validTables.get(id).toLowerCase();
-		return ((Table)validChannels.get(chan));
+		return ((Table)pokerValidChannels.get(chan));
 	}
 	
     /**
@@ -368,13 +372,13 @@ public class Client extends Event {
      * @param id	  The table ID
      * @param buy_in  The initial buy in
      */
-	public void newPlayer(User sender, int id, Integer buy_in) {
+	public void newPlayer(String sender, int id, Integer buy_in) {
 		EventLog.info("Adding new player...", "Client", "newTable");
 		// Get channel for the table id
 		String chan = validTables.get(id);
 		if ( chan != null ) {		
 			// Add player to table
-			Table tbl = (Table) validChannels.get(chan.toLowerCase());
+			Table tbl = (Table) pokerValidChannels.get(chan.toLowerCase());
 			if (tbl != null) {
 				tbl.playerJoins(sender, buy_in);
 			} else {
@@ -419,7 +423,7 @@ public class Client extends Event {
 		boolean full = false;
 		// Get table for the table id
 		String chan = validTables.get(id);
-		Table tbl = (Table) validChannels.get( chan );
+		Table tbl = (Table) pokerValidChannels.get( chan );
 		if (tbl != null) {
 			full = tbl.isFull();
 		}
@@ -508,7 +512,7 @@ public class Client extends Event {
 		
 		// Remove from valid tables
 		String tblchan = table.getChannel().getName();
-		validChannels.remove( tblchan );
+		pokerValidChannels.remove( tblchan );
 		for (Entry<Integer, String> tbl: validTables.entrySet()) {
 			if (tblchan.compareToIgnoreCase( tbl.getValue() ) == 0) {
 				found = tbl.getKey();

@@ -9,13 +9,16 @@
 package org.smokinmils.cashier.commands;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.pircbotx.Channel;
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.DBException;
+import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.logging.EventLog;
 /**
  * Provides the functionality for managing the rank groups
@@ -25,6 +28,9 @@ import org.smokinmils.logging.EventLog;
 public class RankGroups extends Event {
 	private static final String RenCommand = "!rengroup";
 	private static final String RenFormat = "%b%c12" + RenCommand + " <oldname> <newname>";
+	
+    private static final String RemRefCommand = "!remref";
+    private static final String RemRefFormat = "%b%c12" + RemRefCommand + " <user> <referrer>";
 	
 	private static final String NewCommand = "!newgroup";
     private static final String NewFormat = "%b%c12" + NewCommand + " <name>";
@@ -38,8 +44,15 @@ public class RankGroups extends Event {
 	private static final String KikCommand = "!rankkick";
     private static final String KikFormat = "%b%c12" + KikCommand + " <user>";
     
+    private static final String GrpsCommand = "!groups";
+    private static final String GrpsFormat = "%b%c12" + GrpsCommand + "";
+    
+    private static final String GrpLstCommand = "!grouplist";
+    private static final String GrpLstFormat = "%b%c12" + GrpLstCommand + " <group>";
+    
     private static final String NOT_RANKED = "%b%c04%who%c12 is currently not a member of any rank group.";
     private static final String NO_USER = "%b%c04%who%c12 does not exist as a user.";
+    private static final String NO_REFERRER = "%b%c04%user%c12 has not been referred by %c04%ref%c12.";
     private static final String KICKED = "%b%c04%who%c12 has been kicked from the %c04%group%c12 rank group.";
     private static final String ADDED = "%b%c04%who%c12 has been added to the %c04%group%c12 rank group.";
     private static final String MOVED = "%b%c04%who%c12 has been moved from %c04%oldgroup%c12 to %c04%group%c12.";
@@ -48,6 +61,8 @@ public class RankGroups extends Event {
     private static final String GROUP_CREATED = "%b%c04%group%c12 rank group has been created.";
     private static final String GROUP_DELETED = "%b%c04%group%c12 rank group has been deleted.";
     private static final String GROUP_RENAMED = "%b%c04%oldgroup%c12 rank group has been renamed to %c04%newgroup%c12.";
+    private static final String LIST_GROUPS = "%b%c04%sender%c12: Valid rank groups are: %c04%groups%c12";
+    private static final String GROUP_LIST = "%b%c04%sender%c12: %c04%group%c12 rank group contains: %c04%users%c12";
     
 	/**
 	 * This method handles the chips command
@@ -66,16 +81,22 @@ public class RankGroups extends Event {
 		
 		if ( bot.userIsIdentified( sender ) && isValidChannel( chan.getName() )) {
 		    try {
-    			if (message.toLowerCase().startsWith( RenCommand )) {
+    			if ( Utils.startsWith(message, RenCommand )) {
     			    renameGroup(event);
-    			} else if (message.toLowerCase().startsWith( NewCommand )) {
+    			} else if ( Utils.startsWith(message, NewCommand )) {
     			    newGroup(event);
-                } else if (message.toLowerCase().startsWith( DelCommand )) {
+                } else if ( Utils.startsWith(message, DelCommand )) {
                     deleteGroup(event);
-                } else if (message.toLowerCase().startsWith( AddCommand )) {
+                } else if ( Utils.startsWith(message, AddCommand )) {
                     addRank(event);
-                } else if (message.toLowerCase().startsWith( KikCommand )) {
+                } else if ( Utils.startsWith(message, KikCommand )) {
                     kickRank(event);
+                } else if ( Utils.startsWith(message, GrpsCommand )) {
+                    listGroups(event);
+                } else if ( Utils.startsWith(message, GrpLstCommand )) {
+                    groupList(event);
+                } else if ( Utils.startsWith(message, RemRefCommand )) {
+                    removeReferrer(event);
                 }
 		    } catch (Exception e) {
                 EventLog.log(e, "RankGroups", "message");
@@ -121,6 +142,8 @@ public class RankGroups extends Event {
             String group = msg[2];
             if ( !db.checkUserExists(who) ) {
                 bot.sendIRCMessage(channel, NO_USER.replaceAll("%who",who));
+            } else if ( !db.isRankGroup( group ) ) {
+                bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", group));
             } else {
                 String out = null;
                 if ( !db.isRank( who ) ) {
@@ -204,6 +227,74 @@ public class RankGroups extends Event {
             }
         } else {
             bot.invalidArguments( sender, RenFormat );
+        }
+    }
+    
+    private void listGroups(Message event) throws DBException, SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        String sender = event.getUser().getNick();
+        String channel = event.getChannel().getName();
+        
+        if (msg.length == 1) {
+            List<String> groups = DB.getInstance().listRankGroups();
+            String out = LIST_GROUPS.replaceAll("%sender", sender);
+            out = out.replaceAll("%groups", Utils.ListToString(groups));
+            bot.sendIRCMessage(channel, out);
+        } else {
+            bot.invalidArguments( sender, GrpsFormat );
+        }
+    }
+    
+    private void groupList(Message event) throws DBException, SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        String sender = event.getUser().getNick();
+        String channel = event.getChannel().getName();
+        
+        if (msg.length == 2) {
+            DB db = DB.getInstance();
+            String group = msg[1];
+            if ( !db.isRankGroup( group ) ) {
+                bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", group));
+            } else {
+                List<String> users = db.listRankGroupUsers(group);
+                String out = GROUP_LIST.replaceAll("%sender", sender);
+                out = out.replaceAll("%group", group);
+                out = out.replaceAll("%users", Utils.ListToString(users));
+                bot.sendIRCMessage(channel, out);
+            }
+        } else {
+            bot.invalidArguments( sender, GrpLstFormat );
+        }
+    }
+    
+    private void removeReferrer(Message event) throws DBException, SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        String sender = event.getUser().getNick();
+        String channel = event.getChannel().getName();
+        
+        if (msg.length == 3) {
+            DB db = DB.getInstance();
+            String user = msg[1];
+            String ref = msg[1];
+            if ( !db.checkUserExists(user) ) {
+                bot.sendIRCMessage(channel, NO_USER.replaceAll("%who",user));
+            } else if ( !db.checkUserExists(ref) ) {
+                bot.sendIRCMessage(channel, NO_USER.replaceAll("%who",ref));
+            } else {
+                List<ReferalUser> refs = db.getReferalUsers(user);
+                if ( !refs.contains(ref) ) {
+                    String out = NO_REFERRER.replaceAll("%user", user);
+                    out = out.replaceAll("%ref", ref);
+                    bot.sendIRCMessage(channel, out);
+                } else {
+                    
+                }
+            }
+        } else {
+            bot.invalidArguments( sender, RemRefFormat );
         }
     }
 }

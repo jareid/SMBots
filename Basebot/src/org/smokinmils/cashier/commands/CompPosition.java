@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -54,7 +55,7 @@ public class CompPosition extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {			
+				Utils.startsWith(message, Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 2 || msg.length == 3) {
 				String who = (msg.length == 2 ? sender : msg[2] );

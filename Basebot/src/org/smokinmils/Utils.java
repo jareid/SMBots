@@ -71,4 +71,12 @@ public class Utils {
 	    DecimalFormat df = new DecimalFormat("#.#");
 	    return df.format(chips);
 	}
+	
+	public static boolean startsWith(String message, String start) {
+	    String[] msg = message.split(" ");
+	    boolean ret = false;
+	    if (msg.length >= 1 && msg[0].equalsIgnoreCase(start))
+	        ret = true;
+	    return ret;
+	}
 }

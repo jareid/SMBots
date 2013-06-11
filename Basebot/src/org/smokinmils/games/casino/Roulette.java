@@ -82,11 +82,11 @@ public class Roulette extends Event {
             if ( channel.equalsIgnoreCase( event.getChannel().getName() ) &&
                     bot.userIsIdentified( sender ) ) {
         		try {
-        			if (message.toLowerCase().startsWith( BET_CMD )) {
+        			if ( Utils.startsWith(message, BET_CMD ) ) {
         				bet(event);
-        			} else if (message.toLowerCase().startsWith( CXL_CMD )) {
+        			} else if ( Utils.startsWith(message, CXL_CMD ) ) {
         				cancel(event);
-        			} else if (message.toLowerCase().startsWith( END_CMD )) {
+        			} else if ( Utils.startsWith(message, END_CMD ) ) {
         				end(event);
         			}
         		} catch (Exception e) {
@@ -109,6 +109,7 @@ public class Roulette extends Event {
             bot.sendIRCNotice(username, INVALID_BET);
 		} else {
 			Double amount = Utils.tryParseDbl(msg[1]);
+            double betsize = db.checkCredits(username, amount);
 			String choice = msg[2].toLowerCase();
 			Integer choicenum = Utils.tryParse(msg[2]);
 			ProfileType profile = db.getActiveProfile(username);
@@ -122,17 +123,17 @@ public class Roulette extends Event {
                         choice.equalsIgnoreCase("odd")) ||
                        (choicenum != null && choicenum >= 0 && choicenum <= 36))) {
 			    bot.sendIRCNotice(username, INVALID_BET);
-			} else if (db.checkCredits(username) < amount) {
+			} else if (betsize <= 0.0) {
                 bot.sendIRCNotice(username, NO_CHIPS);
 			} else {
-				Bet bet = new Bet(username, profile, amount, choice);
+				Bet bet = new Bet(username, profile, betsize, choice);
 				allBets.add(bet);
-				db.adjustChips(username, -amount, profile, GamesType.ROULETTE, TransactionType.BET);
-				db.addBet(username, choice, amount, profile, GamesType.ROULETTE);
+				db.adjustChips(username, -betsize, profile, GamesType.ROULETTE, TransactionType.BET);
+				db.addBet(username, choice, betsize, profile, GamesType.ROULETTE);
 	
 				String out = BET_MADE.replaceAll("%username", username);
 				out = out.replaceAll("%choice", choice);
-				out = out.replaceAll("%amount", Utils.chipsToString(amount));
+				out = out.replaceAll("%amount", Utils.chipsToString(betsize));
                 bot.sendIRCMessage(channel, out);				
 			}
 		}
@@ -228,15 +229,16 @@ public class Roulette extends Event {
 			String user = bet.getUser();
 			ProfileType profile = bet.getProfile();
 			
-			if (bet.isValid()) {                
+			if (bet.isValid()) {           
 				int winamount = 0;
 				boolean win = false;
 				if ((choice.equalsIgnoreCase("red") || choice.equalsIgnoreCase("black")) &&
-					 choice.equalsIgnoreCase(getColour(winner))) {
+					 choice.equalsIgnoreCase(getColour(winner)) && winner != 0) {
 					winamount = 2;
 					win = true;
-				} else if ((choice.equalsIgnoreCase("even") && isEven) ||
-						   (choice.equalsIgnoreCase("odd") && !isEven)) {
+				} else if (((choice.equalsIgnoreCase("even") && isEven) ||
+						   (choice.equalsIgnoreCase("odd") && !isEven)) &&
+						   winner != 0) {
 					win = true;
 					winamount = 2;
 				} else if (winner != 0 &&
@@ -247,7 +249,7 @@ public class Roulette extends Event {
 					winamount = 3;
 				} else if (choicenum != null && winner == choicenum) {
 					win = true;
-					winamount = ((bet.getChoice() == "0") ? 12 : 36);
+					winamount = ((winner == 0) ? 12 : 36);
 				}
 
 				if (win) {

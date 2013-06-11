@@ -57,7 +57,7 @@ public class Lottery extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {			
+				Utils.startsWith(message, Command ) ) {			
 			String[] msg = message.split(" ");
 			if (msg.length == 2) {
 				Integer amount = Utils.tryParse(msg[1]);

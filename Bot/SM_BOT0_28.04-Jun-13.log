@@ -1,0 +1,11 @@
+0:28:42: SMBaseBot->addChannel() :: DEBUG Joined #smokin_dice on SwiftIRC
+0:28:45: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of arcanicook
+0:28:46: CheckUser::CheckIdentified->call() :: INFO: arcanicook identified
+0:28:46: CheckIdentified->sendStatusRequest() :: INFO: arcanicook identified
+0:28:46: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of arcanicook
+0:28:47: CheckUser::CheckIdentified->call() :: INFO: arcanicook identified
+0:28:47: CheckIdentified->sendStatusRequest() :: INFO: arcanicook identified
+0:28:47: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of No_Gayness
+0:28:47: CheckUser::CheckIdentified->call() :: INFO: No_Gayness identified
+0:28:47: CheckIdentified->sendStatusRequest() :: INFO: No_Gayness identified
+0:28:47: SMBaseBot->addChannel() :: DEBUG Joined #sm_tournaments on SwiftIRC

@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Message;
@@ -43,7 +44,7 @@ public class Jackpots extends Event {
 		
 		if ( isValidChannel( chan.getName() ) &&
 				bot.userIsIdentified( sender ) &&
-				message.toLowerCase().startsWith( Command ) ) {
+				Utils.startsWith(message, Command ) ) {
 			bot.sendIRCMessage(chan, Rake.getAnnounceString());
 		}
 	}
