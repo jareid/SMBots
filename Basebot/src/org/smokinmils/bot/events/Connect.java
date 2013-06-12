@@ -18,11 +18,14 @@ import org.smokinmils.bot.IrcBot;
  */
 public class Connect extends ConnectEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
+	 * @param event the ConnectEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.ConnectEvent
 	 */
-	public Connect(ConnectEvent<IrcBot> event) {
+	public Connect(final ConnectEvent<IrcBot> event) {
 		super(event.getBot());
 	}
 

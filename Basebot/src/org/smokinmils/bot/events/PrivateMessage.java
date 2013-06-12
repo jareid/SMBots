@@ -19,13 +19,14 @@ import org.smokinmils.bot.IrcBot;
 
 public class PrivateMessage extends PrivateMessageEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 *
-	 * @param bot
-	 * @param user The user who sent the private message.
-	 * @param message The actual message.
+	 * @param event the PrivateMessageEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.PrivateMessageEvent
 	 */
-	public PrivateMessage(PrivateMessageEvent<IrcBot> event) {
+	public PrivateMessage(final PrivateMessageEvent<IrcBot> event) {
 		super(event.getBot(), event.getUser(), event.getMessage());
 	}
 

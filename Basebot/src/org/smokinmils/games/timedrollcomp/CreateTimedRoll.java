@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.pircbotx.Channel;
-import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.types.ProfileType;
 
@@ -101,7 +101,7 @@ public class CreateTimedRoll extends Event {
 						}
 					}
 				} else {
-					bot.sendIRCMessage(chan.getName(), IrcBot.ValidProfiles);
+					bot.sendIRCMessage(chan.getName(), IrcBot.VALID_PROFILES);
 				}
 			} else {
 				bot.invalidArguments( sender, Format );

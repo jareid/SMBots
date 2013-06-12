@@ -1,0 +1,204 @@
+19:21:42: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Client->newTable() :: INFO: Creating new table...
+19:21:42: Question->load() :: test3 has no question
+19:21:42: Question->load() :: test4 has no answer
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:21:42: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:22:28: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:32: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:22:34: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:36: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:38: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:22:40: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:42: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:42: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:22:44: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:46: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:46: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Unknown21835
+19:22:48: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:22:50: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+19:22:57: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:22:57: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:23:27: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:23:27: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:23:27: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:24:21: RankGroups->message() :: Exception: org.smokinmils.database.DBException: Column 'referer' not found.
+19:24:21: RankGroups->message() :: org.smokinmils.database.DBException: Column 'referer' not found.
+	at org.smokinmils.database.DB.getRefereeUsers(DB.java:1397)
+	at org.smokinmils.cashier.commands.RankGroups.check(RankGroups.java:281)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:102)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:25:52: RankGroups->message() :: Exception: org.smokinmils.database.DBException: Column 'referer' not found.
+19:25:52: RankGroups->message() :: org.smokinmils.database.DBException: Column 'referer' not found.
+	at org.smokinmils.database.DB.getRefereeUsers(DB.java:1397)
+	at org.smokinmils.cashier.commands.RankGroups.check(RankGroups.java:281)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:102)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:26:15: RankGroups->message() :: Exception: org.smokinmils.database.DBException: Unknown column 'referrer' in 'where clause'
+19:26:15: RankGroups->message() :: org.smokinmils.database.DBException: Unknown column 'referrer' in 'where clause'
+	at org.smokinmils.database.DB.getRefereeUsers(DB.java:1397)
+	at org.smokinmils.cashier.commands.RankGroups.check(RankGroups.java:281)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:102)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:27:40: GroupReferral->message() :: Exception: org.smokinmils.database.DBException: Unknown column 'referrer' in 'field list'
+19:27:40: GroupReferral->message() :: org.smokinmils.database.DBException: Unknown column 'referrer' in 'field list'
+	at org.smokinmils.database.DB.getReferalUsers(DB.java:1357)
+	at org.smokinmils.cashier.commands.GroupReferal.check(GroupReferal.java:142)
+	at org.smokinmils.cashier.commands.GroupReferal.message(GroupReferal.java:68)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:27:41: GroupReferral->message() :: Exception: org.smokinmils.database.DBException: Unknown column 'referrer' in 'field list'
+19:27:41: GroupReferral->message() :: org.smokinmils.database.DBException: Unknown column 'referrer' in 'field list'
+	at org.smokinmils.database.DB.getReferalUsers(DB.java:1357)
+	at org.smokinmils.cashier.commands.GroupReferal.check(GroupReferal.java:142)
+	at org.smokinmils.cashier.commands.GroupReferal.message(GroupReferal.java:68)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:28:02: RankGroups->message() :: Exception: org.smokinmils.database.DBException: Column 'referer' not found.
+19:28:02: RankGroups->message() :: org.smokinmils.database.DBException: Column 'referer' not found.
+	at org.smokinmils.database.DB.getRefereeUsers(DB.java:1397)
+	at org.smokinmils.cashier.commands.RankGroups.check(RankGroups.java:281)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:102)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:29:07: RankGroups->message() :: Exception: org.smokinmils.database.DBException: Column 'referer' not found.
+19:29:07: RankGroups->message() :: org.smokinmils.database.DBException: Column 'referer' not found.
+	at org.smokinmils.database.DB.getRefereeUsers(DB.java:1397)
+	at org.smokinmils.cashier.commands.RankGroups.check(RankGroups.java:281)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:102)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:36:28: RankGroups->message() :: Exception: org.smokinmils.database.DBException: Column 'username' not found.
+19:36:28: RankGroups->message() :: org.smokinmils.database.DBException: Column 'username' not found.
+	at org.smokinmils.database.DB.getReferalUsers(DB.java:1357)
+	at org.smokinmils.cashier.commands.RankGroups.check(RankGroups.java:281)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:102)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor15.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+

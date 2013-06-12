@@ -12,7 +12,8 @@ import org.pircbotx.hooks.events.SetChannelLimitEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * Called when a user limit is set for a channel. The number of users in the channel cannot exceed this limit.
+ * Called when a user limit is set for a channel. The number of users in the
+ * channel cannot exceed this limit.
  *
  * This is a type of mode change and therefore is also dispatched in a ModeEvent
  * 
@@ -20,14 +21,15 @@ import org.smokinmils.bot.IrcBot;
  */
 public class SetChannelLimit extends SetChannelLimitEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param channel The channel in which the mode change took place.
-	 * @param user The user that performed the mode change.
-	 * @param limit The maximum number of users that may be in this channel at the same time.
+	 * @param event the SetChannelLimitEvent
+     * 
+     * @see org.pircbotx.hooks.type.SetChannelLimitEvent
 	 */
-	public SetChannelLimit(SetChannelLimitEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getUser(), event.getLimit());
+	public SetChannelLimit(final SetChannelLimitEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(),
+		        event.getUser(), event.getLimit());
 	}
 }

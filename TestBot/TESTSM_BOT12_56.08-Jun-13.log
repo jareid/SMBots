@@ -1,0 +1,27 @@
+12:56:08: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+12:56:09: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:09: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:09: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:09: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:09: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+12:56:11: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+12:56:11: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+12:56:11: Question->load() :: test3 has no question
+12:56:11: Question->load() :: test4 has no answer
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:11: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:12: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:56:12: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+12:57:27: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+12:57:27: CheckUser::CheckIdentified->call() :: INFO: JReid identified

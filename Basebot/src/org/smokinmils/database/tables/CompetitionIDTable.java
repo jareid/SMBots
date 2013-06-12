@@ -8,13 +8,23 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class CompetitionIDTable {	
-	/** Table name */
-	public static final String Name = "competition_id";
+/**
+* Represents the competition id table from the database.
+* 
+* @author Jamie
+*/
+public final class CompetitionIDTable {	
+    /**
+     * Hiding the default constructor.
+     */
+    private CompetitionIDTable() { }
+    
+    /** Table name. */
+	public static final String NAME = "competition_id";
 	
-	/** Column for the id */
-	public static final String Col_ID = "id";
+	/** Column for the id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the end date */
-	public static final String Col_Ends = "ends";
+	/** Column for the end date. */
+	public static final String COL_ENDS = "ends";
 }

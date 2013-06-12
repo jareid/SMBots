@@ -12,19 +12,22 @@ import org.pircbotx.hooks.events.QuitEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * This event is dispatched whenever someone (possibly us) quits from the server. We will only observe this if the user was in one of the channels to which we are connected.
+ * This event is dispatched whenever someone (possibly us) quits from the
+ * server. We will only observe this if the user was in one of the channels
+ * to which we are connected.
  * 
  * @author Jamie
  */
 public class Quit extends QuitEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 *
-	 * @param bot
-	 * @param user The user that quit from the server in snapshot form
-	 * @param reason The reason given for quitting the server.
+	 * @param event the QuitEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.QuitEvent
 	 */
-	public Quit(QuitEvent<IrcBot> event) {
+	public Quit(final QuitEvent<IrcBot> event) {
 		super(event.getBot(), event.getUser(), event.getReason());
 	}
 	

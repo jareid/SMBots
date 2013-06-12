@@ -12,18 +12,21 @@ import org.pircbotx.hooks.events.JoinEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * This event is dispatched whenever someone (possibly us) joins a channel which we are on.
+ * This event is dispatched whenever someone (possibly us) joins a channel
+ * which we are on.
  * 
  * @author Jamie
  */
 public class Join extends JoinEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
-	 * @param bot
-	 * @param channel The channel which somebody joined.
-	 * @param user The user who joined the channel.
+	 * Default constructor to setup object. Timestamp is automatically set
+	 *  to current time as reported by System.currentTimeMillis()
+	 * 
+	 * @param event the JoinEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.JoinEvent
 	 */
-	public Join(JoinEvent<IrcBot> event) {
+	public Join(final JoinEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 }

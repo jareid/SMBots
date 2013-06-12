@@ -11,32 +11,34 @@ package org.smokinmils.database.types;
 import java.sql.SQLException;
 
 import org.smokinmils.database.DB;
-import org.smokinmils.database.DBException;
 
 /**
-* An enumerate for the DB's credits transaction types
+* An enumerate for the DB's credits transaction types.
 * 
 * @author Jamie Reid
 */
 public enum ProfileType {
-	_07("07",true),
-	EOC("eoc",true),
-	PLAY("play",false),
-	;
+    /** 07 profile. */
+	_07("07", true),
+    /** eoc profile. */
+	EOC("eoc", true),
+    /** play profile. */
+	PLAY("play", false);
 	
 	/** The text. */
 	private final String text;
 	
-	/** Value that stores whether this has competitions */
+	/** Value that stores whether this has competitions. */
 	private final boolean comps;
 	
 	/**
 	 * Constructor.
-	 * @param text  textual representation.
+	 * @param txt  textual representation.
+     * @param hascomps  if this profile has competitions
 	 */
-	ProfileType(String text, boolean comps) {
-		this.text = text;
-		this.comps = comps;
+	ProfileType(final String txt, final boolean hascomps) {
+		text = txt;
+		comps = hascomps;
 	}
 	
 	/**
@@ -46,26 +48,30 @@ public enum ProfileType {
 	 */
 	public String getText() { return text; }
 	
+	/**
+     * @return true if this profile has competitions
+     */
     public boolean hasComps() { return comps; }
 	
 	/**
-	 * (non-Javadoc)
+	 * (non-Javadoc).
 	 * @see java.lang.Enum#toString()
+	 * @return the output
 	 */
 	@Override
 	public String toString() { return text;	}
 	
 	/** 
-	 * Converts a String to the correct ProfileType
+	 * Converts a String to the correct ProfileType.
 	 * 
 	 * @param text the string to check
 	 * @return the correct enumerate object
 	 */
-    public static ProfileType fromString(String text) {
+    public static ProfileType fromString(final String text) {
         if (text != null) {
-        	text = text.toLowerCase();
+        	String txtlc = text.toLowerCase();
         	for (ProfileType pt : ProfileType.values()) {
-        		if ( pt.getText().compareTo(text) == 0 ) {
+        		if (pt.getText().equals(txtlc)) {
         			return pt;
         		}
         	}
@@ -74,11 +80,13 @@ public enum ProfileType {
     }
     
 	/**
-	 * Converts the type to it's integer from the database
+	 * Converts the type to it's integer from the database.
 	 * 
 	 * @return the integer that represents this ProfileType
+	 * 
+	 * @throws SQLException if something fails in the database.
 	 */
-	public int toInteger() throws DBException, SQLException {
-		return DB.getInstance().getProfileID( this );
+	public int toInteger() throws SQLException {
+		return DB.getInstance().getProfileID(this);
 	}
 }

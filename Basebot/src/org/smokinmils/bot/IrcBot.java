@@ -20,54 +20,74 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.database.types.ProfileType;
 
 /**
- * Provides the IRC functionality
+ * Provides the IRC functionality.
  * 
  * @author Jamie
  */
 public class IrcBot extends PircBotX {
-	public static final String InvalidArgs = "%b%c12You provided invalid arguments for the command. The format is:";
-	public static final String ValidProfiles = "%b%c12Valid profiles are: %c04" + Arrays.asList(ProfileType.values()).toString();
+    /** Output message when a command is used with incorrect arguments. */
+	public static final String INVALID_ARGS = "%b%c12You provided invalid "
+	        + "arguments for the command. The format is:";
+	
+	/** Output message that lists the valid profiles. */
+	public static final String VALID_PROFILES = "%b%c12Valid profiles are: %c04"
+	        + Arrays.asList(ProfileType.values()).toString();
 	
 	/**
-	 * This string is used when a user doesn't have enough chips
+	 * This string is used when a user doesn't have enough chips.
 	 * 
 	 * %chips - The amount the user tried to spend
 	 */
-	public static final String NoChipsMsg = "%b%c12Sorry, you do not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
+	public static final String NO_CHIPS_MSG = "%b%c12Sorry, you do not have "
+	       + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 	
-	/** List of users identified with NickServ */
-	private List<String> IdentifiedUsers;
+	/** List of users identified with NickServ. */
+	private List<String> identifiedUsers;
 	
-	/** List of channels */
-	private List<String> ValidChannels;
+	/** List of channels. */
+	private List<String> validChannels;
 	
 	/**
-	 * Constructor
+	 * Constructor.
+	 * 
+	 * @see org.pircbotx.PircBotX
 	 */
 	public IrcBot() {
 		super();
-    	IdentifiedUsers = new ArrayList<String>();
-    	ValidChannels = new ArrayList<String>();
+    	identifiedUsers = new ArrayList<String>();
+    	validChannels = new ArrayList<String>();
 	}
 	
 	/**
-	 * Returns the server this bot is connected to
+	 * Returns the server this bot is connected to.
 	 * 
 	 * @return The name of the server
 	 */
-	public String getServer() {
+	public final String getServer() {
 		return BaseBot.getInstance().getServer(this);
 	}
 	
 	/**
-	 * Used to send a notice to the target replacing formatting variables correctly
-	 * Also allows the sending of multiple lines separate by \n character
+	 * Used to send a notice to the target replacing formatting variables
+	 * correctly.
+	 * Also allows the sending of multiple lines separate by \n character.
 	 * 
 	 * @param target The place where the message is being sent
 	 * @param in The message to send with formatting variables
 	 */	
-	public void sendIRCNotice(Channel target, String in) { sendIRCNotice(target.getName(), in); }
-	public void sendIRCNotice(String target, String in) {
+	public final void sendIRCNotice(final Channel target, final String in) {
+	    sendIRCNotice(target.getName(), in);
+	}
+	
+	/**
+     * Used to send a notice to the target replacing formatting variables
+     * correctly.
+     * Also allows the sending of multiple lines separate by \n character.
+     * 
+     * @param target The place where the message is being sent
+     * @param in The message to send with formatting variables
+     */ 
+	public final void sendIRCNotice(final String target, final String in) {
 		String out = in;
 
 		out = out.replaceAll("%newline", "\n");
@@ -78,19 +98,31 @@ public class IrcBot extends PircBotX {
 		out = out.replaceAll("%n", Colors.NORMAL);
 
 		for (String line: out.split("\n")) {
-			this.sendRawLineNow( "NOTICE " + target + " " + line);
+			this.sendRawLineNow("NOTICE " + target + " " + line);
 		}
 	}
 	
 	/**
-	 * Used to send a message to the target replacing formatting variables correctly
-	 * Also allows the sending of multiple lines separate by \n character
+	 * Used to send a message to the target replacing formatting variables
+	 * correctly.
+	 * Also allows the sending of multiple lines separate by \n character.
 	 * 
 	 * @param target The place where the message is being sent
 	 * @param in The message to send with formatting variables
 	 */
-	public void sendIRCMessage(Channel target, String in) { sendIRCMessage(target.getName(), in); }
-	public void sendIRCMessage(String target, String in) {
+	public final void sendIRCMessage(final Channel target, final String in) {
+	    sendIRCMessage(target.getName(), in);
+	}
+	
+	/**
+     * Used to send a message to the target replacing formatting variables
+     * correctly.
+     * Also allows the sending of multiple lines separate by \n character.
+     * 
+     * @param target The place where the message is being sent
+     * @param in The message to send with formatting variables
+     */
+    public final void sendIRCMessage(final String target, final String in) {
 		String out = in;
 
 		out = out.replaceAll("%newline", "\n");
@@ -101,42 +133,45 @@ public class IrcBot extends PircBotX {
 		out = out.replaceAll("%n", Colors.NORMAL);
 
 		for (String line: out.split("\n")) {
-			this.sendRawLineNow( "PRIVMSG " + target + " " + line);
+			this.sendRawLineNow("PRIVMSG " + target + " " + line);
 		}
 	}
 	
 	/**
-	 * Outputs a notice to a user informing them they don't have enough chips
+	 * Outputs a notice to a user informing them they don't have enough chips.
 	 * 
 	 * @param user		The user
 	 * @param amount	The amount they tried to use
 	 * @param profile	The profile they tried to use
 	 */
-	public void NoChips(String user, int amount, ProfileType profile) {
-		String out = NoChipsMsg.replaceAll( "%chips", Integer.toString(amount));
-		out = out.replaceAll( "%profile", profile.toString() );
+	public final void noChips(final String user,
+	                          final int amount,
+	                          final ProfileType profile) {
+		String out = NO_CHIPS_MSG.replaceAll("%chips",
+		                                     Integer.toString(amount));
+		out = out.replaceAll("%profile", profile.toString());
 		sendIRCNotice(user, out);
 	}
 	
     /**
-     * Sends the invalid argument message 
+     * Sends the invalid argument message.
      * 
      * @param who		The user to send to
      * @param format	The command format
      */
-    public void invalidArguments(String who, String format) {
-		sendIRCNotice(who, InvalidArgs);
+    public final void invalidArguments(final String who, final String format) {
+		sendIRCNotice(who, INVALID_ARGS);
 		sendIRCNotice(who, format);		
 	}
 	
 	/**
-	 * Checks if a user is identified with NickServ
+	 * Checks if a user is identified with NickServ.
 	 * 
 	 * @param nick	The nickname to check
 	 * @return	true if the user is identified, false otherwise.
 	 */
-	public boolean userIsIdentified(String nick) {
-		return IdentifiedUsers.contains(nick.toLowerCase());
+	public final boolean userIsIdentified(final String nick) {
+		return identifiedUsers.contains(nick.toLowerCase());
 	}
 	
 	/**
@@ -144,9 +179,9 @@ public class IrcBot extends PircBotX {
 	 * 
 	 * @param nick	The nickname to check
 	 */
-	public void removeIdentifiedUser(String nick) {
-	    synchronized (IdentifiedUsers) {
-	        IdentifiedUsers.remove(nick.toLowerCase());
+	public final void removeIdentifiedUser(final String nick) {
+	    synchronized (identifiedUsers) {
+	        identifiedUsers.remove(nick.toLowerCase());
 	    }
 	}
 	
@@ -155,18 +190,21 @@ public class IrcBot extends PircBotX {
 	 * 
 	 * @param nick	The nickname to check
 	 */
-	public void addIdentifiedUser(String nick) {
-        synchronized (IdentifiedUsers) {
-            IdentifiedUsers.add(nick.toLowerCase());
+	public final void addIdentifiedUser(final String nick) {
+        synchronized (identifiedUsers) {
+            identifiedUsers.add(nick.toLowerCase());
         }
 	}
 	
 	/**
-	 * Checks if a user is an op for a channel
-	 * @param user
-	 * @param chan
+	 * Checks if a user is an op for a channel.
+	 * 
+	 * @param user The user to check
+	 * @param chan The channel to check the user on
+	 * 
+	 * @return true if they are an op, false otherwise.
 	 */
-	public boolean userIsOp(User user, String chan) {
+	public final boolean userIsOp(final User user, final String chan) {
 		boolean ret = false;
 		for (Channel opchans: user.getChannelsOpIn()) {
 			if (chan.equalsIgnoreCase(opchans.getName())) {
@@ -177,12 +215,15 @@ public class IrcBot extends PircBotX {
 		return ret;
 	}
 	
-	   /**
-     * Checks if a user is an op for a channel
-     * @param user
-     * @param chan
+	/**
+     * Checks if a user is an op for a channel.
+     * 
+     * @param user The user to check
+     * @param chan The channel to check the user on
+     * 
+     * @return true if they are an half op, false otherwise.
      */
-    public boolean userIsHalfOp(User user, String chan) {
+    public final boolean userIsHalfOp(final User user, final String chan) {
         boolean ret = false;
         for (Channel opchans: user.getChannelsOpIn()) {
             if (chan.equalsIgnoreCase(opchans.getName())) {
@@ -194,11 +235,14 @@ public class IrcBot extends PircBotX {
     }
     
 	/**
-	 * Checks if a user is an op for a channel
-	 * @param user
-	 * @param chan
+	 * Checks if a user is an op for a channel.
+     * 
+     * @param user The user to check
+     * @param chan The channel to check the user on
+     * 
+     * @return true if they are a host, false otherwise.
 	 */
-	public boolean userIsHost(User user, String chan) {
+	public final boolean userIsHost(final User user, final String chan) {
 		boolean ret = false;
 		for (Channel opchans: user.getChannelsOwnerIn()) {
 			if (chan.equalsIgnoreCase(opchans.getName())) {
@@ -246,11 +290,20 @@ public class IrcBot extends PircBotX {
 		return ret;
 	}
 
-	public void addValidChannel(String channel) {
-		ValidChannels.add(channel.toLowerCase());
+	/**
+	 * 
+	 * @param channel The channel to add as a valid channel for this server.
+	 */
+	public final void addValidChannel(final String channel) {
+		validChannels.add(channel.toLowerCase());
 	}
 
-	public List<String> getValidChannels() {
-		return ValidChannels;
+	/** 
+	 * Provides the list of channels for this IRC server.
+	 * 
+	 * @return the channel list
+	 */
+	public final List<String> getValidChannels() {
+		return validChannels;
 	}
  }

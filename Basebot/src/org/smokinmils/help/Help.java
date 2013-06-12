@@ -8,40 +8,44 @@
  */ 
 package org.smokinmils.help;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.ini4j.InvalidFileFormatException;
-import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.logging.EventLog;
 
 /**
- * Provides the functionality to check a user's chips
+ * Provides the functionality to check a user's chips.
  * 
  * @author Jamie
  */
 public class Help extends Event {
-	public static final String Command = "!info";
-	public static final String Description = "%b%c12Lists the available info topics";
-	public static final String Format = "%b%c12" + Command + " ?topic?";
+    /** The text used to use the info command. */
+	public static final String COMMAND = "!info";
 	
-	public static final String InvalidTopic = "%b%c12Sorry, %c04%topic%c12 is not a valid topic. Please use %c04%cmd%c12 for valid questions/topics!";
+    /** A description of the info command. */
+	public static final String DESCRIPTION = "%b%c12Lists the available info "
+	                                       + "topics";
 	
-	public static final String FileName = "faq.ini";
+	/** The format used for the info command. */
+	public static final String FORMAT = "%b%c12" + COMMAND + " ?topic?";
+	
+	/** The message used when we receive an invalid topic. */
+	public static final String INVALID_TOPIC = "%b%c12Sorry, %c04%topic%c12 is "
+	 + "not a valid topic. Please use %c04%cmd%c12 for valid questions/topics!";
+	
+	/** The file where we store the questions. */
+	public static final String FILENAME = "faq.ini";
 	
 	/**
-	 * Constructor 
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 * @throws InvalidFileFormatException 
+	 * Constructor.
 	 */
 	public Help() {
 		try {
-			Question.load(FileName);
+			Question.load(FILENAME);
 		} catch (IOException e) {
 			EventLog.fatal(e, "Help", "Help");
 			System.exit(0);
@@ -49,41 +53,40 @@ public class Help extends Event {
 	}
 
 	/**
-	 * This method handles the chips command
+	 * This method handles the chips command.
 	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
+	 * @param event The Message event
 	 */
 	@Override
-	public void message(Message event) {
+    public final void message(final Message event) {
 		IrcBot bot = event.getBot();
 		String message = event.getMessage();
 		String sender = event.getUser().getNick();
 		String chan = event.getChannel().getName();
 		
-		if ( isValidChannel( chan ) && Utils.startsWith(message, Command ) ) {			
+		if (isValidChannel(chan) && Utils.startsWith(message, COMMAND)) {
 			String[] msg = message.split(" ");
 			if (msg.length == 1) {
 				// list all questions
 				Map<Integer, Question> topics = Question.values();
 				// for every question
 				for (Question q: topics.values()) {
-					bot.sendIRCNotice( sender, "%b%c12" + q.getQuestion() + "%c12 - Use %c04" + Command + " " + q.getTopic() );
+					bot.sendIRCNotice(sender, "%b%c12" + q.getQuestion()
+					                          + "%c12 - Use %c04" + COMMAND
+					                          + " " + q.getTopic());
 				}
 			} else if (msg.length == 2) {
 				Question q = Question.fromString(msg[1]);
 				if (q == null) {
-					String out = InvalidTopic.replaceAll( "%topic", msg[1] );
-					out = out.replaceAll( "%cmd", Command );
-					bot.sendIRCNotice( sender, out );					
+					String out = INVALID_TOPIC.replaceAll("%topic", msg[1]);
+					out = out.replaceAll("%cmd", COMMAND);
+					bot.sendIRCNotice(sender, out);
 				} else {
-					bot.sendIRCNotice( sender, "%b%c12" + q.getQuestion());
-					bot.sendIRCNotice( sender, "%b%c12" + q.getAnswer());
+					bot.sendIRCNotice(sender, "%b%c12" + q.getQuestion());
+					bot.sendIRCNotice(sender, "%b%c12" + q.getAnswer());
 				}
 			} else {
-				bot.invalidArguments( sender, Format );
+				bot.invalidArguments(sender, FORMAT);
 			}
 		}
 	}
@@ -105,7 +108,8 @@ public class Help extends Event {
 			} while (is_space != ' ');
 			out.add( line + "\n" );
 			
-			//move to next line, we add 2 as startIndex is inclusive and we want to skip the space too. 
+			/* move to next line, we add 2 as startIndex is inclusive and
+			 * we want to skip the space too./
 			start = end + 2;
 			end = start + MaxCharacters;
 		}

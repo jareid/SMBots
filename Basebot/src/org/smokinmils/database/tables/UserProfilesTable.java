@@ -8,21 +8,30 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class UserProfilesTable {
+/**
+* Represents the user profiles table from the database.
+* 
+* @author Jamie
+*/
+public final class UserProfilesTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private UserProfilesTable() { }
 	
-	/** Table name */
-	public static final String Name = "user_profiles";
+	/** Table name. */
+	public static final String NAME = "user_profiles";
 	
-	/** Column for the userid */
-	public static final String Col_UserID = "user_id";
+	/** Column for the userid. */
+	public static final String COL_USERID = "user_id";
 	
-	/** Column for the typeid */
-	public static final String Col_TypeID = "type_id";
+	/** Column for the typeid. */
+	public static final String COL_TYPEID = "type_id";
 	
-	/** Column for the amount */
-	public static final String Col_Amount = "amount";
+	/** Column for the amount. */
+	public static final String COL_AMOUNT = "amount";
 	
-	/** Column for last updated */
-	public static final String Col_LastUpdated = "last_updated";
+	/** Column for last updated. */
+	public static final String COL_LASTUPDATED = "last_updated";
 
 }

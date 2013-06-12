@@ -55,11 +55,11 @@ public class BetDetails extends TimerTask {
     				BetterInfo top_better = db.getTopBetter(profile);
     				
     				String out = AnnounceLine.replaceAll("%profile", profile.toString() );
-    				out = out.replaceAll("%hb_user", high_bet.User);
-    				out = out.replaceAll("%hb_game", high_bet.Game.toString());
-    				out = out.replaceAll("%hb_chips", Long.toString(high_bet.Amount));
-    				out = out.replaceAll("%hbt_user", top_better.User);
-    				out = out.replaceAll("%hbt_chips", Long.toString(top_better.Amount));
+    				out = out.replaceAll("%hb_user", high_bet.getUser());
+    				out = out.replaceAll("%hb_game", high_bet.getGame().toString());
+    				out = out.replaceAll("%hb_chips", Long.toString(high_bet.getAmount()));
+    				out = out.replaceAll("%hbt_user", top_better.getUser());
+    				out = out.replaceAll("%hbt_chips", Long.toString(top_better.getAmount()));
     				
     				Bot.sendIRCMessage(Channel, out);
     			} catch (Exception e) {

@@ -8,16 +8,26 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class OrderedWinnersView {	
-	/** Table name */
-	public static final String Name = "totalbets";
+/**
+* Represents the ordered winners view from the database.
+* 
+* @author Jamie
+*/
+public final class OrderedWinnersView {
+    /**
+     * Hiding the default constructor.
+     */
+    private OrderedWinnersView() { }
+    
+	/** Table name. */
+	public static final String NAME = "totalbets";
 	
-	/** Column for the username */
-	public static final String Col_Username = "Username";
+	/** Column for the username. */
+	public static final String COL_USERNAME = "Username";
 	
-	/** Column for the profile */
-	public static final String Col_Profile = "Profile";
+	/** Column for the profile. */
+	public static final String COL_PROFILE = "Profile";
 	
-	/** Column for the amount */
-	public static final String Col_Total = "Total";
+	/** Column for the amount. */
+	public static final String COL_TOTAL = "Total";
 }

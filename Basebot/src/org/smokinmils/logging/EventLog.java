@@ -14,26 +14,62 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Class interface through which all logging occurs
+ * Class interface through which all logging occurs.
+ * 
  * @author palacsint
- * @see http://codereview.stackexchange.com/questions/12336/robust-logging-solution-to-file-on-disk-from-multiple-threads-on-serverside-code
- *
+ * @see <a href="http://codereview.stackexchange.com/questions/12336/robust-log
+ * ging-solution-to-file-on-disk-from-multiple-threads-on-serverside-code">
+ * codereview</a>
  */
-public class EventLog {
-	private static Logstream _eventLog;
-	private static boolean _debug;
-
-	public static Logstream create(BlockingQueue<StringBuilder> queue, String rootPath) {
-		_eventLog = new Logstream(queue, rootPath);
-		return _eventLog;
+public final class EventLog {
+    /** The eventlog object. */
+	private static Logstream eventLog;
+	
+    /** A boolean denoting if we log debug or not. */
+	private static boolean debug;
+    
+    /**
+     * Hiding the default constructor.
+     */
+    private EventLog() { }
+    
+	/**
+	 * Create a new log system.
+	 * 
+	 * @param queue    The queue
+	 * @param rootPath The file path
+	 * 
+	 * @return The logstream object
+	 */
+	private static Logstream create(final BlockingQueue<StringBuilder> queue,
+	                               final String rootPath) {
+		eventLog = new Logstream(queue, rootPath);
+		return eventLog;
 	}
-
-	public static Logstream create(String rootPath, boolean debug) {
-		_debug = debug;
+	
+    /**
+     * Create a new log system.
+     * 
+     * @param rootPath The file path
+     * @param dbg    If this log logs debug or not
+     * 
+     * @return The logstream object
+     */
+	public static Logstream create(final String rootPath, final boolean dbg) {
+		debug = dbg;
 	    return create(new LinkedBlockingQueue<StringBuilder>(), rootPath);
 	}
 
-	public static void log(Exception ex, String cls, String func) {
+	/**
+	 * Log regular events.
+	 * 
+	 * @param ex   The exception
+	 * @param cls  The originating class
+	 * @param func The originating functions
+	 */
+	public static void log(final Exception ex, 
+	                       final String cls,
+	                       final String func) {
 	    log("Exception: " + ex.toString(), cls, func);
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
@@ -41,21 +77,57 @@ public class EventLog {
 		log(sw.toString(), cls, func);
 	}
 	
-	public static void log(String msg, String cls, String func) {
-	    _eventLog.write(msg, cls, func);
+	/**
+     * Log regular events.
+     * 
+     * @param msg   The message
+     * @param cls  The originating class
+     * @param func The originating functions
+     */
+	public static void log(final String msg,
+	                       final String cls,
+	                       final String func) {
+	    eventLog.write(msg, cls, func);
 	}
 	 
-	public static void info(String msg, String cls, String func) {
+	/**
+     * Log info events.
+     * 
+     * @param msg   The message
+     * @param cls  The originating class
+     * @param func The originating functions
+     */
+	public static void info(final String msg,
+	                        final String cls,
+	                        final String func) {
 	    log("INFO: " + msg, cls, func);
 	}
 	 
-	public static void debug(String msg, String cls, String func) {
-		if (_debug == true) {
+	/**
+     * Log debug events.
+     * 
+     * @param msg   The message
+     * @param cls  The originating class
+     * @param func The originating functions
+     */
+    public static void debug(final String msg,
+	                         final String cls,
+	                         final String func) {
+		if (debug) {
 			log("DEBUG " + msg, cls, func);
 		}
 	}
 	
-	public static void fatal(Exception ex, String cls, String func) {
+    /**
+     * Log fatal events.
+     * 
+     * @param ex   The exception
+     * @param cls  The originating class
+     * @param func The originating functions
+     */
+    public static void fatal(final Exception ex,
+	                         final String cls,
+	                         final String func) {
 	    log("Fatal Exception: " + ex.toString(), cls, func);
 	}
 }

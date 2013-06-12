@@ -18,30 +18,57 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.logging.EventLog;
 
 /**
- * Handles connection events
+ * Handles connection events.
  * 
  * @author Jamie
  */
 public class ConnectEvents extends ListenerAdapter<IrcBot> {
-	public void onConnect(ConnectEvent<IrcBot> event) {
-		BaseBot.identify( event.getBot() );
+    /** Amount of milliseconds to wait after an event before attempting the
+     ** task. */
+    private static final int WAITMS = 50;
+    
+    /**
+     * Attempts to identify on a server connection.
+     * 
+     * @param event the ConnectEvent
+     * 
+     * @see org.pircbotx.hooks.type.ConnectEvent
+     */
+	public final void onConnect(final ConnectEvent<IrcBot> event) {
+		BaseBot.identify(event.getBot());
 	}
 	
-	public void onDisconnect(ReconnectEvent<IrcBot> event) {
-		EventLog.log("Bot disconnected, attempting reconnection...", "ConnectEvents", "onDisconnect");
+    /**
+     * Attempts to reconnect on disconnection.
+     * 
+     * @param event the ReconnectEvent
+     * 
+     * @see org.pircbotx.hooks.type.ReconnectEvent
+     */
+	public final void onDisconnect(final ReconnectEvent<IrcBot> event) {
+		EventLog.log("Bot disconnected, attempting reconnection...",
+		             "ConnectEvents", "onDisconnect");
 		try {
-			Thread.sleep(25);
+			Thread.sleep(WAITMS);
 			event.getBot().reconnect();
 		} catch (IOException | IrcException | InterruptedException e) {
 			EventLog.fatal(e, "ConnectEvents", "onDisconnect");
 		}
 	}
 	
-	public void onReconnect(ReconnectEvent<IrcBot> event) {
-		if (event.isSuccess() == false) {
-			EventLog.log("Failed to reconnect, attempting reconnection...", "ConnectEvents", "onReconnect");
+    /**
+     * Attempts to reconnect on disconnection.
+     * 
+     * @param event the ReconnectEvent
+     * 
+     * @see org.pircbotx.hooks.type.ReconnectEvent
+     */
+	public final void onReconnect(final ReconnectEvent<IrcBot> event) {
+		if (!event.isSuccess()) {
+			EventLog.log("Failed to reconnect, attempting reconnection...",
+			             "ConnectEvents", "onReconnect");
 			try {
-				Thread.sleep(50);
+				Thread.sleep(WAITMS);
 				event.getBot().reconnect();
 			} catch (IOException | IrcException | InterruptedException e) {
 				EventLog.fatal(e, "ConnectEvents", "onReconnect");

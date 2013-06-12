@@ -8,14 +8,23 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class GamesTable {
-
-	/** The name of the table */
-	public static final String Name = "games";
+/**
+* Represents the total bets view from the database.
+* 
+* @author Jamie
+*/
+public final class GamesTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private GamesTable() { }
+    
+    /** The name of the table. */
+	public static final String NAME = "games";
 	
-	/** Column for the unique id */
-	public static final String Col_ID = "id";
+	/** Column for the unique id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the name of the game */
-	public static final String Col_Name = "name";
+	/** Column for the name of the game. */
+	public static final String COL_NAME = "name";
 }

@@ -21,15 +21,15 @@ import org.smokinmils.bot.IrcBot;
 public class Op extends OpEvent<IrcBot> {
 	/**
 	 * Default constructor to setup object.
-	 * Timestamp is automatically set to current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param channel The channel in which the mode change took place.
-	 * @param source The user that performed the mode change.
-	 * @param recipient The nick of the user that got owner status.
-	 * @param isOp
+	 * Timestamp is automatically set to current time as reported by
+	 * System.currentTimeMillis()
+	 * 
+	 * @param event the OpEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.OpEvent
 	 */
-	public Op(OpEvent<IrcBot> event) {
+	public Op(final OpEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(), event.getSource(),
 				event.getRecipient(), event.isOp()); 
 	}

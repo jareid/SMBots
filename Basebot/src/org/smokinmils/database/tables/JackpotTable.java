@@ -8,13 +8,23 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class JackpotTable {	
-	/** Table name */
-	public static final String Name = "jackpots";
+/**
+* Represents the jackpot table from the database.
+* 
+* @author Jamie
+*/
+public final class JackpotTable {	
+    /**
+     * Hiding the default constructor.
+     */
+    private JackpotTable() { }
+    
+    /** Table name.*/
+	public static final String NAME = "jackpots";
 	
-	/** Column for the profile */
-	public static final String Col_Profile = "profile_id";
+	/** Column for the profile. */
+	public static final String COL_PROFILE = "profile_id";
 	
-	/** Column for the amount */
-	public static final String Col_Total = "amount";
+	/** Column for the amount. */
+	public static final String COL_TOTAL = "amount";
 }

@@ -9,53 +9,153 @@
 package org.smokinmils.database.types;
 
 /**
-* A class used to return values about a transaction for a better
+* A class used to return values about a transaction for a better.
 * 
 * @author Jamie Reid
 */
 public class BetterInfo {
-	public String User;
+    /** The better username. */
+	private String user;
 
-	public GamesType Game;
+	/** The game. */
+	private GamesType game;
 	
-	public long Amount;
+	/** The amount. */
+	private long amount;
 	
-	public int Position;
+	/** The position. */
+	private int position;
 	
-	private static final String UserLine = "%c04%who%c12(%c04%chips%c12)";
+	/** The output string. */
+	private static final String USERLINE = "%c04%who%c12(%c04%chips%c12)";
 	
-	public BetterInfo(String user, long amount) {
-		User = user;
-		Amount = amount;
-		Game = null;
-		Position = 0;
+	/**
+	 * Constructor.
+	 * 
+	 * @param usr the user
+	 * @param amnt the amount
+	 */
+	public BetterInfo(final String usr,
+	                  final long amnt) {
+		setUser(usr);
+		setAmount(amnt);
+		setGame(null);
+		setPosition(0);
 	}
 	
-	public BetterInfo(String user, GamesType game, long amount) {
-		User = user;
-		Game = game;
-		Amount = amount;
-		Position = 0;
+	/**
+	 * Constructor.
+	 * 
+	 * @param usr the user
+	 * @param gme the game
+	 * @param amnt the amount
+	 */
+	public BetterInfo(final String usr,
+	                  final GamesType gme,
+	                  final long amnt) {
+		setUser(usr);
+		setGame(gme);
+		setAmount(amnt);
+		setPosition(0);
 	}
 	
-	public BetterInfo(String user, String game, long amount) {
-		User = user;
-		Game = GamesType.fromString(game);
-		Amount = amount;
-		Position = 0;
+	/**
+	 * Constructor.
+	 * 
+	 * @param usr the user
+	 * @param gme the game
+	 * @param amnt the amount
+	 */
+	public BetterInfo(final String usr,
+	                  final String gme,
+	                  final long amnt) {
+		setUser(usr);
+		setGame(GamesType.fromString(gme));
+		setAmount(amnt);
+		setPosition(0);
 	}
 	
-	public BetterInfo(String user, int position, long amount) {
-		User = user;
-		Game = null;
-		Amount = amount;
-		Position = position;
+	/**
+	 * Constructor.
+	 * 
+	 * @param usr the user
+	 * @param posit the user's position
+	 * @param amnt the amount
+	 */
+	public BetterInfo(final String usr,
+	                  final int posit,
+	                  final long amnt) {
+		setUser(usr);
+		setGame(null);
+		setAmount(amnt);
+		setPosition(posit);
 	}
 	
-	public String toString() {
-		String out = UserLine.replaceAll("%who", User);
-		out = out.replaceAll("%chips", Long.toString(Amount));
-		out = out.replaceAll("%position", Integer.toString(Position));
+    /**
+     * (non-Javadoc).
+     * @see java.lang.Enum#toString()
+     * @return the output
+     */
+	public final String toString() {
+		String out = USERLINE.replaceAll("%who", getUser());
+		out = out.replaceAll("%chips", Long.toString(getAmount()));
+		out = out.replaceAll("%position", Integer.toString(getPosition()));
 		return out;
 	}
+
+    /**
+     * @return the user
+     */
+    public final String getUser() {
+        return user;
+    }
+
+    /**
+     * @param usr the user to set
+     */
+    public final void setUser(final String usr) {
+        user = usr;
+    }
+
+    /**
+     * @return the position
+     */
+    public final int getPosition() {
+        return position;
+    }
+
+    /**
+     * @param posit the position to set
+     */
+    public final void setPosition(final int posit) {
+        position = posit;
+    }
+
+    /**
+     * @return the amount
+     */
+    public final long getAmount() {
+        return amount;
+    }
+
+    /**
+     * @param amnt the amount to set
+     */
+    public final void setAmount(final long amnt) {
+        amount = amnt;
+    }
+
+    /**
+     * @return the game
+     */
+    public final GamesType getGame() {
+        return game;
+    }
+
+    /**
+     * @param gme the game to set
+     */
+    public final void setGame(final GamesType gme) {
+        game = gme;
+    }
 }

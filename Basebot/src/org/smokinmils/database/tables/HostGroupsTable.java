@@ -8,14 +8,23 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class HostGroupsTable {
-
-	/** The name of the table */
-	public static final String Name = "hostgroups";
+/**
+* Represents the hostgroups table from the database.
+* 
+* @author Jamie
+*/
+public final class HostGroupsTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private HostGroupsTable() { }
+    
+    /** The name of the table. */
+	public static final String NAME = "hostgroups";
 	
-	/** Column for the unique id */
-	public static final String Col_ID = "id";
+	/** Column for the unique id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the name of the game */
-	public static final String Col_Name = "name";
+	/** Column for the name of the group. */
+	public static final String COL_NAME = "name";
 }

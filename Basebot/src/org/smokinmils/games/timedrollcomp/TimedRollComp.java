@@ -9,10 +9,10 @@ package org.smokinmils.games.timedrollcomp;
  * Copyright (C) 2013 Jamie Reid
  */ 
 import org.pircbotx.Channel;
-import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
+import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -68,7 +68,7 @@ public class TimedRollComp extends Event {
 		} else if (prize <= 0) {
 			throw new IllegalArgumentException("The prize, " + Integer.toString(prize) + ", is less than or equal to 0");
 		} else if (profile == null) {
-			throw new IllegalArgumentException(IrcBot.ValidProfiles);
+			throw new IllegalArgumentException(IrcBot.VALID_PROFILES);
 		} else {
 			ValidChan = channel;
 			Prize = prize;
@@ -153,7 +153,7 @@ public class TimedRollComp extends Event {
 				win = Prize / winners.size();
 				if (win == 0) win = 1;
 				out = MultipleWinners;
-				winstr = Utils.ListToString(winners);
+				winstr = Utils.listToString(winners);
 			}
 			
 			out = out.replaceAll("%winner", winstr);

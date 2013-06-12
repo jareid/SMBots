@@ -8,18 +8,27 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class HostmasksTable {
-
-	/** The name of the table */
-	public static final String Name = "hostmasks";
+/**
+* Represents the Hostmasks Table from the database.
+* 
+* @author Jamie
+*/
+public final class HostmasksTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private HostmasksTable() { }
+    
+    /** The name of the table. */
+	public static final String NAME = "hostmasks";
 	
-	/** Column for the unique id */
-	public static final String Col_ID = "id";
+	/** Column for the unique id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the hostmask */
-	public static final String Col_Host = "host";
+	/** Column for the hostmask. */
+	public static final String COL_HOST = "host";
 	
-	/** Column for the userid */
-	public static final String Col_UserID = "userid";
+	/** Column for the userid. */
+	public static final String COL_USERID = "userid";
 	
 }

@@ -20,13 +20,14 @@ import org.smokinmils.bot.IrcBot;
  */
 public class RemoveInviteOnly extends RemoveInviteOnlyEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param channel The channel in which the mode change took place.
-	 * @param user The user that performed the mode change.
+	 * @param event the RemoveInviteOnlyEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.RemoveInviteOnlyEvent
 	 */
-	public RemoveInviteOnly(RemoveInviteOnlyEvent<IrcBot> event) {
+	public RemoveInviteOnly(final RemoveInviteOnlyEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 

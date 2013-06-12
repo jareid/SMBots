@@ -1,0 +1,61 @@
+21:13:51: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+21:13:51: Question->load() :: test3 has no question
+21:13:51: Question->load() :: test4 has no answer
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:51: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+21:13:52: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+21:13:52: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+21:15:26: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:15:26: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:15:26: CheckIdentified->sendStatusRequest() :: INFO: Mr_J_Rune identified
+21:16:06: GiveChips->message() :: INFO: Mr_J_Rune attempted to give someone chips
+21:16:20: GiveChips->message() :: INFO: Mr_J_Rune attempted to give someone chips
+21:16:26: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:16:27: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:16:52: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:16:53: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:17:12: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:17:13: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:17:49: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:17:50: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:21:25: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:21:26: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:21:40: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+21:21:41: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+21:25:56: DiceDuel->message() :: Exception: java.util.ConcurrentModificationException
+21:25:56: DiceDuel->message() :: java.util.ConcurrentModificationException
+	at java.util.ArrayList$Itr.checkForComodification(Unknown Source)
+	at java.util.ArrayList$Itr.next(Unknown Source)
+	at org.smokinmils.games.casino.DiceDuel.call(DiceDuel.java:144)
+	at org.smokinmils.games.casino.DiceDuel.message(DiceDuel.java:76)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor13.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+

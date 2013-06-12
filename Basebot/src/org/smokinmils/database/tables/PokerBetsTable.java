@@ -8,20 +8,29 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class PokerBetsTable {
-
-	/** Table name */
-	public static final String Name = "poker_bets";
+/**
+* Represents the poker bets table from the database.
+* 
+* @author Jamie
+*/
+public final class PokerBetsTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private PokerBetsTable() { }
+    
+	/** Table name. */
+	public static final String NAME = "poker_bets";
 	
-	/** Column for the userid */
-	public static final String Col_UserID = "user_id";
+	/** Column for the userid. */
+	public static final String COL_USERID = "user_id";
 	
-	/** Column for the profileid */
-	public static final String Col_ProfileID = "profile_id";
+	/** Column for the profileid. */
+	public static final String COL_PROFILEID = "profile_id";
 	
-	/** Column for the amount */
-	public static final String Col_Amount = "amount";
+	/** Column for the amount. */
+	public static final String COL_AMOUNT = "amount";
 	
-	/** Column for the tableid */
-	public static final String Col_TableID = "table_id";
+	/** Column for the tableid. */
+	public static final String COL_TABLEID = "table_id";
 }

@@ -26,87 +26,115 @@ import org.smokinmils.database.DB;
 import org.smokinmils.logging.EventLog;
 
 /**
- * A singleton Database access system for the poker bot
+ * The main bot that contains access to all the IrcBots for each server.
  * 
  * @author Jamie Reid
  */
-public class BaseBot {
+public final class BaseBot {
 	/** Instance variable. */
-	private static BaseBot _instance = new BaseBot();
+	private static BaseBot instance = new BaseBot();
 
-	/** Static 'instance' method */
-	public static BaseBot getInstance() { return _instance; }
+	/**
+	 * Static 'instance' method.
+	 * 
+	 * @return the BaseBot instance
+	 */
+	public static BaseBot getInstance() { return instance; }
    
-	/** The pircbotx instance */
-	private static Map<String,IrcBot> bots;
+	/** The pircbotx instance. */
+	private static Map<String, IrcBot> bots;
    
-	/** Boolean on whether the bot has been initialised */
- 	private static boolean _initialised = false;
+	/** Boolean on whether the bot has been initialised. */
+ 	private static boolean initialised = false;
    
-	/** Boolean on whether debug output is on */
-	private static boolean _debug = false;
+	/** Boolean on whether debug output is on. */
+	private static boolean debug = false;
    
-	/** The bot nickname */
-	private static String _nick;
+	/** The bot nickname. */
+	private static String nick;
 
 	/** The bot nickserv password. */
-	private static String _password;
+	private static String password;
    
-	/** The bot ident string */
-	private static String _ident;
+	/** The bot ident string. */
+	private static String ident;
 
-	/** The current version of the bot */
-	private static String Version = "SmokinMils Bot System 0.1";
+	/** The current version of the bot. */
+	private static final String VERSION = "SmokinMils Bot System 0.1";
 	
-	/** The message to return on a CTCP FINGER request */
-	private static String FingerMessage = "";
+	/** The message to return on a CTCP FINGER request. */
+	private static final String FINGER_MSG = "Leave me alone, kthx!";
 	
-	public static Object lockObject = new Object();
+	/** The default IRC port. */
+	private static final int DEFAULT_PORT = 6667;
+	
+	/** The number of ms to try to auto join. */
+    private static final int REJOIN_MS = 30000;
+	
+	/** An object to provide synchronisation functionality in the bot. */
+	private static Object lockObject = new Object();
    
    /**
-    * Constructor
+    * Constructor.
     */
    private BaseBot() {
-	   bots = new HashMap<String,IrcBot>();
+	   bots = new HashMap<String, IrcBot>();
    }
    
    /**
-    * Sets up the bot with the correct servers and channels
+    * Sets up the bot with the correct servers and channels.
     * 
     * @param nickname a list of all the servers the bot should connect to
-    * @param password the nickserv password for the bot
-    * @param login the ident name for this bot
-    * @param debug if we should turn the debug on
+    * @param pswd the nickserv password for the bot
+    * @param login    the ident name for this bot
+    * @param dbg    if we should turn the debug on
+    * @param refund   used to check if we should execute refunds when started
     * 
     * @return true if the bot hasn't already been initialised
     */
-   public boolean initialise(String nickname, String password, String login, boolean debug) {
+   public boolean initialise(final String nickname,
+                             final String pswd,
+                             final String login,
+                             final boolean dbg,
+                             final boolean refund) {
 	   boolean ret = false;
-	   if (!_initialised) {
-		   _debug = debug;
-		   _nick = nickname;
-		   _password = password;
-		   _ident = login;
-	       _initialised = true;
-	       EventLog.create(_nick, _debug);
+	   if (!initialised) {
+		   debug = dbg;
+		   nick = nickname;
+		   password = pswd;
+		   ident = login;
+	       initialised = true;
+	       EventLog.create(nick, debug);
 	       ret = true;
 	       
-	       try {
-	           DB.getInstance().processRefunds();
-	       } catch (Exception e) {
-	           EventLog.fatal(e, "SMBaseBot", "initialise");
-	           System.exit(0);
+	       if (refund) {
+    	       try {
+    	           DB.getInstance().processRefunds();
+    	       } catch (Exception e) {
+    	           EventLog.fatal(e, "SMBaseBot", "initialise");
+    	           System.exit(0);
+    	       }
 	       }
 	   }
 	   return ret;
    }
 	   
    /**
+    * @return the lockObject
+    */
+    public static Object getLockObject() {
+        return lockObject;
+    }
+
+   /**
     * Creates a new connection to a server.
+    * 
     * @param name	The name of the server to add
     * @param addr	The address for the server
     */
-   public void addServer(String name, String addr) { addServer(name, addr, 6667); }
+   public void addServer(final String name, final String addr) {
+       addServer(name, addr, DEFAULT_PORT);
+   }
    
    /**
     * Creates a new connection to a server.
@@ -114,25 +142,25 @@ public class BaseBot {
     * @param addr	The address for the server
     * @param port	The port for this server
     */
-   public void addServer(String name, String addr, int port) {
+   public void addServer(final String name, final String addr, final int port) {
 	   IrcBot newbot = new IrcBot();
 
-	   newbot.setName(_nick);
-	   newbot.setLogin(_ident);
-	   newbot.setVerbose(true);
+	   newbot.setName(nick);
+	   newbot.setLogin(ident);
+	   newbot.setVerbose(debug);
 	   newbot.setAutoNickChange(true);
 	   newbot.useShutdownHook(false);
-	   newbot.setVersion(Version);
-	   newbot.setFinger(FingerMessage);
+	   newbot.setVersion(VERSION);
+	   newbot.setFinger(FINGER_MSG);
 	   newbot.setAutoReconnect(true);
 	   newbot.setAutoReconnectChannels(true);
 	   newbot.startIdentServer();
 	   
 	   newbot.setMessageDelay(0);
 	   
-	   newbot.setListenerManager( new ThreadedListenerManager<IrcBot>() );
-	   newbot.getListenerManager().addListener( new CheckIdentified() );	   
-	   newbot.getListenerManager().addListener( new ConnectEvents() );
+	   newbot.setListenerManager(new ThreadedListenerManager<IrcBot>());
+	   newbot.getListenerManager().addListener(new CheckIdentified(newbot));
+	   newbot.getListenerManager().addListener(new ConnectEvents());
 	   
 	   try {
 		   newbot.connect(addr, port);
@@ -144,53 +172,68 @@ public class BaseBot {
 	   
 	   // check we are in all the channels we should be
 	   Timer rejoin = new Timer(true);
-	   rejoin.scheduleAtFixedRate( new AutoJoin(newbot) , 30000, 30000);
+	   rejoin.scheduleAtFixedRate(new AutoJoin(newbot), REJOIN_MS, REJOIN_MS);
    }
    
    /**
-    * Tells the bot to join a channel on a server
+    * Tells the bot to join a channel on a server.
     * 
     * @param server The name of the server
     * @param channel the channel name
+    * 
+    * @return true if action was successful
     */
-   public boolean addChannel(String server, String channel) {
+   public boolean addChannel(final String server, final String channel) {
 	   boolean ret;
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
 		   bot.joinChannel(channel);
 		   bot.addValidChannel(channel);
-		   EventLog.debug("Joined " + channel + " on " + server, "SMBaseBot", "addChannel");
+		   EventLog.debug("Joined " + channel + " on " + server,
+		                  "SMBaseBot", "addChannel");
 		   ret = true;
 	   } else {
-		   EventLog.log("There is no bot currently connected to " + server, "SMBaseBot", "addChannel");
+		   EventLog.log("There is no bot currently connected to " + server,
+		                "SMBaseBot", "addChannel");
 		   ret = false;
 	   }
 	   return ret;
    }
    
    /**
-    * Tells the bot to add a listener for a certain server
+    * Tells the bot to add a listener for a certain server.
     * 
     * @param server The name of the server
-    * @param channel The instance of a listener class
+    * @param listener The instance of a listener class
+    * 
+    * @return true if action was successful
     */
-   public boolean addListener(String server, Event listener) {
+   public boolean addListener(final String server, final Event listener) {
 	   boolean ret;
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
-		   bot.getListenerManager().addListener( listener );
-		   EventLog.debug("Added new listener for " + server, "SMBaseBot", "addListener");
+		   bot.getListenerManager().addListener(listener);
+		   EventLog.debug("Added new listener for " + server,
+		                  "SMBaseBot", "addListener");
 		   ret = true;
 	   } else {
-		   EventLog.log("There is no bot currently connected to " + server, "SMBaseBot", "addListener");
+		   EventLog.log("There is no bot currently connected to " + server,
+		                "SMBaseBot", "addListener");
 		   ret = false;
 	   }
 	   return ret;
    }
 
-   public void addListener(String server,
-                           Event listener,
-                           String[] channels) {
+   /**
+    * Adds a listener object to the irc bot.
+    * 
+    * @param server     The server the listner is for
+    * @param listener   The listener object 
+    * @param channels   The valid channels
+    */
+   public void addListener(final String server,
+                           final Event listener,
+                           final String[] channels) {
        listener.addValidChan(channels);
        addListener(server, listener);
    }
@@ -202,7 +245,7 @@ public class BaseBot {
     * 
     * @return the server name
     */
-	public String getServer(IrcBot ircBot) {
+	public String getServer(final IrcBot ircBot) {
 		String ret = null;
 		for (Entry<String, IrcBot> bot: bots.entrySet()) {
 			if (bot.getValue() == ircBot) {
@@ -211,29 +254,31 @@ public class BaseBot {
 			}
 		}
 		
-		if (ret == null)
-			EventLog.log("A bot was passed to the function that is not a part of the system", "SMBaseBot", "getServer");
+		if (ret == null) {
+            EventLog.log("A bot was passed to the function that is not a part "
+                         + "of the system", "SMBaseBot", "getServer");
+        }
 		
 		return ret;
 	}
 	
    /**
-    * Returns the bot for a certain server
+    * Returns the bot for a certain server.
     * 
     * @param server the name of the server
     * 
     * @return the bot object
     */
-	public IrcBot getBot(String server) {
+	public IrcBot getBot(final String server) {
 		return bots.get(server);
 	}
 	
 	/**
-	 * Sends a message to all channels on all servers
+	 * Sends a message to all channels on all servers.
 	 * 
 	 * @param out The message to send.
 	 */
-	public static void sendMessageToAll(String out) {
+	public static void sendMessageToAll(final String out) {
 		for (IrcBot bot: bots.values())  {
 			for (Channel chan: bot.getChannels()) {
 				bot.sendIRCMessage(chan.getName(), out);
@@ -242,9 +287,11 @@ public class BaseBot {
 	}
 	
 	/**
-	 * Identifies a bot
+	 * Identifies a bot.
+	 * 
+	 * @param bot the bot to identify
 	 */
-	public static void identify(IrcBot bot) {
-		bot.identify(_password);
+	public static void identify(final IrcBot bot) {
+		bot.identify(password);
 	}
 }

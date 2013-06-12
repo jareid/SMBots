@@ -9,13 +9,15 @@
 package org.smokinmils.database.types;
 
 /**
-* An enumerate for the type of referer
+* An enumerate for the type of referrer.
 * 
 * @author Jamie Reid
 */
 public enum ReferrerType {
+    /** No referrer. */
 	NONE,
+    /** public referrer. */
 	PUBLIC,
-	GROUP,
-	;
+    /** Rank referrer. */
+	GROUP;
 }

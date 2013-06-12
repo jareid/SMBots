@@ -25,9 +25,9 @@ import org.pircbotx.Channel;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.smokinmils.BaseBot;
-import org.smokinmils.Utils;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.cashier.rake.Rake;
@@ -100,7 +100,7 @@ public class RPSGame extends Event {
 		String message = event.getMessage();
 		String sender = event.getUser().getNick();
 		Channel chan = event.getChannel();
-		synchronized (BaseBot.lockObject) {
+		synchronized (BaseBot.getLockObject()) {
 			if ( isValidChannel( chan.getName() ) &&
 					bot.userIsIdentified( sender ) ) {			
 				if ( Utils.startsWith(message, CxlCommand ) ) {

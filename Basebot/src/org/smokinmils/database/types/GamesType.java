@@ -1,68 +1,85 @@
 /**
- * This file is part of the 'pokerbot' a commercial IRC bot that 
- * allows users to play Texas Hold'em poker from IRC
+ * This file is part of the 'pokerbot' a commercial IRC bot that allows users to
+ * play Texas Hold'em poker from IRC
  * 
  * The project was commissioned by Julian Clark
  * 
  * Copyright (C) 2013 Jamie Reid
- */ 
+ */
 package org.smokinmils.database.types;
 
 /**
-* An enumerate for the DB's credits transaction types
-* 
-* @author Jamie Reid
-*/
+ * An enumerate for the DB's credits transaction types.
+ * 
+ * @author Jamie Reid
+ */
 public enum GamesType {
-	ADMIN("admin"),
-	DICE_DUEL("Dice Duel"),
-	LOTTERY("Lottery"),
-	OVER_UNDER("Over Under"),
-	POKER("Poker"),
-	ROULETTE("Roulette"),
-	ROCKPAPERSCISSORS("Rock Paper Scissors"),
-	TIMEDROLL("Timed Roll"),
-	OTHER("other"), /* Added for historical reasons */
-	;
-	
-	/** The text. */
-	private final String text;
-	
-	/**
-	 * Constructor.
-	 * @param text  textual representation.
-	 */
-	GamesType(String text) {
-		this.text = text;
-	}
-	
-	/**
-	 * Returns a long textual form of this action.
-	 * 
-	 * @return The textual representation.
-	 */
-	public String getText() { return text; }
-	
-	/**
-	 * (non-Javadoc)
-	 * @see java.lang.Enum#toString()
-	 */
-	@Override
-	public String toString() { return text;	}
-	
-	/** 
-	 * Converts a String to the correct GamesType
-	 * 
-	 * @param text the string to check
-	 * @return the correct enumerate object
-	 */
-    public static GamesType fromString(String text) {
+    /** Admin game. */
+    ADMIN("admin"),
+    /** Competitions. */
+    COMPETITIONS("competitions"),
+    /** DD game. */
+    DICE_DUEL("Dice Duel"),
+    /** Lottery game. */
+    LOTTERY("Lottery"),
+    /** OU game. */
+    OVER_UNDER("Over Under"),
+    /** Poker game. */
+    POKER("Poker"),
+    /** Roulette game. */
+    ROULETTE("Roulette"),
+    /** Rock Paper Scissors game. */
+    ROCKPAPERSCISSORS("Rock Paper Scissors"),
+    /** Timed Roll game. */
+    TIMEDROLL("Timed Roll"),
+    /**
+     * Other games. Used for historical reasons
+     */
+    OTHER("other");
+
+    /** The text. */
+    private final String text;
+
+    /**
+     * Constructor.
+     * @param txt textual representation.
+     */
+    GamesType(final String txt) {
+        text = txt;
+    }
+
+    /**
+     * Returns a long textual form of this action.
+     * 
+     * @return The textual representation.
+     */
+    public String getText() {
+        return text;
+    }
+
+    /**
+     * (non-Javadoc).
+     * @see java.lang.Enum#toString()
+     * @return the output
+     */
+    @Override
+    public String toString() {
+        return text;
+    }
+
+    /**
+     * Converts a String to the correct GamesType.
+     * 
+     * @param text the string to check
+     * @return the correct enumerate object
+     */
+    public static GamesType fromString(final String text) {
         if (text != null) {
-        	for (GamesType gt : GamesType.values()) {
-        		if ( gt.getText().compareTo(text) == 0 ) {
-        			return gt;
-        		}
-        	}
+            for (GamesType gt : GamesType.values()) {
+                if (gt.getText().equals(text)) {
+                    return gt;
+                }
+            }
         }
         return OTHER;
     }

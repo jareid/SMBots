@@ -1,0 +1,66 @@
+13:00:22: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: Question->load() :: test3 has no question
+13:00:22: Question->load() :: test4 has no answer
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: Client->newTable() :: INFO: Creating new table...
+13:00:22: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:01:08: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:01:23: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Unknown14538
+13:01:35: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:01:36: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:01:36: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+13:01:44: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:01:44: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:06:56: OverUnder->message() :: Exception: java.util.ConcurrentModificationException
+13:06:56: OverUnder->message() :: java.util.ConcurrentModificationException
+	at java.util.ArrayList$Itr.checkForComodification(Unknown Source)
+	at java.util.ArrayList$Itr.next(Unknown Source)
+	at org.smokinmils.games.casino.OverUnder.cancel(OverUnder.java:220)
+	at org.smokinmils.games.casino.OverUnder.message(OverUnder.java:60)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor37.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+13:09:27: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+13:09:28: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+13:09:28: CheckIdentified->sendStatusRequest() :: INFO: Mr_J_Rune identified
+13:14:11: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of GsKiki-VX9
+13:14:12: CheckUser::CheckIdentified->call() :: INFO: GsKiki-VX9 identified
+13:14:12: CheckIdentified->sendStatusRequest() :: INFO: GsKiki-VX9 identified
+13:14:20: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of GsKiki-VX9
+13:14:21: CheckUser::CheckIdentified->call() :: INFO: GsKiki-VX9 identified

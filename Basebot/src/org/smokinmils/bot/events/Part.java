@@ -12,20 +12,23 @@ import org.pircbotx.hooks.events.PartEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * This event is dispatched whenever someone (possibly us) parts a channel which we are on.
+ * This event is dispatched whenever someone (possibly us) parts a channel
+ * which we are on.
  * 
  * @author Jamie
  */
 public class Part extends PartEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 *
-	 * @param bot
-	 * @param user The user that quit from the server in snapshot form
-	 * @param reason The reason given for quitting the server.
+	 * @param event the PartEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.PartEvent
 	 */
-	public Part(PartEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getUser(), event.getReason());
+	public Part(final PartEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(),
+		        event.getUser(), event.getReason());
 	}
 
 }

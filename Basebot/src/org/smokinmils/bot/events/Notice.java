@@ -19,13 +19,15 @@ import org.smokinmils.bot.IrcBot;
 
 public class Notice extends NoticeEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set
+	 * to current time as reported by System.currentTimeMillis()
 	 *
-	 * @param bot
-	 * @param user The user who sent the notice.
-	 * @param notice The actual message.
+	 * @param event the NoticeEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.NoticeEvent
 	 */
-	public Notice(NoticeEvent<IrcBot> event) {
-		super(event.getBot(), event.getUser(), event.getChannel(), event.getNotice());
+	public Notice(final NoticeEvent<IrcBot> event) {
+		super(event.getBot(), event.getUser(),
+		        event.getChannel(), event.getNotice());
 	}
 }

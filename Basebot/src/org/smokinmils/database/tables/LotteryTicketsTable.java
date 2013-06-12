@@ -8,19 +8,28 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class LotteryTicketsTable {
+/**
+* Represents the lottery tickets table from the database.
+* 
+* @author Jamie
+*/
+public final class LotteryTicketsTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private LotteryTicketsTable() { }
+    
+    /** Table name. */
+	public static final String NAME = "lottery_tickets";
 	
-	/** Table name */
-	public static final String Name = "lottery_tickets";
+	/** Column for the userid. */
+	public static final String COL_USERID = "user_id";
 	
-	/** Column for the userid */
-	public static final String Col_UserID = "user_id";
+	/** Column for the profile id. */
+	public static final String COL_PROFILEID = "profile_id";
 	
-	/** Column for the profile id */
-	public static final String Col_ProfileID = "profile_id";
-	
-	/** Column for the amount */
-	public static final String Col_ID = "id";
+	/** Column for the id. */
+	public static final String COL_ID = "id";
 	
 
 }

@@ -12,7 +12,9 @@ import org.pircbotx.hooks.events.SetModeratedEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * Called when a channel is set to 'moderated' mode. If a channel is moderated, then only users who have been 'voiced' or 'opped' may speak or change their nicks.
+ * Called when a channel is set to 'moderated' mode. If a channel is moderated,
+ * then only users who have been 'voiced' or 'opped' may speak or change their
+ * nicks.
  * 
  * This is a type of mode change and therefore is also dispatched in a ModeEvent
  * 
@@ -20,13 +22,14 @@ import org.smokinmils.bot.IrcBot;
  */
 public class SetModerated extends SetModeratedEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param channel The channel in which the mode change took place.
-	 * @param user The user that performed the mode change.
+	 * @param event the SetModeratedEvent
+     * 
+     * @see org.pircbotx.hooks.type.SetModeratedEvent
 	 */
-	public SetModerated(SetModeratedEvent<IrcBot> event) {
+	public SetModerated(final SetModeratedEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 }

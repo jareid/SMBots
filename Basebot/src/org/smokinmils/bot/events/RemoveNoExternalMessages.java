@@ -8,25 +8,29 @@
  */ 
 package org.smokinmils.bot.events;
 
-import org.pircbotx.hooks.events. RemoveNoExternalMessagesEvent;
+import org.pircbotx.hooks.events.RemoveNoExternalMessagesEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * Called when a channel is set to allow messages from any user, even if they are not actually in the channel.
+ * Called when a channel is set to allow messages from any user, even if they
+ * are not actually in the channel.
  * 
  * This is a type of mode change and therefore is also dispatched in a ModeEvent
  * 
  * @author Jamie
  */
-public class RemoveNoExternalMessages extends RemoveNoExternalMessagesEvent<IrcBot> {
+public class RemoveNoExternalMessages
+    extends RemoveNoExternalMessagesEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param channel The channel in which the mode change took place.
-	 * @param user The user that performed the mode change.
+	 * @param event the RemoveNoExternalMessagesEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.RemoveNoExternalMessagesEvent
 	 */
-	public  RemoveNoExternalMessages(RemoveNoExternalMessagesEvent<IrcBot> event) {
+	public RemoveNoExternalMessages(
+	        final RemoveNoExternalMessagesEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(), event.getUser());
 	}
 

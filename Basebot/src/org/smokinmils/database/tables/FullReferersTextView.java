@@ -8,15 +8,26 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class FullReferersTextView {
-    /** The name of the table */
-    public static final String Name = "full_referers_text";
+/**
+* Represents the total bets view from the database.
+* 
+* @author Jamie
+*/
+public final class FullReferersTextView {
+    /**
+     * Hiding the default constructor.
+     */
+    private FullReferersTextView() { }
     
-    /** Column for the unique id */
-    public static final String Col_Username = "username";
+    /** The name of the table. */
+    public static final String NAME = "full_referers_text";
     
-    /** Column for the name of the game */
-    public static final String Col_Referer = "referer";
+    /** Column for the user nick. */
+    public static final String COL_USERNAME = "username";
     
-    public static final String Col_Group = "hostgroup";
+    /** Column for the referrer nick. */
+    public static final String COL_REFERRER = "referer";
+    
+    /** Column for the group name. */
+    public static final String COL_GROUP = "hostgroup";
 }

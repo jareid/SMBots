@@ -1,0 +1,78 @@
+14:41:13: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: Question->load() :: test3 has no question
+14:41:13: Question->load() :: test4 has no answer
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: Client->newTable() :: INFO: Creating new table...
+14:41:13: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+14:41:16: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+14:42:00: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified
+14:42:01: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:10: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+14:42:11: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:17: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:23: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:29: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:35: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:41: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:44: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Unknown21835
+14:42:47: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:53: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:42:59: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:43:30: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+14:43:37: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+14:43:46: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+14:43:46: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+14:43:46: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+14:48:05: RankGroups->message() :: Exception: org.smokinmils.database.DBException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'referrer_id = (SELECT uu.id FROM users uu WHERE uu.username LIKE 'JReid' LIMIT 1' at line 1
+14:48:05: RankGroups->message() :: org.smokinmils.database.DBException: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'referrer_id = (SELECT uu.id FROM users uu WHERE uu.username LIKE 'JReid' LIMIT 1' at line 1
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1662)
+	at org.smokinmils.database.DB.delReferer(DB.java:1316)
+	at org.smokinmils.cashier.commands.RankGroups.removeReferrer(RankGroups.java:301)
+	at org.smokinmils.cashier.commands.RankGroups.message(RankGroups.java:100)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor23.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+

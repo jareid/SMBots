@@ -18,12 +18,14 @@ import org.smokinmils.bot.IrcBot;
  */
 public class Invite extends InviteEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
-	 * @param bot
-	 * @param channel The channel which somebody joined.
-	 * @param user The user who joined the channel.
+	 * Default constructor to setup object. Timestamp is automatically
+	 * set to current time as reported by System.currentTimeMillis()
+	 * 
+	 * @param event the InviteEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.InviteEvent
 	 */
-	public Invite(InviteEvent<IrcBot> event) {
+	public Invite(final InviteEvent<IrcBot> event) {
 		super(event.getBot(), event.getUser(), event.getChannel());
 	}
 }

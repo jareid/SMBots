@@ -1,0 +1,54 @@
+19:31:18: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: Question->load() :: test3 has no question
+19:31:19: Question->load() :: test4 has no answer
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: Client->newTable() :: INFO: Creating new table...
+19:31:19: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:31:21: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+19:32:07: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:32:07: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:14: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified
+19:32:17: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:23: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:29: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:35: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:41: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:47: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Unknown21835
+19:32:49: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:53: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:32:59: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+19:33:05: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified

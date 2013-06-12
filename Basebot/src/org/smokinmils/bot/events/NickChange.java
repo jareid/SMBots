@@ -12,20 +12,22 @@ import org.pircbotx.hooks.events.NickChangeEvent;
 import org.smokinmils.bot.IrcBot;
 
 /**
- * This event is dispatched whenever someone (possibly us) changes nick on any of the channels that we are on.
+ * This event is dispatched whenever someone (possibly us) changes nick on any
+ * of the channels that we are on.
  * 
  * @author Jamie
  */
 public class NickChange extends NickChangeEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically set to
+	 * current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param oldNick - The old nick.
-	 * @param newNick - The new nick.
-	 * @param user - The user that changed their nick
+	 * @param event the NickChangeEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.NickChangeEvent
 	 */
-	public NickChange(NickChangeEvent<IrcBot> event) {
-		super(event.getBot(), event.getOldNick(), event.getNewNick(), event.getUser());
+	public NickChange(final NickChangeEvent<IrcBot> event) {
+		super(event.getBot(), event.getOldNick(),
+		        event.getNewNick(), event.getUser());
 	}
 }

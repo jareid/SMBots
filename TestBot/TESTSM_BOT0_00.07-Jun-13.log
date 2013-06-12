@@ -1,0 +1,9 @@
+0:00:08: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+0:00:09: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+0:00:12: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+0:00:12: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+0:01:57: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+0:01:57: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+0:01:57: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+0:02:03: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+0:02:04: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified

@@ -1,0 +1,677 @@
+19:23:31: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: Question->load() :: test3 has no question
+19:23:31: Question->load() :: test4 has no answer
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+19:23:31: Client->newTable() :: INFO: Creating new table...
+19:23:31: Client->newTable() :: INFO: Creating new table...
+19:23:31: Client->newTable() :: INFO: Creating new table...
+19:23:31: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:23:49: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:23:49: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_Poker
+19:23:53: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_Poker
+19:23:54: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_Poker
+19:23:57: CheckUser::CheckIdentified->call() :: INFO: SM_Poker identified
+19:23:57: CheckUser::CheckIdentified->call() :: INFO: SM_Poker identified
+19:23:57: CheckUser::CheckIdentified->call() :: INFO: SM_Poker identified
+19:23:57: CheckIdentified->sendStatusRequest() :: INFO: SM_Poker identified
+19:23:59: CheckIdentified->sendStatusRequest() :: Exception: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+19:23:59: CheckIdentified->sendStatusRequest() :: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.checkUserExists(DB.java:207)
+	at org.smokinmils.bot.CheckIdentified.sendStatusRequest(CheckIdentified.java:148)
+	at org.smokinmils.bot.CheckIdentified.userList(CheckIdentified.java:126)
+	at org.smokinmils.bot.Event.onUserList(Event.java:445)
+	at sun.reflect.GeneratedMethodAccessor18.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:24:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:24:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:202)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:24:31: Competition->end() :: No data for 07
+19:24:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:24:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:202)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:24:31: Competition->end() :: No data for eoc
+19:24:31: Competition->end() :: Not enough prizes for 07
+19:24:32: Competition->end() :: Not enough prizes for eoc
+19:24:32: Competition->end() :: Not enough prizes for play
+19:25:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:25:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:202)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:25:31: Competition->end() :: No data for 07
+19:25:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:25:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:202)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:25:31: Competition->end() :: No data for eoc
+19:25:31: Competition->end() :: Not enough prizes for 07
+19:25:32: Competition->end() :: Not enough prizes for eoc
+19:25:32: Competition->end() :: Not enough prizes for play
+19:26:55: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:26:55: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:202)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:26:55: Competition->end() :: No data for 07
+19:26:55: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:26:55: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:202)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:26:55: Competition->end() :: No data for eoc
+19:26:58: Competition->end() :: Not enough prizes for 07
+19:27:36: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:27:36: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:27:36: Competition->end() :: No data for 07
+19:27:36: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:27:36: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:27:36: Competition->end() :: No data for eoc
+19:27:39: Competition->end() :: Not enough prizes for 07
+19:27:42: Competition->end() :: Not enough prizes for eoc
+19:28:01: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:28:01: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:28:01: Competition->end() :: No data for 07
+19:28:01: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:28:01: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:28:01: Competition->end() :: No data for eoc
+19:28:01: Competition->end() :: Not enough prizes for 07
+19:28:01: Competition->end() :: Not enough prizes for eoc
+19:28:32: BetDetails->run() :: Exception: java.lang.NullPointerException
+19:28:32: BetDetails->run() :: java.lang.NullPointerException
+	at java.util.regex.Matcher.appendReplacement(Unknown Source)
+	at java.util.regex.Matcher.replaceAll(Unknown Source)
+	at java.lang.String.replaceAll(Unknown Source)
+	at org.smokinmils.cashier.tasks.BetDetails.run(BetDetails.java:58)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:28:32: BetDetails->run() :: Exception: java.lang.NullPointerException
+19:28:32: BetDetails->run() :: java.lang.NullPointerException
+	at java.util.regex.Matcher.appendReplacement(Unknown Source)
+	at java.util.regex.Matcher.replaceAll(Unknown Source)
+	at java.lang.String.replaceAll(Unknown Source)
+	at org.smokinmils.cashier.tasks.BetDetails.run(BetDetails.java:58)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:28:34: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:28:34: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:28:34: Competition->end() :: No data for 07
+19:28:34: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:28:34: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:28:34: Competition->end() :: No data for eoc
+19:28:35: Competition->end() :: Not enough prizes for 07
+19:28:35: Competition->end() :: Not enough prizes for eoc
+19:30:03: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:30:03: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:30:03: Competition->end() :: No data for 07
+19:30:03: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:30:03: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:30:03: Competition->end() :: No data for eoc
+19:30:03: Competition->end() :: Not enough prizes for 07
+19:30:04: Competition->end() :: Not enough prizes for eoc
+19:30:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:30:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:30:31: Competition->end() :: No data for 07
+19:30:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:30:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:30:31: Competition->end() :: No data for eoc
+19:30:31: Competition->end() :: Not enough prizes for 07
+19:30:32: Competition->end() :: Not enough prizes for eoc
+19:31:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:31:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:31:31: Competition->end() :: No data for 07
+19:31:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:31:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:31:31: Competition->end() :: No data for eoc
+19:31:31: Competition->end() :: Not enough prizes for 07
+19:31:32: Competition->end() :: Not enough prizes for eoc
+19:32:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:32:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:32:31: Competition->end() :: No data for 07
+19:32:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:32:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:32:31: Competition->end() :: No data for eoc
+19:32:32: Competition->end() :: Not enough prizes for 07
+19:32:32: Competition->end() :: Not enough prizes for eoc
+19:33:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:33:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:33:31: Competition->end() :: No data for 07
+19:33:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:33:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:33:31: Competition->end() :: No data for eoc
+19:33:32: Competition->end() :: Not enough prizes for 07
+19:33:32: Competition->end() :: Not enough prizes for eoc
+19:34:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+19:34:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:34:31: Competition->end() :: No data for 07
+19:34:31: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+19:34:31: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.end(Competition.java:145)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:72)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+19:34:31: Competition->end() :: No data for eoc
+19:34:31: Competition->end() :: Not enough prizes for 07
+19:34:32: Competition->end() :: Not enough prizes for eoc
+19:39:32: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:39:33: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:39:33: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:39:35: CheckIdentified->sendStatusRequest() :: Exception: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+19:39:35: CheckIdentified->sendStatusRequest() :: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.checkUserExists(DB.java:207)
+	at org.smokinmils.bot.CheckIdentified.sendStatusRequest(CheckIdentified.java:148)
+	at org.smokinmils.bot.CheckIdentified.message(CheckIdentified.java:66)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:39:38: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:39:39: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:39:39: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:39:41: CheckIdentified->sendStatusRequest() :: Exception: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+19:39:41: CheckIdentified->sendStatusRequest() :: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.checkUserExists(DB.java:207)
+	at org.smokinmils.bot.CheckIdentified.sendStatusRequest(CheckIdentified.java:148)
+	at org.smokinmils.bot.CheckIdentified.message(CheckIdentified.java:66)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:39:42: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:39:43: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:39:43: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:39:45: CheckIdentified->sendStatusRequest() :: Exception: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+19:39:45: CheckIdentified->sendStatusRequest() :: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.checkUserExists(DB.java:207)
+	at org.smokinmils.bot.CheckIdentified.sendStatusRequest(CheckIdentified.java:148)
+	at org.smokinmils.bot.CheckIdentified.message(CheckIdentified.java:66)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:39:55: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:39:55: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:39:55: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:39:57: CheckIdentified->sendStatusRequest() :: Exception: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+19:39:57: CheckIdentified->sendStatusRequest() :: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.checkUserExists(DB.java:207)
+	at org.smokinmils.bot.CheckIdentified.sendStatusRequest(CheckIdentified.java:148)
+	at org.smokinmils.bot.CheckIdentified.message(CheckIdentified.java:66)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:40:21: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:40:21: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:40:28: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:42:00: CheckIdentified->sendStatusRequest() :: Exception: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+19:42:00: CheckIdentified->sendStatusRequest() :: org.smokinmils.database.DBException: Unknown column 'new_total' in 'NEW'
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.checkUserExists(DB.java:207)
+	at org.smokinmils.bot.CheckIdentified.sendStatusRequest(CheckIdentified.java:148)
+	at org.smokinmils.bot.CheckIdentified.message(CheckIdentified.java:66)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:42:06: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+19:42:07: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+19:42:07: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+19:43:17: Roulette->message() :: Exception: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+19:43:17: Roulette->message() :: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.adjustChips(DB.java:611)
+	at org.smokinmils.games.casino.Roulette.bet(Roulette.java:130)
+	at org.smokinmils.games.casino.Roulette.message(Roulette.java:86)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:43:26: Roulette->message() :: Exception: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+19:43:26: Roulette->message() :: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.adjustChips(DB.java:611)
+	at org.smokinmils.games.casino.Roulette.bet(Roulette.java:130)
+	at org.smokinmils.games.casino.Roulette.message(Roulette.java:86)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:43:29: Roulette->message() :: Exception: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+19:43:29: Roulette->message() :: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.adjustChips(DB.java:611)
+	at org.smokinmils.games.casino.Roulette.bet(Roulette.java:130)
+	at org.smokinmils.games.casino.Roulette.message(Roulette.java:86)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:43:54: Roulette->message() :: Exception: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+19:43:54: Roulette->message() :: org.smokinmils.database.DBException: Column 'game_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.adjustChips(DB.java:611)
+	at org.smokinmils.games.casino.Roulette.bet(Roulette.java:130)
+	at org.smokinmils.games.casino.Roulette.message(Roulette.java:86)
+	at org.smokinmils.bot.Event.onMessage(Event.java:126)
+	at sun.reflect.GeneratedMethodAccessor32.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.pircbotx.hooks.ListenerAdapter.onEvent(ListenerAdapter.java:98)
+	at org.pircbotx.hooks.managers.ThreadedListenerManager$1.run(ThreadedListenerManager.java:110)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask$Sync.innerRun(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+
+19:45:18: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:18: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:22: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:22: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:26: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:26: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:30: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:30: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:34: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:34: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:38: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:38: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:42: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:42: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+
+19:45:46: Referal->doReferal() :: Exception: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+19:45:46: Referal->doReferal() :: org.smokinmils.database.DBException: Column 'type_id' cannot be null
+	at org.smokinmils.database.DB.runBasicQuery(DB.java:1557)
+	at org.smokinmils.database.DB.addTransaction(DB.java:1323)
+	at org.smokinmils.database.DB.adjustChips(DB.java:663)
+	at org.smokinmils.database.DB.houseFees(DB.java:1289)
+	at org.smokinmils.cashier.rake.Referal.doReferal(Referal.java:113)
+	at org.smokinmils.cashier.rake.Referal.run(Referal.java:66)
+

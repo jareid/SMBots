@@ -1,0 +1,208 @@
+14:08:18: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: Question->load() :: test3 has no question
+14:08:18: Question->load() :: test4 has no answer
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:18: Client->newTable() :: INFO: Creating new table...
+14:08:19: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+14:08:21: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+14:08:24: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of GsKiki-VX9
+14:08:26: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+14:08:55: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+14:09:05: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+14:09:07: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:11: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified
+14:09:11: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified
+14:09:14: CheckUser::CheckIdentified->call() :: INFO: GsKiki-VX9 identified
+14:09:15: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:19: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+14:09:21: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:23: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:23: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+14:09:25: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:27: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:29: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:30: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified
+14:09:31: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Unknown14538
+14:09:31: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:38: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:40: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:09:48: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mainly_Dice
+14:09:49: CheckUser::CheckIdentified->call() :: INFO: Mainly_Dice identified
+14:09:49: CheckIdentified->sendStatusRequest() :: INFO: Mainly_Dice identified
+14:10:40: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+14:10:41: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+14:10:41: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:29:39: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+14:53:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+14:53:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+14:53:18: Competition->end() :: No data for 07
+14:53:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+14:53:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+14:53:18: Competition->end() :: No data for eoc
+14:53:21: Competition->end() :: Not enough prizes for 07
+14:53:23: Competition->end() :: Not enough prizes for eoc
+15:38:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+15:38:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+15:38:18: Competition->end() :: No data for 07
+15:38:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+15:38:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+15:38:18: Competition->end() :: No data for eoc
+15:38:21: Competition->end() :: Not enough prizes for 07
+15:38:23: Competition->end() :: Not enough prizes for eoc
+16:23:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+16:23:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+16:23:18: Competition->end() :: No data for 07
+16:23:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+16:23:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+16:23:18: Competition->end() :: No data for eoc
+16:23:21: Competition->end() :: Not enough prizes for 07
+16:23:23: Competition->end() :: Not enough prizes for eoc
+17:08:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+17:08:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.07 (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+17:08:18: Competition->end() :: No data for 07
+17:08:18: Competition->end() :: Exception: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+17:08:18: Competition->end() :: java.io.FileNotFoundException: comp_prizes.eoc (The system cannot find the file specified)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.smokinmils.cashier.tasks.Competition.readPrizes(Competition.java:204)
+	at org.smokinmils.cashier.tasks.Competition.announce(Competition.java:106)
+	at org.smokinmils.cashier.tasks.Competition.run(Competition.java:74)
+	at java.util.TimerThread.mainLoop(Unknown Source)
+	at java.util.TimerThread.run(Unknown Source)
+
+17:08:18: Competition->end() :: No data for eoc
+17:08:20: Competition->end() :: Not enough prizes for 07
+17:08:22: Competition->end() :: Not enough prizes for eoc

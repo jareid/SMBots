@@ -13,20 +13,23 @@ import org.smokinmils.bot.IrcBot;
 
 /**
  * Called when the mode of a user is set.
+ * 
  * @author Jamie
  */
 public class UserMode extends UserModeEvent<IrcBot> {
 
 	/**
 	 * Default constructor to setup object.
-	 * Timestamp is automatically set to current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param target - The user that the mode operation applies to.
-	 * @param source - The user that set the mode.
-	 * @param mode - The mode that has been set.
+	 * Timestamp is automatically set to current time as reported
+	 * by System.currentTimeMillis()
+	 * 
+	 * @param event the UserModeEvent
+     * 
+     * @see org.pircbotx.hooks.type.UserModeEvent
 	 */
-	public UserMode(UserModeEvent<IrcBot> event) {
-		super(event.getBot(), event.getTarget(), event.getSource(), event.getMode());
+	public UserMode(final UserModeEvent<IrcBot> event) {
+		super(event.getBot(), event.getTarget(),
+		      event.getSource(), event.getMode());
 	}
 }

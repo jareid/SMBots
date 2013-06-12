@@ -248,7 +248,7 @@ public class Lobby extends Room {
 					int minbuy = (stake*Variables.MinBuyIn);
 					
 					if ( profile == null ) {
-						IrcClient.getBot().sendIRCNotice(sender, IrcBot.ValidProfiles);	
+						IrcClient.getBot().sendIRCNotice(sender, IrcBot.VALID_PROFILES);	
 					} else if ( !validPlayers(max_players) ) {
 						String out = Strings.InvalidTableSizeMsg.replaceAll("%size", Integer.toString(max_players));
 						out = out.replaceAll("%allowed", Arrays.toString(Variables.AllowedTableSizes));

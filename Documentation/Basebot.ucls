@@ -919,8 +919,8 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="108" language="java" name="org.smokinmils.Utils" project="Basebot" 
-    file="/Basebot/src/org/smokinmils/Utils.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="108" language="java" name="org.smokinmils.bot.Utils" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/bot/Utils.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="117" width="156" x="11746" y="7553"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" accessors="true" 
       visibility="true">      

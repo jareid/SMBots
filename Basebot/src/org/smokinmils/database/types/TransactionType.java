@@ -9,26 +9,39 @@
 package org.smokinmils.database.types;
 
 /**
-* An enumerate for the DB's credits transaction types
+* An enumerate for the DB's credits transaction types.
 * 
 * @author Jamie Reid
 */
 public enum TransactionType {
+    /** admin transactions. */
 	ADMIN("admin"),
+    /** bet transactions. */
 	BET("bet"),
+    /** cancel transactions. */
 	CANCEL("cancel"),
+    /** credit transactions. */
 	CREDIT("credit"),
+    /** lottery transactions. */
 	LOTTERY("lottery"),
-	LOTTERY_WIN("lotterywin"),	
+    /** loterry win transactions. */
+	LOTTERY_WIN("lotterywin"),
+    /** payout transactions. */
 	PAYOUT("payout"),
+    /** jackpot transactions. */
 	JACKPOT("pkrjackpot"),
+    /** poker buy in transactions. */
 	POKER_BUYIN("pokerbuy"),
+    /** poker cash out transactions. */
 	POKER_CASHOUT("pokercash"),
+    /** referral transactions. */
     REFERRAL("referral"),
+    /** reset transactions. */
 	RESET("reset"),
+    /** transfer transactions. */
 	TRANSFER("transfer"),
-	WIN("win"),
-	;
+    /** win transactions. */
+	WIN("win");
 	
 	/** The text. */
 	private final String text;
@@ -36,10 +49,10 @@ public enum TransactionType {
 	/**
 	 * Constructor.
 	 * 
-	 * @param text  textual representation.
+	 * @param txt  textual representation.
 	 */
-	TransactionType(String text) {
-		this.text = text;
+	TransactionType(final String txt) {
+		text = txt;
 	}
 	
 	/**
@@ -49,24 +62,26 @@ public enum TransactionType {
 	 */
 	public String getText() { return text; }
 	
-	/**
-	 * (non-Javadoc)
+	/** 
+	 * (non-Javadoc).
 	 * @see java.lang.Enum#toString()
+	 * 
+	 * @return the output
 	 */
 	@Override
 	public String toString() { return text;	}
 	
 	/** 
-	 * Converts a String to the correct TransactionType
+	 * Converts a String to the correct TransactionType.
 	 * 
 	 * @param text the string to check
 	 * @return the correct enumerate object
 	 */
-    public static TransactionType fromString(String text) {
+    public static TransactionType fromString(final String text) {
         if (text != null) {
-        	text = text.toLowerCase();
+        	String txtlc = text.toLowerCase();
         	for (TransactionType tt : TransactionType.values()) {
-        		if ( tt.getText().compareTo(text) == 0 ) {
+        		if (tt.getText().equals(txtlc)) {
         			return tt;
         		}
         	}

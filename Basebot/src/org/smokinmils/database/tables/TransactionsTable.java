@@ -8,32 +8,41 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class TransactionsTable {
+/**
+* Represents the transactions table from the database.
+* 
+* @author Jamie
+*/
+public final class TransactionsTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private TransactionsTable() { }
 
-	/** Table name */
-	public static final String Name = "transactions";
+	/** Table name. */
+	public static final String NAME = "transactions";
 	
-	/** Column for the unique id */
-	public static final String Col_ID = "id";
+	/** Column for the unique id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the userid */
-	public static final String Col_UserID = "user_id";
+	/** Column for the userid. */
+	public static final String COL_USERID = "user_id";
 	
-	/** Column for the gameid */
-	public static final String Col_GameID = "game_id";
+	/** Column for the gameid. */
+	public static final String COL_GAMEID = "game_id";
 	
-	/** Column for the typeid */
-	public static final String Col_TypeID = "type_id";
+	/** Column for the typeid. */
+	public static final String COL_TYPEID = "type_id";
 	
-	/** Column for the timestamp */
-	public static final String Col_Timestamp = "timestamp";
+	/** Column for the timestamp. */
+	public static final String COL_TIMESTAMP = "timestamp";
 	
-	/** Column for the amount */
-	public static final String Col_Amount = "amount";
+	/** Column for the amount. */
+	public static final String COL_AMOUNT = "amount";
 	
-	/** Column for the profile type */
-	public static final String Col_ProfileType = "profile_type";
+	/** Column for the profile type. */
+	public static final String COL_PROFILETYPE = "profile_type";
 	
-	/** Column for the new total */
-	public static final String Col_newtotal = "new_total";
+	/** Column for the new total. */
+	public static final String COL_NEWTOTAL = "new_total";
 }

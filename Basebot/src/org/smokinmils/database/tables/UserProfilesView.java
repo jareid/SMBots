@@ -8,16 +8,26 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class UserProfilesView {	
-	/** Table name */
-	public static final String Name = "user_profiles_as_text";
+/**
+* Represents the user profiles view from the database.
+* 
+* @author Jamie
+*/
+public final class UserProfilesView {
+    /**
+     * Hiding the default constructor.
+     */
+    private UserProfilesView() { }
+    
+	/** Table name. */
+	public static final String NAME = "user_profiles_as_text";
 	
-	/** Column for the userid */
-	public static final String Col_Username = "username";
+	/** Column for the userid. */
+	public static final String COL_USERNAME = "username";
 	
-	/** Column for the typeid */
-	public static final String Col_Profile = "name";
+	/** Column for the typeid. */
+	public static final String COL_PROFILE = "name";
 	
-	/** Column for the amount */
-	public static final String Col_Amount = "amount";
+	/** Column for the amount. */
+	public static final String COL_AMOUNT = "amount";
 }

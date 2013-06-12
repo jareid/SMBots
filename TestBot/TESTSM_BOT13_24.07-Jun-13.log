@@ -1,0 +1,45 @@
+13:24:49: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: Question->load() :: test3 has no question
+13:24:49: Question->load() :: test4 has no answer
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:49: Client->newTable() :: INFO: Creating new table...
+13:24:50: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Mr_J_Rune
+13:24:52: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of GsKiki-VX9
+13:24:55: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:25:37: CheckUser::CheckIdentified->call() :: INFO: Mr_J_Rune identified
+13:25:39: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:25:42: CheckUser::CheckIdentified->call() :: INFO: GsKiki-VX9 identified
+13:25:45: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:25:45: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:25:57: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Unknown14538
+13:26:06: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:26:11: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+13:26:12: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:26:12: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+13:26:12: CheckIdentified->sendStatusRequest() :: INFO: JReid identified

@@ -8,14 +8,23 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class ReferersTable {
+/**
+* Represents the referrers table from the database.
+* 
+* @author Jamie
+*/
+public final class ReferersTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private ReferersTable() { }
 
-	/** The name of the table */
-	public static final String Name = "referrers";
+	/** The name of the table. */
+	public static final String NAME = "referrers";
 	
-	/** Column for the unique id */
-	public static final String Col_UserID = "user_id";
+	/** Column for the unique id. */
+	public static final String COL_USERID = "user_id";
 	
-	/** Column for the name of the game */
-    public static final String Col_RefererID = "referrer_id";
+	/** Column for the name of the game. */
+    public static final String COL_REFERRERID = "referrer_id";
 }

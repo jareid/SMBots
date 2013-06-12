@@ -20,15 +20,16 @@ import org.smokinmils.bot.IrcBot;
  */
 public class RemoveChannelBan extends RemoveChannelBanEvent<IrcBot> {
 	/**
-	 * Default constructor to setup object. Timestamp is automatically set to current time as reported by System.currentTimeMillis()
+	 * Default constructor to setup object. Timestamp is automatically 
+	 * set to current time as reported by System.currentTimeMillis()
 	 * 
-	 * @param bot
-	 * @param channel The channel in which the mode change took place.
-	 * @param user The user that performed the mode change.
-	 * @param hostmask The ban hostmask removed.
+	 * @param event the RemoveChannelBanEvent
+	 * 
+	 * @see org.pircbotx.hooks.type.RemoveChannelBanEvent
 	 */
-	public RemoveChannelBan(RemoveChannelBanEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getUser(), event.getHostmask());
+	public RemoveChannelBan(final RemoveChannelBanEvent<IrcBot> event) {
+		super(event.getBot(), event.getChannel(),
+		        event.getUser(), event.getHostmask());
 	}
 
 }

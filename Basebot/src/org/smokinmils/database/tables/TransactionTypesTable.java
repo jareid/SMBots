@@ -8,15 +8,24 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class TransactionTypesTable {
+/**
+* Represents the user profiles view from the database.
+* 
+* @author Jamie
+*/
+public final class TransactionTypesTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private TransactionTypesTable() { }
 	
-	/** Table name */
-	public static final String Name = "transaction_types";
+	/** Table name. */
+	public static final String NAME = "transaction_types";
 	
-	/** Column for the unique id */
-	public static final String Col_ID = "id";
+	/** Column for the unique id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the type of transaction */
-	public static final String Col_Type = "type";
+	/** Column for the type of transaction. */
+	public static final String COL_TYPE = "type";
 	
 }

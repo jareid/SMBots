@@ -8,26 +8,35 @@
  */ 
 package org.smokinmils.database.tables;
 
-public class UsersTable {
+/**
+ * Represents the users table from the database.
+ * 
+ * @author Jamie
+ */
+public final class UsersTable {
+    /**
+     * Hiding the default constructor.
+     */
+    private UsersTable() { }
 
-	/** Table name */
-	public static final String Name = "users";
+	/** Table name. */
+	public static final String NAME = "users";
 
-	/** Column for the id */
-	public static final String Col_ID = "id";
+	/** Column for the id. */
+	public static final String COL_ID = "id";
 	
-	/** Column for the username */
-	public static final String Col_Username = "username";
+	/** Column for the username. */
+	public static final String COL_USERNAME = "username";
 	
-	/** Column for the number of wins */
-	public static final String Col_Wins = "wins";
+	/** Column for the number of wins. */
+	public static final String COL_WINS = "wins";
 	
-	/** Column for the number of losses */
-	public static final String Col_Losses = "losses";
+	/** Column for the number of losses. */
+	public static final String COL_LOSSES = "losses";
 	
-	/** Column for the total amount bet */
-	public static final String Col_TotalBets = "total_bets";
+	/** Column for the total amount bet. */
+	public static final String COL_TOTALBETS = "total_bets";
 	
-	/** Column for the active profile */
-	public static final String Col_ActiveProfile = "active_profile";
+	/** Column for the active profile. */
+	public static final String COL_ACTIVEPROFILE = "active_profile";
 }
