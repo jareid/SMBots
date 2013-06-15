@@ -17,58 +17,65 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.smokinmils.database.DB;
-import org.smokinmils.database.DBException;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.database.types.ReferrerType;
 import org.smokinmils.logging.EventLog;
 
 /**
- * Provides the class for referals, uses a queue to process referal earnings.
+ * Provides the class for referrals, uses a queue to process referral earnings.
  * 
  * Implements Thread
  * 
  * @author Jamie Reid
  */
-public class Referal extends Thread {
+public final class Referal extends Thread {
+    /** The percentage of the rake provided that goes to jackpot. */
     private static final double  JACKPOT_PERCENT = 0.10;
+
+    /** The percentage of the rake provided that goes to group referral fees. */
     private static final double  GROUP_PERCENT   = 0.20;
+
+    /** The percentage of the rake provided that goes to user referral fees. */
     private static final double  USER_PERCENT    = 0.20;
 
-    /** A queue of events this room needs to process */
-    private static Deque<Event>  Events;
+    /** A queue of events this room needs to process. */
+    private static Deque<Event>  rakeQueue;
 
-    /** Instance variable */
-    private static final Referal instance        = new Referal();
+    /** Instance variable. */
+    private static final Referal INSTANCE        = new Referal();
 
-    /** Static 'instance' method */
+    /**
+     * Static 'instance' method.
+     * @return the instance of the Referal object
+     */
     public static Referal getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     /**
      * Constructor.
      */
     private Referal() {
-        Events = new ArrayDeque<Event>();
+        rakeQueue = new ArrayDeque<Event>();
         this.start();
     }
 
     /**
-     * (non-Javadoc)
+     * (non-Javadoc).
      * @see java.lang.Thread#run()
      */
     @Override
     public void run() {
         boolean interuptted = false;
         while (!(Thread.interrupted() || interuptted)) {
-            if (!Events.isEmpty()) {
-                Event event = Events.removeFirst();
+            if (!rakeQueue.isEmpty()) {
+                Event event = rakeQueue.removeFirst();
                 doReferal(event);
             }
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 interuptted = true;
             }
@@ -77,11 +84,13 @@ public class Referal extends Thread {
     }
 
     /**
-     * Save the new jackpot value
-     * @return
+     * Save the new jackpot value.
+     * 
+     * @param amount The amount to update by
+     * @param profile The profile of the jackpot
      */
-    private void updateJackpot(double amount,
-                               ProfileType profile) {
+    private void updateJackpot(final double amount,
+                               final ProfileType profile) {
         double jackpot = amount * JACKPOT_PERCENT;
         try {
             DB.getInstance().updateJackpot(profile, jackpot);
@@ -91,31 +100,34 @@ public class Referal extends Thread {
     }
 
     /**
-     * Take the referal amounts
+     * Take the referral amounts.
+     * 
+     * @param event The event to process
      */
-    private void doReferal(Event event) {
+    private void doReferal(final Event event) {
         DB db = DB.getInstance();
 
         try {
-            ReferrerType reftype = db.getRefererType(event.user);
+            ReferrerType reftype = db.getRefererType(event.getUser());
 
-            double house_percent = 1.0 - (Rake.JackpotEnabled ? JACKPOT_PERCENT
-                    : 0.0);
-            if (reftype == ReferrerType.GROUP) {
-                house_percent -= (GROUP_PERCENT + USER_PERCENT);
-                doGroupReferal(event);
-            } else if (reftype == ReferrerType.PUBLIC) {
-                house_percent -= USER_PERCENT;
-                doPublicReferal(event);
-            } else {
-                // do nothing
+            double housepercent = 1.0;
+            if (Rake.JACKPOTENABLED) {
+                housepercent -= JACKPOT_PERCENT;
             }
 
-            double house_fee = event.amount * house_percent;
-            db.houseFees(house_fee, event.profile);
+            if (reftype == ReferrerType.GROUP) {
+                housepercent -= (GROUP_PERCENT + USER_PERCENT);
+                doGroupReferal(event);
+            } else if (reftype == ReferrerType.PUBLIC) {
+                housepercent -= USER_PERCENT;
+                doPublicReferal(event);
+            }
 
-            if (Rake.JackpotEnabled) {
-                updateJackpot(event.amount, event.profile);
+            double housefee = event.getAmount() * housepercent;
+            db.houseFees(housefee, event.getProfile());
+
+            if (Rake.JACKPOTENABLED) {
+                updateJackpot(event.getAmount(), event.getProfile());
             }
         } catch (Exception e) {
             EventLog.log(e, "Referal", "doReferal");
@@ -123,68 +135,79 @@ public class Referal extends Thread {
     }
 
     /**
-     * Take the referal amounts
-     * @throws SQLException
-     * @throws DBException
+     * Take the referral amounts.
+     * 
+     * @param event The event being processed
+     * 
+     * @throws SQLException when there is an issue with the database
      */
-    private void doPublicReferal(Event event)
-        throws DBException, SQLException {
+    private void doPublicReferal(final Event event)
+        throws SQLException {
         DB db = DB.getInstance();
 
-        double ref_fee = event.amount * USER_PERCENT;
+        double reffee = event.getAmount() * USER_PERCENT;
 
-        ReferalUser referer = db.getReferalUsers(event.user).get(0);
+        ReferalUser referer = db.getReferalUsers(event.getUser()).get(0);
 
-        db.giveReferalFee(ref_fee, referer.getUser(), event.profile);
+        db.giveReferalFee(reffee, referer.getUser(), event.getProfile());
     }
 
     /**
-     * Take the referal amounts
-     * @throws SQLException
-     * @throws DBException
+     * Take the referral amounts.
+     * 
+     * @param event The event being processed
+     * 
+     * @throws SQLException when there is an issue with the database
      */
-    private void doGroupReferal(Event event)
-        throws DBException, SQLException {
+    private void doGroupReferal(final Event event)
+        throws SQLException {
         DB db = DB.getInstance();
 
-        double ref_fee = event.amount * USER_PERCENT;
-        double grp_fee = event.amount * GROUP_PERCENT;
+        double reffee = event.getAmount() * USER_PERCENT;
+        double grpfee = event.getAmount() * GROUP_PERCENT;
 
-        List<ReferalUser> referals = db.getReferalUsers(event.user);
+        List<ReferalUser> referals = db.getReferalUsers(event.getUser());
         Map<String, Integer> groups = new HashMap<String, Integer>();
-        double user_fee = ref_fee / referals.size();
+        double userfee = reffee / referals.size();
         int groupusers = 0;
         for (ReferalUser user : referals) {
             if (user.getGroup() != null) {
-                if (!groups.containsKey(user.getGroup())) groups.put(
-                        user.getGroup(), 1);
-                else
-                    groups.put(user.getGroup(), groups.get(user.getGroup()) + 1);
+                if (!groups.containsKey(user.getGroup())) {
+                    groups.put(user.getGroup(), 1);
+                } else {
+                    int count = groups.get(user.getGroup()) + 1;
+                    groups.put(user.getGroup(), count);
+                }
                 groupusers++;
             }
 
-            db.giveReferalFee(user_fee, user.getUser(), event.profile);
+            db.giveReferalFee(userfee, user.getUser(), event.getProfile());
         }
 
         // Give each group an equivalent amount based on number of users
         // in the group with that referal
         if (groupusers > 0) {
-            double each_grp_fee = grp_fee / groupusers;
+            double eachgrpfee = grpfee / groupusers;
             for (Entry<String, Integer> group : groups.entrySet()) {
-                db.giveReferalFee(each_grp_fee * group.getValue(),
-                        group.getKey(), event.profile);
+                db.giveReferalFee(
+                        eachgrpfee * group.getValue(), group.getKey(),
+                        event.getProfile());
             }
         } else {
-            db.houseFees(grp_fee, event.profile);
+            db.houseFees(grpfee, event.getProfile());
         }
     }
 
     /**
-     * Adds an event to be handled by this Room's thread
+     * Adds an event to be handled by this Room's thread.
+     * 
+     * @param user The user the event is for.
+     * @param profile The profile.
+     * @param amount The amount of rake taken.
      */
-    public void addEvent(String user,
-                         ProfileType profile,
-                         double amount) {
-        Events.addLast(new Event(user, profile, amount));
+    public void addEvent(final String user,
+                         final ProfileType profile,
+                         final double amount) {
+        rakeQueue.addLast(new Event(user, profile, amount));
     }
 }

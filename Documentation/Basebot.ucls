@@ -91,8 +91,8 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </enumeration>  
-  <class id="11" language="java" name="org.smokinmils.games.poker.game.Deck" project="Basebot" 
-    file="/Basebot/src/org/smokinmils/games/poker/game/Deck.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="11" language="java" name="org.smokinmils.games.casino.carddeck.Deck" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/games/casino/carddeck/Deck.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="207" width="341" x="16063" y="6141"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" accessors="true" 
       visibility="true">      
@@ -805,8 +805,8 @@
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true"/>  
   </package>  
-  <class id="94" language="java" name="org.smokinmils.games.poker.game.Card" project="Basebot" 
-    file="/Basebot/src/org/smokinmils/games/poker/game/Card.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="94" language="java" name="org.smokinmils.games.casino.carddeck.Card" project="Basebot" 
+    file="/Basebot/src/org/smokinmils/games/casino/carddeck/Card.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="823" width="831" x="12815" y="8858"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" accessors="true" 
       visibility="true">      

@@ -35,7 +35,6 @@ public class Referral extends Event {
     /** The command length. */
     public static final int     CMD_LEN = 2;
 
-    //@formatter:off 
     /** Message when the user doesn't exist. */
     private static final String NO_USER = "%b%c04%sender%c12: " 
                                     + "%c04%who%c12 does not exist as a user.";
@@ -51,7 +50,6 @@ public class Referral extends Event {
     /** Message when the referral failed. */
     private static final String FAILED  = "%b%c04%sender%c12: "
                                         + "You already have a referrer.";
-    //@formatter:on
 
     /**
      * This method handles the command.

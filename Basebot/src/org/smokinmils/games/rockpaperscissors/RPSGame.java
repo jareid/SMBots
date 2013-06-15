@@ -1,12 +1,13 @@
 package org.smokinmils.games.rockpaperscissors;
+
 /**
- * This file is part of a commercial IRC bot that 
- * allows users to play online IRC games.
+ * This file is part of a commercial IRC bot that allows users to play online
+ * IRC games.
  * 
  * The project was commissioned by Julian Clark
  * 
  * Copyright (C) 2013 Jamie Reid
- */ 
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,11 +26,11 @@ import org.pircbotx.Channel;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.smokinmils.BaseBot;
+import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -38,466 +39,715 @@ import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 
 /**
- * Provides the functionality to give a user some chips
+ * Provides the functionality to give a user some chips.
  * 
  * @author Jamie
  */
 public class RPSGame extends Event {
-	public static final String Command = "!rps";
-	public static final String Description = "%b%c12Creates a new Rock Paper Scissors game";
-	public static final String Format = "%b%c12" + Command + " <amount>";
-	
-	public static final String CallCommand = "!rpscall";
-	public static final String CallDescription = "%b%c12Calls an existing Rock Paper Scissors game";
-	public static final String CallFormat = "%b%c12" + CallCommand + " <who>";	
+    /** The rps command. */
+    public static final String  RPS_CMD        = "!rps";
 
-	public static final String CxlCommand = "!rpscancel";
-	public static final String CxlDescription = "%b%c12Cancels your existing Rock Paper Scissors games";
-	public static final String CxlFormat = "%b%c12" + CxlCommand + " <who>";
-	
-	private static final String OpenWager = "%b%c04%who%c12: You already have a wager open, Type %c04" + CxlCommand + "%c12 to cancel it";
-	private static final String OpenedWager = "%b%c04%who%c12: has opened a new RPS wager of %c04%amount%c12 %profile chips! To call this wager type %c04" + CallCommand + " %who";
-	private static final String CancelledWager = "%b%c04%who%c12: Cancelled your open wager";
-	private static final String NoChips = "%b%c12Sorry, you do not have %c04%chips%c12 chips available for the %c04%profile%c12 profile.";
-	private static final String RealChipsOnly = "%b%c04%who%c12: : you need to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
-	private static final String NoBet = "%b%c04%who%c12: I can't find a record of that wager";
-	private static final String SelfBet =  "%b%c04%who%c12: You can't play against yourself!";
-	private static final String Win = "%b%c12%winstring. %c04%loser%c12 loses and %c04%winner%c12 wins %c04%chips%c12!";
-	private static final String Draw = "%b%c04%better%c12 and %c04%caller%c12 draw with %c04%choice%c12! Attempting to replay...";
-	private static final String ReplayFail = "%b%c12Replay between %c04%better%c12 and %c04%caller%c12 failed as %c04%who%c12 didn't respond. Both users have been refunded %c04%chips%c12 chips!";
-	private static final String ValidChoices = "%b%c04%who%c12: Please choose an option and enter it here. Valid choices are: %c04%choices%c12!";
-	private static final String PleaseChoose = "%b%c12You have received a query asking for your choice. Please send your choice in the query and not in this channel.";
-	private static final String ValidChoice = "%b%c12You have chosen %c04%choice%c12!";
-	private static final String InvalidChoice = "%b%c04%what%c12 is invalid. Valid choices are: %c04%choices%c12!";
-	private static final String NoChoice = "%b%c04%who%c12: You didn't make a choice for the game, the bet has been cancelled.";
-	private static final String OpenBets = "%c12%bCurrent open RPS wagers: %bets To call a wager type %c04" + CallCommand + " <name>";
-	private static final String EachOpenBet = "%c04%user%c12(%c04%amount %profile%c12)";
-	
-	private static final int AnnounceMins = 3;
+    /** The rps command format. */
+    public static final String  RPS_FORMAT     = "%b%c12" + RPS_CMD
+                                                       + " <amount>";
 
-	private List<Bet> openBets;
-	
-	/**
-	 * Constructor
-	 * 
-	 * @param chan The channel where jackpots are announce
-	 */
-	public RPSGame() {
-		openBets = new ArrayList<Bet>();
-	}
-	
-	/**
-	 * This method handles the chips command
-	 * 
-	 * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
-	 */
-	@Override
-	public void message(Message event) {
-		IrcBot bot = event.getBot();
-		String message = event.getMessage();
-		String sender = event.getUser().getNick();
-		Channel chan = event.getChannel();
-		synchronized (BaseBot.getLockObject()) {
-			if ( isValidChannel( chan.getName() ) &&
-					bot.userIsIdentified( sender ) ) {			
-				if ( Utils.startsWith(message, CxlCommand ) ) {
-					cancel(event);
-				} else if ( Utils.startsWith(message, CallCommand ) ) {
-					call(event);
-				} else if ( Utils.startsWith(message, Command ) ) {
-					newGame(event);
-				}
-			}
-		}
-	}
+    /** The call command. */
+    public static final String  CALL_CMD       = "!rpscall";
 
-	private void cancel(Message event) {
-		// try to locate and cancel the bet else ignore
-		String username = event.getUser().getNick();
-		for (Bet bet: openBets) {
-			if (bet.getUser().equalsIgnoreCase(username) && bet.isValid()) {
-				DB db = DB.getInstance();
-				bet.invalidate();
-				try {
-					db.adjustChips(username, bet.getAmount(),bet.getProfile(),
-									GamesType.ROCKPAPERSCISSORS,
-									TransactionType.CANCEL);
+    /** The call command format. */
+    public static final String  CALL_FORMAT    = "%b%c12" + CALL_CMD
+                                                       + " <who>";
 
-					db.deleteBet(username, GamesType.ROCKPAPERSCISSORS);
-					openBets.remove(bet);
-				} catch (Exception e) {
-					EventLog.log(e, "RPSGame", "cancel");
-				}
-				// Announce
-				event.getBot().sendIRCMessage(event.getChannel(),
-						CancelledWager.replaceAll("%who", username));
-				break;
-			}
-		}
-	}
+    /** The cancel command. */
+    public static final String  CXL_CMD        = "!rpscancel";
 
-	private void call(Message event) {
-		IrcBot bot = event.getBot();
-		String message = event.getMessage();
-		String caller = event.getUser().getNick();
-		Channel chan = event.getChannel();			
-		String[] msg = message.split(" ");
-		
-		if (msg.length == 2) {
-			String better = msg[1];
+    /** The cancel command format. */
+    public static final String  CXL_FORMAT     = "%b%c12" + CXL_CMD + " <who>";
 
-			// check to see if someone is playing themselves...
-			if (better.equalsIgnoreCase(caller)) {
-				bot.sendIRCMessage(chan, SelfBet.replaceAll("%who", caller));
-			} else {
-				DB db = DB.getInstance();
-				boolean found = false;
-				for (Bet bet : openBets) {
-					if (bet.getUser().equalsIgnoreCase(better) && bet.isValid()) {
-						try {
-							found = true;
-							ProfileType caller_prof = db.getActiveProfile(caller);
-							ProfileType better_prof = bet.getProfile();
-							double amount = bet.getAmount();
-							
-							// first lock it to stop two people form calling it as this
-							// is processing -- Shouldn't be possible with thread
-							// locking now
-							bet.invalidate();
+    /** Message for an open wager existing. */
+    private static final String OPENWAGER      = "%b%c04%who%c12: You already "
+                                                       + "have a wager open, "
+                                                       + "Type %c04"
+                                                       + CXL_CMD
+                                                       + "%c12 to cancel it";
 
-							// quick hax to check if play chips vs non-play chips!
-							if (caller_prof != better_prof) {
-								bet.reset();
-								String out = RealChipsOnly.replaceAll("%who", caller);
-								out = out.replaceAll("%profile", better_prof.toString());
-								bot.sendIRCMessage(chan, out);
-							} else if (db.checkCredits(caller) < amount) {
-								bet.reset();
-								String out = NoChips.replaceAll( "%chips", Utils.chipsToString(amount));
-								out = out.replaceAll( "%profile", caller_prof.toString() );
-								bot.sendIRCMessage(chan, out);
-							} else {
-								GameLogic choice = getChoice( event.getUser().getNick(), event.getBot() );
-								if (choice != null) {									
-									db.deleteBet(better, GamesType.ROCKPAPERSCISSORS);
-									openBets.remove(bet);
-									db.adjustChips(caller, (0-amount), caller_prof, 
-											   GamesType.ROCKPAPERSCISSORS, TransactionType.BET);
-									
-									GameLogic better_choice = GameLogic.fromString(bet.getChoice());
-									GameLogic caller_choice = choice;
-									
-									endGame(better, better_prof, better_choice, 
-											caller, caller_prof, caller_choice,
-											amount, bot, chan.getName());
-								} else {
-									bet.reset();
-									bot.sendIRCMessage(chan, NoChoice.replaceAll("%who", event.getUser().getNick()));
-								}
-							}
-							// Found the bet so we can exit.
-							break;
-						} catch (Exception e) {
-							EventLog.log(e, "RPSGame", "call");
-						}				
-					}		
-				}
+    /** Message when a bet is cancelled. */
+    private static final String CANCELLEDBET = "%b%c04%who%c12: Cancelled "
+                                                            + "your open wager";
 
-				if (!found) {
-					// if we reach here the game doesn't exist
-					String out = NoBet.replaceAll("%who", caller);
-					bot.sendIRCMessage(chan, out);
-				}
-			}
-        } else {
-            bot.invalidArguments( caller, Format );
+    /** Message when someone calls a non-existing bet. */
+    private static final String NOBET          = "%b%c04%who%c12: I can't find "
+                                                     + "a record of that wager";
+    
+    /** Message to say yyou can't bet against yourself. */
+    private static final String SELFBET        = "%b%c04%who%c12: You can't "
+                                                     + "play against yourself!";
+
+    /** Message to say you opened a new bet. */
+    private static final String OPENEDWAGER    = "%b%c04%who%c12: has opened a "
+                   + "new RPS wager of %c04%amount%c12 %profile chips! To call "
+                   + "this wager type %c04" + CALL_CMD + " %who";
+    
+    /** Message when user hasn't got enough chips. */
+    private static final String NOCHIPS        = "%b%c12Sorry, you do not have "
+           + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
+    
+    /** Message for mixed profile bets. */
+    private static final String REALCHIPSONLY  = "%b%c04%who%c12: : you need "
+        + "to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
+    
+    /** Message when someone wins. */
+    private static final String WIN            = "%b%c12%winstring. " 
+              + "%c04%loser%c12 loses and %c04%winner%c12 wins %c04%chips%c12!";
+    
+    /** Message when someone draws. */
+    private static final String DRAW           = "%b%c04%better%c12 and "
+         + "%c04%caller%c12 draw with %c04%choice%c12! Attempting to replay...";
+    
+    /** Message when a replay failed. */
+    private static final String REPLAYFAIL     = "%b%c12Replay between "
+           + "%c04%better%c12 and %c04%caller%c12 failed as %c04%who%c12 didn't"
+              + " respond. Both users have been refunded %c04%chips%c12 chips!";
+    
+    /** Output of valid choices. */
+    private static final String VALIDCHOICES   = "%b%c04%who%c12: Please "
+                      + "choose an option and enter it here. Valid choices are:"
+                      + "%c04%choices%c12!";
+    
+    /** Message to retrieve a user's hoice. */
+    private static final String PLEASECHOOSE   = "%b%c12You have received " 
+             + "a query asking for your choice. Please send your choice in the "
+             + "query and not in this channel.";
+    
+    /** Message when someone choose correctly. */
+    private static final String VALIDCHOICE    = "%b%c12You have chosen "
+                                               + "%c04%choice%c12!";
+    
+    /** Message when someone choose incorrectly. */
+    private static final String INVALIDCHOICE  = "%b%c04%what%c12 is invalid. "
+                                       + "Valid choices are: %c04%choices%c12!";
+
+    
+    /** Message when someone doesn't choose. */
+    private static final String NOCHOICE       = "%b%c04%who%c12: You didn't "
+                    + "make a choice for the game, the bet has been cancelled.";
+    
+    /** Mesaage listing open bets. */
+    private static final String OPENBETS       = "%c12%bCurrent open RPS "
+             + "wagers: %bets To call a wager type %c04" + CALL_CMD + " <name>";
+
+    /** Message for each bet. */
+    private static final String EACHOPENBET    = "%c04%user%c12(%c04%amount"
+                                               + " %profile%c12)";
+
+    /** Number of minutes for open bet announce. */
+    private static final int    ANNOUNCE_MINS   = 3;
+
+    /** Number of seconds for a user to choose an option. */
+    private static final int    CHOICE_SECS    = 25;
+
+    /** The list of open bets. */
+    private final List<Bet>     openBets;
+
+    /**
+     * Constructor.
+     */
+    public RPSGame() {
+        openBets = new ArrayList<Bet>();
+    }
+
+    /**
+     * This method handles the commands.
+     * 
+     * @param event the message event.
+     */
+    @Override
+    public final void message(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        String sender = event.getUser().getNick();
+        Channel chan = event.getChannel();
+        if (isValidChannel(chan.getName())
+                && bot.userIsIdentified(sender)) {
+            if (Utils.startsWith(message, CXL_CMD)) {
+                cancel(event);
+            } else if (Utils.startsWith(message, CALL_CMD)) {
+                call(event);
+            } else if (Utils.startsWith(message, RPS_CMD)) {
+                newGame(event);
+            }
         }
-	}
+    }
 
-	private void newGame(Message event) {
-		IrcBot bot = event.getBot();
-		String message = event.getMessage();
-		String sender = event.getUser().getNick();
-		Channel chan = event.getChannel();			
-		String[] msg = message.split(" ");
-		
-		if(msg.length == 2) {
-			boolean has_open = false;
-			for(Bet bet: openBets) {
-				if (bet.getUser().equalsIgnoreCase(sender)) {
-					has_open = true;
-					break;
-				}
-			}
-			
-			if (has_open) {
-				String out = OpenWager.replaceAll("%who", sender);
-				bot.sendIRCNotice(sender, out);
-			} else {
-				Double amount = Utils.tryParseDbl(msg[1]);
-				if (amount != null && amount != 0) {
-					DB db = DB.getInstance();
-					try {
-						ProfileType profile = db.getActiveProfile(sender);
-						double betsize = db.checkCredits(sender, amount);
-						if (betsize > 0.0) {
-							// add bet, remove chips, notify channel
-							GameLogic choice = getChoice( event.getUser().getNick(), event.getBot() );
-							if (choice != null) {
-								Bet bet = new Bet(sender, profile, betsize, choice.toString());
-								openBets.add(bet);
-								db.adjustChips(sender, -betsize, profile, 
-											   GamesType.ROCKPAPERSCISSORS, TransactionType.BET);
-								db.addBet(sender, choice.toString(), betsize, profile, GamesType.ROCKPAPERSCISSORS);
-								
-								String out = OpenedWager.replaceAll("%who", sender);
-								out = out.replaceAll("%profile", profile.toString());
-								out = out.replaceAll("%amount", Utils.chipsToString(betsize));
-								bot.sendIRCMessage(chan, out);
-							} else {
-								bot.sendIRCMessage(chan, NoChoice.replaceAll("%who", event.getUser().getNick()));
-							}
-						} else {
-							String out = NoChips.replaceAll( "%chips", Utils.chipsToString(amount));
-							out = out.replaceAll( "%profile", profile.toString() );
-							bot.sendIRCMessage(chan, out);
-						}
-					} catch (Exception e) {
-						EventLog.log(e, "RPSGame", "newGame");
-					}				
-				} else {
-					bot.invalidArguments(sender, Format);
-				}
-			}
-		} else {
-			bot.invalidArguments(sender, Format);
-		}
-	}
-	
-	private GameLogic getChoice(String user, IrcBot bot) {
-	    GameLogic choice = null;		
-	    ExecutorService executor = Executors.newFixedThreadPool(1);
-	    FutureTask<GameLogic> choicetask = new FutureTask<GameLogic>( new GetChoice(bot, user) );
-	    executor.execute(choicetask);
-		try {
-			choice = choicetask.get(25, TimeUnit.SECONDS);
-			bot.sendIRCMessage(user, ValidChoice.replaceAll("%choice", choice.toString()));
-		} catch (TimeoutException e) {
-			// Do nothing, we expect this.
-			choice = null;
-		} catch (InterruptedException | ExecutionException e) {
-			EventLog.log(e, "RPSGame", "getChoice");
-		}	
-	    executor.shutdown();
-	    
-		return choice;
-	}
-	
-	private void endGame(String better, ProfileType better_prof, GameLogic better_choice,
-			   			 String caller, ProfileType caller_prof, GameLogic caller_choice,
-			   			 double amount, IrcBot bot, String chan) {
-		GameLogicComparator c = new GameLogicComparator();
-		int order = c.compare(better_choice, caller_choice);
-		String winstr = c.getWinString();
-		
-		if (order == -1) {
-			// better won
-			doWin(better, better_prof, better_choice, 
-					caller, caller_prof, caller_choice,
-					amount, winstr, bot, chan);
-		} else if (order == 1) {
-			// caller won
-			doWin(caller, caller_prof, caller_choice, 
-					better, better_prof, better_choice,
-					amount, winstr, bot, chan);
-		} else {
-			doDraw(better, better_prof,
-				   caller, caller_prof,
-				   amount, bot, chan, caller_choice);
-		}
-	}
-	
-	private void doWin(String winner, ProfileType win_prof, GameLogic win_choice,
-					   String loser, ProfileType lose_prof, GameLogic lose_choice,
-					   double amount, String winstring, IrcBot bot, String chan) {
-		DB db = DB.getInstance();
-		// Take the rake and give chips to winner
-		double rake = Rake.getRake(winner, amount, win_prof) + Rake.getRake(loser, amount, lose_prof);
-        double win = (amount*2) - rake;
+    /**
+     * This method handles the cancel command.
+     * 
+     * @param event the message event.
+     */
+    private void cancel(final Message event) {
+        synchronized (BaseBot.getLockObject()) {
+            // try to locate and cancel the bet else ignore
+            String username = event.getUser().getNick();
+            Bet found = null;
+            for (Bet bet : openBets) {
+                if (bet.getUser().equalsIgnoreCase(username)) {
+                    DB db = DB.getInstance();
+                    found = bet;
+                    try {
+                        db.adjustChips(username,
+                                bet.getAmount(),
+                                bet.getProfile(),
+                                GamesType.ROCKPAPERSCISSORS,
+                                TransactionType.CANCEL);
+    
+                        db.deleteBet(username, GamesType.ROCKPAPERSCISSORS);
+                    } catch (Exception e) {
+                        EventLog.log(e, "RPSGame", "cancel");
+                    }
+                    // Announce
+                    event.getBot().sendIRCMessage(
+                            event.getChannel(),
+                            CANCELLEDBET.replaceAll("%who", username));
+                    break;
+                }
+            }
+    
+            if (found != null) {
+                openBets.remove(found);
+            }
+        }
+    }
+
+    /**
+     * This method handles the call command.
+     * 
+     * @param event the message event.
+     */
+    private void call(final Message event) {
+        boolean playbet = false;
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        String caller = event.getUser().getNick();
+        Channel chan = event.getChannel();
+        String[] msg = message.split(" ");
+
+        if (msg.length == 2) {
+            String better = msg[1];
+
+            // check to see if someone is playing themselves...
+            if (better.equalsIgnoreCase(caller)) {
+               bot.sendIRCMessage(chan, SELFBET.replaceAll("%who", caller));
+            } else {
+                DB db = DB.getInstance();
+                ProfileType callerprof = null;
+                ProfileType betterprof = null;
+                Bet found = null;
+                double amount = 0.0;
+                synchronized (BaseBot.getLockObject()) {
+                    for (Bet bet : openBets) {
+                        if (bet.getUser().equalsIgnoreCase(better)) {
+                            found = bet;
+                            break;
+                        }
+                    }
+    
+                    if (found != null) {
+                        try {
+                            callerprof = db.getActiveProfile(caller);
+                            betterprof = found.getProfile();
+                            amount = found.getAmount();
         
-		try {
-			db.adjustChips(winner, win, win_prof, 
-					   GamesType.ROCKPAPERSCISSORS, TransactionType.WIN);
-			
-			//Announce winner and give chips			
-			String out = Win.replaceAll("%winstring", winstring);
-			out = out.replaceAll("%winner", winner);
-			out = out.replaceAll("%loser", loser);
-			out = out.replaceAll("%chips", Utils.chipsToString(win) );
-			bot.sendIRCMessage(chan, out);
-		} catch (Exception e) {
-			EventLog.log(e, "RPSGame", "updateJackpot");
-		}
-		
-		// jackpot stuff	
-		if (Rake.checkJackpot(amount)) {
-			ArrayList<String> players = new ArrayList<String>();
-			players.add(loser);
-			Rake.jackpotWon(win_prof, GamesType.ROCKPAPERSCISSORS,
-							players, bot, chan);
-		} else if (Rake.checkJackpot(amount)) {
+                            if (callerprof != betterprof) {
+                                String out = REALCHIPSONLY.replaceAll(
+                                        "%who", caller);
+                                out = out.replaceAll(
+                                        "%profile", betterprof.toString());
+                                bot.sendIRCMessage(chan, out);
+                            } else if (db.checkCredits(caller) < amount) {
+                                String out = NOCHIPS.replaceAll(
+                                     "%chips", Utils.chipsToString(amount));
+                                out = out.replaceAll(
+                                        "%profile", callerprof.toString());
+                                bot.sendIRCMessage(chan, out);
+                            } else {
+                                db.adjustChips(caller, -amount, callerprof,
+                                               GamesType.ROCKPAPERSCISSORS,
+                                               TransactionType.BET);
+                                playbet = true;
+                            }
+                        } catch (Exception e) {
+                            EventLog.log(e, "RPSGame", "call");
+                        }
+                    } else {
+                        // if we reach here the game doesn't exist
+                        String out = NOBET.replaceAll("%who", caller);
+                        bot.sendIRCMessage(chan, out);
+                    }
+                }
+                
+                if (playbet) {
+                    try {
+                        GameLogic choice = getChoice(event.getUser()
+                                .getNick(), event.getBot());
+                        if (choice != null) {
+                            db.deleteBet(better,
+                                    GamesType.ROCKPAPERSCISSORS);
+                            openBets.remove(found);
+    
+                            GameLogic betterchoice = GameLogic
+                                    .fromString(found.getChoice());
+                            GameLogic callerchoice = choice;
+    
+                            endGame(
+                                    better, betterprof, betterchoice,
+                                    caller, callerprof, callerchoice,
+                                    amount, bot, chan.getName());
+                        } else {
+                            db.adjustChips(caller, amount, callerprof,
+                                           GamesType.ROCKPAPERSCISSORS,
+                                           TransactionType.CANCEL);
+                            bot.sendIRCMessage(chan, NOCHOICE
+                                    .replaceAll("%who", event.getUser()
+                                            .getNick()));
+                        }
+                    } catch (Exception e) {
+                        EventLog.log(e, "RPSGame", "call");
+                    }
+                }
+            }
+        } else {
+            bot.invalidArguments(caller, RPS_FORMAT);
+        }
+    }
+
+    /**
+     * This method handles the rps command.
+     * 
+     * @param event the message event.
+     */
+    private void newGame(final Message event) {
+            IrcBot bot = event.getBot();
+            String message = event.getMessage();
+            String sender = event.getUser().getNick();
+            Channel chan = event.getChannel();
+            String[] msg = message.split(" ");
+    
+            if (msg.length == 2) {
+                boolean playbet = false;
+                boolean hasopen = false;
+                ProfileType profile = null;
+                double betsize = 0.0;
+                synchronized (BaseBot.getLockObject()) {
+                    for (Bet bet : openBets) {
+                        if (bet.getUser().equalsIgnoreCase(sender)) {
+                            hasopen = true;
+                            break;
+                        }
+                    }
+                    if (hasopen) {
+                        String out = OPENWAGER.replaceAll("%who", sender);
+                        bot.sendIRCNotice(sender, out);
+                    } else {
+                        Double amount = Utils.tryParseDbl(msg[1]);
+                        if (amount != null && amount != 0) {
+                            DB db = DB.getInstance();
+                            try {
+                                profile = db.getActiveProfile(sender);
+                                betsize = db.checkCredits(sender, amount);
+                                if (betsize > 0.0) {
+                                    db.adjustChips(
+                                            sender, -betsize, profile,
+                                            GamesType.ROCKPAPERSCISSORS,
+                                            TransactionType.BET);
+                                    playbet = true;
+                                } else {
+                                    String out = NOCHIPS.replaceAll(
+                                         "%chips", Utils.chipsToString(amount));
+                                    out = out.replaceAll("%profile",
+                                                         profile.toString());
+                                    bot.sendIRCMessage(chan, out);
+                                }
+                            } catch (Exception e) {
+                                EventLog.log(e, "RPSGame", "newGame");
+                            }
+                        } else {
+                            bot.invalidArguments(sender, RPS_FORMAT);
+                        }
+                    }
+                }
+                
+                /* Play the bet outside of the synchronisation. */
+                if (playbet) {
+                    DB db = DB.getInstance();
+                    try {
+                        // add bet, remove chips, notify channel
+                        GameLogic choice = getChoice(event.getUser()
+                                .getNick(), event.getBot());
+                        if (choice != null) {
+                            Bet bet = new Bet(sender, profile, betsize,
+                                    choice.toString());
+                            openBets.add(bet);
+                            db.adjustChips(
+                                    sender, -betsize, profile,
+                                    GamesType.ROCKPAPERSCISSORS,
+                                    TransactionType.BET);
+                            db.addBet(
+                                    sender, choice.toString(), betsize,
+                                    profile, GamesType.ROCKPAPERSCISSORS);
+
+                            String out = OPENEDWAGER.replaceAll(
+                                    "%who", sender);
+                            out = out.replaceAll(
+                                    "%profile", profile.toString());
+                            out = out
+                                    .replaceAll(
+                                            "%amount",
+                                            Utils.chipsToString(betsize));
+                            bot.sendIRCMessage(chan, out);
+                        } else {
+                            db.adjustChips(
+                                    sender, betsize, profile,
+                                    GamesType.ROCKPAPERSCISSORS,
+                                    TransactionType.CANCEL);
+                            bot.sendIRCMessage(chan, NOCHOICE.replaceAll(
+                                    "%who", event.getUser().getNick()));
+                        }
+                } catch (Exception e) {
+                    EventLog.log(e, "RPSGame", "newGame");
+                }
+            } else {
+                bot.invalidArguments(sender, RPS_FORMAT);
+            }
+        }
+    }
+
+    /**
+     * Retrieves a user's response.
+     * 
+     * @param user The user to ask for a choice from
+     * @param bot The bot to get the choice
+     * 
+     * @return The GameLogic object
+     */
+    private GameLogic getChoice(final String user,
+                                final IrcBot bot) {
+        GameLogic choice = null;
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        FutureTask<GameLogic> choicetask = new FutureTask<GameLogic>(
+                new GetChoice(bot, user));
+        executor.execute(choicetask);
+        try {
+            choice = choicetask.get(CHOICE_SECS, TimeUnit.SECONDS);
+            bot.sendIRCMessage(
+                    user, VALIDCHOICE.replaceAll("%choice", choice.toString()));
+        } catch (TimeoutException e) {
+            // Do nothing, we expect this.
+            choice = null;
+        } catch (InterruptedException | ExecutionException e) {
+            EventLog.log(e, "RPSGame", "getChoice");
+        }
+        executor.shutdown();
+
+        return choice;
+    }
+
+    /**
+     * Ends a game between two users.
+     * 
+     * @param better The better.
+     * @param bprof The better's profile.
+     * @param bchoice The better's choice.
+     * @param caller The caller.
+     * @param cprof The caller's profile.
+     * @param cchoice The caller's choice.
+     * @param amount The amount.
+     * @param bot The bot used.
+     * @param chan The channel it was performed in.
+     */
+    private void endGame(final String better,
+                         final ProfileType bprof,
+                         final GameLogic bchoice,
+                         final String caller,
+                         final ProfileType cprof,
+                         final GameLogic cchoice,
+                         final double amount,
+                         final IrcBot bot,
+                         final String chan) {
+        GameLogicComparator c = new GameLogicComparator();
+        int order = c.compare(bchoice, cchoice);
+        String winstr = c.getWinString();
+
+        if (order == -1) {
+            // better won
+            doWin(
+                    better, bprof, bchoice, caller, cprof,
+                    cchoice, amount, winstr, bot, chan);
+        } else if (order == 1) {
+            // caller won
+            doWin(
+                    caller, cprof, cchoice, better, bprof,
+                    bchoice, amount, winstr, bot, chan);
+        } else {
+            doDraw(
+                    better, bprof, caller, cprof, amount, bot,
+                    chan, cchoice);
+        }
+    }
+
+    /**
+     * Performs a win between two users.
+     * 
+     * @param winner The winner.
+     * @param wprof The winner's profile.
+     * @param wchoice The winner's choice.
+     * @param loser The loser.
+     * @param lprof The loser's profile.
+     * @param lchoice The loser's choice.
+     * @param amount The amount.
+     * @param winstring The win string.
+     * @param bot The bot used.
+     * @param chan The channel it was performed in.
+     */
+    private void doWin(final String winner,
+                       final ProfileType wprof,
+                       final GameLogic wchoice,
+                       final String loser,
+                       final ProfileType lprof,
+                       final GameLogic lchoice,
+                       final double amount,
+                       final String winstring,
+                       final IrcBot bot,
+                       final String chan) {
+        DB db = DB.getInstance();
+        // Take the rake and give chips to winner
+        double rake = Rake.getRake(winner, amount, wprof)
+                + Rake.getRake(loser, amount, lprof);
+        double win = (amount * 2) - rake;
+
+        try {
+            db.adjustChips(
+                    winner, win, wprof, GamesType.ROCKPAPERSCISSORS,
+                    TransactionType.WIN);
+
+            // Announce winner and give chips
+            String out = WIN.replaceAll("%winstring", winstring);
+            out = out.replaceAll("%winner", winner);
+            out = out.replaceAll("%loser", loser);
+            out = out.replaceAll("%chips", Utils.chipsToString(win));
+            bot.sendIRCMessage(chan, out);
+        } catch (Exception e) {
+            EventLog.log(e, "RPSGame", "updateJackpot");
+        }
+
+        // jackpot stuff
+        if (Rake.checkJackpot(amount)) {
+            ArrayList<String> players = new ArrayList<String>();
+            players.add(loser);
+            Rake.jackpotWon(
+                    wprof, GamesType.ROCKPAPERSCISSORS, players, bot, chan);
+        } else if (Rake.checkJackpot(amount)) {
             ArrayList<String> players = new ArrayList<String>();
             players.add(loser);
             players.add(winner);
-            Rake.jackpotWon(win_prof, GamesType.ROCKPAPERSCISSORS,
-                            players, bot, chan);
-		}
-	}
-	
-	private void doDraw(String better, ProfileType better_prof,
-						String caller, ProfileType caller_prof,						
-  			 			double amount, IrcBot bot, String chan, GameLogic choice) {
-		//Announce winner and give chips			
-		String out = Draw.replaceAll("%choice", choice.toString());
-		out = out.replaceAll("%better", better);
-		out = out.replaceAll("%caller", caller);
-		bot.sendIRCMessage(chan, out);
-		
-		boolean cxld = false;
-		String who = "";
-		GameLogic b_choice = getChoice(better, bot);
-		if (b_choice != null) {
-			GameLogic c_choice = getChoice(caller, bot);
-			if (c_choice != null) {
-				endGame(caller, caller_prof, c_choice, 
-						better, better_prof, b_choice,
-						amount, bot, chan);
-			} else {
-				who = caller;
-				cxld = true;
-			}
-		} else {
-			who = better;
-			cxld = true;
-		}
-		
-		if (cxld) {
-			DB db = DB.getInstance();
-			// cancel bets.
-			try {
-				db.adjustChips(better, amount, better_prof,
-							   GamesType.ROCKPAPERSCISSORS,
-							   TransactionType.CANCEL);
-				
-				for (Bet bet: openBets) {
-					if (bet.getUser().equalsIgnoreCase(better) && bet.isValid()) {
-						bet.invalidate();
-						break;
-					}
-				}
-				
-				db.adjustChips(caller, amount, caller_prof,
-						   GamesType.ROCKPAPERSCISSORS,
-						   TransactionType.CANCEL);
-
-				String fail = ReplayFail.replaceAll("%better", better);
-				fail = fail.replaceAll("%caller", caller);
-				fail = fail.replaceAll("%who", who);
-				fail = fail.replaceAll("%chips", Utils.chipsToString(amount) );
-				bot.sendIRCMessage(chan, fail);
-			} catch (Exception e) {
-				EventLog.log(e, "RPSGame", "doDraw");
-			}
-		}
-	}
-	
-	/**
-	 * Adds a channel that announces open bets
-	 * @param channel the channel name
-	 * @parma bot the IRC bot object
-	 */
-	public void addAnnounce(String channel, IrcBot bot) {
-		Timer chan_timer = new Timer(true);
-		chan_timer.scheduleAtFixedRate( new OpenBetsAnnounce(bot, channel), 
-										500, AnnounceMins*1000*60 );
-	}
-	
-	class GetChoice implements Callable<GameLogic> {
-		private IrcBot Bot;
-		private String User;
-		
-		public GetChoice(IrcBot bot, String user) {
-			Bot = bot;
-			User = user;
-		}
-		
-        @SuppressWarnings("unchecked")
-		public GameLogic call() {
-			GameLogic choice = null;
-			WaitForQueue queue = new WaitForQueue( Bot );
-			boolean received = false;
-			String choices = Arrays.asList(GameLogic.values()).toString();
-			choices = choices.substring(1, choices.length()-1);
-			
-			Bot.sendIRCMessage(User,
-					ValidChoices.replaceAll("%choices", choices).replaceAll("%who", User));
-			Bot.sendIRCNotice(User, PleaseChoose);
-			
-    	    //Loop until we receive the correct message
-    	    while (!received) {
-    	        //Use the waitFor() method to wait for a MessageEvent.
-    	        //This will block (wait) until a message event comes in, ignoring
-    	        //everything else
-    	    	PrivateMessageEvent<IrcBot> currentEvent = null;
-    	    	try {
-    				currentEvent = queue.waitFor(PrivateMessageEvent.class);
-    			} catch (InterruptedException ex) {
-    				EventLog.log(ex, "RPSGame", "getChoice");
-    			}
-    			
-    	        //Check if this message is the response
-           		String msg = currentEvent.getMessage().toLowerCase();
-    	        if ( currentEvent.getUser().getNick().equalsIgnoreCase(User) ) {
-            		// get and store choice
-            		choice = GameLogic.fromString(msg);
-            		if (choice == null) {
-            			String out = InvalidChoice.replaceAll("%what", msg);
-            			out = out.replaceAll("%choices", Arrays.asList(GameLogic.values()).toString());
-            			Bot.sendIRCMessage(User, out);
-            		} else {
-    		        	queue.close();
-    		        	received = true;
-            		}
-    	        }
-    	    }
-			return choice;
+            Rake.jackpotWon(
+                    wprof, GamesType.ROCKPAPERSCISSORS, players, bot, chan);
         }
-	}
+    }
 
-	public class OpenBetsAnnounce extends TimerTask {
-		private IrcBot Bot;
-		private String Channel;
+    /**
+     * Performs a draw between two users.
+     * 
+     * @param better The better.
+     * @param bprof The better's profile.
+     * @param caller The caller.
+     * @param cprof The caller's profile.
+     * @param amount The amount.
+     * @param bot The bot used.
+     * @param chan The channel it was performed in.
+     * @param choice The choice.
+     */
+    private void doDraw(final String better,
+                        final ProfileType bprof,
+                        final String caller,
+                        final ProfileType cprof,
+                        final double amount,
+                        final IrcBot bot,
+                        final String chan,
+                        final GameLogic choice) {
+        // Announce winner and give chips
+        String out = DRAW.replaceAll("%choice", choice.toString());
+        out = out.replaceAll("%better", better);
+        out = out.replaceAll("%caller", caller);
+        bot.sendIRCMessage(chan, out);
 
-		public OpenBetsAnnounce(IrcBot bot, String channel) {
-			this.Bot = bot;
-			this.Channel = channel;
-		}
+        boolean cxld = false;
+        String who = "";
+        GameLogic bchoice = getChoice(better, bot);
+        if (bchoice != null) {
+            GameLogic cchoice = getChoice(caller, bot);
+            if (cchoice != null) {
+                endGame(
+                        caller, cprof, cchoice, better, bprof,
+                        bchoice, amount, bot, chan);
+            } else {
+                who = caller;
+                cxld = true;
+            }
+        } else {
+            who = better;
+            cxld = true;
+        }
 
-		public void run() {
-			if (openBets.size() > 0) {
-				String bets = "";
-				for (Bet bet : openBets) {
-					String betstr = EachOpenBet.replaceAll("%user", bet.getUser());
-					betstr = betstr.replaceAll("%amount", Utils.chipsToString(bet.getAmount()));
-					betstr = betstr.replaceAll("%profile", bet.getProfile().toString());
-					bets += betstr;
-				}
-				String out = OpenBets.replaceAll("%bets", bets);
-				Bot.sendIRCMessage(Channel, out);
-			}
-		}
-	}
+        if (cxld) {
+            DB db = DB.getInstance();
+            // cancel bets.
+            try {
+                db.adjustChips(
+                        better, amount, bprof,
+                        GamesType.ROCKPAPERSCISSORS, TransactionType.CANCEL);
+
+                db.adjustChips(
+                        caller, amount, cprof,
+                        GamesType.ROCKPAPERSCISSORS, TransactionType.CANCEL);
+
+                String fail = REPLAYFAIL.replaceAll("%better", better);
+                fail = fail.replaceAll("%caller", caller);
+                fail = fail.replaceAll("%who", who);
+                fail = fail.replaceAll("%chips", Utils.chipsToString(amount));
+                bot.sendIRCMessage(chan, fail);
+            } catch (Exception e) {
+                EventLog.log(e, "RPSGame", "doDraw");
+            }
+        }
+    }
+
+    /**
+     * Adds a channel that announces open bets.
+     * 
+     * @param channel the channel name
+     * @param bot the IRC bot object
+     */
+    public final void addAnnounce(final String channel,
+                                  final IrcBot bot) {
+        Timer chantimer = new Timer(true);
+        chantimer.scheduleAtFixedRate(new OpenBetsAnnounce(bot, channel),
+                ANNOUNCE_MINS * Utils.MS_IN_MIN,
+                ANNOUNCE_MINS * Utils.MS_IN_MIN);
+    }
+
+    /**
+     * A callable class that is used to get a user's choice or time out.
+     * 
+     * @author Jamie
+     */
+    class GetChoice implements Callable<GameLogic> {
+        /** The bot to get the choice. */
+        private final IrcBot irc;
+        /** The user to get the choice from. */
+        private final String user;
+
+        /**
+         * Constructor.
+         * 
+         * @param bot The bot to get the choice.
+         * @param usr The user to get the choice from.
+         */
+        public GetChoice(final IrcBot bot, final String usr) {
+            irc = bot;
+            user = usr;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public GameLogic call() {
+            GameLogic choice = null;
+            WaitForQueue queue = new WaitForQueue(irc);
+            boolean received = false;
+            String choices = Arrays.asList(GameLogic.values()).toString();
+            choices = choices.substring(1, choices.length() - 1);
+
+            irc.sendIRCMessage(
+                    user, VALIDCHOICES.replaceAll("%choices", choices)
+                            .replaceAll("%who", user));
+            irc.sendIRCNotice(user, PLEASECHOOSE);
+
+            // Loop until we receive the correct message
+            while (!received) {
+                // Use the waitFor() method to wait for a MessageEvent.
+                // This will block (wait) until a message event comes in,
+                // ignoring
+                // everything else
+                PrivateMessageEvent<IrcBot> currentEvent = null;
+                try {
+                    currentEvent = queue.waitFor(PrivateMessageEvent.class);
+                } catch (InterruptedException ex) {
+                    EventLog.log(ex, "RPSGame", "getChoice");
+                }
+
+                // Check if this message is the response
+                String msg = currentEvent.getMessage().toLowerCase();
+                if (currentEvent.getUser().getNick().equalsIgnoreCase(user)) {
+                    // get and store choice
+                    choice = GameLogic.fromString(msg);
+                    if (choice == null) {
+                        String out = INVALIDCHOICE.replaceAll("%what", msg);
+                        out = out.replaceAll(
+                                "%choices", Arrays.asList(GameLogic.values())
+                                        .toString());
+                        irc.sendIRCMessage(user, out);
+                    } else {
+                        queue.close();
+                        received = true;
+                    }
+                }
+            }
+            return choice;
+        }
+    }
+
+    /**
+     * A task to announce open bets for this game.
+     * 
+     * @author Jamie
+     */
+    public class OpenBetsAnnounce extends TimerTask {
+        /** The bot used for announcing. */
+        private final IrcBot irc;
+
+        /** The channel to announce on. */
+        private final String channel;
+
+        /**
+         * Constructor.
+         * 
+         * @param bot The bot to announce with.
+         * @param chan The channel to announce on.
+         */
+        public OpenBetsAnnounce(final IrcBot bot, final String chan) {
+            irc = bot;
+            channel = chan;
+        }
+
+        /**
+         * (non-Javadoc).
+         * @see java.util.TimerTask#run()
+         */
+        @Override
+        public final void run() {
+            if (openBets.size() > 0) {
+                String bets = "";
+                for (Bet bet : openBets) {
+                    String betstr = EACHOPENBET.replaceAll(
+                            "%user", bet.getUser());
+                    betstr = betstr.replaceAll(
+                            "%amount", Utils.chipsToString(bet.getAmount()));
+                    betstr = betstr.replaceAll("%profile", bet.getProfile()
+                            .toString());
+                    bets += betstr;
+                }
+                String out = OPENBETS.replaceAll("%bets", bets);
+                irc.sendIRCMessage(channel, out);
+            }
+        }
+    }
 }

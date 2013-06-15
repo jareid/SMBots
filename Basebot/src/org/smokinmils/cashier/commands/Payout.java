@@ -26,11 +26,9 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class Payout extends Event {
-
     /** The command. */
     public static final String  COMMAND       = "!payout";
-
-    /*@formatter:off*/
+    
     /** The command description. */
     public static final String  DESC          = "%b%c12Payout a number of chips"
                                               + "from a players profile";
@@ -57,8 +55,6 @@ public class Payout extends Event {
                             + "does not have %c04%chips%c12 chips available for"
                             + "the %c04%profile%c12 profile.";
 
-    /*@formatter:on*/
-
     /**
      * This method handles the command.
      * 
@@ -75,7 +71,7 @@ public class Payout extends Event {
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
 
-            if (bot.userIsOp(event.getUser(), chan.getName())) {
+            if (bot.userIsHalfOp(event.getUser(), chan.getName())) {
                 if (msg.length == CMD_LEN) {
                     String user = msg[1];
                     Double amount = Utils.tryParseDbl(msg[2]);
@@ -109,7 +105,7 @@ public class Payout extends Event {
                             boolean success = false;
                             try {
                                 success = DB.getInstance().adjustChips(user,
-                                        amount, profile, GamesType.ADMIN,
+                                        -amount, profile, GamesType.ADMIN,
                                         TransactionType.ADMIN);
                             } catch (Exception e) {
                                 EventLog.log(e, "Payout", "message");

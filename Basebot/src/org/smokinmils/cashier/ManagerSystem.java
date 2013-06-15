@@ -33,55 +33,113 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class ManagerSystem extends Event {
-    public static final String         OnCommand           = "!on";
-    public static final String         LoginCommand        = "!login";
-    public static final String         LogoutCommand       = "!logout";
 
-    private static final String        FileName            = "managers.ini";
 
-    private static final String        NoLoggedOn          = "%b%c12[%c04Logged In%c12] There are %c04no%c12 currently logged in managers.";
-    private static final String        LoggedOn            = "%b%c12[%c04Logged In%c12] Currently logged in manager: %c04%who";
-    private static final String        NotLoggedIn         = "%b%c12[%c04Login%c12]%c04 You are not currently logged in...";
-    private static final String        LoggedIn            = "%b%c12[%c04Login%c12]%c04 %who%c12, you have sucessfully been logged in!";
-    private static final String        LoggedOut           = "%b%c12[%c04Login%c12]%c04 %who%c12, you have sucessfully been logged out!";
-    private static final String        InactiveLoggedOut   = "%b%c12[%c04Inactive%c12]%c04 %who%c12, you have been logged out for inactivity in %c04%actchan%c12!";
-    private static final String        CantLogIn           = "%b%c12[%c04Login%c12]%c04 %b%c04%who%c12 is currently logged in, please wait until they finish their shift";
+    /** The command used to check who is logged in. */
+    public static final String         ON_CMD           = "!on";
 
-    private static String              LoggedInUser;
-    private static Map<String, Double> ManagerTimes;
-    private static int                 InactiveTime;
-    private static String              ActivityChan;
-    private static String              ManagerChan;
-    private static IrcBot              Bot;
+    /** The command to login. */
+    public static final String         LOGIN_CMD        = "!login";
 
-    private static final int           DefaultInactiveTime = 15;
+    /** The command to logout. */
+    public static final String         LOGOUT_CMD       = "!logout";
 
-    private static Timer               NextMin;
-    private static Timer               Inactive;
+    /** The file where the times are stored. */
+    private static final String        FILENAME            = "managers.ini";
 
-    public ManagerSystem(String active_chan, String manager_chan, IrcBot bot) {
-        LoggedInUser = null;
-        ManagerTimes = new HashMap<String, Double>();
-        InactiveTime = DefaultInactiveTime;
-        ActivityChan = active_chan;
-        ManagerChan = manager_chan;
-        Bot = bot;
+    /** Message when nobody is logged in. */
+    private static final String        NOLOGGEDON          = "%b%c12[%c04Logged"
+            + "In%c12] There are %c04no%c12 currently logged in managers.";
+
+    /** Message when you check who is logged in. */
+    private static final String        LOGGEDON            = "%b%c12[%c04Logged"
+            + "In%c12] Currently logged in manager: %c04%who";
+
+    /** Message when you try to log out but aren't logged in. */
+    private static final String        NOTLOGGEDON         = "%b%c12[%c04Login"
+            + "%c12]%c04 You are not currently logged in...";
+
+    /** Message when you log in. */
+    private static final String        LOGGEDIN            = "%b%c12[%c04Login"
+            + "%c12]%c04 %who%c12, you have sucessfully been logged in!";
+
+    /** Message when you log out. */
+    private static final String        LOGGEDOUT           = "%b%c12[%c04Login"
+            + "%c12]%c04 %who%c12, you have sucessfully been logged out!";
+
+    /** Message when you log out for inactivity. */
+    private static final String        INACTIVEDLOGGEDOUT  = "%b%c12[%c04Inacti"
+            + "ve%c12]%c04 %who%c12, you have been logged out for inactivity in"
+            + "%c04%actchan%c12!";
+
+    /** Message when you can't log in. */
+    private static final String        CANTLOGIN           = "%b%c12[%c04Login"
+            + "%c12]%c04 %b%c04%who%c12 is currently logged in, please wait "
+            + "until they finish their shift";
+
+    /** The manager who is currently logged in. */
+    private static String              loggedInUser;
+
+    /** The map of times manager's have been logged in. */
+    private static Map<String, Double> managerTimes;
+
+    /** The amount of time user has been inactive. */
+    private static int                 inactiveTime;
+
+    /** The channel that is checked for inactivity. */
+    private static String              activityChan;
+
+    /** The channel the manager's can use commands. */
+    private static String              managerChan;
+
+    /** The IRC bot. */
+    private static IrcBot              bot;
+
+    /** Maximum minutes of inactivity. */
+    private static final int           DEFAULTINACTIVETIME = 15;
+
+    /** Timer used to perform checks every minute. */
+    private static Timer               nextMin;
+
+    /** Inactivity timer. */
+    private static Timer               inactive;
+
+    /**
+     * Constructor.
+     * 
+     * @param activechan the channel that is monitorred for activity.
+     * @param managerchan the channell the commands can be used on.
+     * @param irc The irc bot.
+     */
+    public ManagerSystem(final String activechan, final String managerchan,
+            final IrcBot irc) {
+        loggedInUser = null;
+        managerTimes = new HashMap<String, Double>();
+        inactiveTime = DEFAULTINACTIVETIME;
+        activityChan = activechan;
+        managerChan = managerchan;
+        bot = irc;
 
         try {
-            File inifile = new File(FileName);
+            File inifile = new File(FILENAME);
             if (inifile.exists()) {
                 // read from the file
-                Ini ini = new Ini(new FileReader(FileName));
-                LoggedInUser = ini.get("loggedin", "who");
+                Ini ini = new Ini(new FileReader(FILENAME));
+                loggedInUser = ini.get("loggedin", "who");
                 Integer temp = ini.get("inactive", "maxtime", Integer.class);
-                InactiveTime = (temp == null ? DefaultInactiveTime : temp);
+                inactiveTime = DEFAULTINACTIVETIME;
+                if (temp != null) {
+                    inactiveTime = temp;
+                }
 
                 Ini.Section section = ini.get("times");
                 if (section != null) {
                     for (String user : section.keySet()) {
                         Double val = section.get(user, Double.class);
-                        if (val == null) val = 0.0;
-                        ManagerTimes.put(user, val);
+                        if (val == null) {
+                            val = 0.0;
+                        }
+                        managerTimes.put(user, val);
                     }
                 }
             }
@@ -89,124 +147,158 @@ public class ManagerSystem extends Event {
             EventLog.log(e, "ManagerSystem", "ManagerSystem");
         }
 
-        NextMin = new Timer(true);
-        NextMin.scheduleAtFixedRate(new IncreaseTime(), 60 * 1000, 60 * 1000);
+        nextMin = new Timer(true);
+        nextMin.scheduleAtFixedRate(
+                new IncreaseTime(), Utils.MS_IN_MIN, Utils.MS_IN_MIN);
 
-        if (LoggedInUser != null) {
-            Inactive = new Timer(true);
-            Inactive.schedule(new InactiveTask(), InactiveTime * 60 * 1000);
+        if (loggedInUser != null) {
+            inactive = new Timer(true);
+            inactive.schedule(
+                    new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
         }
     }
 
     /**
-     * This method handles the chips command
+     * This method handles the manager commands.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
+     * @param event the message event.
      */
     @Override
-    public void message(Message event) {
-        IrcBot bot = event.getBot();
+    public final void message(final Message event) {
+        IrcBot irc = event.getBot();
         String message = event.getMessage();
         String sender = event.getUser().getNick();
         Channel chan = event.getChannel();
 
-        if (bot.userIsIdentified(sender)) {
-            if (sender.equalsIgnoreCase(LoggedInUser)
-                    && chan.getName().equalsIgnoreCase(ActivityChan)) {
-                Inactive.cancel();
-                Inactive = new Timer(true);
-                Inactive.schedule(new InactiveTask(), InactiveTime * 60 * 1000);
+        if (irc.userIsIdentified(sender)) {
+            if (sender.equalsIgnoreCase(loggedInUser)
+                    && chan.getName().equalsIgnoreCase(activityChan)) {
+                inactive.cancel();
+                inactive = new Timer(true);
+                inactive.schedule(
+                        new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
             }
 
             if (isValidChannel(chan.getName())
-                    && Utils.startsWith(message, OnCommand)) {
-                if (LoggedInUser == null) {
-                    bot.sendIRCMessage(event.getChannel(), NoLoggedOn);
+                    && Utils.startsWith(message, ON_CMD)) {
+                if (loggedInUser == null) {
+                    irc.sendIRCMessage(event.getChannel(), NOLOGGEDON);
                 } else {
-                    bot.sendIRCMessage(event.getChannel(),
-                            LoggedOn.replaceAll("%who", LoggedInUser));
+                    irc.sendIRCMessage(event.getChannel(),
+                            LOGGEDON.replaceAll("%who", loggedInUser));
                 }
-            } else if (ManagerChan.equalsIgnoreCase(chan.getName())
-                    && Utils.startsWith(message, LoginCommand)) {
-                if (LoggedInUser != null) {
-                    bot.sendIRCNotice(sender,
-                            CantLogIn.replaceAll("%who", LoggedInUser));
+            } else if (managerChan.equalsIgnoreCase(chan.getName())
+                    && Utils.startsWith(message, LOGIN_CMD)) {
+                if (loggedInUser != null) {
+                    irc.sendIRCNotice(sender,
+                            CANTLOGIN.replaceAll("%who", loggedInUser));
                 } else {
                     managerLoggedIn(sender);
-                    bot.sendIRCMessage(chan,
-                            LoggedIn.replaceAll("%who", sender));
+                    irc.sendIRCMessage(chan,
+                            LOGGEDIN.replaceAll("%who", sender));
                 }
-            } else if (ManagerChan.equalsIgnoreCase(chan.getName())
-                    && Utils.startsWith(message, LogoutCommand)) {
-                if (LoggedInUser == null
-                        || !LoggedInUser.equalsIgnoreCase(sender)) {
-                    bot.sendIRCNotice(sender, NotLoggedIn);
+            } else if (managerChan.equalsIgnoreCase(chan.getName())
+                    && Utils.startsWith(message, LOGOUT_CMD)) {
+                if (loggedInUser == null
+                        || !loggedInUser.equalsIgnoreCase(sender)) {
+                    irc.sendIRCNotice(sender, NOTLOGGEDON);
                 } else {
                     managerLoggedOut();
-                    bot.sendIRCMessage(chan,
-                            LoggedOut.replaceAll("%who", sender));
+                    irc.sendIRCMessage(chan,
+                            LOGGEDOUT.replaceAll("%who", sender));
                 }
             }
         }
     }
 
-    private static void managerLoggedIn(String who) {
-        if (Inactive != null) Inactive.cancel();
-        Inactive = new Timer(true);
-        Inactive.schedule(new InactiveTask(), InactiveTime * 60 * 1000);
-        LoggedInUser = who;
+    /**
+     * Manager has logged in.
+     * 
+     * @param who the user logging in.
+     */
+    private static void managerLoggedIn(final String who) {
+        if (inactive != null) {
+            inactive.cancel();
+        }
+        inactive = new Timer(true);
+        inactive.schedule(new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
+        loggedInUser = who;
     }
 
+    /**
+     * Manager has logged out.
+     */
     private static void managerLoggedOut() {
-        if (Inactive != null) Inactive.cancel();
-        LoggedInUser = null;
+        if (inactive != null) {
+            inactive.cancel();
+        }
+        loggedInUser = null;
     }
 
+    /**
+     * Checks for inactivity every minute.
+     */
     public static void inactive() {
-        if (Inactive != null) Inactive.cancel();
-        if (LoggedInUser != null) {
-            String out = InactiveLoggedOut.replaceAll("%who", LoggedInUser);
-            out = out.replaceAll("%actchan", ActivityChan);
-            Bot.sendIRCMessage(ManagerChan, out);
+        if (inactive != null) {
+            inactive.cancel();
+        }
+        if (loggedInUser != null) {
+            String out = INACTIVEDLOGGEDOUT.replaceAll("%who", loggedInUser);
+            out = out.replaceAll("%actchan", activityChan);
+            bot.sendIRCMessage(managerChan, out);
             managerLoggedOut();
         }
     }
 
+    /**
+     * Logs the current manager times to the file.
+     */
     public static void nextMinute() {
         checkData();
-        String user = (LoggedInUser == null ? "NOBODY" : LoggedInUser);
-        if (LoggedInUser != null) {
-            Double current = ManagerTimes.get(user);
-            if (current == null) current = 0.0;
-            current += (1.0 / 60.0);
-            ManagerTimes.put(user, current);
+        String user = loggedInUser;
+        if (user == null) {
+            user = "NOBODY";
+        }
+
+        if (loggedInUser != null) {
+            Double current = managerTimes.get(user);
+            if (current == null) {
+                current = 0.0;
+            }
+            current += (1.0 / Utils.MIN_IN_HOUR);
+            managerTimes.put(user, current);
             saveData();
         }
     }
 
+    /**
+     * Check's the manager file exists.
+     */
     private static void checkData() {
-        File inifile = new File(FileName);
+        File inifile = new File(FILENAME);
         if (!inifile.exists()) {
-            ManagerTimes.clear();
+            managerTimes.clear();
             try {
-                if (!inifile.createNewFile()) return;
+                if (!inifile.createNewFile()) {
+                    return;
+                }
             } catch (IOException e) {
                 EventLog.log(e, "ManagerSystem", "checkData");
             }
         }
     }
 
+    /**
+     * Saves the data to a file.
+     */
     private static void saveData() {
         try {
-            File inifile = new File(FileName);
+            File inifile = new File(FILENAME);
             Wini ini = new Wini(inifile);
 
-            ini.put("loggedin", "who", LoggedInUser);
-            ini.put("inactive", "maxtime", InactiveTime);
-            for (Entry<String, Double> entry : ManagerTimes.entrySet()) {
+            ini.put("loggedin", "who", loggedInUser);
+            ini.put("inactive", "maxtime", inactiveTime);
+            for (Entry<String, Double> entry : managerTimes.entrySet()) {
                 ini.put("times", entry.getKey(), entry.getValue());
             }
             ini.store();
@@ -216,6 +308,11 @@ public class ManagerSystem extends Event {
     }
 }
 
+/**
+ * Task to increase logged times every minute.
+ * 
+ * @author Jamie
+ */
 class IncreaseTime extends TimerTask {
     @Override
     public void run() {
@@ -223,6 +320,11 @@ class IncreaseTime extends TimerTask {
     }
 }
 
+/**
+ * Task to check inactivity every minute.
+ * 
+ * @author Jamie
+ */
 class InactiveTask extends TimerTask {
     @Override
     public void run() {

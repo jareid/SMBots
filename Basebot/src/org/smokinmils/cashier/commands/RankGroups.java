@@ -87,7 +87,6 @@ public class RankGroups extends Event {
     /** The command format. */
     private static final String GL_FRMT       = "%b%c12" + GL_CMD + " <group>";
 
-//@formatter:off
     /** Message for un ranked users. */
     private static final String NOT_RANKED    = "%b%c04%who%c12 is "
                                   + "currently not a member of any rank group.";
@@ -143,8 +142,6 @@ public class RankGroups extends Event {
     /** Message when a rank group's user list is requested. */
     private static final String GROUP_LIST    = "%b%c04%sender%c12:"
                          + "%c04%group%c12 rank group contains: %c04%users%c12";
-    
-//@formatter:on
 
     /**
      * This method handles the commands.

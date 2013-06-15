@@ -24,8 +24,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class CompPosition extends Event {
-
-/*@formatter:off*/
     /** The command. */
     public static final String COMMAND           = "!position";
     
@@ -66,7 +64,6 @@ public class CompPosition extends Event {
     /** No competition running message. */
     private static final String       NOCOMPETITION     = "%b%c04%sender:%c12 "
            + "There is no competition running for the %c04%profile%c12 profile";
-    /*@formatter:on*/
 
     /**
      * This method handles the position command.
@@ -130,13 +127,15 @@ public class CompPosition extends Event {
                         if (profile.hasComps()) {
                             try {
                                 BetterInfo highbet = db.getHighestBet(prof,
-                                        sender);
+                                        who);
                                 BetterInfo topbet = db.getTopBetter(prof,
-                                        sender);
+                                        who);
 
                                 if (highbet.getUser() == null
                                         || topbet.getUser() == null) {
                                     out = LAST30DAYS_NODATA;
+                                    out = out.replaceAll("%who",
+                                            who);
                                 } else {
                                     out = LAST30DAYS.replaceAll("%hb_game",
                                             highbet.getGame().toString());

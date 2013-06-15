@@ -28,10 +28,11 @@ import org.smokinmils.logging.EventLog;
  */
 public class Lottery extends Event {
 
+
+
     /** The command. */
     public static final String   COMMAND        = "!ticket";
 
-//@formatter:off
     /** The command description. */
     public static final String   DESC           = "%b%c12Buys a quantity of "
                                      + "lottery tickets for the active profile";
@@ -59,7 +60,6 @@ public class Lottery extends Event {
             + "has begun! It's 1 chip per ticket, %c04%percent%%c01 of the pot "
             + "is paid out. Time to draw: %c04%timeleft%c01. To buy 1 ticket "
             + "with your active profile type %c04%cmd 1";
-//@formatter:on
 
     /** Percentage of tickets given to winner. */
     private static final int     LOTTERYPERCENT = 90;
@@ -69,12 +69,6 @@ public class Lottery extends Event {
 
     /** Denotes if the lottery is enabled or not. */
     private static final boolean ENABLED        = false;
-
-    /** The number of hours in a day. */
-    private static final int     HOUR_IN_DAY    = 24;
-
-    /** The number of mins in an hour. */
-    private static final int     MIN_IN_HOUR    = 60;
 
     /**
      * This method handles the command.
@@ -102,8 +96,8 @@ public class Lottery extends Event {
                         if (amount > chips) {
                             bot.noChips(sender, amount, profile);
                         } else {
-                            boolean res = db.buyLotteryTickets(sender, profile,
-                                    amount);
+                            boolean res = db.buyLotteryTickets(
+                                    sender, profile, amount);
                             if (res) {
                                 announceLottery(bot, profile, chan.getName());
                             } else {
@@ -145,17 +139,10 @@ public class Lottery extends Event {
         int amount = db.getLotteryTickets(profile);
         if (amount > 0) {
             int secs = db.getCompetitionTimeLeft();
-            String fmt = "%%c04%d%%c12 day(s) " + "%%c04%d%%c12 hour(s) "
-                    + "%%c04%d%%c12 min(s)";
-            int day = (MIN_IN_HOUR * MIN_IN_HOUR * HOUR_IN_DAY);
-            int days = secs / day;
-            int hours = (secs % day) / (MIN_IN_HOUR * MIN_IN_HOUR);
-            int mins = ((secs % day) % (MIN_IN_HOUR * MIN_IN_HOUR))
-                    / MIN_IN_HOUR;
-            String duration = String.format(fmt, days, hours, mins);
+            String duration = Utils.secondsToString(secs);
 
-            String out = BOUGHTTICKETS.replaceAll("%profile",
-                    profile.toString());
+            String out = BOUGHTTICKETS.replaceAll(
+                    "%profile", profile.toString());
             out = out.replaceAll("%timeleft", duration);
             out = out.replaceAll("%amount", Integer.toString(amount));
             out = out.replaceAll("%percent", Integer.toString(LOTTERYPERCENT));
@@ -188,11 +175,12 @@ public class Lottery extends Event {
 
                     String winner = db.getLotteryWinner(profile);
 
-                    db.adjustChips(winner, amount, profile, GamesType.LOTTERY,
+                    db.adjustChips(
+                            winner, amount, profile, GamesType.LOTTERY,
                             TransactionType.LOTTERY_WIN);
 
-                    String out = LOTTERYENDED.replaceAll("%profile",
-                            profile.toString());
+                    String out = LOTTERYENDED.replaceAll(
+                            "%profile", profile.toString());
                     out = out.replaceAll("%winner", winner);
                     out = out.replaceAll("%amount", Integer.toString(amount));
                     bot.sendIRCMessage(channel, out);
@@ -222,14 +210,7 @@ public class Lottery extends Event {
         }
 
         int secs = DB.getInstance().getCompetitionTimeLeft();
-
-        String fmt = "%%c04%d%%c12 day(s) " + "%%c04%d%%c12 hour(s) "
-                + "%%c04%d%%c12 min(s)";
-        int day = (MIN_IN_HOUR * MIN_IN_HOUR * HOUR_IN_DAY);
-        int days = secs / day;
-        int hours = (secs % day) / (MIN_IN_HOUR * MIN_IN_HOUR);
-        int mins = ((secs % day) % (MIN_IN_HOUR * MIN_IN_HOUR)) / MIN_IN_HOUR;
-        String duration = String.format(fmt, days, hours, mins);
+        String duration = Utils.secondsToString(secs);
 
         String out = RESET.replaceAll("%timeleft", duration);
         out = out.replaceAll("%percent", Integer.toString(LOTTERYPERCENT));

@@ -1,11 +1,11 @@
 /**
- * This file is part of a commercial IRC bot that 
- * allows users to play online IRC games.
+ * This file is part of a commercial IRC bot that allows users to play online
+ * IRC games.
  * 
  * The project was commissioned by Julian Clark
  * 
  * Copyright (C) 2013 Jamie Reid
- */ 
+ */
 package org.smokinmils.cashier.tasks;
 
 import java.io.FileReader;
@@ -19,98 +19,135 @@ import org.ini4j.Ini;
 import org.ini4j.Profile.Section;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
+
 /**
- * Provides announcements about the betting on an irc server
+ * Provides announcements about the betting on an irc server.
  * 
  * @author Jamie
  */
-public class ManagerAnnounce extends TimerTask {	
-	private IrcBot Bot;
-	private String Channel;
-	private Timer AnnounceTimer;
-	private List<String> Messages;
-	private List<Integer> Intervals;
-	private static final String FileName = "messages.ini";
-	private static final int DefaultInterval = 1;
-	
-	/**
-	 * Constructor
-	 * 
-	 * @param bot
-	 */
-	public ManagerAnnounce(IrcBot bot, String chan) {
-		Bot = bot;
-		Channel = chan;
-		Intervals = new ArrayList<Integer>();
-		Messages = new ArrayList<String>();
-		readData();
-	}
-	
-	/**
-	 * Constructor
-	 * 
-	 * @param bot
-	 */
-	public ManagerAnnounce(IrcBot bot, String chan, List<Integer> intervals,
-							List<String> msgs, int next) {
-		Bot = bot;
-		Channel = chan;
-		Intervals = intervals;
-		Messages = msgs;
-		begin(next);
-	}
-	
-	/**
-	 * Initialise the system
-	 */
-	public void begin(int next) {
-		if (next <= 0) next = DefaultInterval;
-		AnnounceTimer = new Timer(true);
-		AnnounceTimer.schedule( this , next*60*1000);
-	}
-	
-	/**
-	 * (non-Javadoc)
-	 * @see java.util.TimerTask#run()
-	 */
-	public void run() {	
-		String out = null;
-		Integer interval = DefaultInterval;
-		if (Messages.size() >= 1 && Intervals.size() >= 1) {
-			out = Messages.remove(0);
-			interval = Intervals.remove(0); 
-		
-			Bot.sendIRCMessage(Channel, out);
-		}
-		
-		if (Messages.size() == 0) {
-			Intervals.clear();
-			readData();
-		}
-		
-		if (AnnounceTimer != null) AnnounceTimer.cancel();
-		new ManagerAnnounce( Bot, Channel, Intervals, Messages, interval );
-	}
-	
-	private void readData() {
-		try {
-			Ini ini = new Ini( new FileReader( FileName ) );
+public class ManagerAnnounce extends TimerTask {
+    /** The bot that is announcing. */
+    private final IrcBot        bot;
 
-	    	for (String name: ini.keySet()) {
-	    		Section section = ini.get(name);
-	    		String msg = section.get("message");
-	    		Integer interval = section.get("interval", Integer.class);
-	    		if (msg == null) {
-	    			EventLog.log(name + " has no message", "ManagerAnnounce", "readData");
-	    		} else if (interval == null) {
-	    			EventLog.log(name + " has no interval", "ManagerAnnounce", "readData");
-	    		} else {
-	    			Messages.add( msg );
-	    			Intervals.add( interval );
-	    		}
-	    	}
-		} catch (IOException e) {
-			EventLog.log(e, "ManagerAnnounce", "readData");
-		}
-	}
+    /** The channel for the announcements. */
+    private final String        channel;
+
+    /** The timer used to announce. */
+    private Timer               announceTimer;
+
+    /** The list of messages to announce. */
+    private final List<String>  messages;
+
+    /** The list of intervals for each message. */
+    private final List<Integer> intervals;
+
+    /** The file name the messages are stored in. */
+    private static final String FILENAME         = "messages.ini";
+
+    /** The default interval. */
+    private static final int    DEFAULT_INTERVAL = 1;
+
+    /** MS in a minute. */
+    private static final int    MIN              = 60 * 1000;
+
+    /**
+     * Constructor.
+     * 
+     * @param irc The irc bot for this manager system.
+     * @param chan The channel for announcements
+     */
+    public ManagerAnnounce(final IrcBot irc, final String chan) {
+        bot = irc;
+        channel = chan;
+        intervals = new ArrayList<Integer>();
+        messages = new ArrayList<String>();
+        readData();
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param irc The irc bot for this manager system.
+     * @param chan The channel for announcements
+     * @param intervls The intervals between announcements
+     * @param msgs The messages to announce.
+     * @param next The interval to the next announcement.
+     */
+    public ManagerAnnounce(final IrcBot irc, final String chan,
+            final List<Integer> intervls, final List<String> msgs,
+            final int next) {
+        bot = irc;
+        channel = chan;
+        intervals = intervls;
+        messages = msgs;
+        begin(next);
+    }
+
+    /**
+     * Initialise the system.
+     * @param next the interval between announcements.
+     */
+    public final void begin(final int next) {
+        int interval = next;
+        if (interval <= 0) {
+            interval = DEFAULT_INTERVAL;
+        }
+        announceTimer = new Timer(true);
+        announceTimer.schedule(this, next * MIN);
+    }
+
+    /**
+     * (non-Javadoc).
+     * @see java.util.TimerTask#run()
+     */
+    @Override
+    public final void run() {
+        String out = null;
+        Integer interval = DEFAULT_INTERVAL;
+        if (messages.size() >= 1 && intervals.size() >= 1) {
+            out = messages.remove(0);
+            interval = intervals.remove(0);
+
+            bot.sendIRCMessage(channel, out);
+        }
+
+        if (messages.size() == 0) {
+            intervals.clear();
+            readData();
+        }
+
+        if (announceTimer != null) {
+            announceTimer.cancel();
+        }
+        new ManagerAnnounce(bot, channel, intervals, messages, interval);
+    }
+
+    /**
+     * Read the logged in managers from file.
+     */
+    private void readData() {
+        try {
+            Ini ini = new Ini(new FileReader(FILENAME));
+
+            for (String name : ini.keySet()) {
+                Section section = ini.get(name);
+                String msg = section.get("message");
+                Integer interval = section.get("interval", Integer.class);
+                if (msg == null) {
+                    EventLog.log(
+                            name + " has no message", "ManagerAnnounce",
+                            "readData");
+                } else if (interval == null) {
+                    EventLog.log(
+                            name + " has no interval", "ManagerAnnounce",
+                            "readData");
+                } else {
+                    messages.add(msg);
+                    intervals.add(interval);
+                }
+            }
+        } catch (IOException e) {
+            EventLog.log(e, "ManagerAnnounce", "readData");
+        }
+    }
 }

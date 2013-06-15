@@ -25,8 +25,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class CheckChips extends Event {
-
-/*@formatter:off*/
     /** The command. */
 	public static final String COMMAND = "!check";
 
@@ -50,8 +48,6 @@ public class CheckChips extends Event {
 	/** Used to specify the user has no credits. */
 	public static final String NOCREDITS = "%b%c04%sender: %user %c12currently "
 	                                     + "has %c04no%c12 available chips.";
-	
-/*@formatter:on*/
 
     /**
      * This method handles the chips command.
@@ -104,10 +100,8 @@ public class CheckChips extends Event {
 
                     if (creds.size() > 1) {
                         credstr += " and ";
-                        //@formatter:off
                         for (Entry<ProfileType, Double> cred 
                                 : creds.entrySet()) {
-                        //@formatter:on
                             if (cred.getKey().compareTo(active) != 0) {
                                 String othercred = OTHERPROFILES.replaceAll(
                                         "%name", cred.getKey().toString());

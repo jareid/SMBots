@@ -27,16 +27,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class GroupReferal extends Event {
-
-
-
-
-
-
-
-
-
-//@formatter:off
     /** The refer command. */
     private static final String REF_CMD           = "!grefer";
     
@@ -96,7 +86,7 @@ public class GroupReferal extends Event {
     /** Size of the first line of check. */
     private static final int FIRST_LINE = 20;
 
-//@formatter:off
+
     /**
      * This method handles the commands.
      * 

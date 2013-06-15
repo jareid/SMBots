@@ -21,11 +21,9 @@ import org.smokinmils.cashier.rake.Rake;
  * @author Jamie
  */
 public class Jackpots extends Event {
-
     /** The command. */
     public static final String COMMAND   = "!jackpots";
-
-//@formatter:off
+    
     /** The command description. */
     public static final String DESC      = "b%c12Lists all the jackpot totals "
          + "for each profile. Each poker hand and bet has a chance of winning!";
@@ -37,7 +35,6 @@ public class Jackpots extends Event {
     public static final String INFO_LINE = "%b%c12The current jackpot sizes "
                        + "are: %jackpots. Every poker hand and bet has a chance"
                        + " to win the jackpot.";
-  //@formatter:on
 
     /**
      * This method handles the command.

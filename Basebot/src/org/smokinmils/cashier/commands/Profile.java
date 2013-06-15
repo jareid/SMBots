@@ -25,8 +25,7 @@ public class Profile extends Event {
 
     /** The command. */
     public static final String COMMAND           = "!profile";
-
-//@formatter:off
+    
     /** The command description. */
     public static final String DESCR             = "%b%c12Changes the active "
                                                  + "profile for you";
@@ -45,7 +44,6 @@ public class Profile extends Event {
     public static final String PROFILECHANGE_FAIL = "%b%c04%user %c12tried to"
                               + " change to the %c04%profile%c12 game profile "
                               + "and it failed. Please try again!";
-//@formatter:on
 
     /**
      * This method handles the command.

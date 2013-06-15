@@ -14,52 +14,111 @@ import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
-import org.smokinmils.database.DBException;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 
+/**
+ * Class the provide a roulette game.
+ * 
+ * @author Jamie
+ */
 public class DiceDuel extends Event {
+    /** The dd command. */
     private static final String  BET_CMD         = "!dd";
+    
+    /** The cancel command. */
     private static final String  CXL_CMD         = "!ddcancel";
+    
+    /** The call command. */
     private static final String  CALL_CMD        = "!call";
 
-    private static final String  INVALID_BET     = "%b%c12\"%c04!dd <amount> %c12\". Error, Invalid Bet";
-    private static final String  INVALID_BETSIZE = "%b%c12You have to bet more than %c040%c12!";
-    private static final String  BET_CANCELLED   = "%b%c04%username%c12: Cancelled your open wager";
-    private static final String  OPEN_WAGER      = "%b%c04%username%c12: You already have a wager open, Type %c04!ddcancel %c12to cancel it";
-    private static final String  NO_WAGER        = "%b%c04%username%c12: I can't find a record of that wager";
-    private static final String  NO_CHIPS        = "%b%c04%username%c12: You do not have enough chips for that!";
-    private static final String  NO_SELFPLAY     = "%b%c04%username%c12: You can't play against yourself!";
-    private static final String  NEW_WAGER       = "%b%c04%username%c12 has opened a new dice duel wager of %c04%amount %proftype%c12  chips! To call this wager type %c04!call %username";
-    private static final String  PLAY_VS         = "%b%c04%username%c12: you need to use play chips to call a play chips dd!";
-    private static final String  REAL_VS         = "%b%c04%username%c12: you need to use real chips to call a real chips dd!";
-    private static final String  ROLL            = "%b%c04%winner%c12 rolled %c04%windice%c12, %c04%loser%c12 rolled %c04%losedice%c12. %c04%winner%c12 wins the %c04%amount%c12 chip pot!";
-    private static final String  OPEN_WAGERS     = "%b%c12Current open wagers: %wagers. To call a wager type %c04!call <name>";
-    private static final String  WAGER           = "%c04%username%c12(%c04%amount %proftype%c12) ";
+    /** THe invalid bet message. */
+    private static final String  INVALID_BET     = "%b%c12\"%c04!dd <amount> "
+                                                 + "%c12\". Error, Invalid Bet";
+    
+    /** The invalid bet size message. */
+    private static final String  INVALID_BETSIZE = "%b%c12You have to bet more"
+                                                 + "than %c040%c12!";
+    
+    /** The bet cancelled message. */
+    private static final String  BET_CANCELLED   = "%b%c04%username%c12: "
+                                                 + "Cancelled your open wager";
+    
+    /** The message when you already have a bet open. */
+    private static final String  OPEN_WAGER      = "%b%c04%username%c12: "
+         + "You already have a wager open, Type %c04!ddcancel %c12to cancel it";
+    
+    /** No bet exsits message. */
+    private static final String  NO_WAGER        = "%b%c04%username%c12: "
+                                        + "I can't find a record of that wager";
+    
+    /** Not enough chips message. */
+    private static final String  NO_CHIPS        = "%b%c04%username%c12: "
+                                     + "You do not have enough chips for that!";
+    
+    /** Can't play against yourself message. */
+    private static final String  NO_SELFPLAY     = "%b%c04%username%c12: "
+                                           + "You can't play against yourself!";
+    
+    /** New bet made message.*/
+    private static final String  NEW_WAGER       = "%b%c04%username%c12 has "
+           + "opened a new dice duel wager of %c04%amount %proftype%c12  chips!"
+           + "To call this wager type %c04!call %username";
+    
+    /** Play vs real message. */
+    private static final String  PLAY_VS         = "%b%c04%username%c12: you "
+                            + "need to use play chips to call a play chips dd!";
+    
+    /** Real vs play message. */
+    private static final String  REAL_VS         = "%b%c04%username%c12: you "
+                            + "need to use real chips to call a real chips dd!";
+    
+    /** Bet called message. */
+    private static final String  ROLL            = "%b%c04%winner%c12 rolled "
+                 + "%c04%windice%c12, %c04%loser%c12 rolled %c04%losedice%c12. "
+                 + "%c04%winner%c12 wins the %c04%amount%c12 chip pot!";
+    
+    /** Open wages list message. */
+    private static final String  OPEN_WAGERS     = "%b%c12Current open wagers: "
+                             + "%wagers. To call a wager type %c04!call <name>";
+    
+    /** Open wage line. */
+    private static final String  WAGER           = "%c04%username%c12(%c04"
+                                                 + "%amount %proftype%c12) ";
 
-    private static final int     AnnounceDelay   = 3;
+    /** Minutes between announcements. */
+    private static final int     ANNOUNCEDELAY   = 3;
+
+    /** Random number. */
+    private static final int    RANDOM = 6;
+    
+    /** All the open bets. */
     private final ArrayList<Bet> openBets;
 
     /**
      * Constructor.
      * 
+     * @param bot    The irc bot.
      * @param channel The channel the game will run on
      */
-    public DiceDuel(IrcBot bot, String channel) {
+    public DiceDuel(final IrcBot bot, final String channel) {
         openBets = new ArrayList<Bet>();
 
         Timer announce = new Timer(true);
-        announce.scheduleAtFixedRate(new Announce(bot, channel),
-                AnnounceDelay * 60 * 1000, AnnounceDelay * 60 * 1000);
+        announce.scheduleAtFixedRate(
+                new Announce(bot, channel), ANNOUNCEDELAY * Utils.MS_IN_MIN,
+                ANNOUNCEDELAY * Utils.MS_IN_MIN);
     }
 
     /**
-     * This method handles the roulette commands
+     * This method handles the dice duel commands.
+     * 
+     * @param event the message event.
      */
     @Override
-    public void message(Message event) {
+    public final void message(final Message event) {
         String message = event.getMessage();
         String sender = event.getUser().getNick();
 
@@ -80,9 +139,16 @@ public class DiceDuel extends Event {
             }
         }
     }
-
-    private void dd(Message event)
-        throws DBException, SQLException {
+    
+    /**
+     * This method handles the dd command.
+     * 
+     * @param event the message event.
+     * 
+     * @throws SQLException when the system failed to perform db tasks
+     */
+    private void dd(final Message event)
+        throws SQLException {
         String username = event.getUser().getNick();
         DB db = DB.getInstance();
         String[] msg = event.getMessage().split(" ");
@@ -96,7 +162,8 @@ public class DiceDuel extends Event {
             boolean found = false;
             for (Bet bet : openBets) {
                 if (bet.getUser().equalsIgnoreCase(username)) {
-                    bot.sendIRCMessage(channel,
+                    bot.sendIRCMessage(
+                            channel,
                             OPEN_WAGER.replaceAll("%username", username));
                     found = true;
                 }
@@ -115,17 +182,20 @@ public class DiceDuel extends Event {
                     ProfileType profile = db.getActiveProfile(username);
                     Bet bet = new Bet(username, profile, betsize, "");
                     openBets.add(bet);
-                    db.adjustChips(username, -betsize, profile,
-                            GamesType.DICE_DUEL, TransactionType.BET);
-                    db.addBet(username, "", amount, profile,
-                            GamesType.DICE_DUEL);
+                    db.adjustChips(
+                            username, -betsize, profile, GamesType.DICE_DUEL,
+                            TransactionType.BET);
+                    db.addBet(
+                            username, "", amount, profile, GamesType.DICE_DUEL);
 
                     String out = NEW_WAGER.replaceAll("%username", username);
-                    out = out.replaceAll("%amount",
-                            Utils.chipsToString(betsize));
-                    out = out.replaceAll("%proftype",
-                            (bet.getProfile() == ProfileType.PLAY ? "play"
-                                    : "real"));
+                    out = out.replaceAll(
+                            "%amount", Utils.chipsToString(betsize));
+                    String ptype = "real";
+                    if (bet.getProfile() == ProfileType.PLAY) {
+                        ptype = "play";
+                    }
+                    out = out.replaceAll("%proftype", ptype);
                     bot.sendIRCMessage(channel, out);
                 } else {
                     bot.sendIRCMessage(channel,
@@ -135,8 +205,15 @@ public class DiceDuel extends Event {
         }
     }
 
-    private void call(Message event)
-        throws DBException, SQLException {
+    /**
+     * This method handles the call command.
+     * 
+     * @param event the message event.
+     * 
+     * @throws SQLException when the system failed to perform db tasks
+     */
+    private void call(final Message event)
+        throws SQLException {
         String username = event.getUser().getNick();
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
@@ -144,17 +221,20 @@ public class DiceDuel extends Event {
 
         DB db = DB.getInstance();
         String p1 = username; // user who is calling
-        String p2 = msg.length < 2 ? null : msg[1];
+        String p2 =  null;
+        if (msg.length >= 2) {
+            p2 = msg[1];
+        }
 
         // check to see if someone is playing themselves...
         if (p1.equalsIgnoreCase(p2)) {
-            bot.sendIRCMessage(channel,
-                    NO_SELFPLAY.replaceAll("%username", username));
+            bot.sendIRCMessage(
+                    channel, NO_SELFPLAY.replaceAll("%username", username));
         } else if (p2 != null) {
             Bet found = null;
             boolean foundb = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().equalsIgnoreCase(p2) && bet.isValid()) {
+                if (bet.getUser().equalsIgnoreCase(p2)) {
                     found = bet;
                     foundb = true;
                     ProfileType p1prof = db.getActiveProfile(p1);
@@ -162,31 +242,35 @@ public class DiceDuel extends Event {
                     // quick hax to check if play chips vs non-play chips!
                     if (p1prof != ProfileType.PLAY
                             && bet.getProfile() == ProfileType.PLAY) {
-                        bot.sendIRCMessage(channel,
+                        bot.sendIRCMessage(
+                                channel,
                                 PLAY_VS.replaceAll("%username", username));
                         found = null;
                     } else if (p1prof == ProfileType.PLAY
                             && bet.getProfile() != ProfileType.PLAY) {
-                        bot.sendIRCMessage(channel,
+                        bot.sendIRCMessage(
+                                channel,
                                 REAL_VS.replaceAll("%username", username));
                         found = null;
                     } else if (db.checkCredits(p1) < bet.getAmount()) {
-                        bot.sendIRCMessage(channel,
+                        bot.sendIRCMessage(
+                                channel,
                                 NO_CHIPS.replaceAll("%username", username));
                         found = null;
                     } else {
                         // play this wager
                         // add a transaction for the 2nd player to call
-                        db.adjustChips(p1, -bet.getAmount(), p1prof,
+                        db.adjustChips(
+                                p1, -bet.getAmount(), p1prof,
                                 GamesType.DICE_DUEL, TransactionType.BET);
 
                         int d1 = 0;
                         int d2 = 0;
                         do {
-                            d1 = (Random.nextInt(6) + 1)
-                                    + (Random.nextInt(6) + 1); // p1
-                            d2 = (Random.nextInt(6) + 1)
-                                    + (Random.nextInt(6) + 1); // p2
+                            d1 = (Random.nextInt(RANDOM) + 1)
+                                    + (Random.nextInt(RANDOM) + 1); // p1
+                            d2 = (Random.nextInt(RANDOM) + 1)
+                                    + (Random.nextInt(RANDOM) + 1); // p2
                         } while (d1 == d2); // re-roll until winner
 
                         String winner = "";
@@ -205,12 +289,13 @@ public class DiceDuel extends Event {
                             winnerProfile = bet.getProfile();
                         }
 
-                        double rake = Rake.getRake(winner, bet.getAmount(),
-                                winnerProfile)
-                                + Rake.getRake(loser, bet.getAmount(),
-                                        loserProfile);
+                        double rake = Rake.getRake(
+                                winner, bet.getAmount(), winnerProfile)
+                                + Rake.getRake(
+                                        loser, bet.getAmount(), loserProfile);
                         double win = (bet.getAmount() * 2) - rake;
-                        db.adjustChips(winner, win, winnerProfile,
+                        db.adjustChips(
+                                winner, win, winnerProfile,
                                 GamesType.DICE_DUEL, TransactionType.WIN);
 
                         db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
@@ -222,23 +307,33 @@ public class DiceDuel extends Event {
                                                                   // nice
                             ArrayList<String> players = new ArrayList<String>();
                             players.add(loser);
-                            Rake.jackpotWon(loserProfile, GamesType.DICE_DUEL,
-                                    players, bot, null);
+                            Rake.jackpotWon(
+                                    loserProfile, GamesType.DICE_DUEL, players,
+                                    bot, null);
                         } else if (Rake.checkJackpot(bet.getAmount())) {
                             ArrayList<String> players = new ArrayList<String>();
                             players.add(winner);
-                            Rake.jackpotWon(winnerProfile, GamesType.DICE_DUEL,
+                            Rake.jackpotWon(
+                                    winnerProfile, GamesType.DICE_DUEL,
                                     players, bot, null);
+                        }
+                        
+                        int losed = d1;
+                        int wind = d1;
+                        if (d1 > d2) {
+                            losed = d2;
+                        } else if (d1 < d2) {
+                            wind = d2;
                         }
 
                         String out = ROLL.replaceAll("%winner", winner);
                         out = out.replaceAll("%loser", loser);
-                        out = out.replaceAll("%amount",
-                                Utils.chipsToString(win));
+                        out = out.replaceAll(
+                                "%amount", Utils.chipsToString(win));
                         out = out.replaceAll("%windice",
-                                Integer.toString((d1 > d2 ? d1 : d2)));
+                                Integer.toString(wind));
                         out = out.replaceAll("%losedice",
-                                Integer.toString((d1 < d2 ? d1 : d2)));
+                                Integer.toString(losed));
                         bot.sendIRCMessage(channel, out);
                     }
                     break;
@@ -247,8 +342,8 @@ public class DiceDuel extends Event {
 
             if (!foundb) {
                 // if we reach here the game doesn't exist
-                bot.sendIRCMessage(channel,
-                        NO_WAGER.replaceAll("%username", username));
+                bot.sendIRCMessage(
+                        channel, NO_WAGER.replaceAll("%username", username));
             }
 
             if (found != null) {
@@ -256,9 +351,16 @@ public class DiceDuel extends Event {
             }
         }
     }
-
-    private void cancel(Message event)
-        throws DBException, SQLException {
+    
+    /**
+     * This method handles the cancel command.
+     * 
+     * @param event the message event.
+     * 
+     * @throws SQLException when the system failed to perform db tasks
+     */
+    private void cancel(final Message event)
+        throws SQLException {
         String username = event.getUser().getNick();
         String channel = event.getChannel().getName();
 
@@ -266,34 +368,45 @@ public class DiceDuel extends Event {
         // try to locate and cancel the bet else ignore
         Bet found = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().equalsIgnoreCase(username) && bet.isValid()) {
-                bet.invalidate();
-                db.adjustChips(username, bet.getAmount(), bet.getProfile(),
+            if (bet.getUser().equalsIgnoreCase(username)) {
+                db.adjustChips(
+                        username, bet.getAmount(), bet.getProfile(),
                         GamesType.DICE_DUEL, TransactionType.CANCEL);
                 found = bet;
 
                 db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
 
-                event.getBot().sendIRCMessage(channel,
+                event.getBot().sendIRCMessage(
+                        channel,
                         BET_CANCELLED.replaceAll("%username", username));
                 break;
             }
         }
-        if (found != null) openBets.remove(found);
+        if (found != null) {
+            openBets.remove(found);
+        }
     }
 
     /**
-     * Simple extension to time task to deal with game triggers
+     * Simple extension to time task to deal with game triggers.
      * 
      * @author cjc
      */
     class Announce extends TimerTask {
-        private final IrcBot bot;
+        /** The IRC bot. */
+        private final IrcBot irc;
+        
+        /** The IRC channel. */
         private final String channel;
 
-        public Announce(IrcBot bot, String channel) {
-            this.bot = bot;
-            this.channel = channel;
+        /**
+         * Constructor.
+         * @param ib   The irc bot/server.
+         * @param chan The channel.
+         */
+        public Announce(final IrcBot ib, final String chan) {
+            irc = ib;
+            channel = chan;
         }
 
         @Override
@@ -301,16 +414,19 @@ public class DiceDuel extends Event {
             if (openBets.size() > 0) {
                 String wagers = "";
                 for (Bet bet : openBets) {
-                    wagers += WAGER.replaceAll("%proftype",
-                            (bet.getProfile() == ProfileType.PLAY) ? "play"
-                                    : "real");
+                    String prof = "play";
+                    if (bet.getProfile() != ProfileType.PLAY) {
+                        prof = "real";
+                    }
+
+                    wagers += WAGER.replaceAll("%proftype", prof);
                     wagers = wagers.replaceAll("%username", bet.getUser());
-                    wagers = wagers.replaceAll("%amount",
-                            Utils.chipsToString(bet.getAmount()));
+                    wagers = wagers.replaceAll(
+                            "%amount", Utils.chipsToString(bet.getAmount()));
                 }
                 String line = OPEN_WAGERS.replaceAll("%wagers", wagers);
 
-                bot.sendIRCMessage(channel, line);
+                irc.sendIRCMessage(channel, line);
             }
         }
     }

@@ -26,8 +26,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class GiveChips extends Event {
-
-    /*@formatter:off*/
     /** The command. */
     public static final String  COMMAND     = "!chips";
 
@@ -49,7 +47,6 @@ public class GiveChips extends Event {
     /** Message sent to the user on success. */
     private static final String GIVECHIPSPM = "%b%c12You have had "
       + "%c04%amount%c12 chips deposited into your account by %c04%sender%c12";
-    /*@formatter:on*/
 
     /**
      * This method handles the chips command.
@@ -67,7 +64,7 @@ public class GiveChips extends Event {
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
 
-            if (bot.userIsOp(event.getUser(), chan.getName())) {
+            if (bot.userIsHalfOp(event.getUser(), chan.getName())) {
                 if (msg.length == CMD_LEN) {
                     String user = msg[1];
                     Double amount = Utils.tryParseDbl(msg[CMD_LEN - 2]);

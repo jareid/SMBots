@@ -1,0 +1,26 @@
+9:50:07: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+9:50:07: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+9:50:07: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+9:50:07: Question->load() :: test3 has no question
+9:50:07: Question->load() :: test4 has no answer
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+9:50:07: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:47:34: Room->run() :: Fatal Exception: java.lang.NullPointerException

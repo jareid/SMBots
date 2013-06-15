@@ -105,8 +105,8 @@ public final class DB {
      * @throws Exception when we fail to retrieve a connection
      */
     private DB() throws Exception {
-        unpooled = DataSources.unpooledDataSource(url, DBSettings.DB_USER,
-                DBSettings.DB_PASS);
+        unpooled = DataSources.unpooledDataSource(
+                url, DBSettings.DB_USER, DBSettings.DB_PASS);
         pooled = DataSources.pooledDataSource(unpooled);
     }
 
@@ -581,7 +581,8 @@ public final class DB {
                 throw new DBException(e.getMessage(), sqlsel);
             }
             while (rs.next()) {
-                adjustChips(rs.getString("ut." + UsersTable.COL_USERNAME),
+                adjustChips(
+                        rs.getString("ut." + UsersTable.COL_USERNAME),
                         rs.getInt(BetsTable.COL_AMOUNT),
                         ProfileType.fromString(rs
                                 .getString(ProfileTypeTable.COL_NAME)),
@@ -646,9 +647,11 @@ public final class DB {
             }
 
             while (rs.next()) {
-                String updsqlinst = updsql.replaceAll("%amount",
+                String updsqlinst = updsql.replaceAll(
+                        "%amount",
                         Integer.toString(rs.getInt(PokerBetsTable.COL_AMOUNT)));
-                updsqlinst = updsqlinst.replaceAll("%user_id",
+                updsqlinst = updsqlinst.replaceAll(
+                        "%user_id",
                         Integer.toString(rs.getInt(PokerBetsTable.COL_USERID)));
                 updsqlinst = updsqlinst.replaceAll("%type_id", Integer
                         .toString(rs.getInt(PokerBetsTable.COL_PROFILEID)));
@@ -718,10 +721,7 @@ public final class DB {
      * @return The list of profile types
      * 
      * @throws SQLException when a database error occurs
-     * 
-     * @deprecated
      */
-    @Deprecated
     public int getProfileID(final ProfileType profile)
         throws SQLException {
         return runGetIntQuery(getProfileIDSQL(profile));
@@ -779,9 +779,11 @@ public final class DB {
         }
         runBasicQuery(updminussql);
 
-        addTransaction(sender, (0 - amount), GamesType.ADMIN,
+        addTransaction(
+                sender, (0 - amount), GamesType.ADMIN,
                 TransactionType.TRANSFER, profile);
-        addTransaction(user, amount, GamesType.ADMIN, TransactionType.TRANSFER,
+        addTransaction(
+                user, amount, GamesType.ADMIN, TransactionType.TRANSFER,
                 profile);
     }
 
@@ -904,7 +906,8 @@ public final class DB {
                 + getProfileIDSQL(proftype) + ")";
 
         runBasicQuery(sql);
-        addTransaction(username, amount, GamesType.POKER,
+        addTransaction(
+                username, amount, GamesType.POKER,
                 TransactionType.POKER_CASHOUT, proftype);
     }
 
@@ -978,8 +981,9 @@ public final class DB {
 
         runBasicQuery(sql);
         runBasicQuery(reset);
-        addTransaction(username, amount, GamesType.ADMIN,
-                TransactionType.JACKPOT, proftype);
+        addTransaction(
+                username, amount, GamesType.ADMIN, TransactionType.JACKPOT,
+                proftype);
     }
 
     /**
@@ -1006,7 +1010,8 @@ public final class DB {
                 + getProfileIDSQL(proftype) + ")";
 
         runBasicQuery(sql);
-        addTransaction(username, -amount, GamesType.POKER,
+        addTransaction(
+                username, -amount, GamesType.POKER,
                 TransactionType.POKER_BUYIN, proftype);
     }
 
@@ -1395,7 +1400,8 @@ public final class DB {
                                      final ProfileType profile,
                                      final int amount)
         throws SQLException {
-        adjustChips(username, (0 - amount), profile, GamesType.LOTTERY,
+        adjustChips(
+                username, (0 - amount), profile, GamesType.LOTTERY,
                 TransactionType.LOTTERY);
 
         String sql = "INSERT INTO " + LotteryTicketsTable.NAME + " ("
@@ -1875,8 +1881,8 @@ public final class DB {
                                final String user,
                                final ProfileType profile)
         throws SQLException {
-        adjustChips(user, fee, profile, GamesType.ADMIN,
-                TransactionType.REFERRAL);
+        adjustChips(
+                user, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
     }
 
     /**
@@ -1891,7 +1897,8 @@ public final class DB {
                           final ProfileType profile)
         throws SQLException {
         checkUserExists("HOUSE", "HOUSE!HOUSE@HOUSE");
-        adjustChips("HOUSE", fee, profile, GamesType.ADMIN,
+        adjustChips(
+                "HOUSE", fee, profile, GamesType.ADMIN,
                 TransactionType.REFERRAL);
     }
 

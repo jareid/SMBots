@@ -42,10 +42,10 @@ public class IrcBot extends PircBotX {
 	       + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 	
 	/** List of users identified with NickServ. */
-	private List<String> identifiedUsers;
+	private final List<String> identifiedUsers;
 	
 	/** List of channels. */
-	private List<String> validChannels;
+	private final List<String> validChannels;
 	
 	/**
 	 * Constructor.
@@ -63,7 +63,8 @@ public class IrcBot extends PircBotX {
 	 * 
 	 * @return The name of the server
 	 */
-	public final String getServer() {
+	@Override
+    public final String getServer() {
 		return BaseBot.getInstance().getServer(this);
 	}
 	

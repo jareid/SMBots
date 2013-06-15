@@ -19,8 +19,6 @@ import org.smokinmils.bot.events.Message;
  * @author Jamie
  */
 public class Profiles extends Event {
- 
-    /*@formatter:off*/
     /** The command. */
     public static final String        COMMAND           = "!profiles";
     
@@ -40,7 +38,6 @@ public class Profiles extends Event {
     public static final String        PROFILECHANGEFAIL = 
             "%b%c04%user %c12tried to change to the %c04%profile%c12 game "
             + " profile and it failed. Please try again!";
-    /*@formatter:on*/
 
     /**
      * This method handles the command.

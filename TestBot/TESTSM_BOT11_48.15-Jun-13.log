@@ -1,0 +1,56 @@
+11:48:23: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Question->load() :: test3 has no question
+11:48:23: Question->load() :: test4 has no answer
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:48:23: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:23: Client->newTable() :: INFO: Creating new table...
+11:48:24: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+11:48:24: CheckIdentified->sendStatusRequest() :: INFO: JReid identified
+11:48:31: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of `Sonic`
+11:48:33: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:10: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:16: CheckUser::CheckIdentified->call() :: INFO: `Sonic` identified
+11:49:18: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:49:18: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:49:19: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:26: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:32: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:38: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:44: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Sonic
+11:49:46: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:49:54: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:50:00: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:06: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:50:14: Room->run() :: Fatal Exception: java.lang.NullPointerException

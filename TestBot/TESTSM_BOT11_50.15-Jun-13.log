@@ -1,0 +1,72 @@
+11:50:17: SMBaseBot->addChannel() :: DEBUG Joined #testeroo on SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Client->newTable() :: INFO: Creating new table...
+11:50:17: Question->load() :: test3 has no question
+11:50:17: Question->load() :: test4 has no answer
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: ManagerSystem->ManagerSystem() :: Exception: org.ini4j.InvalidFileFormatException: parse error (at line: 9): = 0.016666666666666666
+11:50:17: ManagerSystem->ManagerSystem() :: org.ini4j.InvalidFileFormatException: parse error (at line: 9): = 0.016666666666666666
+	at org.ini4j.spi.AbstractParser.parseError(AbstractParser.java:53)
+	at org.ini4j.spi.AbstractParser.parseOptionLine(AbstractParser.java:96)
+	at org.ini4j.spi.IniParser.parse(IniParser.java:101)
+	at org.ini4j.spi.IniParser.parse(IniParser.java:62)
+	at org.ini4j.Ini.load(Ini.java:109)
+	at org.ini4j.Ini.<init>(Ini.java:50)
+	at org.smokinmils.cashier.ManagerSystem.<init>(ManagerSystem.java:128)
+	at org.smokinmils.bots.Bot.main(Bot.java:92)
+
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:17: SMBaseBot->addListener() :: DEBUG Added new listener for SwiftIRC
+11:50:31: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+11:51:02: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:04: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of `Sonic`
+11:51:04: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+11:51:04: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+11:51:10: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:16: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:28: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:31: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:37: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:47: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:50: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of Sonic
+11:51:53: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:55: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of SM_BOT
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckUser::CheckIdentified->call() :: INFO: SM_BOT identified
+11:51:58: CheckIdentified->sendStatusRequest() :: INFO: SM_BOT identified
+11:52:07: CheckUser::CheckIdentified->call() :: INFO: `Sonic` identified
+11:52:23: CheckUser::CheckIdentified->call() :: INFO: Sonic identified
+11:53:03: CheckUser::CheckIdentified->call() :: DEBUG Checking the status of JReid
+11:53:04: CheckUser::CheckIdentified->call() :: INFO: JReid identified
+11:53:04: CheckIdentified->sendStatusRequest() :: INFO: JReid identified

@@ -29,7 +29,6 @@ public class TransferChips extends Event {
     /** The command. */
     public static final String  COMMAND             = "!transfer";
 
-//@formatter:off
     /** The command description. */
     public static final String  DESCRIPTION         = "%b%c12Transfer an "
                         + "amount of chips from a profile to another user";
@@ -59,7 +58,6 @@ public class TransferChips extends Event {
     private static final String TRANSFERCHIPSSENDER = "%b%c12You have "
                 + "transferred %c04%amount%c12 chips from your %c04%profile%c12"
                 + " account to %c04%who%c12";
-//@formatter:on
 
     /**
      * This method handles the command.
