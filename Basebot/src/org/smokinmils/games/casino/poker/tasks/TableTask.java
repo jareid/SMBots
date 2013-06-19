@@ -57,6 +57,6 @@ public class TableTask extends TimerTask {
      */
     @Override
     public final void run() {
-        table.addEvent(taskName, "", "", "", EventType.TIMER);
+        table.addEvent(taskName, EventType.TIMER);
     }
 }

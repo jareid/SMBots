@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -45,7 +46,7 @@ public class Jackpots extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
         Channel chan = event.getChannel();
 
         if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)

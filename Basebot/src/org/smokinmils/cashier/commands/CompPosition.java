@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -74,10 +75,12 @@ public class CompPosition extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
         Channel chan = event.getChannel();
 
-        if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)
+        if (isValidChannel(chan.getName())
+                && bot.userIsIdentified(senderu)
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
             if (msg.length == 2 || msg.length == CMD_LEN) {
@@ -149,7 +152,7 @@ public class CompPosition extends Event {
                                 out = out.replaceAll("%profile",
                                         prof.toString());
 
-                                bot.sendIRCNotice(sender, out);
+                                bot.sendIRCNotice(senderu, out);
                             } catch (Exception e) {
                                 EventLog.log(e, "BetDetails", "run");
                             }
@@ -157,7 +160,7 @@ public class CompPosition extends Event {
                     }
                 }
             } else {
-                bot.invalidArguments(sender, FORMAT);
+                bot.invalidArguments(senderu, FORMAT);
             }
         }
     }

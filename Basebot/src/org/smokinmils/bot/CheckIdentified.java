@@ -71,8 +71,8 @@ public class CheckIdentified extends Event {
             + "for specific topics listed. If you need any help just ask in "
             + "the channel. We hope that you enjoy your stay!";
     
-    /** Contains a seperate thread to process identification checks. */
-    private CheckUserQueue checkThread;
+    /** Contains a separate thread to process identification checks. */
+    private final CheckUserQueue checkThread;
     
     /**
      * Constructor.
@@ -90,7 +90,7 @@ public class CheckIdentified extends Event {
     public final void action(final Action event) {
         IrcBot bot = event.getBot();
         User user = event.getUser();
-        if (!bot.userIsIdentified(user.getNick())) {
+        if (!bot.userIsIdentified(user)) {
             checkThread.addUser(user);
         }
     }
@@ -99,12 +99,13 @@ public class CheckIdentified extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         User user = event.getUser();
-        if (!bot.userIsIdentified(user.getNick())
+        boolean test = bot.userIsIdentified(user);
+        if (!test
                 && event.getMessage().startsWith("!")) {
             checkThread.addUser(user);
             // If we already told this user, don't tell them again
             if (!sentNoIdent.contains(user.getNick())) {
-                bot.sendIRCMessage(user.getNick(), NOT_IDENTIFIED_MSG);
+                bot.sendIRCMessage(user, NOT_IDENTIFIED_MSG);
                 sentNoIdent.add(user.getNick());
             }
         }
@@ -114,7 +115,7 @@ public class CheckIdentified extends Event {
     public final void privateMessage(final PrivateMessage event) {
         IrcBot bot = event.getBot();
         User user = event.getUser();
-        if (!bot.userIsIdentified(user.getNick())) {
+        if (!bot.userIsIdentified(user)) {
             checkThread.addUser(user);
         }
     }
@@ -167,6 +168,18 @@ public class CheckIdentified extends Event {
     }
     
     /**
+     * Sends a request to NickServ to check a user's status with the server
+     * and waits for the response.
+     * 
+     * @param user the username
+     * 
+     * @return true if the user meets the required status
+     */
+    public final boolean manualStatusRequest(final User user) {
+        return checkThread.manualStatusRequest(user);
+    }
+    
+    /**
      * A separate class that is used to process identification checks
      * 
      * This is a thread safe class that processes events using a queue system.
@@ -175,16 +188,16 @@ public class CheckIdentified extends Event {
      */
     final class CheckUserQueue extends Thread {
         /** A queue of events users to be checked. */
-        private Deque<User> users;
+        private final Deque<User> users;
         
         /** The IRC bot used to check. */
-        private IrcBot bot;
+        private final IrcBot bot;
         
         /** A map that stores when this user last requested an ident check. */
-        private Map<User, Long> userMap;
+        private final Map<User, Long> userMap;
         
         /** The number of milliseconds to wait for network services responses.*/
-        private static final int WAIT_MS = 2500;
+        private static final int WAIT_MS = 3500;
         
         /** A message for when the network services don't respond. */
         private static final String NO_SERVICES = "%b%c12The IRC Network "
@@ -212,12 +225,13 @@ public class CheckIdentified extends Event {
          * (non-Javadoc)
          * @see java.lang.Thread#run()
          */
+        @Override
         public void run() {
             boolean interuptted = false;
             while (!(Thread.interrupted() || interuptted)) { 
                 if (!users.isEmpty()) {
                     User user = users.removeFirst();
-                    sendStatusRequest(user.getNick(), user.getHostmask());
+                    sendStatusRequest(user);
                 }
                 
                 try {
@@ -237,7 +251,7 @@ public class CheckIdentified extends Event {
          * 
          * @return true if the user meets the required status
          */
-        public Boolean checkIdentified(final String user) {
+        public Boolean checkIdentified(final User user) {
             Boolean ret = null;
             ExecutorService executor = Executors.newFixedThreadPool(1);
             FutureTask<Boolean> choicetask =
@@ -260,28 +274,46 @@ public class CheckIdentified extends Event {
          * Sends a request to NickServ to check a user's status with the server
          * and waits for the response.
          * 
-         * @param user     The username
-         * @param hostmask The user's hostmask
+         * @param user the username
+         * 
+         * @return true if the user meets the required status
          */
-        private void sendStatusRequest(final String user,
-                                       final String hostmask) {
+        public boolean manualStatusRequest(final User user) {
+            Boolean ident = sendStatusRequest(user);
+            boolean ret = false;
+            if (ident) {
+                ret = true;
+            }
+            return ret;
+        }
+        
+        /**
+         * Sends a request to NickServ to check a user's status with the server
+         * and waits for the response.
+         * 
+         * @param user     The user
+         * 
+         * @return true if successful, false if not identified, null if failed.
+         */
+        private Boolean sendStatusRequest(final User user) {
             Boolean identd = checkIdentified(user);
             // Only add users with the correct levels
             if (identd == null) {
                 bot.sendIRCMessage(user, NO_SERVICES);
             } else if (identd) {
-                EventLog.info(user + " identified", "CheckIdentified",
+                EventLog.info(user.getNick() + " identified", "CheckIdentified",
                               "sendStatusRequest");
                 sentNoIdent.remove(user);
                 try {
-                    UserCheck res = DB.getInstance().checkUserExists(user,
-                                                                     hostmask);
+                    UserCheck res = DB.getInstance()
+                           .checkUserExists(user.getNick(), user.getHostmask());
                     if (res == UserCheck.FAILED) {
                         bot.sendIRCMessage(user, TOO_MANY_ACCS);
                     } else {
                         bot.addIdentifiedUser(user);
                         if (res == UserCheck.CREATED) {
-                            String out = WELCOME_MSG.replaceAll("%user", user);
+                            String out = WELCOME_MSG.replaceAll("%user",
+                                                                user.getNick());
                             bot.sendIRCNotice(user, out);
                         }
                     }
@@ -289,6 +321,7 @@ public class CheckIdentified extends Event {
                     EventLog.log(e, "CheckIdentified", "sendStatusRequest");
                 }
             }
+            return identd;
         }
         
         /**
@@ -332,18 +365,18 @@ class CheckUser implements Callable<Boolean> {
     private static final int STATUS_RESP_LEN = 3;
     
     /** The IRC Bot that this check is being performed on. */
-    private IrcBot bot;
+    private final IrcBot bot;
     
-    /** The user's nickname to check. */
-    private String user;
+    /** The user to check. */
+    private final User user;
     
     /**
      * Constructor.
      * 
      * @param irc   The irc bot
-     * @param usr  The username to check
+     * @param usr  The user to check
      */
-    public CheckUser(final IrcBot irc, final String usr) {
+    public CheckUser(final IrcBot irc, final User usr) {
         bot = irc;
         user = usr;
     }
@@ -355,13 +388,15 @@ class CheckUser implements Callable<Boolean> {
      *  @return true if they are identified, false if they aren't and null if
      *           the check failed.
      */
+    @Override
     @SuppressWarnings("unchecked")
     public Boolean call() {
-        EventLog.debug("Checking the status of " + user,
+        EventLog.debug("Checking the status of " + user.getNick(),
                 "CheckUser::CheckIdentified", "call");
         
         WaitForQueue queue = new WaitForQueue(bot);
-        bot.sendRawLine("PRIVMSG NickServ " + NICKSERV_STATUS + " " + user);
+        bot.sendRaw().rawLine("PRIVMSG NickServ "
+                                + NICKSERV_STATUS + " " + user.getNick());
         
         boolean received = false;
         Boolean ret = false;
@@ -382,13 +417,13 @@ class CheckUser implements Callable<Boolean> {
             if (Utils.startsWith(currentEvent.getMessage(), NICKSERV_STATUS)
                 && currentEvent.getUser().getNick().equalsIgnoreCase(NICKSERV)
                  && msg.length == STATUS_RESP_LEN
-                 && msg[1].equalsIgnoreCase(user)) {
+                 && msg[1].equalsIgnoreCase(user.getNick())) {
                 Integer code = Utils.tryParse(msg[2]);
                 
                 // Only add users with the correct levels
                 if (code >= STATUS_REQD) {
-                    EventLog.info(user + " identified",
-                            "CheckUser::CheckIdentified", "call");
+                    EventLog.info(user.getNick() + " identified",
+                                          "CheckUser::CheckIdentified", "call");
                     ret = true;
                 }
                 queue.close();

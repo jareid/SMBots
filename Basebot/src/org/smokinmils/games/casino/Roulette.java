@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
@@ -20,6 +21,7 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
+import org.smokinmils.settings.Variables;
 
 /**
  * Class the provide a roulette game.
@@ -196,7 +198,7 @@ public class Roulette extends Event {
     @Override
     public final void message(final Message event) {
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
 
         synchronized (BaseBot.getLockObject()) {
             if (channel.equalsIgnoreCase(event.getChannel().getName())
@@ -225,7 +227,8 @@ public class Roulette extends Event {
         throws SQLException {
         // if we are not accepting bets
         DB db = DB.getInstance();
-        String username = event.getUser().getNick();
+        User user = event.getUser();
+        String username = user.getNick();
         String[] msg = event.getMessage().split(" ");
 
         if (state == CLOSE) {
@@ -251,10 +254,16 @@ public class Roulette extends Event {
                         .equalsIgnoreCase("odd")) || (choicenum != null
                     && choicenum >= 0 && choicenum <= NUMBER))) {
                 bot.sendIRCNotice(username, INVALID_BET);
+            } else if ((choicenum != null
+                        && choicenum >= 0 && choicenum <= NUMBER)
+                    && amount > Variables.MAXBET_ROUL_NUM) {
+                bot.maxBet(user, event.getChannel(), Variables.MAXBET_ROUL_NUM);
+            } else if (amount > Variables.MAXBET) {
+                bot.maxBet(user, event.getChannel(), Variables.MAXBET);
             } else if (betsize <= 0.0) {
                 bot.sendIRCNotice(username, NO_CHIPS);
             } else {
-                Bet bet = new Bet(username, profile, betsize, choice);
+                Bet bet = new Bet(user, profile, betsize, choice);
                 allBets.add(bet);
                 db.adjustChips(
                         username, -betsize, profile, GamesType.ROULETTE,
@@ -279,26 +288,35 @@ public class Roulette extends Event {
      */
     private void cancel(final Message event)
         throws SQLException {
-        DB db = DB.getInstance();
-        boolean found = false;
-
-        String username = event.getUser().getNick();
-
-        for (Bet bet : allBets) {
-            if (bet.getUser().equalsIgnoreCase(username)) {
-                found = true;
-                db.adjustChips(
-                        username, bet.getAmount(), bet.getProfile(),
-                        GamesType.ROULETTE, TransactionType.CANCEL);
+            DB db = DB.getInstance();
+            if (state == CLOSE) {
+                bot.sendIRCMessage(channel, BETS_CLOSED);
+            } else {
+            User user = event.getUser();
+            String username = event.getUser().getNick();
+            List<Bet> found = new ArrayList<Bet>();
+            for (Bet bet : allBets) {
+                if (bet.getUser().compareTo(user) == 0) {
+                    found.add(bet);
+                    db.adjustChips(
+                            username, bet.getAmount(), bet.getProfile(),
+                            GamesType.ROULETTE, TransactionType.CANCEL);
+                }
+            }
+            
+    
+            if (found.size() > 0) {
+                db.deleteBet(username, GamesType.ROULETTE);
+                
+                for (Bet bet: found)  {
+                    allBets.remove(bet);
+                }
+                
+                bot.sendIRCMessage(channel,
+                        BETS_CANCELLED.replaceAll("%username", username));
             }
         }
 
-        if (found) {
-            db.deleteBet(username, GamesType.ROULETTE);
-        }
-
-        bot.sendIRCMessage(
-                channel, BETS_CANCELLED.replaceAll("%username", username));
     }
 
     /**
@@ -367,7 +385,8 @@ public class Roulette extends Event {
         for (Bet bet : allBets) {
             String choice = bet.getChoice();
             Integer choicenum = Utils.tryParse(choice);
-            String user = bet.getUser();
+            User user = bet.getUser();
+            String username = user.getNick();
             ProfileType profile = bet.getProfile();
             
             int winamount = 0;
@@ -399,24 +418,23 @@ public class Roulette extends Event {
             }
 
             if (win) {
-                if (!nameList.contains(user)) {
-                    nameList.add(user);
+                if (!nameList.contains(username)) {
+                    nameList.add(username);
                 }
 
-                db.adjustChips(
-                        user, bet.getAmount() * winamount, profile,
+                db.adjustChips(username, bet.getAmount() * winamount, profile,
                         GamesType.ROULETTE, TransactionType.WIN);
             }
-            Rake.getRake(user, bet.getAmount(), profile);
+            Rake.getRake(username, bet.getAmount(), profile);
 
             double amount = bet.getAmount();
             if (Rake.checkJackpot(amount)) {
                 ArrayList<String> players = new ArrayList<String>();
-                players.add(user);
+                players.add(username);
                 Rake.jackpotWon(profile, GamesType.ROULETTE,
                                 players, bot, null);
             }
-            db.deleteBet(bet.getUser(), GamesType.ROULETTE);
+            db.deleteBet(username, GamesType.ROULETTE);
         }
 
         // Construct the winning string

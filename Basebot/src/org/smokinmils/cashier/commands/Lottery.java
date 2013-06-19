@@ -11,6 +11,7 @@ package org.smokinmils.cashier.commands;
 import java.sql.SQLException;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -27,9 +28,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class Lottery extends Event {
-
-
-
     /** The command. */
     public static final String   COMMAND        = "!ticket";
 
@@ -79,10 +77,12 @@ public class Lottery extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
         Channel chan = event.getChannel();
 
-        if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)
+        if (isValidChannel(chan.getName())
+                && bot.userIsIdentified(senderu)
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
             if (msg.length == 2) {
@@ -94,7 +94,7 @@ public class Lottery extends Event {
                         int chips = db.checkCreditsAsInt(sender);
                         ProfileType profile = db.getActiveProfile(sender);
                         if (amount > chips) {
-                            bot.noChips(sender, amount, profile);
+                            bot.noChips(senderu, amount, profile);
                         } else {
                             boolean res = db.buyLotteryTickets(
                                     sender, profile, amount);
@@ -110,10 +110,10 @@ public class Lottery extends Event {
                         EventLog.log(e, "TransferChips", "message");
                     }
                 } else {
-                    bot.invalidArguments(sender, FORMAT);
+                    bot.invalidArguments(senderu, FORMAT);
                 }
             } else {
-                bot.invalidArguments(sender, FORMAT);
+                bot.invalidArguments(senderu, FORMAT);
             }
         }
     }

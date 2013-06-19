@@ -38,6 +38,6 @@ public class Disconnect extends DisconnectEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.DisconnectEvent
 	 */
 	public Disconnect(final DisconnectEvent<IrcBot> event) {
-		super(event.getBot());
+		super(event.getBot(), event.getDaoSnapshot());
 	}
 }

@@ -19,7 +19,6 @@ import org.smokinmils.cashier.commands.GiveChips;
 import org.smokinmils.cashier.commands.GroupReferal;
 import org.smokinmils.cashier.commands.Jackpots;
 import org.smokinmils.cashier.commands.Payout;
-import org.smokinmils.cashier.commands.Profile;
 import org.smokinmils.cashier.commands.Profiles;
 import org.smokinmils.cashier.commands.RankGroups;
 import org.smokinmils.cashier.commands.Referral;
@@ -59,7 +58,7 @@ public class Bot {
         
         BaseBot basebot = BaseBot.getInstance();
         boolean debug = true;
-        boolean refund = true;
+        boolean refund = false;
         basebot.initialise("TESTSM_BOT", "5w807", "smokinmils", debug, refund);
         String swift_irc = "SwiftIRC";
         basebot.addServer(swift_irc, server, 6667);
@@ -70,6 +69,8 @@ public class Bot {
         String[] host_swift_chans = { "#testeroo" };
         String[] mgrs_swift_chans = { "#testeroo" };
         String poker_lobby_swift = "#testeroo";
+        
+        Thread.sleep(250); // wait for some time to allow bot to connect.
 
         for (String chan : all_swift_chans) {
             basebot.addChannel(swift_irc, chan);
@@ -102,7 +103,6 @@ public class Bot {
                 new ManagerSystem("#testeroo", "#testeroo", swift_bot),
                 all_swift_chans);
         basebot.addListener(swift_irc, new Payout(), all_swift_chans);
-        basebot.addListener(swift_irc, new Profile(), all_swift_chans);
         basebot.addListener(swift_irc, new Profiles(), all_swift_chans);
         basebot.addListener(swift_irc, new TransferChips(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);

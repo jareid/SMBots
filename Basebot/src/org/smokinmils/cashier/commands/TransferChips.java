@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
@@ -69,10 +70,11 @@ public class TransferChips extends Event {
         synchronized (BaseBot.getLockObject()) {
             IrcBot bot = event.getBot();
             String message = event.getMessage();
-            String sender = event.getUser().getNick();
+            User senderu = event.getUser();
+            String sender = senderu.getNick();
             Channel chan = event.getChannel();
 
-            if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)
+            if (isValidChannel(chan.getName()) && bot.userIsIdentified(senderu)
                     && Utils.startsWith(message, COMMAND)) {
                 String[] msg = message.split(" ");
 
@@ -85,25 +87,25 @@ public class TransferChips extends Event {
                     if (!user.isEmpty() && !user.equals(sender)
                             && amount != null) {
                         // Check valid profile
-                        if (!bot.userIsIdentified(user)) {
+                        if (!bot.userIsIdentified(user)
+                                && bot.manualStatusRequest(user)) {
                             String out = CheckIdentified.NOT_IDENTIFIED
                                     .replaceAll("%user", user);
-                            bot.sendIRCMessage(sender, out);
+                            bot.sendIRCMessage(senderu, out);
                         } else if (profile == null) {
-                            bot.sendIRCMessage(chan.getName(),
-                                    IrcBot.VALID_PROFILES);
+                            bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                         } else {
                             try {
                                 int chips = DB.getInstance().checkCreditsAsInt(
                                         sender, profile);
                                 if (amount > chips || amount < 0) {
-                                    bot.noChips(sender, amount, profile);
+                                    bot.noChips(senderu, amount, profile);
                                 } else if (!DB.getInstance().checkUserExists(
                                         user)) {
                                     String out = NO_USER.replaceAll("%who",
                                             user);
                                     out = out.replaceAll("%sender", sender);
-                                    bot.sendIRCMessage(chan.getName(), out);
+                                    bot.sendIRCMessage(chan, out);
                                 } else {
                                     DB.getInstance().transferChips(sender,
                                             user, amount, profile);
@@ -116,7 +118,7 @@ public class TransferChips extends Event {
                                             Integer.toString(amount));
                                     out = out.replaceAll("%profile",
                                             profile.toString());
-                                    bot.sendIRCMessage(chan.getName(), out);
+                                    bot.sendIRCMessage(chan, out);
 
                                     // Send notice to sender
                                     out = TRANSFERCHIPSUSER.replaceAll("%who",
@@ -136,17 +138,17 @@ public class TransferChips extends Event {
                                             Integer.toString(amount));
                                     out = out.replaceAll("%profile",
                                             profile.toString());
-                                    bot.sendIRCNotice(sender, out);
+                                    bot.sendIRCNotice(senderu, out);
                                 }
                             } catch (Exception e) {
                                 EventLog.log(e, "TransferChips", "message");
                             }
                         }
                     } else {
-                        bot.invalidArguments(sender, FORMAT);
+                        bot.invalidArguments(senderu, FORMAT);
                     }
                 } else {
-                    bot.invalidArguments(sender, FORMAT);
+                    bot.invalidArguments(senderu, FORMAT);
                 }
             }
         }

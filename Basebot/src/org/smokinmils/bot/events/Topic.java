@@ -29,8 +29,9 @@ public class Topic extends TopicEvent<IrcBot> {
      * @see org.pircbotx.hooks.type.TopicEvent
 	 */
 	public Topic(final TopicEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getTopic(),
-			  event.getUser(), event.getDate(), event.isChanged());
+		super(event.getBot(), event.getChannel(), event.getOldTopic(),
+		      event.getTopic(), event.getUser(),
+		      event.getDate(), event.isChanged());
 	}
 
 }

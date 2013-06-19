@@ -30,7 +30,7 @@ public class Op extends OpEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.OpEvent
 	 */
 	public Op(final OpEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getSource(),
+		super(event.getBot(), event.getChannel(), event.getUser(),
 				event.getRecipient(), event.isOp()); 
 	}
 

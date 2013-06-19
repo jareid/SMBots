@@ -28,7 +28,7 @@ public class Voice extends VoiceEvent<IrcBot> {
 	 */
 	public Voice(final VoiceEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(),
-		      event.getSource(), event.getRecipient(),
+		      event.getUser(), event.getRecipient(),
 		      event.hasVoice());
 	}
 

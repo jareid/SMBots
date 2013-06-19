@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -57,14 +58,16 @@ public class GiveChips extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
         Channel chan = event.getChannel();
 
-        if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)
+        if (isValidChannel(chan.getName())
+                && bot.userIsIdentified(sender)
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
 
-            if (bot.userIsHalfOp(event.getUser(), chan.getName())) {
+            if (bot.userIsHalfOp(sender, chan.getName())
+                    || bot.userIsOp(event.getUser(), chan.getName())) {
                 if (msg.length == CMD_LEN) {
                     String user = msg[1];
                     Double amount = Utils.tryParseDbl(msg[CMD_LEN - 2]);
@@ -73,9 +76,10 @@ public class GiveChips extends Event {
 
                     if (amount != null && amount > 0) {
                         // Check valid profile
-                        if (!bot.userIsIdentified(user)) {
+                        if (!bot.userIsIdentified(user)
+                                && bot.manualStatusRequest(user)) {
                             String out = CheckIdentified.NOT_IDENTIFIED
-                                    .replaceAll("%user", user);
+                                                     .replaceAll("%user", user);
                             bot.sendIRCMessage(sender, out);
                         } else if (profile != null) {
                             boolean success = false;
@@ -91,15 +95,18 @@ public class GiveChips extends Event {
                                 String out = GIVECHIPS.replaceAll("%amount",
                                         Utils.chipsToString(amount));
                                 out = out.replaceAll("%who", user);
-                                out = out.replaceAll("%sender", sender);
+                                out = out.replaceAll("%sender",
+                                                     sender.getNick());
                                 out = out.replaceAll("%profile",
-                                        profile.toString());
+                                                     profile.toString());
+                                
                                 bot.sendIRCMessage(chan.getName(), out);
 
                                 out = GIVECHIPSPM.replaceAll("%amount",
                                         Utils.chipsToString(amount));
                                 out = out.replaceAll("%who", user);
-                                out = out.replaceAll("%sender", sender);
+                                out = out.replaceAll("%sender",
+                                                     sender.getNick());
                                 out = out.replaceAll("%profile",
                                         profile.toString());
                                 bot.sendIRCNotice(user, out);
@@ -113,10 +120,10 @@ public class GiveChips extends Event {
                                     IrcBot.VALID_PROFILES);
                         }
                     } else {
-                        bot.invalidArguments(sender, FORMAT);
+                        bot.invalidArguments(event.getUser(), FORMAT);
                     }
                 } else {
-                    bot.invalidArguments(sender, FORMAT);
+                    bot.invalidArguments(event.getUser(), FORMAT);
                 }
             } else {
                 EventLog.info(sender + " attempted to give someone chips",

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.smokinmils.bot.Utils;
 import org.smokinmils.database.tables.BetsTable;
 import org.smokinmils.database.tables.CompetitionIDTable;
 import org.smokinmils.database.tables.CompetitionView;
@@ -58,6 +59,9 @@ import com.mchange.v2.c3p0.DataSources;
  * @author Jamie Reid
  */
 public final class DB {
+    /** Number of minutes the connections can be idle for. */
+    private static final int MAX_IDLE_MINS = 15;
+
     /** Instance variable. */
     private static DB instance;
     static {
@@ -85,10 +89,10 @@ public final class DB {
 
     /** The database URL. */
     private final String        url         = "jdbc:mysql://"
-                                                    + DBSettings.SERVER + ":"
-                                                    + DBSettings.PORT + "/"
-                                                    + DBSettings.DB_NAME
-                                                    + "?autoReconnect=true";
+                                            + DBSettings.SERVER + ":"
+                                            + DBSettings.PORT + "/"
+                                            + DBSettings.DB_NAME
+                                            + "?autoReconnect=true";
 
     /** This is used to adjust bets to compare against one. */
     private static final double CHIPS_ONE   = 1.0;
@@ -103,11 +107,23 @@ public final class DB {
      * Constructor.
      * 
      * @throws Exception when we fail to retrieve a connection
+     * 
+     * TODO: clean up datasources with a close method.
+     *  see http://www.mchange.com/projects/c3p0/
      */
     private DB() throws Exception {
-        unpooled = DataSources.unpooledDataSource(
-                url, DBSettings.DB_USER, DBSettings.DB_PASS);
-        pooled = DataSources.pooledDataSource(unpooled);
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("minPoolSize", "12");
+        props.put("initialPoolSize", "12");
+        props.put("maxPoolSize", "30");
+        props.put("numHelperThreads", "12");
+        props.put("aquireIncrement", "5");
+        props.put("maxIdleTime", new Integer(MAX_IDLE_MINS * Utils.MS_IN_MIN));
+        
+        unpooled = DataSources.unpooledDataSource(url,
+                                                  DBSettings.DB_USER,
+                                                  DBSettings.DB_PASS);
+        pooled = DataSources.pooledDataSource(unpooled, props);
     }
 
     /**

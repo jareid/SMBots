@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
@@ -18,6 +20,7 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
+import org.smokinmils.settings.Variables;
 
 /**
  * Class the provide a roulette game.
@@ -120,7 +123,7 @@ public class DiceDuel extends Event {
     @Override
     public final void message(final Message event) {
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
 
         synchronized (BaseBot.getLockObject()) {
             if (isValidChannel(event.getChannel().getName())
@@ -149,11 +152,12 @@ public class DiceDuel extends Event {
      */
     private void dd(final Message event)
         throws SQLException {
-        String username = event.getUser().getNick();
+        User user = event.getUser();
+        String username = user.getNick();
         DB db = DB.getInstance();
         String[] msg = event.getMessage().split(" ");
         IrcBot bot = event.getBot();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length < 2) {
             bot.sendIRCMessage(channel, INVALID_BET);
@@ -161,9 +165,8 @@ public class DiceDuel extends Event {
             // check if they already have an openbet
             boolean found = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().equalsIgnoreCase(username)) {
-                    bot.sendIRCMessage(
-                            channel,
+                if (bet.getUser().compareTo(user) == 0) {
+                    bot.sendIRCMessage(channel,
                             OPEN_WAGER.replaceAll("%username", username));
                     found = true;
                 }
@@ -177,10 +180,12 @@ public class DiceDuel extends Event {
                     bot.sendIRCMessage(channel, INVALID_BET);
                 } else if (amount <= 0) {
                     bot.sendIRCMessage(channel, INVALID_BETSIZE);
+                } else if (amount > Variables.MAXBET) {
+                    bot.maxBet(user, channel, Variables.MAXBET);
                 } else if (betsize > 0.0) { // add bet, remove chips,notify
                                             // channel
                     ProfileType profile = db.getActiveProfile(username);
-                    Bet bet = new Bet(username, profile, betsize, "");
+                    Bet bet = new Bet(user, profile, betsize, "");
                     openBets.add(bet);
                     db.adjustChips(
                             username, -betsize, profile, GamesType.DICE_DUEL,
@@ -214,7 +219,8 @@ public class DiceDuel extends Event {
      */
     private void call(final Message event)
         throws SQLException {
-        String username = event.getUser().getNick();
+        User user = event.getUser();
+        String username = user.getNick();
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         String channel = event.getChannel().getName();
@@ -234,7 +240,7 @@ public class DiceDuel extends Event {
             Bet found = null;
             boolean foundb = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().equalsIgnoreCase(p2)) {
+                if (bet.getUser().getNick().equalsIgnoreCase(p2)) {
                     found = bet;
                     foundb = true;
                     ProfileType p1prof = db.getActiveProfile(p1);
@@ -298,7 +304,7 @@ public class DiceDuel extends Event {
                                 winner, win, winnerProfile,
                                 GamesType.DICE_DUEL, TransactionType.WIN);
 
-                        db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
+                        db.deleteBet(username, GamesType.DICE_DUEL);
 
                         // jackpot stuff
                         if (Rake.checkJackpot(bet.getAmount())) { // loser
@@ -361,23 +367,23 @@ public class DiceDuel extends Event {
      */
     private void cancel(final Message event)
         throws SQLException {
-        String username = event.getUser().getNick();
+        User user = event.getUser();
+        String username = user.getNick();
         String channel = event.getChannel().getName();
 
         DB db = DB.getInstance();
         // try to locate and cancel the bet else ignore
         Bet found = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().equalsIgnoreCase(username)) {
+            if (bet.getUser().compareTo(user) == 0) {
                 db.adjustChips(
                         username, bet.getAmount(), bet.getProfile(),
                         GamesType.DICE_DUEL, TransactionType.CANCEL);
                 found = bet;
 
-                db.deleteBet(bet.getUser(), GamesType.DICE_DUEL);
+                db.deleteBet(username, GamesType.DICE_DUEL);
 
-                event.getBot().sendIRCMessage(
-                        channel,
+                event.getBot().sendIRCMessage(channel,
                         BET_CANCELLED.replaceAll("%username", username));
                 break;
             }
@@ -420,9 +426,10 @@ public class DiceDuel extends Event {
                     }
 
                     wagers += WAGER.replaceAll("%proftype", prof);
-                    wagers = wagers.replaceAll("%username", bet.getUser());
-                    wagers = wagers.replaceAll(
-                            "%amount", Utils.chipsToString(bet.getAmount()));
+                    wagers = wagers.replaceAll("%username",
+                                               bet.getUser().getNick());
+                    wagers = wagers.replaceAll("%amount",
+                                        Utils.chipsToString(bet.getAmount()));
                 }
                 String line = OPEN_WAGERS.replaceAll("%wagers", wagers);
 

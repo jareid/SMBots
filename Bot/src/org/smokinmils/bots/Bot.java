@@ -19,7 +19,6 @@ import org.smokinmils.cashier.commands.GiveChips;
 import org.smokinmils.cashier.commands.GroupReferal;
 import org.smokinmils.cashier.commands.Jackpots;
 import org.smokinmils.cashier.commands.Payout;
-import org.smokinmils.cashier.commands.Profile;
 import org.smokinmils.cashier.commands.Profiles;
 import org.smokinmils.cashier.commands.RankGroups;
 import org.smokinmils.cashier.commands.Referral;
@@ -114,7 +113,6 @@ public class Bot {
                 new ManagerSystem("#SMGamer", "#managers", swift_bot),
                 all_swift_chans);
         basebot.addListener(swift_irc, new Payout(), all_swift_chans);
-        basebot.addListener(swift_irc, new Profile(), all_swift_chans);
         basebot.addListener(swift_irc, new Profiles(), all_swift_chans);
         basebot.addListener(swift_irc, new TransferChips(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);

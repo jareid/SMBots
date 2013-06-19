@@ -29,7 +29,7 @@ public class UserMode extends UserModeEvent<IrcBot> {
      * @see org.pircbotx.hooks.type.UserModeEvent
 	 */
 	public UserMode(final UserModeEvent<IrcBot> event) {
-		super(event.getBot(), event.getTarget(),
-		      event.getSource(), event.getMode());
+		super(event.getBot(), event.getUser(),
+		      event.getRecipient(), event.getMode());
 	}
 }

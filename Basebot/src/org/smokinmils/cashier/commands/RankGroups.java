@@ -12,12 +12,14 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ReferalUser;
+import org.smokinmils.database.types.ReferrerType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -46,6 +48,16 @@ public class RankGroups extends Event {
 
     /** The command length. */
     private static final int     RR_CMD_LEN    = 3;
+    
+    /** The remove referrer command. */
+    private static final String AR_CMD        = "!addref";
+
+    /** The command format. */
+    private static final String AR_FRMT       = "%b%c12" + AR_CMD
+                                                      + " <user> <referrer>";
+
+    /** The command length. */
+    private static final int     AR_CMD_LEN    = 3;
 
     /** The new group command. */
     private static final String NEW_CMD       = "!newgroup";
@@ -142,7 +154,19 @@ public class RankGroups extends Event {
     /** Message when a rank group's user list is requested. */
     private static final String GROUP_LIST    = "%b%c04%sender%c12:"
                          + "%c04%group%c12 rank group contains: %c04%users%c12";
+    
+    /** Message when informing you can't self refer. */
+    private static final String NO_SELF = "%b%c04%sender%c12: " 
+                                        + "You can not be your own referrer.";
+    
+    /** Message when the add refer is successful. */
+    private static final String ADDSUCCESS = "%b%c04%sender%c12: Succesfully"
+                            + " added %c04%ref%c12 as %c04%user's%c12 referer.";
 
+    /** Message when the referral failed. */
+    private static final String ADDFAILED  = "%b%c04%sender%c12: "
+                                        + "%c04%who%c12 already has a referrer.";
+    
     /**
      * This method handles the commands.
      * 
@@ -152,7 +176,7 @@ public class RankGroups extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
         Channel chan = event.getChannel();
 
         if (bot.userIsIdentified(sender) && isValidChannel(chan.getName())) {
@@ -173,6 +197,8 @@ public class RankGroups extends Event {
                     groupList(event);
                 } else if (Utils.startsWith(message, RR_CMD)) {
                     removeReferrer(event);
+                } else if (Utils.startsWith(message, AR_CMD)) {
+                    addReferrer(event);
                 }
             } catch (Exception e) {
                 EventLog.log(e, "RankGroups", "message");
@@ -191,7 +217,7 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
         String channel = event.getChannel().getName();
 
         if (msg.length == 2) {
@@ -203,14 +229,14 @@ public class RankGroups extends Event {
                 bot.sendIRCMessage(channel, NOT_RANKED.replaceAll("%who", who));
             } else {
                 String group = db.getRankGroup(who);
-                db.kickRank(sender);
+                db.kickRank(who);
 
                 String out = KICKED.replaceAll("%who", who);
                 out = out.replaceAll("%group", group);
                 bot.sendIRCMessage(channel, out);
             }
         } else {
-            bot.invalidArguments(sender, KIK_FRMT);
+            bot.invalidArguments(senderu, KIK_FRMT);
         }
     }
 
@@ -225,7 +251,6 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
 
         if (msg.length == ADD_CMD_LEN) {
@@ -253,7 +278,7 @@ public class RankGroups extends Event {
                 bot.sendIRCMessage(channel, out);
             }
         } else {
-            bot.invalidArguments(sender, ADD_FRMT);
+            bot.invalidArguments(event.getUser(), ADD_FRMT);
         }
     }
 
@@ -268,7 +293,6 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
 
         if (msg.length == 2) {
@@ -283,7 +307,7 @@ public class RankGroups extends Event {
                         GROUP_DELETED.replaceAll("%group", group));
             }
         } else {
-            bot.invalidArguments(sender, DEL_FRMT);
+            bot.invalidArguments(event.getUser(), DEL_FRMT);
         }
     }
 
@@ -298,7 +322,6 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
 
         if (msg.length == 2) {
@@ -313,7 +336,7 @@ public class RankGroups extends Event {
                         GROUP_CREATED.replaceAll("%group", group));
             }
         } else {
-            bot.invalidArguments(sender, NEW_FRMT);
+            bot.invalidArguments(event.getUser(), NEW_FRMT);
         }
     }
 
@@ -328,7 +351,6 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
 
         if (msg.length == REN_CMD_LEN) {
@@ -349,7 +371,7 @@ public class RankGroups extends Event {
                 bot.sendIRCMessage(channel, out);
             }
         } else {
-            bot.invalidArguments(sender, REN_FRMT);
+            bot.invalidArguments(event.getUser(), REN_FRMT);
         }
     }
 
@@ -373,7 +395,7 @@ public class RankGroups extends Event {
             out = out.replaceAll("%groups", Utils.listToString(groups));
             bot.sendIRCMessage(channel, out);
         } else {
-            bot.invalidArguments(sender, GRPS_FRMT);
+            bot.invalidArguments(event.getUser(), GRPS_FRMT);
         }
     }
 
@@ -405,7 +427,7 @@ public class RankGroups extends Event {
                 bot.sendIRCMessage(channel, out);
             }
         } else {
-            bot.invalidArguments(sender, GL_FRMT);
+            bot.invalidArguments(event.getUser(), GL_FRMT);
         }
     }
 
@@ -420,7 +442,6 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
         String channel = event.getChannel().getName();
 
         if (msg.length == RR_CMD_LEN) {
@@ -452,7 +473,56 @@ public class RankGroups extends Event {
                 }
             }
         } else {
-            bot.invalidArguments(sender, RR_FRMT);
+            bot.invalidArguments(event.getUser(), RR_FRMT);
+        }
+    }
+    
+    /**
+     * Handles the referral command.
+     * 
+     * @param event the message event
+     * 
+     * @throws SQLException on a database error
+     */
+    private void addReferrer(final Message event)
+        throws SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
+        Channel channel = event.getChannel();
+
+        if (msg.length == AR_CMD_LEN) {
+            DB db = DB.getInstance();
+            ReferrerType reftype = db.getRefererType(sender);
+            String user = msg[1];
+            String ref = msg[2];
+            if (reftype == ReferrerType.NONE) {
+                if (ref.equalsIgnoreCase(user)) {
+                    String out = NO_SELF.replaceAll("%sender", sender);
+                    bot.sendIRCMessage(channel, out);
+                } else if (!db.checkUserExists(ref)) {
+                    String out = NO_USER.replaceAll("%sender", sender);
+                    out = out.replaceAll("%who", ref);
+                    bot.sendIRCMessage(channel, out);
+                } else if (!db.checkUserExists(user)) {
+                    String out = NO_USER.replaceAll("%sender", sender);
+                    out = out.replaceAll("%who", user);
+                    bot.sendIRCMessage(channel, out);
+                } else {
+                    db.addReferer(user, ref);
+                    String out = ADDSUCCESS.replaceAll("%sender", sender);
+                    out = out.replaceAll("%user", user);
+                    out = out.replaceAll("%ref", ref);
+                    bot.sendIRCMessage(channel, out);
+                }
+            } else {
+                String out = ADDFAILED.replaceAll("%sender", sender);
+                out = out.replaceAll("%user", user);
+                bot.sendIRCMessage(channel, out);
+            }
+        } else {
+            bot.invalidArguments(senderu, AR_FRMT);
         }
     }
 }

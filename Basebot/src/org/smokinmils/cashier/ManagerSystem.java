@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import org.ini4j.Ini;
 import org.ini4j.Wini;
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -167,10 +168,11 @@ public class ManagerSystem extends Event {
     public final void message(final Message event) {
         IrcBot irc = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
         Channel chan = event.getChannel();
 
-        if (irc.userIsIdentified(sender)) {
+        if (irc.userIsIdentified(senderu)) {
             if (sender.equalsIgnoreCase(loggedInUser)
                     && chan.getName().equalsIgnoreCase(activityChan)) {
                 inactive.cancel();
@@ -201,7 +203,7 @@ public class ManagerSystem extends Event {
                     && Utils.startsWith(message, LOGOUT_CMD)) {
                 if (loggedInUser == null
                         || !loggedInUser.equalsIgnoreCase(sender)) {
-                    irc.sendIRCNotice(sender, NOTLOGGEDON);
+                    irc.sendIRCNotice(senderu, NOTLOGGEDON);
                 } else {
                     managerLoggedOut();
                     irc.sendIRCMessage(chan,

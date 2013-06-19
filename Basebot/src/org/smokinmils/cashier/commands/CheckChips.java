@@ -11,6 +11,7 @@ package org.smokinmils.cashier.commands;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -58,10 +59,11 @@ public class CheckChips extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
 
         if (isValidChannel(event.getChannel().getName())
-                && bot.userIsIdentified(sender)
+                && bot.userIsIdentified(senderu)
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
             String user = "";
@@ -121,9 +123,9 @@ public class CheckChips extends Event {
                 }
                 credstr = credstr.replaceAll("%sender", sender);
 
-                bot.sendIRCMessage(event.getChannel().getName(), credstr);
+                bot.sendIRCMessage(event.getChannel(), credstr);
             } else {
-                bot.invalidArguments(sender, FORMAT);
+                bot.invalidArguments(senderu, FORMAT);
             }
         }
     }

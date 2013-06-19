@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -64,14 +65,16 @@ public class Payout extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
         Channel chan = event.getChannel();
 
-        if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)
+        if (isValidChannel(chan.getName()) && bot.userIsIdentified(senderu)
                 && Utils.startsWith(message, COMMAND)) {
             String[] msg = message.split(" ");
 
-            if (bot.userIsHalfOp(event.getUser(), chan.getName())) {
+            if (bot.userIsHalfOp(event.getUser(), chan.getName()) 
+                 || bot.userIsOp(event.getUser(), chan.getName())) {
                 if (msg.length == CMD_LEN) {
                     String user = msg[1];
                     Double amount = Utils.tryParseDbl(msg[2]);
@@ -81,26 +84,29 @@ public class Payout extends Event {
                     if (amount != null && amount > 0) {
                         double chips = 0;
                         try {
-                            chips = DB.getInstance()
-                                    .checkCredits(user, profile);
+                            chips = DB.getInstance().checkCredits(user,
+                                                                  profile);
                         } catch (Exception e) {
                             EventLog.log(e, "Payout", "message");
                         }
 
-                        if (!bot.userIsIdentified(user)) {
+                        if (!bot.userIsIdentified(user)
+                                && bot.manualStatusRequest(user)) {
                             String out = CheckIdentified.NOT_IDENTIFIED
-                                    .replaceAll("%user", user);
+                                                     .replaceAll("%user", user);
+                            
                             bot.sendIRCMessage(sender, out);
                         } else if (profile == null) {
                             bot.sendIRCMessage(chan.getName(),
-                                    IrcBot.VALID_PROFILES);
+                                                IrcBot.VALID_PROFILES);
                         } else if (chips < amount) {
                             String out = NOCHIPSMSG.replaceAll("%chips",
                                     Utils.chipsToString(amount));
                             out = out
                                     .replaceAll("%profile", profile.toString());
                             out = out.replaceAll("%user", user);
-                            bot.sendIRCMessage(chan.getName(), out);
+                            
+                            bot.sendIRCMessage(chan, out);
                         } else {
                             boolean success = false;
                             try {
@@ -118,7 +124,8 @@ public class Payout extends Event {
                                 out = out.replaceAll("%sender", sender);
                                 out = out.replaceAll("%profile",
                                         profile.toString());
-                                bot.sendIRCMessage(chan.getName(), out);
+                                
+                                bot.sendIRCMessage(chan, out);
 
                                 out = PAYOUTCHIPSPM.replaceAll("%amount",
                                         Utils.chipsToString(amount));
@@ -126,6 +133,7 @@ public class Payout extends Event {
                                 out = out.replaceAll("%sender", sender);
                                 out = out.replaceAll("%profile",
                                         profile.toString());
+                                
                                 bot.sendIRCNotice(user, out);
                             } else {
                                 EventLog.log(sender + "database failed",
@@ -133,10 +141,10 @@ public class Payout extends Event {
                             }
                         }
                     } else {
-                        bot.invalidArguments(sender, FORMAT);
+                        bot.invalidArguments(senderu, FORMAT);
                     }
                 } else {
-                    bot.invalidArguments(sender, FORMAT);
+                    bot.invalidArguments(senderu, FORMAT);
                 }
             } else {
                 EventLog.info(sender + " attempted to pay out someone chips",

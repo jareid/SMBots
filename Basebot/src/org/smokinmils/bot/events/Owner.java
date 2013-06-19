@@ -31,7 +31,7 @@ public class Owner extends OwnerEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.OwnerEvent
 	 */
 	public Owner(final OwnerEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getSource(),
+		super(event.getBot(), event.getChannel(), event.getUser(),
 				event.getRecipient(), event.isOwner()); 
 	}
 

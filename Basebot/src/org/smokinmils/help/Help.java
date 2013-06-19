@@ -11,6 +11,7 @@ package org.smokinmils.help;
 import java.io.IOException;
 import java.util.Map;
 
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -61,7 +62,7 @@ public class Help extends Event {
     public final void message(final Message event) {
 		IrcBot bot = event.getBot();
 		String message = event.getMessage();
-		String sender = event.getUser().getNick();
+		User sender = event.getUser();
 		String chan = event.getChannel().getName();
 		
 		if (isValidChannel(chan) && Utils.startsWith(message, COMMAND)) {

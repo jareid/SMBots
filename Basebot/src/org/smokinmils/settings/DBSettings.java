@@ -27,7 +27,7 @@ public final class DBSettings {
     public static final int    PORT    = 3306;
 
     /** The database name of the database. */
-    public static final String DB_NAME = "live";
+    public static final String DB_NAME = "test";
 
     /** The username of the database. */
     public static final String DB_USER = "smbot";

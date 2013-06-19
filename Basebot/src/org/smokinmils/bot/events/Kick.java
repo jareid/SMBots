@@ -28,7 +28,7 @@ public class Kick extends KickEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.KickEvent
 	 */
 	public Kick(final KickEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getSource(),
+		super(event.getBot(), event.getChannel(), event.getUser(),
 				event.getRecipient(), event.getReason());
 	}
 

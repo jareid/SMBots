@@ -112,14 +112,14 @@ public class HandValue implements Comparable<HandValue> {
     /**
      * (non-Javadoc).
      * @see java.lang.Comparable#compareTo(java.lang.Object)
-     * @param handValue the hand value.
+     * @param handval the hand value.
      * @return an int
      */
     @Override
-    public final int compareTo(final HandValue handValue) {
-        if (value > handValue.getValue()) {
+    public final int compareTo(final HandValue handval) {
+        if (value > handval.getValue()) {
             return -1;
-        } else if (value < handValue.getValue()) {
+        } else if (value < handval.getValue()) {
             return 1;
         } else {
             return 0;

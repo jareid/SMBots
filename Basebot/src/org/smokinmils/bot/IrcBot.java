@@ -14,10 +14,12 @@ import java.util.List;
 
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
+import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.settings.Variables;
 
 /**
  * Provides the IRC functionality.
@@ -47,15 +49,21 @@ public class IrcBot extends PircBotX {
 	/** List of channels. */
 	private final List<String> validChannels;
 	
+	/** The thread used to check identification. */
+	private CheckIdentified identCheck;
+	
 	/**
 	 * Constructor.
 	 * 
+	 * @param config The configuration object.
+	 * 
 	 * @see org.pircbotx.PircBotX
 	 */
-	public IrcBot() {
-		super();
+	public IrcBot(final Configuration config) {
+		super(config);
     	identifiedUsers = new ArrayList<String>();
     	validChannels = new ArrayList<String>();
+    	identCheck = null;
 	}
 	
 	/**
@@ -63,10 +71,24 @@ public class IrcBot extends PircBotX {
 	 * 
 	 * @return The name of the server
 	 */
-	@Override
     public final String getServer() {
 		return BaseBot.getInstance().getServer(this);
 	}
+    
+    
+    /**
+     * Used to send a notice to the target replacing formatting variables
+     * correctly.
+     * Also allows the sending of multiple lines separate by \n character.
+     * 
+     * @param target The place where the message is being sent
+     * @param in The message to send with formatting variables
+     */ 
+    public final void sendIRCNotice(final String target, final String in) {
+        for (String line: replaceIRCVariables(in).split("\n")) {
+            sendRaw().rawLine("NOTICE " + target + " " + line);
+        }
+    }
 	
 	/**
 	 * Used to send a notice to the target replacing formatting variables
@@ -77,7 +99,9 @@ public class IrcBot extends PircBotX {
 	 * @param in The message to send with formatting variables
 	 */	
 	public final void sendIRCNotice(final Channel target, final String in) {
-	    sendIRCNotice(target.getName(), in);
+        for (String line: replaceIRCVariables(in).split("\n")) {
+            target.send().notice(line);
+        }
 	}
 	
 	/**
@@ -88,31 +112,10 @@ public class IrcBot extends PircBotX {
      * @param target The place where the message is being sent
      * @param in The message to send with formatting variables
      */ 
-	public final void sendIRCNotice(final String target, final String in) {
-		String out = in;
-
-		out = out.replaceAll("%newline", "\n");
-		out = out.replaceAll("%c", "\u0003");
-		out = out.replaceAll("%b", Colors.BOLD);
-		out = out.replaceAll("%i", Colors.REVERSE);
-		out = out.replaceAll("%u", Colors.UNDERLINE);
-		out = out.replaceAll("%n", Colors.NORMAL);
-
-		for (String line: out.split("\n")) {
-			this.sendRawLineNow("NOTICE " + target + " " + line);
-		}
-	}
-	
-	/**
-	 * Used to send a message to the target replacing formatting variables
-	 * correctly.
-	 * Also allows the sending of multiple lines separate by \n character.
-	 * 
-	 * @param target The place where the message is being sent
-	 * @param in The message to send with formatting variables
-	 */
-	public final void sendIRCMessage(final Channel target, final String in) {
-	    sendIRCMessage(target.getName(), in);
+	public final void sendIRCNotice(final User target, final String in) {
+        for (String line: replaceIRCVariables(in).split("\n")) {
+            target.send().notice(line);
+        }
 	}
 	
 	/**
@@ -124,19 +127,57 @@ public class IrcBot extends PircBotX {
      * @param in The message to send with formatting variables
      */
     public final void sendIRCMessage(final String target, final String in) {
-		String out = in;
-
-		out = out.replaceAll("%newline", "\n");
-		out = out.replaceAll("%c", "\u0003");
-		out = out.replaceAll("%b", Colors.BOLD);
-		out = out.replaceAll("%i", Colors.REVERSE);
-		out = out.replaceAll("%u", Colors.UNDERLINE);
-		out = out.replaceAll("%n", Colors.NORMAL);
-
-		for (String line: out.split("\n")) {
-			this.sendRawLineNow("PRIVMSG " + target + " " + line);
+        for (String line: replaceIRCVariables(in).split("\n")) {
+            sendRaw().rawLine("PRIVMSG " + target + " " + line);
+        }
+    }
+	
+	/**
+	 * Used to send a message to the target replacing formatting variables
+	 * correctly.
+	 * Also allows the sending of multiple lines separate by \n character.
+	 * 
+	 * @param target The place where the message is being sent
+	 * @param in The message to send with formatting variables
+	 */
+	public final void sendIRCMessage(final Channel target, final String in) {
+        for (String line: replaceIRCVariables(in).split("\n")) {
+            target.send().message(line);
+        }
+	}
+	
+	/**
+     * Used to send a message to the target replacing formatting variables
+     * correctly.
+     * Also allows the sending of multiple lines separate by \n character.
+     * 
+     * @param target The place where the message is being sent
+     * @param in The message to send with formatting variables
+     */
+    public final void sendIRCMessage(final User target, final String in) {
+		for (String line: replaceIRCVariables(in).split("\n")) {
+			target.send().message(line);
 		}
 	}
+    
+    /**
+     * Replace the IRC output.
+     * 
+     * @param in    The message.
+     * @return  The replaced message.
+     */
+    private static String replaceIRCVariables(final String in) {
+        String out = in;
+
+        out = out.replaceAll("%newline", "\n");
+        out = out.replaceAll("%c", "\u0003");
+        out = out.replaceAll("%b", Colors.BOLD);
+        out = out.replaceAll("%i", Colors.REVERSE);
+        out = out.replaceAll("%u", Colors.UNDERLINE);
+        out = out.replaceAll("%n", Colors.NORMAL);
+        
+        return out;
+    }
 	
 	/**
 	 * Outputs a notice to a user informing them they don't have enough chips.
@@ -145,7 +186,7 @@ public class IrcBot extends PircBotX {
 	 * @param amount	The amount they tried to use
 	 * @param profile	The profile they tried to use
 	 */
-	public final void noChips(final String user,
+	public final void noChips(final User user,
 	                          final int amount,
 	                          final ProfileType profile) {
 		String out = NO_CHIPS_MSG.replaceAll("%chips",
@@ -155,25 +196,76 @@ public class IrcBot extends PircBotX {
 	}
 	
     /**
+     * Sends a request to NickServ to check a user's status with the server
+     * and waits for the response.
+     * 
+     * @param user the username
+     * 
+     * @return true if the user meets the required status
+     */
+    public final boolean manualStatusRequest(final String user) {
+        boolean ret = false;
+        User usr = this.getUserChannelDao().getUser(user);
+        if (identCheck != null && user != null) {
+            identCheck.manualStatusRequest(usr);
+        }
+        return ret;
+    }
+    
+    /**
+     * Sets the ident check thread.
+     * 
+     * @param cithread the thread.
+     */
+    public final void setIdentCheck(final CheckIdentified cithread) {
+        identCheck = cithread;
+    }
+	
+    /**
      * Sends the invalid argument message.
      * 
      * @param who		The user to send to
      * @param format	The command format
      */
-    public final void invalidArguments(final String who, final String format) {
+    public final void invalidArguments(final User who, final String format) {
 		sendIRCNotice(who, INVALID_ARGS);
 		sendIRCNotice(who, format);		
 	}
+    
+    /**
+     * Sends the maximum bet message.
+     * 
+     * @param who     The user to send to.
+     * @param chan    The channel to send to.
+     * @param size    The maximum bet.
+     */
+    public final void maxBet(final User who,
+                             final Channel chan,
+                             final int size) {
+        String out = Variables.MAXBETMSG.replaceAll("%sender", who.getNick());
+        out = out.replaceAll("%amount", Integer.toString(size));
+        sendIRCMessage(chan, out);
+    }
 	
 	/**
 	 * Checks if a user is identified with NickServ.
 	 * 
-	 * @param nick	The nickname to check
+	 * @param user	The user to check
 	 * @return	true if the user is identified, false otherwise.
 	 */
-	public final boolean userIsIdentified(final String nick) {
-		return identifiedUsers.contains(nick.toLowerCase());
+	public final boolean userIsIdentified(final User user) {
+		return identifiedUsers.contains(user.getNick().toLowerCase());
 	}
+	
+	/**
+     * Checks if a user is identified with NickServ.
+     * 
+     * @param nick  The nickname to check
+     * @return  true if the user is identified, false otherwise.
+     */
+    public final boolean userIsIdentified(final String nick) {
+        return identifiedUsers.contains(nick.toLowerCase());
+    }
 	
 	/**
 	 * Removes an identified user from the bot.
@@ -189,11 +281,11 @@ public class IrcBot extends PircBotX {
 	/**
 	 * Adds an identified user to the bot.
 	 * 
-	 * @param nick	The nickname to check
+	 * @param user	The nickname to check
 	 */
-	public final void addIdentifiedUser(final String nick) {
+	public final void addIdentifiedUser(final User user) {
         synchronized (identifiedUsers) {
-            identifiedUsers.add(nick.toLowerCase());
+            identifiedUsers.add(user.getNick().toLowerCase());
         }
 	}
 	
@@ -226,7 +318,7 @@ public class IrcBot extends PircBotX {
      */
     public final boolean userIsHalfOp(final User user, final String chan) {
         boolean ret = false;
-        for (Channel opchans: user.getChannelsOpIn()) {
+        for (Channel opchans: user.getChannelsHalfOpIn()) {
             if (chan.equalsIgnoreCase(opchans.getName())) {
                 ret = true;
                 break;

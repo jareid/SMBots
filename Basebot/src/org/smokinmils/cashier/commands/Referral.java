@@ -11,6 +11,7 @@ package org.smokinmils.cashier.commands;
 import java.sql.SQLException;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -25,7 +26,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class Referral extends Event {
-
     /** The command. */
     public static final String  COMMAND = "!refer";
 
@@ -60,10 +60,11 @@ public class Referral extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
         Channel chan = event.getChannel();
 
-        if (Utils.startsWith(message, COMMAND) && bot.userIsIdentified(sender)
+        if (Utils.startsWith(message, COMMAND)
+                && bot.userIsIdentified(sender)
                 && isValidChannel(chan.getName())) {
             try {
                 refer(event);
@@ -84,8 +85,9 @@ public class Referral extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
-        String channel = event.getChannel().getName();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
+        Channel channel = event.getChannel();
 
         if (msg.length == 2) {
             DB db = DB.getInstance();
@@ -110,7 +112,7 @@ public class Referral extends Event {
                 bot.sendIRCMessage(channel, out);
             }
         } else {
-            bot.invalidArguments(sender, FORMAT);
+            bot.invalidArguments(senderu, FORMAT);
         }
     }
 }

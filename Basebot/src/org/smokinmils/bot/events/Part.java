@@ -27,8 +27,8 @@ public class Part extends PartEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.PartEvent
 	 */
 	public Part(final PartEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(),
-		        event.getUser(), event.getReason());
+		super(event.getBot(), event.getDaoSnapshot(),
+		      event.getChannel(), event.getUser(), event.getReason());
 	}
 
 }

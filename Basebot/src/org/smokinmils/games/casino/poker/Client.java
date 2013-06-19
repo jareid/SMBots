@@ -18,8 +18,6 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.events.Action;
-import org.smokinmils.bot.events.Connect;
-import org.smokinmils.bot.events.Disconnect;
 import org.smokinmils.bot.events.Invite;
 import org.smokinmils.bot.events.Join;
 import org.smokinmils.bot.events.Message;
@@ -28,7 +26,6 @@ import org.smokinmils.bot.events.Notice;
 import org.smokinmils.bot.events.Op;
 import org.smokinmils.bot.events.Part;
 import org.smokinmils.bot.events.Quit;
-import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.poker.enums.EventType;
 import org.smokinmils.games.casino.poker.game.rooms.Lobby;
@@ -46,88 +43,69 @@ import org.smokinmils.settings.PokerVars;
  * @author Jamie Reid
  */
 public class Client extends Event {
-    /** The name of the server this for */
-    private final String               ServerName;
+    /** The name of the server this for. */
+    private final String               serverName;
 
-    /** The bot object for this server */
-    private final IrcBot               Bot;
+    /** The bot object for this server. */
+    private final IrcBot               bot;
 
-    /** A mapping of channel to Room objects */
+    /** A mapping of channel to Room objects. */
     private final Map<String, Room>    pokerValidChannels;
 
-    /** A mapping of table ID to table channel */
+    /** A mapping of table ID to table channel. */
     private final Map<Integer, String> validTables;
 
-    /** Main channel for the poker bot */
+    /** Main channel for the poker bot. */
     private final String               lobbyChan;
 
-    public Client(String server, String lobby) {
-        ServerName = server;
-        Bot = BaseBot.getInstance().getBot(ServerName);
+    /**
+     * Constructor.
+     * 
+     * @param server The server name.
+     * @param lobby The lobby channel.
+     */
+    public Client(final String server, final String lobby) {
+        serverName = server;
+        bot = BaseBot.getInstance().getBot(serverName);
         pokerValidChannels = new HashMap<String, Room>();
         validTables = new HashMap<Integer, String>();
         lobbyChan = lobby;
     }
 
-    public void initialise() {
+    /**
+     * Initialise the poker lobby.
+     */
+    public final void initialise() {
         // At a minimum, we should exist in a lobby
         if (pokerValidChannels.isEmpty()) {
-            Bot.joinChannel(lobbyChan);
-            Lobby lobby = new Lobby(Bot.getChannel(lobbyChan), this);
+            bot.sendIRC().joinChannel(lobbyChan);
+            Channel lchan = bot.getUserChannelDao().getChannel(lobbyChan);
+            Lobby lobby = new Lobby(lchan, this);
             lobby.start();
             pokerValidChannels.put(lobbyChan.toLowerCase(), lobby);
         }
 
         // Request invites from Chanserv and attempt to join all channels
         for (Entry<String, Room> entry : pokerValidChannels.entrySet()) {
-            Bot.sendMessage("ChanServ", "INVITE " + entry.getKey());
-            Bot.joinChannel(entry.getKey());
+            bot.sendRaw().rawLine("ChanServ INVITE " + entry.getKey());
+            bot.sendIRC().joinChannel(entry.getKey());
         }
     }
 
     /**
-     * Joins the correct channels
-     * 
-     * (non-Javadoc)
-     * @see org.jibble.pircbot.PircBot#onConnect()
-     */
-    @Override
-    public void connect(Connect event) {
-        initialise();
-    }
-
-    /**
-     * Automatically reconnect
-     * 
-     * (non-Javadoc)
-     * @see org.jibble.pircbot.PircBot#onDisconnect()
-     */
-    @Override
-    public void disconnect(Disconnect event) {
-        EventLog.info(
-                "Disconnected, cancelling all table hands", "Client",
-                "onDisconnect");
-        for (Entry<String, Room> entry : pokerValidChannels.entrySet()) {
-            if (validTables.containsValue(entry.getKey().toLowerCase())) {
-                Table table = (Table) entry.getValue();
-                table.cancelHand();
-            }
-        }
-    }
-
-    /**
-     * Ensures that the bot will join channels when invited by ChanServ
+     * Ensures that the bot will join channels when invited by ChanServ.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onInvite(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.String)
+     * @param event the invite event.
      */
     @Override
-    public void invite(Invite event) {
+    public final void invite(final Invite event) {
         String chan = event.getChannel();
         if (pokerValidChannels.containsKey(chan)) {
-            event.getBot().joinChannel(chan);
+            event.getBot().sendIRC().joinChannel(chan);
         }
     }
 
@@ -138,19 +116,21 @@ public class Client extends Event {
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onJoin(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String)
+     * @param event The Join event.
      */
     @Override
-    public void join(Join event) {
+    public final void join(final Join event) {
         String channel = event.getChannel().getName();
         String joinee = event.getUser().getNick();
         // (Re-)Check the user's status with NickServ
-        if (joinee.compareToIgnoreCase(event.getBot().getNick()) == 0 &&
-                channel.compareToIgnoreCase(lobbyChan) == 0) {
-            Integer[] blinds = { 2, 6, 10 };
-            ProfileType profiles[] = ProfileType.values();
-            for (Integer x : blinds) {
-                for (int y = 0; y < profiles.length; y++) {
-                    newTable(x, 8, profiles[y], false);
+        if (joinee.compareToIgnoreCase(event.getBot().getNick()) == 0
+              && channel.compareToIgnoreCase(lobbyChan) == 0) {
+            ProfileType[] profiles = ProfileType.values();
+            for (Integer x : PokerVars.INITBB) {
+                for (Integer y : PokerVars.INITTBLSIZES) {
+                    for (int z = 0; z < profiles.length; z++) {
+                        newTable(x, y, profiles[z], false);
+                    }
                 }
             }
         }
@@ -158,31 +138,25 @@ public class Client extends Event {
         // Notify the correct room if required
         Room room = pokerValidChannels.get(channel.toLowerCase());
         if (room != null) {
-            if (room instanceof Table) ((Table) room).addEvent(joinee, event
-                    .getUser().getLogin(),
-                    event.getUser().getHostmask(), "", EventType.JOIN);
-            else if (room instanceof Lobby)
-                ((Lobby) room).addEvent(joinee, event.getUser().getLogin(),
-                        event.getUser().getHostmask(), "", EventType.JOIN);
+            room.addEvent(event, EventType.JOIN);
         }
     }
 
     /**
-     * Send the part to the correct Room's events system
+     * Send the part to the correct Room's events system.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onPart(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String)
+     * @param event The Part event.
      */
     @Override
-    public void part(Part event) {
+    public final void part(final Part event) {
         // Notify the correct room if required
         Room room = pokerValidChannels.get(event.getChannel().getName()
                 .toLowerCase());
         if (room != null) {
-            room.addEvent(
-                    event.getUser().getNick(), event.getUser().getLogin(),
-                    event.getUser().getHostmask(), "", EventType.PART);
+            room.addEvent(event, EventType.PART);
         }
     }
 
@@ -192,15 +166,15 @@ public class Client extends Event {
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onQuit(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String)
+     * @param event The Quit event.
      */
     @Override
-    public void quit(Quit event) {
+    public final void quit(final Quit event) {
         String nick = event.getUser().getNick();
         if (nick.compareToIgnoreCase(event.getBot().getNick()) != 0) {
             // Notify the correct room if required
             for (Room room : pokerValidChannels.values()) {
-                room.addEvent(nick, event.getUser().getLogin(),
-                        event.getUser().getHostmask(), "", EventType.PART);
+                room.addEvent(event, EventType.PART);
             }
         }
     }
@@ -210,213 +184,186 @@ public class Client extends Event {
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onNickChange(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String)
+     * @param event The nick change event.
      */
     @Override
-    public void nickChange(NickChange event) {
+    public final void nickChange(final NickChange event) {
         // Notify the correct rooms
         for (Entry<String, Room> room : pokerValidChannels.entrySet()) {
-            room.getValue().addEvent(
-                    event.getOldNick(), event.getUser().getLogin(),
-                    event.getUser().getHostmask(), event.getNewNick(),
-                    EventType.NICKCHANGE);
+            room.getValue().addEvent(event, EventType.NICKCHANGE);
         }
     }
 
     /**
-     * We joined a channel so beginning checking users' status
+     * We joined a channel so beginning checking users' status.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onUserList(java.lang.String,
      *      org.jibble.pircbot.User[])
+     * @param channel the Channel the list is for
+     * @param users the list of users.
      */
-    protected void onUserList(String channel,
-                              User[] users) {
-        for (User usr : users) {
-            sendStatusRequest(usr.getNick());
-        }
-
-        channel = channel.toLowerCase();
-        if (validTables.containsValue(channel)) {
-            Table table = (Table) pokerValidChannels.get(channel);
+    protected final void onUserList(final Channel channel,
+                              final User[] users) {
+        String chan = channel.getName().toLowerCase();
+        if (validTables.containsValue(chan)) {
+            Table table = (Table) pokerValidChannels.get(chan);
             table.joinedChannel(users);
         }
     }
 
     /**
-     * Pass the message to the correct Room
+     * Pass the message to the correct Room.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onMessage(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.String)
+     * @param event The Message event.
      */
     @Override
-    public void message(Message event) {
-        IrcBot bot = event.getBot();
+    public final void message(final Message event) {
+        IrcBot irc = event.getBot();
         String message = event.getMessage();
         User user = event.getUser();
-        String sender = user.getNick();
         Channel chan = event.getChannel();
 
         // Get the first character and check if it is a command
         char fChar = message.charAt(0);
         if (fChar == PokerStrs.CommandChar) {
-            if (bot.userIsIdentified(sender)) {
+            if (irc.userIsIdentified(user)) {
                 // Notify the correct room if required
                 Room room = pokerValidChannels
                         .get(chan.getName().toLowerCase());
                 if (room != null) {
-                    room.addEvent(sender, user.getLogin(), user.getHostmask(),
-                            message, EventType.MESSAGE);
+                    room.addEvent(event, EventType.MESSAGE);
                 }
             }
         }
     }
 
     /**
-     * Pass the action to the correct Room
+     * Pass the action to the correct Room.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onMessage(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String,
-     *      java.lang.String)
+     *      java.lang.String)     *      
+     * @param event The Action event.
      */
     @Override
-    public void action(Action event) {
+    public final void action(final Action event) {
         // Notify the correct room if required
         Room room = pokerValidChannels.get(event.getChannel().getName()
                 .toLowerCase());
         if (room != null) {
-            room.addEvent(
-                    event.getUser().getNick(), event.getUser().getLogin(),
-                    event.getUser().getHostmask(), event.getAction(),
-                    EventType.ACTION);
+            room.addEvent(event, EventType.ACTION);
         }
     }
 
     /**
      * Processes NickServ responses. Currently uses - STATUS Passes onto the
-     * correct room as an event
+     * correct room as an event.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onNotice(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.String)
+     * @param event The notice event.
      */
     @Override
-    public void notice(Notice event) {
+    public final void notice(final Notice event) {
         // Notify the correct room if required
         Room room = pokerValidChannels.get(event.getChannel());
         if (room != null) {
-            room.addEvent(
-                    event.getUser().getNick(), event.getUser().getLogin(),
-                    event.getUser().getHostmask(), event.getNotice(),
-                    EventType.NOTICE);
+            room.addEvent(event, EventType.NOTICE);
         }
     }
 
     /**
-     * Processes Op events Passes onto the correct room as an event
+     * Processes Op events Passes onto the correct room as an event.
      * 
      * (non-Javadoc)
      * @see org.jibble.pircbot.PircBot#onNotice(java.lang.String,
      *      java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.String)
+     * @param event the op event.
      */
     @Override
-    public void op(Op event) {
+    public final void op(final Op event) {
         // Notify the correct room if required
         Room room = pokerValidChannels.get(event.getChannel().getName()
                 .toLowerCase());
         if (room != null) {
-            room.addEvent(event.getSource().getNick(), event.getSource()
-                    .getLogin(),
-                    event.getSource().getHostmask(), event.getRecipient()
-                            .getNick(),
-                    EventType.OP);
+            room.addEvent(event, EventType.OP);
         }
     }
 
     /**
-     * Returns the bot for this lobby
+     * Returns the bot for this lobby.
      * 
      * @return the bot object
      */
-    public IrcBot getBot() {
-        return Bot;
+    public final IrcBot getBot() {
+        return bot;
     }
 
     /**
-     * Returns an IRC channel object for a string
-     * 
-     * @param chan The channel name
-     * 
-     * @return the channel object
-     */
-    public Channel getChannel(String chan) {
-        return Bot.getChannel(chan);
-    }
-
-    /**
-     * Sends a request to NickServ to check a user's status with the server
-     * 
-     * @param user the username
-     */
-    private void sendStatusRequest(String user) {
-        Bot.sendRawLine("PRIVMSG NickServ STATUS " + user);
-    }
-
-    /**
-     * Creates a new poker table
+     * Creates a new poker table.
      * 
      * @param stake the big blind for this table
      * @param players the maximum number of players for this table
+     * @param profile the profile used on the table
+     * @param manual if this was created through a command.
+     * 
+     * @return the table id.
      */
-    public int newTable(int stake,
-                        int players,
-                        ProfileType profile,
-                        boolean manual) {
+    public final int newTable(final int stake,
+                        final int players,
+                        final ProfileType profile,
+                        final boolean manual) {
         EventLog.info("Creating new table...", "Client", "newTable");
 
         Integer tableid = Table.getNextID();
         String chan = PokerVars.TABLECHAN + tableid;
-        Bot.joinChannel(chan);
-        Bot.sendMessage("ChanServ", "INVITE " + chan);
-        Table table = new Table(Bot.getChannel(chan), this, tableid, stake,
-                players, profile, manual);
+        bot.sendIRC().joinChannel(chan);
+        bot.sendIRCMessage("ChanServ", "INVITE " + chan);
+        Channel achan = bot.getUserChannelDao().getChannel(chan);
+        Table table = new Table(achan, this, tableid, stake,
+                                players, profile, manual);
         pokerValidChannels.put(chan.toLowerCase(), table);
         validTables.put(tableid, chan.toLowerCase());
         table.start();
 
         if (manual) {
-            sendIRCMessage(lobbyChan, table.formatTableInfo(PokerStrs.NewTable));
+            sendIRCMessage(table.formatTableInfo(PokerStrs.NewTable));
         }
 
         return tableid;
     }
 
     /**
-     * Gets the Table with a specified ID
+     * Gets the Table with a specified ID.
      * 
      * @param id the table id
      * 
      * @return the table that matches or null
      */
-    public Table getTable(int id) {
+    public final Table getTable(final int id) {
         String chan = validTables.get(id).toLowerCase();
         return ((Table) pokerValidChannels.get(chan));
     }
 
     /**
-     * Creates a new player on a table
+     * Creates a new player on a table.
      * 
      * @param sender The user
      * @param id The table ID
-     * @param buy_in The initial buy in
+     * @param buyin The initial buy in
      */
-    public void newPlayer(String sender,
-                          int id,
-                          Integer buy_in) {
+    public final void newPlayer(final User sender,
+                          final int id,
+                          final Integer buyin) {
         EventLog.info("Adding new player...", "Client", "newTable");
         // Get channel for the table id
         String chan = validTables.get(id);
@@ -424,59 +371,57 @@ public class Client extends Event {
             // Add player to table
             Table tbl = (Table) pokerValidChannels.get(chan.toLowerCase());
             if (tbl != null) {
-                tbl.playerJoins(sender, buy_in);
+                tbl.playerJoins(sender, buyin);
             } else {
                 EventLog.log(sender + "tried to join "
                         + Integer.toString(id)
                         + "but couldn't find the table",
                         "Client", "newPlayer");
-                sendIRCMessage(
-                        lobbyChan,
-                        "Something went wrong when the bot tried to add you to the table, please inform staff");
+                sendIRCMessage("Something went wrong when the bot tried to add"
+                                    + " you to the table, please inform staff");
             }
         } else {
             EventLog.log(sender + "tried to join "
                     + Integer.toString(id)
                     + "but couldn't find the table's channel",
                     "Client", "newPLayer");
-            sendIRCMessage(
-                    lobbyChan,
-                    "Something went wrong when the bot tried to add you to the table, please inform staff");
+            sendIRCMessage("Something went wrong when the bot tried to add"
+                                    + " you to the table, please inform staff");
         }
     }
 
     /**
-     * Allows a new user to join the channel to watch the game play
+     * Allows a new user to join the channel to watch the game play.
      * 
      * @param sender The user
      * @param id The table ID
      */
-    public void newObserver(String sender,
-                            int id) {
+    public final void newObserver(final User sender,
+                                  final int id) {
         // Get channel for the table id
         String chan = validTables.get(id);
         if (chan != null) {
             // Invite the player to join channel
-            Bot.sendInvite(sender, chan);
+            bot.sendIRC().invite(sender.getNick(), chan);
         } else {
-            EventLog.log(sender + "tried to join "
-                    + Integer.toString(id)
-                    + "but couldn't find the table's channel",
-                    "Client", "newPLayer");
-            sendIRCMessage(
-                    lobbyChan,
-                    "Something went wrong when the bot tried to add you to the table, please inform staff");
+            EventLog.log(sender.getNick() + "tried to join "
+                                + Integer.toString(id)
+                                + "but couldn't find the table's channel",
+                         "Client", "newPLayer");
+            
+            sendIRCMessage("Something went wrong when the bot tried to add"
+                                + " you to the table, please inform staff");
         }
     }
 
     /**
-     * Used to check whether a table is full
+     * Used to check whether a table is full.
      * 
      * @param id The ID of the table to be checked
      * 
      * @return boolean true if the table has no seats left
      */
-    public boolean tableIsFull(int id) {
+    public final boolean tableIsFull(final int id) {
         boolean full = false;
         // Get table for the table id
         String chan = validTables.get(id);
@@ -488,92 +433,27 @@ public class Client extends Event {
     }
 
     /**
-     * Used to check whether a user has credits
-     * 
-     * @param username The username who's credit level we need to check
-     * @param credits The amount of credits they need to have
-     * 
-     * @return boolean true if the user has sufficient credits.
-     */
-    public boolean userHasCredits(String username,
-                                  int credits) {
-        int usercred = 0;
-        try {
-            usercred = DB.getInstance().checkCreditsAsInt(username);
-        } catch (Exception e) {
-            EventLog.log(e, "Client", "userHasCredits");
-        }
-        return ((usercred - credits) >= 0);
-    }
-
-    /**
-     * Used to check whether a user has credits for a certain profile
-     * 
-     * @param username The username who's credit level we need to check
-     * @param credits The amount of credits they need to have
-     * 
-     * @return boolean true if the user has sufficient credits.
-     */
-    public boolean userHasCredits(String username,
-                                  int credits,
-                                  ProfileType profile) {
-        int usercred = 0;
-        try {
-            usercred = DB.getInstance().checkCreditsAsInt(username, profile);
-        } catch (Exception e) {
-            EventLog.log(e, "Client", "userHasCredits");
-        }
-        return ((usercred - credits) >= 0);
-    }
-
-    /**
-     * Used to send a notice to the target replacing formatting variables
-     * correctly Also allows the sending of multiple lines separate by \n
-     * character
-     * 
-     * @param target The place where the message is being sent
-     * @param in The message to send with formatting variables
-     */
-    public void sendIRCNotice(String target,
-                              String in) {
-        Bot.sendIRCNotice(target, in);
-    }
-
-    /**
      * Used to send a message to the target replacing formatting variables
      * correctly Also allows the sending of multiple lines separate by \n
-     * character
-     * 
-     * @param target The place where the message is being sent
-     * @param in The message to send with formatting variables
-     */
-    public void sendIRCMessage(String target,
-                               String in) {
-        Bot.sendIRCMessage(target, in);
-    }
-
-    /**
-     * Used to send a message to the target replacing formatting variables
-     * correctly Also allows the sending of multiple lines separate by \n
-     * character
+     * character.
      * 
      * Sends to the lobby
      * 
-     * @param target The place where the message is being sent
      * @param in The message to send with formatting variables
      */
-    public void sendIRCMessage(String in) {
-        Bot.sendIRCMessage(lobbyChan, in);
+    public final void sendIRCMessage(final String in) {
+        bot.sendIRCMessage(lobbyChan, in);
     }
 
     /**
-     * Method to shut down a table when all players leave
-     * @param table
+     * Method to shut down a table when all players leave.
+     * 
+     * @param table The table
      */
-    public void closeTable(Table table) {
+    public final void closeTable(final Table table) {
         int found = -1;
         // leave the channel
-        Bot.partChannel(table.getChannel(), "No players");
+        table.getChannel().send().part("No players");
 
         // Remove from valid tables
         String tblchan = table.getChannel().getName();
@@ -586,13 +466,10 @@ public class Client extends Event {
         }
 
         if (found != -1) {
-            sendIRCMessage(
-                    lobbyChan,
-                    PokerStrs.TableClosed.replaceAll(
-                            "%id", Integer.toString(found)));
-            EventLog.info(
-                    "Table " + Integer.toString(found) + " closed", "Client",
-                    "closeTable");
+            sendIRCMessage(PokerStrs.TableClosed.replaceAll(
+                                               "%id", Integer.toString(found)));
+            EventLog.info("Table " + Integer.toString(found) + " closed",
+                          "Client", "closeTable");
             validTables.remove(found);
         } else {
             EventLog.log(

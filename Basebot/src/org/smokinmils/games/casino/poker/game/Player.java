@@ -11,6 +11,7 @@ package org.smokinmils.games.casino.poker.game;
 import java.util.List;
 import java.util.Timer;
 
+import org.pircbotx.User;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.games.casino.carddeck.Card;
 import org.smokinmils.games.casino.poker.enums.ActionType;
@@ -24,9 +25,9 @@ import org.smokinmils.settings.PokerVars;
  * 
  * @author Jamie Reid
  */
-public class Player {
-    /** Name. */
-    private final String name;
+public class Player {    
+    /** User. */
+    private final User user;
 
     /** Players hand. */
     private final Hand   hand;
@@ -64,14 +65,21 @@ public class Player {
     /**
      * Constructor.
      * 
-     * @param nick The player's username.
+     * @param usr The player's user object.
      * @param buyin The player's buy in.
      */
-    public Player(final String nick, final int buyin) {
-        name = nick;
+    public Player(final User usr, final int buyin) {
+        user = usr;
         chips = buyin;
         hand = new Hand();
         sittingOut = false;
+    }
+    
+    /**
+     * @return the user
+     */
+    public final User getUser() {
+        return user;
     }
 
     /**
@@ -80,7 +88,7 @@ public class Player {
      * @return The name.
      */
     public final String getName() {
-        return name;
+        return getUser().getNick();
     }
 
     /**
@@ -305,19 +313,19 @@ public class Player {
      * Determining the player's action is handled by the GamePlay task.
      * 
      * @param act The action.
-     * @param minBet The minimum bet.
-     * @param currentBet The current bet.
+     * @param minbet The minimum bet.
+     * @param currentbet The current bet.
      * 
      * @return The selected action.
      */
     public final ActionType act(final ActionType act,
-                                final int minBet,
-                                final int currentBet) {
+                                final int minbet,
+                                final int currentbet) {
         switch (act) {
         case CHECK:
             break;
         case CALL:
-            betIncrement = currentBet - bet;
+            betIncrement = currentbet - bet;
             if (betIncrement > chips) {
                 betIncrement = chips;
             }
@@ -326,7 +334,7 @@ public class Player {
             totalBet += betIncrement;
             break;
         case BET:
-            betIncrement += minBet;
+            betIncrement += minbet;
             if (betIncrement >= chips) {
                 betIncrement = chips;
             }
@@ -337,7 +345,7 @@ public class Player {
             break;
         case RAISE:
             // currentBet += minBet;
-            betIncrement = currentBet - bet;
+            betIncrement = currentbet - bet;
             if (betIncrement > chips) {
                 betIncrement = chips;
             }
@@ -394,6 +402,6 @@ public class Player {
      */
     @Override
     public final String toString() {
-        return this.name;
+        return getUser().getNick();
     }
 }

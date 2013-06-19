@@ -25,6 +25,9 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public final class Rake {
+    /** The amount the jackpot is reset to upon winning. */
+    private static final int MIN_JACKPOT = 100;
+
     /**
      * Hiding the default constructor.
      */
@@ -36,7 +39,7 @@ public final class Rake {
     private static String       jackpotChannel;
     
     /** The 1 in X chance of winning the jack pot.*/
-    private static final int    JACKPOTCHANCE  = 50000;
+    private static final int    JACKPOTCHANCE  = 100000;
     
     /** Amount of rake taken/generated from bets. */
     private static final double RAKE           = 0.05;
@@ -165,7 +168,7 @@ public final class Rake {
                     bot.sendIRCMessage(jackpotChannel, out);
                     bot.sendIRCMessage(jackpotChannel, out);
 
-                    db.updateJackpot(profile, remainder);
+                    db.updateJackpot(profile, MIN_JACKPOT);
                 }
             }
         } catch (Exception e) {

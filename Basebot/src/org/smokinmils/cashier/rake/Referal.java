@@ -29,7 +29,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie Reid
  */
-public final class Referal extends Thread {
+public final class Referal {
     /** The percentage of the rake provided that goes to jackpot. */
     private static final double  JACKPOT_PERCENT = 0.10;
 
@@ -45,6 +45,9 @@ public final class Referal extends Thread {
     /** Instance variable. */
     private static final Referal INSTANCE        = new Referal();
 
+    /** Number of processing threads for the queue. */
+    private static final int THREAD_COUNT = 10;
+
     /**
      * Static 'instance' method.
      * @return the instance of the Referal object
@@ -58,29 +61,10 @@ public final class Referal extends Thread {
      */
     private Referal() {
         rakeQueue = new ArrayDeque<Event>();
-        this.start();
-    }
-
-    /**
-     * (non-Javadoc).
-     * @see java.lang.Thread#run()
-     */
-    @Override
-    public void run() {
-        boolean interuptted = false;
-        while (!(Thread.interrupted() || interuptted)) {
-            if (!rakeQueue.isEmpty()) {
-                Event event = rakeQueue.removeFirst();
-                doReferal(event);
-            }
-
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                interuptted = true;
-            }
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            ReferralQueue refq = new ReferralQueue();
+            refq.start();
         }
-        return;
     }
 
     /**
@@ -185,7 +169,7 @@ public final class Referal extends Thread {
         }
 
         // Give each group an equivalent amount based on number of users
-        // in the group with that referal
+        // in the group with that referral
         if (groupusers > 0) {
             double eachgrpfee = grpfee / groupusers;
             for (Entry<String, Integer> group : groups.entrySet()) {
@@ -199,7 +183,7 @@ public final class Referal extends Thread {
     }
 
     /**
-     * Adds an event to be handled by this Room's thread.
+     * Adds an event to be handled by this thread.
      * 
      * @param user The user the event is for.
      * @param profile The profile.
@@ -208,6 +192,50 @@ public final class Referal extends Thread {
     public void addEvent(final String user,
                          final ProfileType profile,
                          final double amount) {
-        rakeQueue.addLast(new Event(user, profile, amount));
+        synchronized (rakeQueue) {
+            rakeQueue.addLast(new Event(user, profile, amount));
+        }
+    }
+    
+    /**
+     * Reads an event to be handled by this thread.
+     * 
+     * @return The event or null if there is nothing to process.
+     */
+    public Event readEvent() {
+        Event event = null;
+        synchronized (rakeQueue) {
+            if (!rakeQueue.isEmpty()) {
+                event = rakeQueue.removeFirst();
+            }
+        }
+        return event;
+    }
+    
+    /**
+     * The thread object that processes the events.
+     */
+    private class ReferralQueue extends Thread {
+        /**
+         * (non-Javadoc).
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
+            boolean interuptted = false;
+            while (!(Thread.interrupted() || interuptted)) {
+                Event event = readEvent();
+                if (event != null) {
+                    doReferal(event);
+                }
+
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    interuptted = true;
+                }
+            }
+            return;
+        }
     }
 }

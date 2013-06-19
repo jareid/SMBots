@@ -8,6 +8,7 @@
  */
 package org.smokinmils.bot;
 
+import org.pircbotx.User;
 import org.smokinmils.database.types.ProfileType;
 
 /**
@@ -16,27 +17,27 @@ import org.smokinmils.database.types.ProfileType;
  * @author Jamie
  */
 public class Bet {
-
     /** The user who placed this bet. */
-	private String user;
+	private final User user;
 	
 	/** The decimal amount for this bet. */
-	private double amount;
+	private final double amount;
 	
 	/** The choice made on the bet, may be blank, i.e for DD bets. */
-	private String choice;
+	private final String choice;
 	
 	/** 
 	 * Used to activate bets to stop double bets.
 	 * @deprecated No longer used as bets are processed in a thread safe manner
 	 */
-	private boolean valid;
+	@Deprecated
+    private boolean valid;
 	
 	/**
 	 * The profile used for this bet.
 	 * @see ProfileType
 	 */
-	private ProfileType profile;
+	private final ProfileType profile;
 	
 	/**
 	 * Constructor. 
@@ -46,7 +47,7 @@ public class Bet {
 	 * @param amnt   The decimal amount of the bet.
 	 * @param chce   The choice of the bet, can be null.
 	 */
-	public Bet(final String usr,
+	public Bet(final User usr,
 	           final ProfileType prof,
 	           final double amnt,
 	           final String chce) {
@@ -63,7 +64,8 @@ public class Bet {
 	 * 
 	 * @deprecated
 	 */
-	public final void invalidate() {
+	@Deprecated
+    public final void invalidate() {
 		this.valid = false;
 	}
 	
@@ -73,7 +75,8 @@ public class Bet {
      * 
      * @deprecated
      */
-	public final void reset() {
+	@Deprecated
+    public final void reset() {
 		this.valid = true;
 	}
 	
@@ -82,7 +85,7 @@ public class Bet {
 	 * 
 	 * @return The user.
 	 */
-	public final String getUser() { return user; }
+	public final User getUser() { return user; }
 	
 	/**
      * Returns this bet's amount.
@@ -105,7 +108,8 @@ public class Bet {
      * 
      * @deprecated
      */
-	public final boolean isValid() { return valid; }
+	@Deprecated
+    public final boolean isValid() { return valid; }
 	
 	/**
      * Returns this bet's profile.

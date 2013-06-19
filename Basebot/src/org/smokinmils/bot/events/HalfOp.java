@@ -30,7 +30,7 @@ public class HalfOp extends HalfOpEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.HalfOpEvent
 	 */
 	public HalfOp(final HalfOpEvent<IrcBot> event) {
-		super(event.getBot(), event.getChannel(), event.getSource(),
+		super(event.getBot(), event.getChannel(), event.getUser(),
 				event.getRecipient(), event.isHalfOp()); 
 	}
 

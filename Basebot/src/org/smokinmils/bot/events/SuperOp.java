@@ -33,7 +33,7 @@ public class SuperOp extends SuperOpEvent<IrcBot> {
 	 */
 	public SuperOp(final SuperOpEvent<IrcBot> event) {
 		super(event.getBot(), event.getChannel(),
-		      event.getSource(), event.getRecipient(),
+		      event.getUser(), event.getRecipient(),
 		      event.isSuperOp());
 	}
 

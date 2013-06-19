@@ -83,19 +83,19 @@ public class Deck {
     /**
      * Deals multiple cards at once.
      * 
-     * @param noOfCards How many cards to deal
+     * @param numcards How many cards to deal
      * 
      * @return The cards of this hand
      */
-    public final List<Card> deal(final int noOfCards) {
-        if (noOfCards < 1) {
+    public final List<Card> deal(final int numcards) {
+        if (numcards < 1) {
             throw new IllegalArgumentException("noOfCards < 1");
         }
-        if (nextCardIndex + noOfCards >= NO_OF_CARDS) {
+        if (nextCardIndex + numcards >= NO_OF_CARDS) {
             throw new IllegalStateException("No cards left in deck");
         }
         List<Card> dealtCards = new ArrayList<Card>();
-        for (int i = 0; i < noOfCards; i++) {
+        for (int i = 0; i < numcards; i++) {
             dealtCards.add(cards[nextCardIndex++]);
         }
         return dealtCards;

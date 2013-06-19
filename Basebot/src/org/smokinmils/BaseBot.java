@@ -14,12 +14,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
 
-import org.pircbotx.Channel;
+import org.pircbotx.Configuration;
+import org.pircbotx.IdentServer;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 import org.smokinmils.bot.AutoJoin;
 import org.smokinmils.bot.CheckIdentified;
-import org.smokinmils.bot.ConnectEvents;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.database.DB;
@@ -64,6 +64,9 @@ public final class BaseBot {
 	
 	/** The message to return on a CTCP FINGER request. */
 	private static final String FINGER_MSG = "Leave me alone, kthx!";
+
+	/** The socket timeout value. */
+    private static final int SOCKET_TIMEOUT = 20000;
 	
 	/** The default IRC port. */
 	private static final int DEFAULT_PORT = 6667;
@@ -115,6 +118,7 @@ public final class BaseBot {
     	           System.exit(0);
     	       }
 	       }
+	       IdentServer.startServer();
 	   }
 	   return ret;
    }
@@ -142,33 +146,36 @@ public final class BaseBot {
     * @param addr	The address for the server
     * @param port	The port for this server
     */
+   @SuppressWarnings("unchecked")
    public void addServer(final String name, final String addr, final int port) {
-	   IrcBot newbot = new IrcBot();
-
-	   newbot.setName(nick);
-	   newbot.setLogin(ident);
-	   newbot.setVerbose(debug);
-	   newbot.setAutoNickChange(true);
-	   newbot.useShutdownHook(false);
-	   newbot.setVersion(VERSION);
-	   newbot.setFinger(FINGER_MSG);
-	   newbot.setAutoReconnect(true);
-	   newbot.setAutoReconnectChannels(true);
-	   newbot.startIdentServer();
-	   
-	   newbot.setMessageDelay(0);
-	   
-	   newbot.setListenerManager(new ThreadedListenerManager<IrcBot>());
-	   newbot.getListenerManager().addListener(new CheckIdentified(newbot));
-	   newbot.getListenerManager().addListener(new ConnectEvents());
-	   
-	   try {
-		   newbot.connect(addr, port);
-		} catch (IOException | IrcException e) {
-			EventLog.fatal(e, "ConnectEvents", "onDisconnect");
-		}
+       ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();
+	   Configuration configuration =  new Configuration.Builder()
+                   .setName(nick) //Set the nick of the bot.
+                   .setLogin(ident) //login part of hostmask, eg name:login@host
+                   .setAutoNickChange(true) //Automatically change nick
+                   .setVersion(VERSION)
+                   .setCapEnabled(true) //Enable CAP features
+                   .setFinger(FINGER_MSG)
+                   .setAutoReconnect(true)
+                   .setIdentServerEnabled(true)
+                   .setServerPort(port)
+                   .setServerHostname(addr)
+                   .setMessageDelay(0)
+                   .setNickservPassword(password)
+                   .setListenerManager(lm)
+               .setSocketTimeout(SOCKET_TIMEOUT)
+               .buildConfiguration();
+       IrcBot newbot = new IrcBot(configuration);
+       
+       CheckIdentified cithread = new CheckIdentified(newbot);
+	   newbot.getConfiguration().getListenerManager().addListener(cithread);
+	   newbot.setIdentCheck(cithread);
 	   
 	   bots.put(name, newbot);
+	   
+	   // Start connecting.
+	   BotThread bt = new BotThread(newbot);
+	   bt.start();
 	   
 	   // check we are in all the channels we should be
 	   Timer rejoin = new Timer(true);
@@ -187,7 +194,7 @@ public final class BaseBot {
 	   boolean ret;
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
-		   bot.joinChannel(channel);
+		   bot.sendIRC().joinChannel(channel);
 		   bot.addValidChannel(channel);
 		   EventLog.debug("Joined " + channel + " on " + server,
 		                  "SMBaseBot", "addChannel");
@@ -208,11 +215,12 @@ public final class BaseBot {
     * 
     * @return true if action was successful
     */
-   public boolean addListener(final String server, final Event listener) {
+   @SuppressWarnings("unchecked")
+public boolean addListener(final String server, final Event listener) {
 	   boolean ret;
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
-		   bot.getListenerManager().addListener(listener);
+		   bot.getConfiguration().getListenerManager().addListener(listener);
 		   EventLog.debug("Added new listener for " + server,
 		                  "SMBaseBot", "addListener");
 		   ret = true;
@@ -241,14 +249,14 @@ public final class BaseBot {
    /**
     * Returns the name of the server a bot is connected to.
     * 
-    * @param ircBot the bot to check.
+    * @param ircbot the bot to check.
     * 
     * @return the server name
     */
-	public String getServer(final IrcBot ircBot) {
+	public String getServer(final IrcBot ircbot) {
 		String ret = null;
 		for (Entry<String, IrcBot> bot: bots.entrySet()) {
-			if (bot.getValue() == ircBot) {
+			if (bot.getValue() == ircbot) {
 				ret = bot.getKey();
 				break;
 			}
@@ -274,24 +282,43 @@ public final class BaseBot {
 	}
 	
 	/**
-	 * Sends a message to all channels on all servers.
-	 * 
-	 * @param out The message to send.
-	 */
-	public static void sendMessageToAll(final String out) {
-		for (IrcBot bot: bots.values())  {
-			for (Channel chan: bot.getChannels()) {
-				bot.sendIRCMessage(chan.getName(), out);
-			}
-		}
-	}
-	
-	/**
 	 * Identifies a bot.
 	 * 
 	 * @param bot the bot to identify
 	 */
 	public static void identify(final IrcBot bot) {
-		bot.identify(password);
+		bot.sendIRC().identify(password);
+	}
+	
+	/**
+	 * A thread used to continuously try to connect to the IRC server.
+	 * 
+	 * @author Jamie
+	 */
+	private class BotThread extends Thread {
+	    /** The irc bot to run. */
+	    private final IrcBot bot;
+	    
+	    /**
+	     * Constructor.
+	     * 
+	     * @param abot the bot to run.
+	     */
+	    public BotThread(final IrcBot abot) {
+	        bot = abot;
+	    }
+	    
+        /**
+         * (non-Javadoc).
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
+            try {
+                bot.startBot();
+            } catch (IOException | IrcException e) {
+                EventLog.log(e, "BotThread", "run");
+            }
+        }
 	}
 }

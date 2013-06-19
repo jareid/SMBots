@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -96,7 +97,7 @@ public class GroupReferal extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
         Channel chan = event.getChannel();
 
         if (bot.userIsIdentified(sender) && isValidChannel(chan.getName())) {
@@ -144,6 +145,12 @@ public class GroupReferal extends Event {
                     bot.sendIRCMessage(channel, out);
 
                     isok = false;
+                } else if (!db.checkUserExists(user)) {
+                    String out = NO_USER.replaceAll("%sender", sender);
+                    out = out.replaceAll("%who", user);
+                    bot.sendIRCMessage(channel, out);
+
+                    isok = false;
                 } else if (!db.checkUserExists(ref)) {
                     String out = NO_USER.replaceAll("%sender", sender);
                     out = out.replaceAll("%who", ref);
@@ -181,7 +188,7 @@ public class GroupReferal extends Event {
              * out.replaceAll("%who", user); bot.sendIRCMessage(channel, out); }
              */
         } else {
-            bot.invalidArguments(sender, REF_FORMAT);
+            bot.invalidArguments(event.getUser(), REF_FORMAT);
         }
     }
 
@@ -201,34 +208,42 @@ public class GroupReferal extends Event {
         if (msg.length >= 2) {
             DB db = DB.getInstance();
             String user = msg[1];
-            List<ReferalUser> refs = db.getReferalUsers(user);
-            if (refs.size() == 0) {
-                String line = REFER_CHECK_NONE.replaceAll("%user", user);
-                line = line.replaceAll("%sender", sender);
-                bot.sendIRCNotice(sender, line);
+            if (!db.checkUserExists(user)) {
+                String out = NO_USER.replaceAll("%sender", sender);
+                out = out.replaceAll("%who", user);
+                bot.sendIRCMessage(event.getChannel(), out);
             } else {
-                String[] words = Utils.listToString(refs).split("(?=[\\s\\.])");
-                int i = 0;
-                boolean isfirst = true;
-                while (words.length > i) {
-                    String line = REFER_CHECK_LINE;
-                    int linelim = MAX_LINE;
-                    if (isfirst) {
-                        line = REFER_CHECK_FLINE.replaceAll("%user", user);
-                        line = line.replaceAll("%sender", sender);
-                        isfirst = false;
-                        linelim = MAX_LINE - FIRST_LINE;
-                    }
-                    while (words.length > i
-                            && line.length() + words[i].length() < linelim) {
-                        line += words[i];
-                        i++;
-                    }
+                List<ReferalUser> refs = db.getReferalUsers(user);
+                if (refs.size() == 0) {
+                    String line = REFER_CHECK_NONE.replaceAll("%user", user);
+                    line = line.replaceAll("%sender", sender);
                     bot.sendIRCNotice(sender, line);
+                } else {
+                    String[] words = Utils.listToString(refs)
+                                                        .split("(?=[\\s\\.])");
+                    int i = 0;
+                    boolean isfirst = true;
+                    while (words.length > i) {
+                        String line = REFER_CHECK_LINE;
+                        int linelim = MAX_LINE;
+                        if (isfirst) {
+                            line = REFER_CHECK_FLINE.replaceAll("%user", user);
+                            line = line.replaceAll("%sender", sender);
+                            isfirst = false;
+                            linelim = MAX_LINE - FIRST_LINE;
+                        }
+                        while (words.length > i
+                                &&
+                               line.length() + words[i].length() < linelim) {
+                            line += words[i];
+                            i++;
+                        }
+                        bot.sendIRCNotice(sender, line);
+                    }
                 }
             }
         } else {
-            bot.invalidArguments(sender, CHK_FORMAT);
+            bot.invalidArguments(event.getUser(), CHK_FORMAT);
         }
     }
 }

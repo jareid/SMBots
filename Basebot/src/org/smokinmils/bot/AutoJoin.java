@@ -11,8 +11,6 @@ package org.smokinmils.bot;
 import java.util.List;
 import java.util.TimerTask;
 
-import org.pircbotx.Channel;
-
 /**
  * Handles auto joining of the correct channels.
  *
@@ -20,7 +18,7 @@ import org.pircbotx.Channel;
  */
 public class AutoJoin extends TimerTask {
     /** Reference to the IrcBot this AutoJoiner is for. */
-    private IrcBot irc;
+    private final IrcBot irc;
 
     /**
      * Constructor.
@@ -35,20 +33,12 @@ public class AutoJoin extends TimerTask {
      * (non-Javadoc).
      * @see java.util.TimerTask#run()
      */
+    @Override
     public final void run() {
         if (irc.isConnected()) {
             List<String> channels = irc.getValidChannels();
             for (String chan: channels) {
-                boolean found = false;
-                for (Channel allchan :irc.getChannels()) {
-					if (chan.equalsIgnoreCase(allchan.getName())) {
-					    found = true;
-					}
-				}
-
-				if (!found) {
-				    irc.joinChannel(chan);
-				}
+                irc.sendIRC().joinChannel(chan);
 			}
 		}
 	}

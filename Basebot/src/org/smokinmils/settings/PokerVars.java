@@ -28,9 +28,15 @@ public final class PokerVars {
     /** The allowed big blinds. */
     public static final Integer[] ALLOWEDBB         = { 2, 4, 6, 8, 10 };
 
-    /** The table sizes. */
+    /** The initial big blinds. */
+    public static final Integer[] INITBB            = { 2, 8 };
+
+    /** The allowed table sizes. */
     public static final Integer[] ALLOWEDTBLSIZES   = { 2, 8 };
 
+    /** The initial table sizes. */
+    public static final Integer[] INITTBLSIZES      = { 8 };
+    
     /** Number of seconds to wait for actions. */
     public static final int       ACTIONSECS        = 40;
 

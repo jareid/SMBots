@@ -3,6 +3,8 @@ package org.smokinmils.games.casino;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
@@ -16,6 +18,7 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
+import org.smokinmils.settings.Variables;
 
 /**
  * Class the provide a overunder game.
@@ -90,10 +93,10 @@ public class OverUnder extends Event {
     private static final int    RANDOM = 6;
     
     /** Bonus chance. */
-    private static final double BONUS_EVEN = 0.75;
+    private static final double BONUS_EVEN = 0.76;
     
     /** Bonus chance. */
-    private static final double BONUS_NUMB = 0.84;
+    private static final double BONUS_NUMB = 0.86;
 
     /** All open bets for OU. */
     private final ArrayList<Bet> openBets;
@@ -113,7 +116,7 @@ public class OverUnder extends Event {
     @Override
     public final void message(final Message event) {
         String message = event.getMessage();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
         String channel = event.getChannel().getName();
 
         synchronized (BaseBot.getLockObject()) {
@@ -148,15 +151,16 @@ public class OverUnder extends Event {
         DB db = DB.getInstance();
         String[] msg = event.getMessage().split(" ");
         IrcBot bot = event.getBot();
-        String username = event.getUser().getNick();
-        String channel = event.getChannel().getName();
+        User user = event.getUser();
+        String username = user.getNick();
+        Channel channel = event.getChannel();
 
         if (msg.length < ROLL_CMD_LEN) {
             bot.sendIRCMessage(channel, INVALID_BET);
         } else {
             boolean found = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().equalsIgnoreCase(username)) {
+                if (bet.getUser().compareTo(user) == 0) {
                     // They already have a bet open, and as such, tell them to
                     // roll instead
                     found = true;
@@ -178,12 +182,18 @@ public class OverUnder extends Event {
                     && !choice.equalsIgnoreCase("under")
                     && !choice.equalsIgnoreCase("7")) {
                 bot.sendIRCMessage(channel, INVALID_BET);
+            } else if (choice.equalsIgnoreCase("7")
+                    && amount > Variables.MAXBET_OU_7) {
+                bot.maxBet(user, channel, Variables.MAXBET_OU_7);
+            } else if (!choice.equalsIgnoreCase("7")
+                    && amount > Variables.MAXBET) {
+                bot.maxBet(user, channel, Variables.MAXBET);
             } else if (betsize <= 0.0) {
                 bot.sendIRCMessage(
                         channel, NO_CHIPS.replaceAll("%username", username));
             } else {
                 ProfileType prof = db.getActiveProfile(username);
-                Bet bet = new Bet(username, prof, betsize, choice);
+                Bet bet = new Bet(user, prof, betsize, choice);
                 openBets.add(bet);
                 db.adjustChips(
                         username, -betsize, prof, GamesType.OVER_UNDER,
@@ -210,14 +220,15 @@ public class OverUnder extends Event {
         throws SQLException {
         DB db = DB.getInstance();
 
-        String username = event.getUser().getNick();
+        User user = event.getUser();
+        String username = user.getNick();
         IrcBot bot = event.getBot();
         String channel = event.getChannel().getName();
 
         boolean found = false;
         Bet foundbet = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().equalsIgnoreCase(username)) {
+            if (bet.getUser().compareTo(user) == 0) {
                 found = true;
                 foundbet = bet;
                 // generate some die rolls
@@ -282,15 +293,15 @@ public class OverUnder extends Event {
                 }
 
                 // remove the bet
-                db.deleteBet(bet.getUser(), GamesType.OVER_UNDER);
+                db.deleteBet(username, GamesType.OVER_UNDER);
 
                 // Generate "rake"
-                Rake.getRake(bet.getUser(), bet.getAmount(), bet.getProfile());
+                Rake.getRake(username, bet.getAmount(), bet.getProfile());
 
                 // check if jackpot won
                 if (Rake.checkJackpot(bet.getAmount())) {
                     ArrayList<String> winners = new ArrayList<String>();
-                    winners.add(bet.getUser());
+                    winners.add(username);
                     Rake.jackpotWon(
                             bet.getProfile(), GamesType.OVER_UNDER, winners,
                             bot, null);
@@ -319,15 +330,16 @@ public class OverUnder extends Event {
     private void cancel(final Message event)
         throws SQLException {
         DB db = DB.getInstance();
-        String username = event.getUser().getNick();
+        User user = event.getUser();
+        String username = user.getNick();
         String channel = event.getChannel().getName();
         Bet found = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().equalsIgnoreCase(username)) {
+            if (bet.getUser().compareTo(user) == 0) {
                 found = bet;
-                db.deleteBet(bet.getUser(), GamesType.OVER_UNDER);
+                db.deleteBet(username, GamesType.OVER_UNDER);
                 db.adjustChips(
-                        bet.getUser(), bet.getAmount(), bet.getProfile(),
+                        username, bet.getAmount(), bet.getProfile(),
                         GamesType.OVER_UNDER, TransactionType.CANCEL);
 
                 event.getBot().sendIRCMessage(

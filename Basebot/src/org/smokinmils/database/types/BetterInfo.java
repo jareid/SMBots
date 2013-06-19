@@ -27,7 +27,7 @@ public class BetterInfo {
 	private int position;
 	
 	/** The output string. */
-	private static final String USERLINE = "%c04%who%c12(%c04%chips%c12)";
+	private static final String USERLINE = "%c04%who%c01(%c04%chips%c01)";
 	
 	/**
 	 * Constructor.
@@ -96,7 +96,8 @@ public class BetterInfo {
      * @see java.lang.Enum#toString()
      * @return the output
      */
-	public final String toString() {
+	@Override
+    public final String toString() {
 		String out = USERLINE.replaceAll("%who", getUser());
 		out = out.replaceAll("%chips", Long.toString(getAmount()));
 		out = out.replaceAll("%position", Integer.toString(getPosition()));

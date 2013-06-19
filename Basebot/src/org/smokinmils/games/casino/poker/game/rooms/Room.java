@@ -13,11 +13,18 @@ import java.util.Deque;
 
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
+import org.pircbotx.User;
+import org.smokinmils.bot.events.Join;
+import org.smokinmils.bot.events.Message;
+import org.smokinmils.bot.events.NickChange;
+import org.smokinmils.bot.events.Notice;
+import org.smokinmils.bot.events.Op;
+import org.smokinmils.bot.events.Part;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.casino.poker.enums.CommandType;
 import org.smokinmils.games.casino.poker.enums.EventType;
 import org.smokinmils.games.casino.poker.enums.RoomType;
-import org.smokinmils.games.casino.poker.game.events.Event;
+import org.smokinmils.games.casino.poker.game.events.PokerEvent;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.PokerStrs;
 
@@ -34,7 +41,7 @@ public class Room extends Thread {
     private Client             ircClient;
 
     /** The channel this bot is running on. */
-    private Channel            ircChannel;
+    private Channel            channel;
 
     /** The type of Room this is. */
     private final RoomType     roomType;
@@ -43,20 +50,20 @@ public class Room extends Thread {
     private String             roomTopic;
 
     /** A queue of events this room needs to process. */
-    private final Deque<Event> eventQueue;
+    private final Deque<PokerEvent> eventQueue;
 
     /**
      * Constructor.
      * 
-     * @param channel The channel this bot is running on
+     * @param chan The channel this bot is running on
      * @param irc The IRC client
      * @param rt The type of Room this is
      */
-    public Room(final Channel channel, final Client irc, final RoomType rt) {
-        eventQueue = new ArrayDeque<Event>();
+    public Room(final Channel chan, final Client irc, final RoomType rt) {
+        eventQueue = new ArrayDeque<PokerEvent>();
 
         setIrcClient(irc);
-        setIrcChannel(channel);
+        setChannel(chan);
         roomType = rt;
     }
 
@@ -78,50 +85,67 @@ public class Room extends Thread {
         boolean interuptted = false;
         while (!(Thread.interrupted() || interuptted)) {
             if (!eventQueue.isEmpty()) {
-                Event event = eventQueue.removeFirst();
+                PokerEvent event = eventQueue.removeFirst();
                 try {
                     switch (event.getType()) {
-                    case ACTION:
-                        this.onAction(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname(),
-                                event.getExtra());
-                        break;
                     case JOIN:
-                        this.onJoin(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname());
+                        if (event.getEvent() instanceof Join) {
+                            Join jev = (Join) event.getEvent();
+                            String botnick = jev.getBot().getNick();
+                            String jnick = jev.getUser().getNick();
+                            if (botnick.equalsIgnoreCase(jnick)
+                                    && getChannel() == null) {
+                                setChannel(jev.getChannel());
+                            }
+                            
+                            onJoin((Join) event.getEvent());
+                        } else {
+                            EventLog.log("Received Join event with invalid "
+                                         + "details", "Room", "run");
+                        }
                         break;
                     case MESSAGE:
-                        this.onMessage(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname(), event.getExtra());
+                        if (event.getEvent() instanceof Message) {
+                            onMessage((Message) event.getEvent());
+                        } else {
+                            EventLog.log("Received Message event with invalid "
+                                         + "details", "Room", "run");
+                        }
                         break;
                     case NICKCHANGE:
-                        this.onMessage(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname(),
-                                event.getExtra());
+                        if (event.getEvent() instanceof NickChange) {
+                            onNickChange((NickChange) event.getEvent());
+                        } else {
+                            EventLog.log("Received NickChange event with "
+                                         + "invalid details", "Room", "run");
+                        }
                         break;
                     case NOTICE:
-                        this.onNotice(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname(),
-                                event.getExtra());
+                        if (event.getEvent() instanceof Notice) {
+                            onNotice((Notice) event.getEvent());
+                        } else {
+                            EventLog.log("Received Notice event with invalid "
+                                         + "details", "Room", "run");
+                        }
                         break;
                     case PART:
-                        this.onPart(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname());
+                        if (event.getEvent() instanceof Part) {
+                            onPart((Part) event.getEvent());
+                        } else {
+                            EventLog.log("Received Part event with invalid "
+                                         + "details", "Room", "run");
+                        }
                         break;
                     case OP:
-                        this.onOp(
-                                event.getSender(), event.getLogin(),
-                                event.getHostname(),
-                                event.getExtra());
+                        if (event.getEvent() instanceof Op) {
+                            onOp((Op) event.getEvent());
+                        } else {
+                            EventLog.log("Received Op event with invalid "
+                                         + "details", "Room", "run");
+                        }
                         break;
                     case TIMER:
-                        this.onTimer(event.getSender());
+                        this.onTimer(event.getText());
                     default:
                         break;
                     }
@@ -145,27 +169,23 @@ public class Room extends Thread {
     /**
      * Adds an event to be handled by this Room's thread.
      * 
-     * @param sender The nick of the person who caused the event.
-     * @param login The login of the person who caused the event.
-     * @param host The hostname of the person who caused the event.
-     * @param extra The additional details for this event
+     * @param event The details for this event
      * @param type The type of event to add.
      */
-    public final void addEvent(final String sender,
-                               final String login,
-                               final String host,
-                               final String extra,
+    public final void addEvent(final Object event,
                                final EventType type) {
-        eventQueue.addLast(new Event(sender, login, host, extra, type));
+        eventQueue.addLast(new PokerEvent(event, type));
     }
-
+    
     /**
-     * Method to get this rooms IRC channel.
+     * Adds an event to be handled by this Room's thread.
      * 
-     * @return The channel for this event.
+     * @param event The details for this event
+     * @param type The type of event to add.
      */
-    public final Channel getChannel() {
-        return getIrcChannel();
+    public final void addEvent(final String event,
+                               final EventType type) {
+        eventQueue.addLast(new PokerEvent(event, type));
     }
 
     /**
@@ -174,34 +194,9 @@ public class Room extends Thread {
      * The implementation of this method in the Room abstract class performs no
      * actions and may be overridden as required.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
+     * @param event the message event.
      */
-    protected void onMessage(final String sender,
-                             final String login,
-                             final String hostname,
-                             final String message) {
-
-    }
-
-    /**
-     * This method is called whenever an ACTION is sent from a user. E.g. such
-     * events generated by typing "/me goes shopping" in most IRC clients.
-     * <p>
-     * The implementation of this method in the Room abstract class performs no
-     * actions and may be overridden as required.
-     * 
-     * @param sender The nick of the user that sent the action.
-     * @param login The login of the user that sent the action.
-     * @param hostname The hostname of the user that sent the action.
-     * @param action The action carried out by the user.
-     */
-    protected void onAction(final String sender,
-                            final String login,
-                            final String hostname,
-                            final String action) {
+    protected void onMessage(final Message event) {
 
     }
 
@@ -211,15 +206,9 @@ public class Room extends Thread {
      * The implementation of this method in the Room abstract class performs no
      * actions and may be overridden as required.
      * 
-     * @param sourceNick The nick of the user that sent the notice.
-     * @param sourceLogin The login of the user that sent the notice.
-     * @param sourceHostname The hostname of the user that sent the notice.
-     * @param notice The notice message.
+     * @param event The notice message.
      */
-    protected void onNotice(final String sourceNick,
-                            final String sourceLogin,
-                            final String sourceHostname,
-                            final String notice) {
+    protected void onNotice(final Notice event) {
 
     }
 
@@ -229,13 +218,9 @@ public class Room extends Thread {
      * The implementation of this method in the Room abstract class performs no
      * actions and may be overridden as required.
      * 
-     * @param sender The nick of the user who joined the channel.
-     * @param login The login of the user who joined the channel.
-     * @param hostname The hostname of the user who joined the channel.
+     * @param event The event
      */
-    protected void onJoin(final String sender,
-                          final String login,
-                          final String hostname) {
+    protected void onJoin(final Join event) {
 
     }
 
@@ -246,13 +231,9 @@ public class Room extends Thread {
      * The implementation of this method in the Room abstract class performs no
      * actions and may be overridden as required.
      * 
-     * @param sender The nick of the user who parted the channel.
-     * @param login The login of the user who parted from the channel.
-     * @param hostname The hostname of the user who parted from the channel.
+     * @param event The event
      */
-    protected void onPart(final String sender,
-                          final String login,
-                          final String hostname) {
+    protected void onPart(final Part event) {
 
     }
 
@@ -262,15 +243,9 @@ public class Room extends Thread {
      * The implementation of this method in the Room abstract class performs no
      * actions and may be overridden as required.
      * 
-     * @param oldNick The old nick.
-     * @param login The login of the user.
-     * @param hostname The hostname of the user.
-     * @param newNick The new nick.
+     * @param event The event
      */
-    protected void onNickChange(final String oldNick,
-                                final String login,
-                                final String hostname,
-                                final String newNick) {
+    protected void onNickChange(final NickChange event) {
 
     }
 
@@ -278,25 +253,18 @@ public class Room extends Thread {
      * Called when a user (possibly us) gets granted operator status for a
      * channel.
      * 
-     * @param sourceNick The nick of the user that performed the mode change.
-     * @param sourceLogin The login of the user that performed the mode change.
-     * @param sourceHostname The hostname of the user that performed the mode
-     *            change.
-     * @param recipient The nick of the user that got 'opped'.
+     * @param event The event
      */
-    protected void onOp(final String sourceNick,
-                        final String sourceLogin,
-                        final String sourceHostname,
-                        final String recipient) {
+    protected void onOp(final Op event) {
 
     }
 
     /**
      * Called when a user needs to send a message back to the room.
      * 
-     * @param timerName The type of timer that requires attention.
+     * @param timername The type of timer that requires attention.
      */
-    protected void onTimer(final String timerName) {
+    protected void onTimer(final String timername) {
 
     }
 
@@ -306,10 +274,10 @@ public class Room extends Thread {
      * @param who The user to send to
      * @param format The command format
      */
-    protected final void invalidArguments(final String who,
+    protected final void invalidArguments(final User who,
                                           final String format) {
-        getIrcClient().sendIRCNotice(who, PokerStrs.InvalidArgs);
-        getIrcClient().sendIRCNotice(who, format);
+        getIrcClient().getBot().sendIRCNotice(who, PokerStrs.InvalidArgs);
+        getIrcClient().getBot().sendIRCNotice(who, format);
     }
 
     /**
@@ -319,11 +287,11 @@ public class Room extends Thread {
      * @param cmd The command
      * @param format The command format
      */
-    protected final void sendFormat(final String who,
+    protected final void sendFormat(final User who,
                                     final String cmd,
                                     final String format) {
-        getIrcClient().sendIRCNotice(
-                who, "%b%c04 " + cmd + "%c12 - Format:" + format);
+        getIrcClient().getBot().sendIRCNotice(who, 
+                                   "%b%c04 " + cmd + "%c12 - Format:" + format);
     }
 
     /**
@@ -332,10 +300,10 @@ public class Room extends Thread {
      * @param who The user to send to
      * @param cmd The command
      */
-    protected final void sendFullCommand(final String who,
+    protected final void sendFullCommand(final User who,
                                          final CommandType cmd) {
         sendFormat(who, cmd.getCommandText(), cmd.getFormat());
-        getIrcClient().sendIRCNotice(who, cmd.getDescription());
+        getIrcClient().getBot().sendIRCNotice(who, cmd.getDescription());
     }
 
     /**
@@ -352,7 +320,7 @@ public class Room extends Thread {
         out = out.replaceAll("%n", Colors.NORMAL);
 
         setRoomTopic(out);
-        getIrcClient().getBot().setTopic(getIrcChannel(), getRoomTopic());
+        getChannel().send().setTopic(getRoomTopic());
     }
 
     /**
@@ -372,15 +340,15 @@ public class Room extends Thread {
     /**
      * @return the ircChannel
      */
-    protected final Channel getIrcChannel() {
-        return ircChannel;
+    public final Channel getChannel() {
+        return channel;
     }
 
     /**
-     * @param channel the ircChannel to set
+     * @param chan the ircChannel to set
      */
-    protected final void setIrcChannel(final Channel channel) {
-        ircChannel = channel;
+    protected final void setChannel(final Channel chan) {
+        channel = chan;
     }
 
     /**

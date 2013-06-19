@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -78,7 +79,7 @@ public class CreateTimedRoll extends Event {
     @Override
     public final void message(final Message event) {
         String message = event.getMessage().toLowerCase();
-        String sender = event.getUser().getNick();
+        User sender = event.getUser();
 
         if (isValidChannel(event.getChannel().getName())
                 && event.getBot().userIsIdentified(sender)) {
@@ -99,7 +100,7 @@ public class CreateTimedRoll extends Event {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
         Channel chan = event.getChannel();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
         String[] msg = message.split(" ");
 
         if (msg.length == CRE_CMD_LEN) {
@@ -142,19 +143,19 @@ public class CreateTimedRoll extends Event {
                             games.put(channel.toLowerCase(), trc);
                         } catch (IllegalArgumentException e) {
                             bot.sendIRCNotice(
-                                    sender,
+                                    senderu,
                                     "%b%c12Received the following error: %c04"
                                             + e.getMessage());
                         }
                     }
                 } else {
-                    bot.sendIRCMessage(chan.getName(), IrcBot.VALID_PROFILES);
+                    bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                 }
             } else {
-                bot.invalidArguments(sender, CRE_FORMAT);
+                bot.invalidArguments(senderu, CRE_FORMAT);
             }
         } else {
-            bot.invalidArguments(sender, CRE_FORMAT);
+            bot.invalidArguments(senderu, CRE_FORMAT);
         }
     }
 
@@ -167,7 +168,7 @@ public class CreateTimedRoll extends Event {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
         Channel chan = event.getChannel();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
         String[] msg = message.split(" ");
 
         if (msg.length == 2) {
@@ -185,10 +186,10 @@ public class CreateTimedRoll extends Event {
                             chan.getName(), ENDED.replaceAll("%chan", channel));
                 }
             } else {
-                bot.invalidArguments(sender, END_FORMAT);
+                bot.invalidArguments(senderu, END_FORMAT);
             }
         } else {
-            bot.invalidArguments(sender, END_FORMAT);
+            bot.invalidArguments(senderu, END_FORMAT);
         }
     }
 

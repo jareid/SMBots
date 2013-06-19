@@ -37,27 +37,27 @@ public final class EventLog {
 	 * Create a new log system.
 	 * 
 	 * @param queue    The queue
-	 * @param rootPath The file path
+	 * @param rootpath The file path
 	 * 
 	 * @return The logstream object
 	 */
 	private static Logstream create(final BlockingQueue<StringBuilder> queue,
-	                               final String rootPath) {
-		eventLog = new Logstream(queue, rootPath);
+	                               final String rootpath) {
+		eventLog = new Logstream(queue, rootpath);
 		return eventLog;
 	}
 	
     /**
      * Create a new log system.
      * 
-     * @param rootPath The file path
+     * @param rootpath The file path
      * @param dbg    If this log logs debug or not
      * 
      * @return The logstream object
      */
-	public static Logstream create(final String rootPath, final boolean dbg) {
+	public static Logstream create(final String rootpath, final boolean dbg) {
 		debug = dbg;
-	    return create(new LinkedBlockingQueue<StringBuilder>(), rootPath);
+	    return create(new LinkedBlockingQueue<StringBuilder>(), rootpath);
 	}
 
 	/**

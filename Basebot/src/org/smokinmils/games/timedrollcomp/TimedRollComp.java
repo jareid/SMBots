@@ -9,7 +9,9 @@ package org.smokinmils.games.timedrollcomp;
  * Copyright (C) 2013 Jamie Reid
  */
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,6 +27,7 @@ import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
+import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -46,13 +49,18 @@ public class TimedRollComp extends Event {
     
     /** The message when there is one winner. */
     public static final String               SINGLEWINNER    = "%b%c04%winner"
-          + "%c12 has won this round with a roll of %c04%roll%c12 and has been "
+          + "%c01 has won this round with a roll of %c04%roll%c01 and has been "
           + "awarded %c04%chips %profile%c12 chips.";
     
+    /** The message when there is one winner. */
+    public static final String               CANTWIN    = "%b%c04%winner"
+          + "%c01 has won this round with a roll of %c04%roll%c01 and can't be"
+          + "awarded %c04%chips %profile%c01 chips. Please message an admin!";
+    
     /** The message when there is more than one winner. */
-    public static final String               MULTIPLEWINS = "%b%c04%winner%c12"
-                   + " have won this round with rolls of %c04%roll%c12 and have"
-                   + "been awarded %c04%chips %profile%c12 chips each.";
+    public static final String               MULTIPLEWINS = "%b%c04%winner%c01"
+                   + " have won this round with rolls of %c04%roll%c01 and have"
+                   + "been awarded %c04%chips %profile%c01 chips each.";
 
     /** The message when a new round is started. */
     public static final String               NEWGAME         = "%b%c12A new "
@@ -78,7 +86,7 @@ public class TimedRollComp extends Event {
     private SortedMap<Integer, List<String>> rolls;
     
     /** List of users who have rolled. */
-    private List<String>                     userlist;
+    private Map<String, String>            userlist;
     
     /** The prize for each round. */
     private int                              prize;
@@ -106,6 +114,7 @@ public class TimedRollComp extends Event {
      * @param rnds      The number of rounds to play.
      * @param ctr       The parent object.
      */
+    @SuppressWarnings("unchecked")
     public TimedRollComp(final IrcBot bot, final String channel,
             final ProfileType prof, final int prze, final int mins,
             final int rnds, final CreateTimedRoll ctr) {
@@ -125,16 +134,16 @@ public class TimedRollComp extends Event {
             validChan = channel;
             prize = prze;
             rolls = new TreeMap<Integer, List<String>>();
-            userlist = new ArrayList<String>();
+            userlist = new HashMap<String, String>();
             irc = bot;
             profile = prof;
             rounds = rnds;
             roundsRun = 0;
             parent = ctr;
 
-            irc.joinChannel(validChan);
+            irc.sendIRC().joinChannel(validChan);
 
-            bot.getListenerManager().addListener(this);
+            bot.getConfiguration().getListenerManager().addListener(this);
 
             // Start the timer
             gameTimer = new Timer(true);
@@ -147,17 +156,24 @@ public class TimedRollComp extends Event {
     /**
      * Ends the game prematurely.
      */
+    @SuppressWarnings("unchecked")
     public final void close() {
         if (gameTimer != null) {
             gameTimer.cancel();
         }
-        Channel chan = irc.getChannel(validChan);
+        
         boolean isvalid = irc.getValidChannels().contains(
                 validChan.toLowerCase());
-        if (chan != null && !isvalid) {
-            irc.partChannel(chan);
+        if (!isvalid) {
+            Channel chan = irc.getUserChannelDao().getChannel(validChan);
+            if (chan == null) {
+                irc.sendRaw().rawLine("PART " + validChan
+                                + "Game was ended! Join #SMGamer for more!!!");
+            } else {
+                chan.send().part("Game was ended! Join #SMGamer for more!!!");
+            }
         }
-        irc.getListenerManager().removeListener(this);
+        irc.getConfiguration().getListenerManager().removeListener(this);
     }
 
     /**
@@ -171,11 +187,13 @@ public class TimedRollComp extends Event {
         String message = event.getMessage();
         Channel chan = event.getChannel();
         String sender = event.getUser().getNick();
+        String host = event.getUser().getHostmask();
 
         synchronized (this) {
             if (Utils.startsWith(message, CMD)
                     && validChan.equalsIgnoreCase(chan.getName())) {
-                if (!userlist.contains(sender.toLowerCase())) {
+                if (!userlist.containsValue(host)
+                        && !userlist.containsKey(sender)) {
                     int userroll = Random.nextInt(MAXROLL);
 
                     String out = ROLLED.replaceAll("%who", sender);
@@ -196,10 +214,10 @@ public class TimedRollComp extends Event {
                     }
                     users.add(sender);
                     rolls.put(userroll, users);
-                    userlist.add(sender.toLowerCase());
+                    userlist.put(sender, host);
                 } else {
-                    irc.sendIRCNotice(
-                            sender, CANTROLL.replaceAll("%who", sender));
+                    irc.sendIRCNotice(sender,
+                                      CANTROLL.replaceAll("%who", sender));
                 }
             }
         }
@@ -236,10 +254,22 @@ public class TimedRollComp extends Event {
             irc.sendIRCMessage(validChan, out);
 
             for (String winner : winners) {
+                DB db = DB.getInstance();
                 try {
-                    DB.getInstance().adjustChips(
-                            winner, win, profile, GamesType.TIMEDROLL,
-                            TransactionType.WIN);
+                    UserCheck ckusr = db.checkUserExists(winner,
+                                                         userlist.get(winner));
+                    if (ckusr != UserCheck.FAILED) {
+                        db.adjustChips(
+                                winner, win, profile, GamesType.TIMEDROLL,
+                                TransactionType.WIN);
+                    } else {
+                        out = CANTWIN.replaceAll("%winner", winstr);
+                        out = out.replaceAll("%roll", Integer.toString(winroll));
+                        out = out.replaceAll("%chips", Utils.chipsToString(win));
+                        out = out.replaceAll("%profile", profile.toString());
+
+                        irc.sendIRCMessage(validChan, out);
+                    }
                 } catch (Exception e) {
                     EventLog.log(e, "TimedRollComp", "processRound");
                 }

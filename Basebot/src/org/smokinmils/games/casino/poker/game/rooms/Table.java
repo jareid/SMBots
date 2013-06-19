@@ -24,6 +24,11 @@ import java.util.Vector;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.events.Join;
+import org.smokinmils.bot.events.Message;
+import org.smokinmils.bot.events.NickChange;
+import org.smokinmils.bot.events.Op;
+import org.smokinmils.bot.events.Part;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -53,12 +58,13 @@ public class Table extends Room {
     private static Integer               currentID  = 0;
 
     /** A map of all tables and their big blind. */
-    private static Map<Integer, Integer> tables = new HashMap<Integer, Integer>();
+    private static Map<Integer, Integer> tables
+                                            = new HashMap<Integer, Integer>();
 
-    /** The ID of this table */
+    /** The ID of this table. */
     private final int                    tableID;
 
-    /** The profile ID of this table */
+    /** The profile ID of this table. */
     private final ProfileType            profile;
 
     /** The size of the big blind. */
@@ -129,10 +135,14 @@ public class Table extends Room {
 
     /** Timer to handle waiting for enough players. */
     private Timer                        waitForPlayersTimer;
+    
+    /** The number of times the waiting for players timer has run. */
     private int                          waitedCount;
 
     /** Timer to handle a request to show cards. */
     private Timer                        showCardsTimer;
+    
+    /** Denotes if showing cards is enabled. */
     private boolean                      canShow;
 
     /** Timer to start a game. */
@@ -263,15 +273,14 @@ public class Table extends Room {
         setTopic();
         scheduleWaitForPlayers();
         if (failed) {
-            getIrcClient()
-                    .sendIRCMessage(
-                            "Something caused the bot to crash... please notify the staff.");
+            getIrcClient().sendIRCMessage(
+               "Something caused the bot to crash... please notify the staff.");
             System.exit(1);
         }
     }
 
     /**
-     * Returns the table ID
+     * Returns the table ID.
      * 
      * @return The table ID
      */
@@ -280,7 +289,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the profile name
+     * Returns the profile name.
      * 
      * @return The profile name
      */
@@ -289,7 +298,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the small blind
+     * Returns the small blind.
      * 
      * @return The small blind
      */
@@ -298,7 +307,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the big blind
+     * Returns the big blind.
      * 
      * @return The big blind
      */
@@ -307,7 +316,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the players at the table
+     * Returns the players at the table.
      * 
      * @return The players at the table
      */
@@ -316,7 +325,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the minimum buy in
+     * Returns the minimum buy in.
      * 
      * @return The minimum buy in
      */
@@ -325,7 +334,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the maximum buy in
+     * Returns the maximum buy in.
      * 
      * @return The maximum buy in
      */
@@ -334,7 +343,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the number of players at the table
+     * Returns the number of players at the table.
      * 
      * @return The number of players
      */
@@ -343,7 +352,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the minimum number of players for play to commence
+     * Returns the minimum number of players for play to commence.
      * 
      * @return The minimum number of players
      */
@@ -352,7 +361,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the maximum number of players for play to commence
+     * Returns the maximum number of players for play to commence.
      * 
      * @return The maximum number of players
      */
@@ -361,7 +370,7 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the number of players who are sat down/active
+     * Returns the number of players who are sat down/active.
      * 
      * @return The number of players
      */
@@ -370,23 +379,23 @@ public class Table extends Room {
     }
 
     /**
-     * Returns the next table ID
+     * Returns the next table ID.
      * 
      * @return The next available ID
      */
     public static final Integer getNextID() {
-        Integer next_id = currentID + 1;
-        for (Integer i = 1; i < next_id; i++) {
+        Integer nextid = currentID + 1;
+        for (Integer i = 1; i < nextid; i++) {
             if (!tables.containsKey(i)) {
-                next_id = i;
+                nextid = i;
                 break;
             }
         }
-        return next_id;
+        return nextid;
     }
 
     /**
-     * Returns the Map of all tables and their big blind
+     * Returns the Map of all tables and their big blind.
      * 
      * @return The map of all table IDs and big blinds
      */
@@ -395,7 +404,7 @@ public class Table extends Room {
     }
 
     /**
-     * This method checks if the table is full
+     * This method checks if the table is full.
      * 
      * @return true if the table is full. false otherwise
      */
@@ -404,7 +413,7 @@ public class Table extends Room {
     }
 
     /**
-     * This method returns how many seats are left
+     * This method returns how many seats are left.
      * 
      * @return the number of remaining seats
      */
@@ -413,28 +422,36 @@ public class Table extends Room {
     }
 
     /**
-     * This method is used to check if a user is already watching the table
+     * This method is used to check if a user is already watching the table.
+     * 
+     * @param user The user.
      * 
      * @return true if the user is not already watching
      */
-    public final boolean canWatch(final String user) {
-        return observers.contains(user);
+    public final boolean canWatch(final User user) {
+        return observers.contains(user.getNick());
     }
 
     /**
-     * This method is used to check if a user is already playing at the table
+     * This method is used to check if a user is already playing at the table.
+     * 
+     * @param user The user.
      * 
      * @return true if the user is not already playing
      */
-    public final boolean canPlay(final String user) {
+    public final boolean canPlay(final User user) {
         Player found = findPlayer(user);
-        return (found == null ? true : false);
+        boolean ret = false;
+        if (found == null) {
+            ret = true;
+        }
+        return ret;
     }
 
     /**
-     * Outputs a table message replacing all variables
+     * Outputs a table message replacing all variables.
      * 
-     * @param The unformatted string
+     * @param in The unformatted string
      * 
      * @return The formatted string
      */
@@ -445,8 +462,7 @@ public class Table extends Room {
         out = out.replaceAll("%bb", Integer.toString(bigBlind));
         out = out.replaceAll("%min", Integer.toString(minBuyIn));
         out = out.replaceAll("%max", Integer.toString(maxBuyIn));
-        out = out.replaceAll(
-                "%Pcur",
+        out = out.replaceAll("%Pcur",
                 Integer.toString(players.size() + satOutPlayers.size()));
         out = out.replaceAll("%Pmin", Integer.toString(minPlayers));
         out = out.replaceAll("%Pmax", Integer.toString(maxPlayers));
@@ -454,21 +470,22 @@ public class Table extends Room {
         out = out.replaceAll("%watching", Integer.toString(observers.size()));
         out = out.replaceAll("%hID", Integer.toString(handID));
         out = out.replaceAll("%profile", profile.toString());
-        return in;
+        return out;
     }
 
     /**
      * Adds a player to the table.
      * 
-     * @param player The player.
+     * @param sender The player.
+     * @param buyin The amount bought in for.
      */
-    public final synchronized void playerJoins(final String sender,
-                                               final Integer buy_in) {
-        Player player = new Player(sender, buy_in);
+    public final synchronized void playerJoins(final User sender,
+                                               final Integer buyin) {
+        Player player = new Player(sender, buyin);
         boolean found = false;
-        Set<User> users = getIrcClient().getBot().getUsers(getIrcChannel());
+        Set<User> users = getChannel().getUsers();
         for (User user : users) {
-            if (user.getNick().equalsIgnoreCase(sender)) {
+            if (user.compareTo(sender) == 0) {
                 found = true;
             }
         }
@@ -483,51 +500,47 @@ public class Table extends Room {
 
         // Remove chips from db
         try {
-            DB.getInstance().buyIn(sender, buy_in, profile);
-            DB.getInstance().addPokerTableCount(
-                    sender, tableID, profile, buy_in);
+            DB.getInstance().buyIn(sender.getNick(), buyin, profile);
+            DB.getInstance().addPokerTableCount(sender.getNick(), tableID,
+                                                profile, buyin);
         } catch (Exception e) {
             EventLog.log(e, "Table", "playerJoins");
         }
 
         // Invite the player to join channel
-        getIrcClient().getBot().sendInvite(sender, getIrcChannel().getName());
+        getChannel().getBot().sendIRC().invite(sender.getNick(),
+                                                getChannel().getName());
 
         // Try to voice the user incase they were watching
-        User user = getIrcClient().getBot().getUser(sender);
-        if (user != null) {
-            getIrcClient().getBot().voice(getIrcChannel(), user);
-        }
-        observers.remove(sender);
+        getChannel().send().voice(sender);
+        observers.remove(sender.getNick());
 
         // Announce
         String out = PokerStrs.PlayerJoins.replaceAll(
                 "%id", Integer.toString(tableID));
         out = out.replaceAll("%player", player.getName());
         out = out.replaceAll("%chips", Integer.toString(player.getChips()));
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
         setTopic();
     }
 
     /**
-     * A player has left the table
+     * A player has left the table.
      * 
      * @param player the player who left
-     * @param sat_out true if the player was sat out prior to leaving
+     * @param satout true if the player was sat out prior to leaving
      */
     public final synchronized void playerLeaves(final Player player,
-                                                final boolean sat_out) {
+                                                final boolean satout) {
         String name = player.getName();
         int chips = player.getChips() + player.getRebuy();
 
         // Ensure user has left the table
-        User user = getIrcClient().getBot().getUser(name);
-        if (user != null) {
-            if (createdManually) {
-                getIrcClient().getBot().kick(getIrcChannel(), user);
-            } else {
-                getIrcClient().getBot().deVoice(getIrcChannel(), user);
-            }
+        User user = player.getUser();
+        if (createdManually) {
+            getChannel().send().kick(user);
+        } else {
+            getChannel().send().deVoice(user);
         }
         // Cash out
         if (!player.isBroke()) {
@@ -565,7 +578,7 @@ public class Table extends Room {
                 "%id", Integer.toString(tableID));
         out = out.replaceAll("%player", name);
         out = out.replaceAll("%chips", Integer.toString(chips));
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
         getIrcClient().getBot().sendIRCNotice(
                 player.getName(),
                 PokerStrs.PlayerLeavesPM.replaceAll(
@@ -573,6 +586,11 @@ public class Table extends Room {
         setTopic();
     }
 
+    /**
+     * A player has sat back down.
+     * 
+     * @param player the player who left
+     */
     private synchronized void playerSitsDown(final Player player) {
         if (player.getSittingOutTimer() != null) {
             player.getSittingOutTimer().cancel();
@@ -588,13 +606,13 @@ public class Table extends Room {
         String out = PokerStrs.PlayerSitsDown.replaceAll(
                 "%id", Integer.toString(tableID));
         out = out.replaceAll("%player", player.getName());
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
     }
 
     /**
      * Called when a player is auto sat out or chooses to sit out.
      * 
-     * @param player
+     * @param player the player.
      */
     private synchronized void playerSitsOut(final Player player) {
         // Cancel timer
@@ -621,22 +639,18 @@ public class Table extends Room {
         String out = PokerStrs.PlayerSitsOut.replaceAll(
                 "%id", Integer.toString(tableID));
         out = out.replaceAll("%player", player.getName());
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
     }
 
     /**
      * This method is called whenever a message is sent to this channel.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
-     * @param message The actual message sent to the channel.
+     * @param event the Message event.
      */
     @Override
-    protected final synchronized void onMessage(final String sender,
-                                                final String login,
-                                                final String hostname,
-                                                final String message) {
+    protected final synchronized void onMessage(final Message event) {
+        String message = event.getMessage();
+        User sender = event.getUser();
         int fSpace = message.indexOf(" ");
         if (fSpace == -1) {
             fSpace = message.length();
@@ -651,8 +665,11 @@ public class Table extends Room {
 
         CommandType cmd = CommandType.fromString(firstWord);
         if (cmd != null) {
-            boolean isActor = (actor != null ? (actor.getName()
-                    .equalsIgnoreCase(sender)) : false);
+            boolean isActor = false;
+            if (actor != null) {
+                isActor = (actor.getUser().compareTo(sender) == 0);
+            }
+            
             switch (cmd) {
             case CHECK:
                 if ((msg.length == 0 || msg[0].compareTo("") == 0) && isActor) {
@@ -690,22 +707,22 @@ public class Table extends Room {
                 }
                 break;
             case SHOW:
-                onShow(sender, login, hostname, restofmsg);
+                onShow(sender, restofmsg);
                 break;
             case TBLCHIPS:
-                onChips(sender, login, hostname, restofmsg);
+                onChips(sender, restofmsg);
                 break;
             case REBUY:
-                onRebuy(sender, login, hostname, restofmsg);
+                onRebuy(sender, restofmsg);
                 break;
             case SITDOWN:
-                onSitDown(sender, login, hostname, restofmsg);
+                onSitDown(sender, restofmsg);
                 break;
             case LEAVE:
-                onLeave(sender, login, hostname, restofmsg);
+                onLeave(sender, restofmsg);
                 break;
             case SITOUT:
-                onSitOut(sender, login, hostname, restofmsg);
+                onSitOut(sender, restofmsg);
                 break;
             default:
                 // Nothing to be done
@@ -714,50 +731,32 @@ public class Table extends Room {
     }
 
     /**
-     * This method is called whenever we receive a notice to this channel.
-     * 
-     * @param sourceNick The nick of the user that sent the notice.
-     * @param sourceLogin The login of the user that sent the notice.
-     * @param sourceHostname The hostname of the user that sent the notice.
-     * @param notice The notice message.
-     */
-    @Override
-    protected synchronized void onNotice(final String sourceNick,
-                                         final String sourceLogin,
-                                         final String sourceHostname,
-                                         final String notice) {}
-
-    /**
      * This method is called whenever someone joins a channel which we are on.
      * 
-     * @param sender The nick of the user who joined the channel.
-     * @param login The login of the user who joined the channel.
-     * @param hostname The hostname of the user who joined the channel.
+     * @param event The event.
      */
     @Override
-    protected final synchronized void onJoin(final String sender,
-                                             final String login,
-                                             final String hostname) {
-        if (sender.compareToIgnoreCase(getIrcClient().getBot().getNick()) != 0) {
+    protected final synchronized void onJoin(final Join event) {
+        User sender = event.getUser();
+        String senderu = sender.getNick();
+        String botu = getIrcClient().getBot().getNick();
+        if (!senderu.equalsIgnoreCase(botu)) {
             Player found = null;
             for (Player plyr : satOutPlayers) {
-                if (plyr.getName().equalsIgnoreCase(sender)) {
+                if (plyr.getUser().compareTo(sender) == 0) {
                     found = plyr;
                     break;
                 }
             }
 
             if (found != null) {
-                User user = getIrcClient().getBot().getUser(sender);
-                if (user != null) {
-                    getIrcClient().getBot().voice(getIrcChannel(), user);
-                }
+                getChannel().send().voice(sender);
                 playerSitsDown(found);
             } else {
-                observers.add(sender.toLowerCase());
+                observers.add(senderu.toLowerCase());
             }
         } else {
-            getIrcClient().getBot().setMode(getIrcChannel(), "+m");
+            getChannel().send().setMode("+m");
         }
         setTopic();
     }
@@ -766,18 +765,17 @@ public class Table extends Room {
      * This method is called whenever someone parts this channel which we are
      * on. This is also the handler for whenever someone quits from the channel
      * 
-     * @param sender The nick of the user who parted the channel.
-     * @param login The login of the user who parted from the channel.
-     * @param hostname The hostname of the user who parted from the channel.
+     * @param event the event.
      */
     @Override
-    protected final synchronized void onPart(final String sender,
-                                             final String login,
-                                             final String hostname) {
-        if (sender.compareToIgnoreCase(getIrcClient().getBot().getNick()) != 0) {
+    protected final synchronized void onPart(final Part event) {
+        User sender = event.getUser();
+        String senderu = sender.getNick();
+        String botu = getIrcClient().getBot().getNick();
+        if (!senderu.equalsIgnoreCase(botu)) {
             Player found = null;
             for (Player plyr : players) {
-                if (plyr.getName().compareToIgnoreCase(sender) == 0) {
+                if (plyr.getUser().compareTo(sender) == 0) {
                     found = plyr;
                     break;
                 }
@@ -792,8 +790,8 @@ public class Table extends Room {
                         scheduleWaitForPlayers();
                     }
                 }
-            } else if (observers.contains(sender.toLowerCase())) {
-                observers.remove(sender.toLowerCase());
+            } else if (observers.contains(senderu.toLowerCase())) {
+                observers.remove(senderu.toLowerCase());
             }
         }
     }
@@ -801,47 +799,36 @@ public class Table extends Room {
     /**
      * This method is called whenever someone changes nick on this channel.
      * 
-     * @param oldNick The old nick.
-     * @param login The login of the user.
-     * @param hostname The hostname of the user.
-     * @param newNick The new nick.
+     * @param event the event.
      */
     @Override
-    protected synchronized void onNickChange(final String oldNick,
-                                             final String login,
-                                             final String hostname,
-                                             final String newNick) {}
+    protected synchronized void onNickChange(final NickChange event) {
+        // TODO: code to handle this.
+    }
 
     /**
      * Called when a user (possibly us) gets granted operator status for a
      * channel.
      * 
-     * @param channel The channel in which the mode change took place.
-     * @param sourceNick The nick of the user that performed the mode change.
-     * @param sourceLogin The login of the user that performed the mode change.
-     * @param sourceHostname The hostname of the user that performed the mode
-     *            change.
-     * @param recipient The nick of the user that got 'opped'.
+     * @param event the event.
      */
-    protected final synchronized void onOp(final String channel,
-                                           final String sourceNick,
-                                           final String sourceLogin,
-                                           final String sourceHostname,
-                                           final String recipient) {
-        if (sourceNick.compareToIgnoreCase(getIrcClient().getBot().getNick()) == 0) {
+    @Override
+    protected final synchronized void onOp(final Op event) {
+        String who = event.getRecipient().getNick();
+        if (who.equalsIgnoreCase(getIrcClient().getBot().getNick())) {
             setTopic();
-            getIrcClient().getBot().setMode(getIrcChannel(), "+m");
+            getChannel().send().setMode("+m");
         }
     }
 
     /**
-     * Called when a user needs to send a message back to the room
+     * Called when a user needs to send a message back to the room.
      * 
-     * @param timerName The type of timer that requires attention.
+     * @param timername The type of timer that requires attention.
      */
     @Override
-    protected final synchronized void onTimer(final String timerName) {
-        switch (timerName) {
+    protected final synchronized void onTimer(final String timername) {
+        switch (timername) {
         case TableTask.ACTION:
             if (!actionReceived && actor != null) {
                 String out = PokerStrs.NoActionWarning.replaceAll(
@@ -850,7 +837,7 @@ public class Table extends Room {
                 out = out.replaceAll(
                         "%secs",
                         Integer.toString(PokerVars.ACTIONWARNINGSECS));
-                getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+                getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
                 if (actionTimer != null) {
                     actionTimer.cancel();
@@ -858,7 +845,7 @@ public class Table extends Room {
                 actionTimer = new Timer(true);
                 actionTimer.schedule(
                         new TableTask(this, TableTask.ACTIONWARNING),
-                        PokerVars.ACTIONWARNINGSECS * 1000);
+                        PokerVars.ACTIONWARNINGSECS * Utils.MS_IN_SEC);
             }
             break;
         case TableTask.ACTIONWARNING:
@@ -912,7 +899,7 @@ public class Table extends Room {
                 out = out.replaceAll("%max", Integer.toString(maxPlayers));
                 out = out.replaceAll(
                         "%seated", Integer.toString(players.size()));
-                getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+                getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
                 scheduleWaitForPlayers();
             } else {
@@ -923,7 +910,7 @@ public class Table extends Room {
                         "%secs", Integer.toString(PokerVars.GAMESTARTSECS));
                 out = out.replaceAll(
                         "%seatedP", Integer.toString(getPlayersSatDown()));
-                getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+                getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
                 waitedCount = 0;
 
@@ -931,7 +918,7 @@ public class Table extends Room {
                 startGameTimer = new Timer(true);
                 startGameTimer.schedule(
                         new TableTask(this, TableTask.STARTGAME),
-                        PokerVars.GAMESTARTSECS * 1000);
+                        PokerVars.GAMESTARTSECS * Utils.MS_IN_SEC);
             }
             break;
         default:
@@ -940,32 +927,27 @@ public class Table extends Room {
     }
 
     /**
-     * This method handles the chips command
+     * This method handles the chips command.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
+     * @param sender The person who sent the message.
      * @param message The actual message sent to the channel.
      */
-    private synchronized void onChips(final String sender,
-                                      final String login,
-                                      final String hostname,
+    private synchronized void onChips(final User sender,
                                       final String message) {
-        String sender_nick = sender;
         String[] msg = message.split(" ");
         if ((msg.length == 0 || msg[0].compareTo("") == 0)) {
-            Player found = findPlayer(sender_nick);
+            Player found = findPlayer(sender);
 
             if (found != null) {
                 String out = PokerStrs.CheckChips.replaceAll(
                         "%id", Integer.toString(tableID));
                 out = out.replaceAll(
                         "%creds", Integer.toString(found.getChips()));
-                getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+                getIrcClient().getBot().sendIRCNotice(sender, out);
             } else {
                 String out = PokerStrs.CheckChipsFailed.replaceAll(
                         "%id", Integer.toString(tableID));
-                getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+                getIrcClient().getBot().sendIRCNotice(sender, out);
             }
         } else if ((msg.length == 1 && msg[0].compareTo("") != 0)) {
             Player found = findPlayer(msg[0]);
@@ -976,48 +958,43 @@ public class Table extends Room {
                 out = out.replaceAll("%user", msg[0]);
                 out = out.replaceAll(
                         "%creds", Integer.toString(found.getChips()));
-                getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+                getIrcClient().getBot().sendIRCNotice(sender, out);
             } else {
                 String out = PokerStrs.CheckChipsUserFailed.replaceAll(
                         "%id", Integer.toString(tableID));
                 out = out.replaceAll("%user", msg[0]);
-                getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+                getIrcClient().getBot().sendIRCNotice(sender, out);
             }
         } else {
-            invalidArguments(sender_nick, CommandType.TBLCHIPS.getFormat());
+            invalidArguments(sender, CommandType.TBLCHIPS.getFormat());
         }
     }
 
     /**
-     * This method handles the chips command
+     * This method handles the chips command.
      * 
      * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
      */
-    private synchronized void onShow(final String sender,
-                                     final String login,
-                                     final String hostname,
+    private synchronized void onShow(final User sender,
                                      final String message) {
-        String sender_nick = sender;
-        Player found = findPlayer(sender_nick);
+        Player found = findPlayer(sender);
 
         if (found == null) {
             String out = PokerStrs.ShowCardFailNoPlayer.replaceAll(
                     "%id", Integer.toString(tableID));
             out = out.replaceAll("%hID", Integer.toString(handID));
-            getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+            getIrcClient().getBot().sendIRCNotice(sender, out);
         } else if (found.getCards().length == 0) {
             String out = PokerStrs.ShowCardFailNotActive.replaceAll(
                     "%id", Integer.toString(tableID));
             out = out.replaceAll("%hID", Integer.toString(handID));
-            getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+            getIrcClient().getBot().sendIRCNotice(sender, out);
         } else if (!canShow) {
             String out = PokerStrs.ShowCardFailInHand.replaceAll(
                     "%id", Integer.toString(tableID));
             out = out.replaceAll("%hID", Integer.toString(handID));
-            getIrcClient().getBot().sendIRCNotice(sender_nick, out);
+            getIrcClient().getBot().sendIRCNotice(sender, out);
         } else {
             Card[] cards = found.getCards();
             String cardstr = "%n[";
@@ -1033,39 +1010,43 @@ public class Table extends Room {
             out = out.replaceAll("%hID", Integer.toString(handID));
             out = out.replaceAll("%who", found.getName());
             out = out.replaceAll("%cards", cardstr);
-            getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+            getIrcClient().getBot().sendIRCMessage(getChannel(), out);
         }
     }
 
     /**
-     * This method handles the rebuy command
+     * This method handles the rebuy command.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
+     * @param sender The person who sent the message.
      * @param message The actual message sent to the channel.
      */
-    private synchronized void onRebuy(final String sender,
-                                      final String login,
-                                      final String hostname,
+    private synchronized void onRebuy(final User sender,
                                       final String message) {
         String[] msg = message.split(" ");
-        Integer buy_in = Utils.tryParse(msg[0]);
-        if ((msg.length == 1 && msg[0].compareTo("") != 0) || buy_in != null) {
+        Integer buyin = Utils.tryParse(msg[0]);
+        if ((msg.length == 1 && msg[0].compareTo("") != 0) || buyin != null) {
             int maxbuy = (bigBlind * PokerVars.MAXBUYIN);
             int minbuy = (bigBlind * PokerVars.MINBUYIN);
 
-            if (buy_in != null
-                    && !getIrcClient().userHasCredits(sender, buy_in, profile)) {
+            int credits = 0;
+            try {
+                credits = DB.getInstance().checkCreditsAsInt(
+                                                 sender.getNick(), profile);
+            } catch (Exception e) {
+                EventLog.log(e, "Lobby", "onNewTable");
+            }
+            
+            if (buyin != null && credits < buyin) {
                 String out = PokerStrs.NoChipsMsg.replaceAll(
-                        "%chips", Integer.toString(buy_in));
+                        "%chips", Integer.toString(buyin));
                 out = out.replaceAll("%profile", profile.toString());
+                
                 getIrcClient().getBot().sendIRCNotice(sender, out);
-            } else if (buy_in != null) {
+            } else if (buyin != null) {
                 Player found = findPlayer(sender);
 
                 if (found != null) {
-                    int total = buy_in + found.getRebuy() + found.getChips();
+                    int total = buyin + found.getRebuy() + found.getChips();
                     int diff = maxbuy - total;
 
                     if (total > maxbuy) {
@@ -1080,7 +1061,7 @@ public class Table extends Room {
                         getIrcClient().getBot().sendIRCNotice(sender, out);
                     } else if (diff < 0) {
                         String out = PokerStrs.IncorrectBuyInMsg.replaceAll(
-                                "%buyin", Integer.toString(buy_in));
+                                "%buyin", Integer.toString(buyin));
                         out = out.replaceAll(
                                 "%maxbuy", Integer.toString(maxbuy));
                         out = out.replaceAll(
@@ -1093,14 +1074,15 @@ public class Table extends Room {
                     } else {
                         // Remove chips from db
                         try {
-                            DB.getInstance().buyIn(sender, buy_in, profile);
+                            DB.getInstance().buyIn(sender.getNick(),
+                                                   buyin, profile);
                             DB.getInstance().addPokerTableCount(
-                                    found.getName(), tableID, profile, buy_in);
+                                    found.getName(), tableID, profile, buyin);
                         } catch (Exception e) {
                             EventLog.log(e, "Table", "nextHand");
                         }
 
-                        found.rebuy(buy_in);
+                        found.rebuy(buyin);
 
                         String out = PokerStrs.RebuySuccess.replaceAll(
                                 "%id", Integer.toString(tableID));
@@ -1111,7 +1093,7 @@ public class Table extends Room {
                                 Integer.toString(found.getChips()
                                         + found.getRebuy()));
                         getIrcClient().getBot().sendIRCMessage(
-                                getIrcChannel(), out);
+                                getChannel(), out);
 
                         if (satOutPlayers.contains(found)) {
                             playerSitsDown(found);
@@ -1119,15 +1101,12 @@ public class Table extends Room {
                     }
                 } else {
                     EventLog.log(
-                            "RECOVERABLE: User tried to rebuy but is not on the table",
-                            "Table", "onRebuy");
+                            "RECOVERABLE: User tried to rebuy but is not "
+                             + "on the table", "Table", "onRebuy");
 
-                    User user = getIrcClient().getBot().getUser(sender);
-                    if (user != null) {
-                        getIrcClient().getBot().deVoice(getIrcChannel(), user);
-                    }
+                    getChannel().send().deVoice(sender);
 
-                    observers.add(sender.toLowerCase());
+                    observers.add(sender.getNick().toLowerCase());
                 }
             }
         } else {
@@ -1136,34 +1115,28 @@ public class Table extends Room {
     }
 
     /**
-     * This method handles the leave command
+     * This method handles the leave command.
      * 
      * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
      * @param message The actual message sent to the channel.
      */
-    private synchronized void onLeave(final String sender,
-                                      final String login,
-                                      final String hostname,
+    private synchronized void onLeave(final User sender,
                                       final String message) {
         String[] msg = message.split(" ");
         if (msg.length == 0 || msg[0].compareTo("") == 0) {
             Player found = findPlayer(sender);
-            boolean is_active = (found != null ? players.contains(found)
-                    : false);
+            boolean isactive = false;
+            if (found != null) {
+                isactive = players.contains(found);
+            }
 
             if (found != null) {
-                playerLeaves(found, is_active);
+                playerLeaves(found, isactive);
             } else {
-                EventLog.log(
-                        sender
-                                + "failed to leave as they should not have been voiced.",
+                EventLog.log(sender
+                      + "failed to leave as they should not have been voiced.",
                         "Table", "onLeave");
-                User user = getIrcClient().getBot().getUser(sender);
-                if (user != null) {
-                    getIrcClient().getBot().deVoice(getIrcChannel(), user);
-                }
+                getChannel().send().deVoice(sender);
             }
         } else {
             invalidArguments(sender, CommandType.LEAVE.getFormat());
@@ -1171,22 +1144,18 @@ public class Table extends Room {
     }
 
     /**
-     * This method handles the sitdown command
+     * This method handles the sitdown command.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
+     * @param sender The person who sent the message.
      * @param message The actual message sent to the channel.
      */
-    private synchronized void onSitDown(final String sender,
-                                        final String login,
-                                        final String hostname,
+    private synchronized void onSitDown(final User sender,
                                         final String message) {
         String[] msg = message.split(" ");
         if (msg.length == 0 || msg[0].compareTo("") == 0) {
             Player found = null;
             for (Player plyr : satOutPlayers) {
-                if (plyr.getName().equalsIgnoreCase(sender)) {
+                if (plyr.getUser().compareTo(sender) == 0) {
                     found = plyr;
                     break;
                 }
@@ -1206,22 +1175,18 @@ public class Table extends Room {
     }
 
     /**
-     * This method handles the sitout command
+     * This method handles the sitout command.
      * 
-     * @param sender The nick of the person who sent the message.
-     * @param login The login of the person who sent the message.
-     * @param hostname The hostname of the person who sent the message.
+     * @param sender The user who sent the message.
      * @param message The actual message sent to the channel.
      */
-    private synchronized void onSitOut(final String sender,
-                                       final String login,
-                                       final String hostname,
+    private synchronized void onSitOut(final User sender,
                                        final String message) {
         String[] msg = message.split(" ");
         if (msg.length == 0 || msg[0].compareTo("") == 0) {
             Player found = null;
             for (Player plyr : players) {
-                if (plyr.getName().equalsIgnoreCase(sender)) {
+                if (plyr.getUser().compareTo(sender) == 0) {
                     found = plyr;
                     break;
                 }
@@ -1241,7 +1206,7 @@ public class Table extends Room {
     }
 
     /**
-     * Announces the next actor and valid actions and waits
+     * Announces the next actor and valid actions and waits.
      */
     private synchronized void getAction() {
         Set<ActionType> allowed = getAllowedActions(actor);
@@ -1262,22 +1227,23 @@ public class Table extends Room {
         out = out.replaceAll("%actor", actor.getName());
         out = out.replaceAll("%valid", actions);
         out = out.replaceAll("%hID", Integer.toString(handID));
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         actionReceived = false;
 
         // Schedule time out
         actionTimer = new Timer(true);
-        actionTimer
-                .schedule(
-                        new TableTask(this, TableTask.ACTION),
-                        (PokerVars.ACTIONSECS - PokerVars.ACTIONWARNINGSECS) * 1000);
+        actionTimer.schedule(new TableTask(this, TableTask.ACTION),
+        (PokerVars.ACTIONSECS - PokerVars.ACTIONWARNINGSECS) * Utils.MS_IN_SEC);
     }
 
     /**
-     * This method handles the results of an action and moves to the next action
+     * This method handles the results of an action and moves to the next
+     * action.
+     * 
+     * @param isfirst If this was the first action for the round.
      */
-    private synchronized void actionReceived(final boolean is_first) {
+    private synchronized void actionReceived(final boolean isfirst) {
         try {
             rotateActor();
             while (actor.isBroke() && playersToAct > 1) {
@@ -1289,7 +1255,7 @@ public class Table extends Room {
             System.exit(1);
         }
 
-        if (playersToAct > 0 && !(is_first && playersToAct == 1)) {
+        if (playersToAct > 0 && !(isfirst && playersToAct == 1)) {
             getAction();
         } else {
             // Reset the results of betting in the previous round
@@ -1304,7 +1270,7 @@ public class Table extends Room {
                 if (activePlayers.size() > 1) {
                     bet = 0;
                     minBet = bigBlind;
-                    dealCommunityCards(FLOPSTR, 3);
+                    dealCommunityCards(FLOPSTR, 1 + 1 + 1);
                     doBettingRound();
                 }
                 break;
@@ -1341,12 +1307,11 @@ public class Table extends Room {
     }
 
     /**
-     * This method is called whenever the correct users acts
+     * This method is called whenever the correct users acts.
      * 
-     * @param sourceNick The nick of the user that sent the notice.
-     * @param sourceLogin The login of the user that sent the notice.
-     * @param sourceHostname The hostname of the user that sent the notice.
-     * @param extra Additional data for bet/raise
+     * @param act The action type.
+     * @param extra Extra details for the action.
+     * @param timeout If this action was due to a timeout.
      */
     private synchronized void onAction(final ActionType act,
                                        final String extra,
@@ -1368,7 +1333,7 @@ public class Table extends Room {
                         "%hID", Integer.toString(handID));
                 out = out.replaceAll("%invalid", action.getName());
                 out = out.replaceAll("%valid", allowedActions.toString());
-                getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+                getIrcClient().getBot().sendIRCMessage(getChannel(), out);
                 getIrcClient().getBot().sendIRCNotice(actor.getName(), out);
             } else {
                 Integer amount = Utils.tryParse(extra);
@@ -1399,7 +1364,7 @@ public class Table extends Room {
                     }
                 } else if (action == ActionType.RAISE) {
                     valid = (bet - actor.getBet()) + minBet;
-                    int to_call = bet - actor.getBet();
+                    int tocall = bet - actor.getBet();
                     if (amount < valid) {
                         String out = PokerStrs.InvalidBet.replaceAll(
                                 "%hID", Integer.toString(handID));
@@ -1407,7 +1372,7 @@ public class Table extends Room {
                                 "%pChips", Integer.toString(actor.getChips()));
                         out.replaceAll("%min", Integer.toString(valid));
                         stop = true;
-                    } else if (actor.getChips() <= to_call) {
+                    } else if (actor.getChips() <= tocall) {
                         action = ActionType.CALL;
                     } else if (amount > (actor.getChips() + actor.getBet())) {
                         amount = actor.getChips() + actor.getBet();
@@ -1464,7 +1429,7 @@ public class Table extends Room {
                                 "%hID", Integer.toString(handID));
                         out = out.replaceAll("%actor", actor.getName());
                         getIrcClient().getBot().sendIRCMessage(
-                                getIrcChannel(), out);
+                                getChannel(), out);
                     }
 
                     // Re-calulate all the pots
@@ -1479,7 +1444,7 @@ public class Table extends Room {
                             "%chips", Integer.toString(actor.getChips()));
                     out = out.replaceAll("%pot", Integer.toString(pot));
                     getIrcClient().getBot()
-                            .sendIRCMessage(getIrcChannel(), out);
+                            .sendIRCMessage(getChannel(), out);
 
                     if (action == ActionType.FOLD && activePlayers.size() == 1) {
                         playersToAct = 0;
@@ -1500,7 +1465,7 @@ public class Table extends Room {
      * 
      * @param sender the user who tried to act
      */
-    private synchronized void invalidAction(final String sender) {
+    private synchronized void invalidAction(final User sender) {
         String out;
         if (actor == null) {
             out = PokerStrs.InvalidActTime;
@@ -1509,8 +1474,8 @@ public class Table extends Room {
             out = out.replaceAll("%hID", Integer.toString(handID));
         }
 
-        out = out.replaceAll("%user", sender);
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        out = out.replaceAll("%user", sender.getNick());
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
     }
 
     /**
@@ -1676,7 +1641,7 @@ public class Table extends Room {
                         out = out.replaceAll("%hID", Integer.toString(handID));
 
                         getIrcClient().getBot().sendIRCMessage(
-                                getIrcChannel(), out);
+                                getChannel(), out);
                         break;
                     } else {
                         // Tie; share the pot amongst winners.
@@ -1717,7 +1682,7 @@ public class Table extends Room {
                             out = out.replaceAll(
                                     "%hID", Integer.toString(handID));
                             getIrcClient().getBot().sendIRCMessage(
-                                    getIrcChannel(), out);
+                                    getChannel(), out);
                             y++;
                         }
                         break;
@@ -1736,7 +1701,7 @@ public class Table extends Room {
                 out = out.replaceAll("%amount", Integer.toString(returned));
                 out = out.replaceAll("%id", Integer.toString(tableID));
                 out = out.replaceAll("%hID", Integer.toString(handID));
-                getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+                getIrcClient().getBot().sendIRCMessage(getChannel(), out);
             }
 
             // Each side pot contains the previous pot's total, so remove it
@@ -1752,7 +1717,7 @@ public class Table extends Room {
                 "%rake", Integer.toString(totalrake));
         out = out.replaceAll("%id", Integer.toString(tableID));
         out = out.replaceAll("%hID", Integer.toString(handID));
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         startShowCards();
 
@@ -1762,13 +1727,14 @@ public class Table extends Room {
     /**
      * Returns the active players mapped and sorted by their hand value.
      * 
-     * @param player_list The list of players to compare
+     * @param playerlist The list of players to compare
      * 
      * @return The active players mapped by their hand value (sorted).
      */
-    private synchronized Map<HandValue, List<Player>> getRankedPlayers(final List<Player> player_list) {
+    private synchronized Map<HandValue, List<Player>>getRankedPlayers(
+                                               final List<Player> playerlist) {
         Map<HandValue, List<Player>> winners = new TreeMap<HandValue, List<Player>>();
-        for (Player player : player_list) {
+        for (Player player : playerlist) {
             // Create a hand with the community cards and the player's hole
             // cards.
             Hand hand = null;
@@ -1837,7 +1803,7 @@ public class Table extends Room {
         out = out.replaceAll("%amount", Integer.toString(pot));
         out = out.replaceAll("%total", Integer.toString(player.getChips()));
         out = out.replaceAll("%rake", Integer.toString(rake));
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         pot = 0;
 
@@ -1846,31 +1812,36 @@ public class Table extends Room {
         doRake(rake);
     }
 
+    /**
+     * Takes rake for each player.
+     * 
+     * @param rake the amount of total rake.
+     */
     private void doRake(final int rake) {
-        double ind_rake = ((double) rake) / jackpotPlayers.size();
+        double indrake = ((double) rake) / jackpotPlayers.size();
         for (Player player : jackpotPlayers) {
             if (player.getBet() >= bigBlind) {
 
                 if (Rake.checkJackpot(player.getBet())) {
-                    List<String> players = new ArrayList<String>();
-                    players.add(player.getName());
+                    List<String> plyrs = new ArrayList<String>();
+                    plyrs.add(player.getName());
                     Rake.jackpotWon(
-                            profile, GamesType.POKER, players, getIrcClient()
-                                    .getBot(), getIrcChannel().getName());
+                            profile, GamesType.POKER, plyrs, getIrcClient()
+                                    .getBot(), getChannel().getName());
                 }
             }
-            Rake.getPokerRake(player.getName(), ind_rake, profile);
+            Rake.getPokerRake(player.getName(), indrake, profile);
         }
     }
 
     /**
-     * Schedules the wait for players timer
+     * Schedules the wait for players timer.
      */
     private synchronized void scheduleWaitForPlayers() {
         waitForPlayersTimer = new Timer(true);
         waitForPlayersTimer.schedule(
                 new TableTask(this, TableTask.WAITFORPLAYERS),
-                PokerVars.PLAYERWAITSECS * 1000);
+                PokerVars.PLAYERWAITSECS * Utils.MS_IN_SEC);
     }
 
     /**
@@ -1897,7 +1868,7 @@ public class Table extends Room {
         String out = PokerStrs.NoAction.replaceAll(
                 "%hID", Integer.toString(handID));
         out = out.replaceAll("%actor", actor.getName());
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         // sit the player out
         playerSitsOut(actor);
@@ -1907,15 +1878,15 @@ public class Table extends Room {
      * Posts the small blind.
      */
     private synchronized void postSmallBlind() {
-        final int smallBlind = bigBlind / 2;
-        actor.postSmallBlind(smallBlind);
-        pot += smallBlind;
-        playerBets.put(actor, smallBlind);
+        final int sb = bigBlind / 2;
+        actor.postSmallBlind(sb);
+        pot += sb;
+        playerBets.put(actor, sb);
 
         String out = PokerStrs.SmallBlindPosted.replaceAll(
-                "%sb", Integer.toString(smallBlind));
+                "%sb", Integer.toString(sb));
         out = out.replaceAll("%player", actor.getName());
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         try {
             rotateActor();
@@ -1938,7 +1909,7 @@ public class Table extends Room {
         String out = PokerStrs.BigBlindPosted.replaceAll(
                 "%bb", Integer.toString(bigBlind));
         out = out.replaceAll("%player", actor.getName());
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         try {
             rotateActor();
@@ -1972,7 +1943,7 @@ public class Table extends Room {
             getIrcClient().getBot().sendIRCMessage(player.getName(), out);
         }
         getIrcClient().getBot().sendIRCMessage(
-                getIrcChannel(),
+                getChannel(),
                 PokerStrs.HoleCardsDealt.replaceAll(
                         "%hID", Integer.toString(handID)));
     }
@@ -1980,13 +1951,13 @@ public class Table extends Room {
     /**
      * Deals a number of community cards.
      * 
-     * @param phaseName The name of the phase.
-     * @param noOfCards The number of cards to deal.
+     * @param phase The name of the phase.
+     * @param nocards The number of cards to deal.
      */
-    private synchronized void dealCommunityCards(final String phaseName,
-                                                 final int noOfCards) {
+    private synchronized void dealCommunityCards(final String phase,
+                                                 final int nocards) {
         String cardstr = "";
-        for (int i = 0; i < noOfCards; i++) {
+        for (int i = 0; i < nocards; i++) {
             Card card = deck.deal();
             try {
                 card = deck.deal();
@@ -1997,16 +1968,16 @@ public class Table extends Room {
             board.add(card);
             cardstr = cardstr + card.toIRCString() + "%n ";
         }
-        phaseStrings.put(phaseName, cardstr);
+        phaseStrings.put(phase, cardstr);
 
-        String board_out = createBoardOutput(phaseName);
+        String boardout = createBoardOutput(phase);
 
         // Notify channel of the card(s) dealt
         String out = PokerStrs.CommunityDealt.replaceAll(
                 "%hID", Integer.toString(handID));
-        out = out.replaceAll("%round", phaseName);
-        out = out.replaceAll("%cards", board_out);
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        out = out.replaceAll("%round", phase);
+        out = out.replaceAll("%cards", boardout);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
         // Notify each player of all their cards
         for (Player player : activePlayers) {
@@ -2017,20 +1988,20 @@ public class Table extends Room {
                     cardstr = cardstr + cards[i].toIRCString() + "%n ";
                 }
             }
-            cardstr += "] " + board_out;
+            cardstr += "] " + boardout;
 
             out = PokerStrs.CommunityDealtPlayer.replaceAll(
                     "%hID", Integer.toString(handID));
             out = out.replaceAll("%id", Integer.toString(tableID));
-            out = out.replaceAll("%round", phaseName);
+            out = out.replaceAll("%round", phase);
             out = out.replaceAll("%cards", cardstr);
-            getIrcClient().sendIRCMessage(player.getName(), out);
+            getIrcClient().getBot().sendIRCMessage(player.getName(), out);
         }
 
     }
 
     /**
-     * Prepares the table for a new hand
+     * Prepares the table for a new hand.
      */
     private synchronized void nextHand() {
         board.clear();
@@ -2038,7 +2009,7 @@ public class Table extends Room {
         pot = 0;
         currentRound = 0;
         handActive = false;
-        List<Player> remove_list = new ArrayList<Player>();
+        List<Player> removelist = new ArrayList<Player>();
         playerBets = new HashMap<Player, Integer>();
         phaseStrings.clear();
 
@@ -2050,12 +2021,12 @@ public class Table extends Room {
             player.resetHand();
             // Remove players without chips
             if (player.isBroke()) {
-                remove_list.add(player);
+                removelist.add(player);
             }
             playerBets.put(player, 0);
 
             // Only add non-sat out players to activePlayers
-            if (!remove_list.contains(player)) {
+            if (!removelist.contains(player)) {
                 activePlayers.add(player);
                 jackpotPlayers.add(player);
             }
@@ -2068,11 +2039,11 @@ public class Table extends Room {
         }
 
         // Sit all broke players out.
-        for (Player player : remove_list) {
+        for (Player player : removelist) {
             String out = PokerStrs.OutOfChips.replaceAll(
                     "%player", player.getName());
             out = out.replaceAll("%id", Integer.toString(tableID));
-            getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+            getIrcClient().getBot().sendIRCMessage(getChannel(), out);
             playerSitsOut(player);
         }
 
@@ -2106,7 +2077,7 @@ public class Table extends Room {
             out = out.replaceAll("%sb", players.get(actorPosition).getName());
             out = out.replaceAll("%bb", players.get(bbPosition).getName());
 
-            getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+            getIrcClient().getBot().sendIRCMessage(getChannel(), out);
 
             // Small blind.
             postSmallBlind();
@@ -2126,7 +2097,7 @@ public class Table extends Room {
     }
 
     /**
-     * Shuts down this table when we have no active or sat out players
+     * Shuts down this table when we have no active or sat out players.
      */
     private synchronized void closeTable() {
         tables.remove(tableID);
@@ -2135,7 +2106,7 @@ public class Table extends Room {
     }
 
     /**
-     * Set's the table channel's topic
+     * Set's the table channel's topic.
      */
     private void setTopic() {
         super.setTopic(formatTableInfo(PokerStrs.TableTopic));
@@ -2143,6 +2114,8 @@ public class Table extends Room {
 
     /**
      * Voices/Devoices players/non-players when the bot joins the channel.
+     * 
+     * @param users who joined the channel
      */
     public final void joinedChannel(final User[] users) {
         EventLog.info(
@@ -2154,7 +2127,7 @@ public class Table extends Room {
         for (int i = 0; i < users.length; i++) {
             for (Player player : playerlist) {
                 if (player.getName().equalsIgnoreCase(users[i].getNick())) {
-                    getIrcClient().getBot().voice(getIrcChannel(), users[i]);
+                    getChannel().send().voice(users[i]);
                     if (satOutPlayers.contains(player)) {
                         playerSitsDown(player);
                     }
@@ -2165,8 +2138,8 @@ public class Table extends Room {
             // user didn't exist, devoice
             if (users[i].getNick().compareToIgnoreCase(
                     getIrcClient().getBot().getNick()) != 0) {
-                getIrcClient().getBot().deOp(getIrcChannel(), users[i]);
-                getIrcClient().getBot().deVoice(getIrcChannel(), users[i]);
+                getChannel().send().deOp(users[i]);
+                getChannel().send().deVoice(users[i]);
             }
         }
 
@@ -2177,7 +2150,7 @@ public class Table extends Room {
 
     /**
      * Used to cancel the currently running hand Generally called after a
-     * disconnect
+     * disconnect.
      */
     public final synchronized void cancelHand() {
         for (Player player : players) {
@@ -2198,22 +2171,22 @@ public class Table extends Room {
     }
 
     /**
-     * Calculates the players in each side pot and the amount of each
+     * Calculates the players in each side pot and the amount of each.
      */
     private synchronized void calculateSidePots() {
         // Reset the sidepots
         sidePots.clear();
 
         // For each unique "all-in" bet amount, create a new sidepot
-        List<Integer> sidepot_amounts = new ArrayList<Integer>();
+        List<Integer> spamounts = new ArrayList<Integer>();
         for (Player player : activePlayers) {
             if (player.isBroke()) {
                 // Player is all in, do we have a side pot for this size?
                 // If not, create one
                 int totalbet = player.getTotalBet();
-                if (!sidepot_amounts.contains(totalbet)) {
+                if (!spamounts.contains(totalbet)) {
                     sidePots.add(new SidePot(totalbet));
-                    sidepot_amounts.add(totalbet);
+                    spamounts.add(totalbet);
                 }
             }
         }
@@ -2236,7 +2209,7 @@ public class Table extends Room {
     }
 
     /**
-     * Finds a player object with a specific name
+     * Finds a player object with a specific name.
      * 
      * @param name the player name
      * @return the player
@@ -2245,7 +2218,7 @@ public class Table extends Room {
         Player found = null;
         // find the player
         for (Player plyr : players) {
-            if (plyr.getName().compareToIgnoreCase(name) == 0) {
+            if (plyr.getName().equalsIgnoreCase(name)) {
                 found = plyr;
                 break;
             }
@@ -2254,7 +2227,36 @@ public class Table extends Room {
         // check if they are sat out
         if (found == null) {
             for (Player plyr : satOutPlayers) {
-                if (plyr.getName().compareToIgnoreCase(name) == 0) {
+                if (plyr.getName().equalsIgnoreCase(name)) {
+                    found = plyr;
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+    
+    /**
+     * Finds a player object with a specific name.
+     * 
+     * @param name the player name
+     * @return the player
+     */
+    private Player findPlayer(final User name) {
+        Player found = null;
+        // find the player
+        for (Player plyr : players) {
+            if (plyr.getUser().compareTo(name) == 0) {
+                found = plyr;
+                break;
+            }
+        }
+
+        // check if they are sat out
+        if (found == null) {
+            for (Player plyr : satOutPlayers) {
+                if (plyr.getUser().compareTo(name) == 0) {
                     found = plyr;
                     break;
                 }
@@ -2265,19 +2267,19 @@ public class Table extends Room {
     }
 
     /**
-     * Creates the public output of cards for the board
+     * Creates the public output of cards for the board.
      * 
-     * @param phaseName The current board
+     * @param phase The current board
      * @return the cards output
      */
-    private String createBoardOutput(final String phaseName) {
+    private String createBoardOutput(final String phase) {
         String output = "";
-        if (phaseName.compareTo(FLOPSTR) == 0) {
+        if (phase.compareTo(FLOPSTR) == 0) {
             output = phaseStrings.get(FLOPSTR);
-        } else if (phaseName.compareTo(TURNSTR) == 0) {
+        } else if (phase.compareTo(TURNSTR) == 0) {
             output = phaseStrings.get(FLOPSTR) + "| ";
             output += phaseStrings.get(TURNSTR);
-        } else if (phaseName.compareTo(RIVERSTR) == 0) {
+        } else if (phase.compareTo(RIVERSTR) == 0) {
             output = phaseStrings.get(FLOPSTR) + "| ";
             output += phaseStrings.get(TURNSTR) + "| ";
             output += phaseStrings.get(RIVERSTR);
@@ -2295,10 +2297,9 @@ public class Table extends Room {
                 "%id", Integer.toString(tableID));
         out = out.replaceAll("%hID", Integer.toString(handID));
         out = out.replaceAll("%secs", Integer.toString(PokerVars.SHOWCARDSECS));
-        getIrcClient().getBot().sendIRCMessage(getIrcChannel(), out);
+        getIrcClient().getBot().sendIRCMessage(getChannel(), out);
         showCardsTimer = new Timer(true);
-        showCardsTimer.schedule(
-                new TableTask(this, TableTask.SHOWCARDS),
-                PokerVars.SHOWCARDSECS * 1000);
+        showCardsTimer.schedule(new TableTask(this, TableTask.SHOWCARDS),
+                                PokerVars.SHOWCARDSECS * Utils.MS_IN_SEC);
     }
 }

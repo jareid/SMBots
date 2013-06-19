@@ -28,7 +28,8 @@ public class Quit extends QuitEvent<IrcBot> {
 	 * @see org.pircbotx.hooks.type.QuitEvent
 	 */
 	public Quit(final QuitEvent<IrcBot> event) {
-		super(event.getBot(), event.getUser(), event.getReason());
+		super(event.getBot(), event.getDaoSnapshot(),
+		        event.getUser(), event.getReason());
 	}
 	
 
