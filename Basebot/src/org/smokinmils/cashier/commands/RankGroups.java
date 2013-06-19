@@ -218,7 +218,7 @@ public class RankGroups extends Event {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         User senderu = event.getUser();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == 2) {
             DB db = DB.getInstance();
@@ -251,7 +251,7 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == ADD_CMD_LEN) {
             DB db = DB.getInstance();
@@ -293,7 +293,7 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == 2) {
             DB db = DB.getInstance();
@@ -322,7 +322,7 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == 2) {
             DB db = DB.getInstance();
@@ -351,7 +351,7 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == REN_CMD_LEN) {
             DB db = DB.getInstance();
@@ -387,7 +387,7 @@ public class RankGroups extends Event {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         String sender = event.getUser().getNick();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == 1) {
             List<String> groups = DB.getInstance().listRankGroups();
@@ -411,7 +411,7 @@ public class RankGroups extends Event {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         String sender = event.getUser().getNick();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == 2) {
             DB db = DB.getInstance();
@@ -442,7 +442,7 @@ public class RankGroups extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length == RR_CMD_LEN) {
             DB db = DB.getInstance();

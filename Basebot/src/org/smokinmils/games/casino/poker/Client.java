@@ -327,7 +327,6 @@ public class Client extends Event {
         Integer tableid = Table.getNextID();
         String chan = PokerVars.TABLECHAN + tableid;
         bot.sendIRC().joinChannel(chan);
-        bot.sendIRCMessage("ChanServ", "INVITE " + chan);
         Channel achan = bot.getUserChannelDao().getChannel(chan);
         Table table = new Table(achan, this, tableid, stake,
                                 players, profile, manual);
@@ -442,7 +441,7 @@ public class Client extends Event {
      * @param in The message to send with formatting variables
      */
     public final void sendIRCMessage(final String in) {
-        bot.sendIRCMessage(lobbyChan, in);
+        bot.sendIRCMessage(bot.getUserChannelDao().getChannel(lobbyChan), in);
     }
 
     /**

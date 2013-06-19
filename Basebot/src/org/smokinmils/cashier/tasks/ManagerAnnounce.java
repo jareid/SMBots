@@ -17,6 +17,7 @@ import java.util.TimerTask;
 
 import org.ini4j.Ini;
 import org.ini4j.Profile.Section;
+import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.logging.EventLog;
 
@@ -107,8 +108,9 @@ public class ManagerAnnounce extends TimerTask {
         if (messages.size() >= 1 && intervals.size() >= 1) {
             out = messages.remove(0);
             interval = intervals.remove(0);
-
-            bot.sendIRCMessage(channel, out);
+            
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
+            bot.sendIRCMessage(chan, out);
         }
 
         if (messages.size() == 0) {

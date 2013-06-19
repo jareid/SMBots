@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
@@ -50,7 +51,7 @@ public class TimedRollComp extends Event {
     /** The message when there is one winner. */
     public static final String               SINGLEWINNER    = "%b%c04%winner"
           + "%c01 has won this round with a roll of %c04%roll%c01 and has been "
-          + "awarded %c04%chips %profile%c12 chips.";
+          + "awarded %c04%chips %profile%c01 chips.";
     
     /** The message when there is one winner. */
     public static final String               CANTWIN    = "%b%c04%winner"
@@ -65,10 +66,6 @@ public class TimedRollComp extends Event {
     /** The message when a new round is started. */
     public static final String               NEWGAME         = "%b%c12A new "
                                  + "round has begun, use %c04%cmd%c12 to roll.";
-    
-    /** The message when someone has already rolled. */
-    public static final String               CANTROLL   = "%b%c04%who%c12: "
-                                    + "You have already rolled for this round.";
 
     /** The highest possible roll number. */
     public static final int                  MAXROLL         = 1000;
@@ -186,7 +183,8 @@ public class TimedRollComp extends Event {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
         Channel chan = event.getChannel();
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender =  senderu.getNick();
         String host = event.getUser().getHostmask();
 
         synchronized (this) {
@@ -198,13 +196,13 @@ public class TimedRollComp extends Event {
 
                     String out = ROLLED.replaceAll("%who", sender);
                     out = out.replaceAll("%roll", Integer.toString(userroll));
-                    bot.sendIRCMessage(validChan, out);
+                    bot.sendIRCMessage(chan, out);
 
                     if (rolls.isEmpty() || rolls.lastKey() < userroll) {
                         out = NEWLEADER.replaceAll("%winner", sender);
                         out = out.replaceAll(
                                 "%roll", Integer.toString(userroll));
-                        irc.sendIRCMessage(validChan, out);
+                        irc.sendIRCMessage(chan, out);
                     }
 
                     // add to the map
@@ -215,9 +213,6 @@ public class TimedRollComp extends Event {
                     users.add(sender);
                     rolls.put(userroll, users);
                     userlist.put(sender, host);
-                } else {
-                    irc.sendIRCNotice(sender,
-                                      CANTROLL.replaceAll("%who", sender));
                 }
             }
         }
@@ -228,6 +223,7 @@ public class TimedRollComp extends Event {
      */
     private synchronized void processRound() {
         // Decide who has won and give them their prize.
+        Channel vchan = irc.getUserChannelDao().getChannel(validChan);
         if (!rolls.isEmpty() && rolls.size() > 1) {
             Integer winroll = rolls.lastKey();
             List<String> winners = rolls.get(winroll);
@@ -251,7 +247,7 @@ public class TimedRollComp extends Event {
             out = out.replaceAll("%chips", Utils.chipsToString(win));
             out = out.replaceAll("%profile", profile.toString());
 
-            irc.sendIRCMessage(validChan, out);
+            irc.sendIRCMessage(vchan, out);
 
             for (String winner : winners) {
                 DB db = DB.getInstance();
@@ -268,7 +264,7 @@ public class TimedRollComp extends Event {
                         out = out.replaceAll("%chips", Utils.chipsToString(win));
                         out = out.replaceAll("%profile", profile.toString());
 
-                        irc.sendIRCMessage(validChan, out);
+                        irc.sendIRCMessage(vchan, out);
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "TimedRollComp", "processRound");
@@ -284,7 +280,7 @@ public class TimedRollComp extends Event {
             parent.endRollGame(validChan, irc);
             close();
         } else {
-            irc.sendIRCMessage(validChan, NEWGAME.replaceAll("%cmd", CMD));
+            irc.sendIRCMessage(vchan, NEWGAME.replaceAll("%cmd", CMD));
         }
     }
 

@@ -11,6 +11,7 @@ package org.smokinmils.cashier.rake;
 
 import java.util.List;
 
+import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.Utils;
@@ -134,7 +135,7 @@ public final class Rake {
                                                final GamesType game,
                                                final List<String> players,
                                                final IrcBot bot,
-                                               final String channel) {
+                                               final Channel channel) {
         try {
             DB db = DB.getInstance();
             int jackpot = (int) Math.floor(db.getJackpot(profile));
@@ -158,15 +159,18 @@ public final class Rake {
                     out = out.replaceAll("%game", game.toString());
 
                     if (channel != null
-                            && !channel.equalsIgnoreCase(jackpotChannel)) {
+                       && !channel.getName().equalsIgnoreCase(jackpotChannel)) {
                         bot.sendIRCMessage(channel, out);
                         bot.sendIRCMessage(channel, out);
                         bot.sendIRCMessage(channel, out);
                     }
+                    
+                    Channel jpchan = bot.getUserChannelDao()
+                                                    .getChannel(jackpotChannel);
 
-                    bot.sendIRCMessage(jackpotChannel, out);
-                    bot.sendIRCMessage(jackpotChannel, out);
-                    bot.sendIRCMessage(jackpotChannel, out);
+                    bot.sendIRCMessage(jpchan, out);
+                    bot.sendIRCMessage(jpchan, out);
+                    bot.sendIRCMessage(jpchan, out);
 
                     db.updateJackpot(profile, MIN_JACKPOT);
                 }

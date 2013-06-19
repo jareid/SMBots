@@ -10,6 +10,7 @@ package org.smokinmils.cashier.tasks;
 
 import java.util.TimerTask;
 
+import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.BetterInfo;
@@ -73,7 +74,8 @@ public class BetDetails extends TimerTask {
                     out = out.replaceAll(
                             "%hbt_chips", Long.toString(topbetter.getAmount()));
 
-                    bot.sendIRCMessage(channel, out);
+                    Channel chan = bot.getUserChannelDao().getChannel(channel);
+                    bot.sendIRCMessage(chan, out);
                 } catch (Exception e) {
                     EventLog.log(e, "BetDetails", "run");
                 }

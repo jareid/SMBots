@@ -147,8 +147,9 @@ public class Lottery extends Event {
             out = out.replaceAll("%amount", Integer.toString(amount));
             out = out.replaceAll("%percent", Integer.toString(LOTTERYPERCENT));
             out = out.replaceAll("%cmd", COMMAND);
-
-            bot.sendIRCMessage(channel, out);
+            
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
+            bot.sendIRCMessage(chan, out);
         }
     }
 
@@ -167,6 +168,7 @@ public class Lottery extends Event {
 
         try {
             DB db = DB.getInstance();
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
             for (ProfileType profile : ProfileType.values()) {
                 int amount = db.getLotteryTickets(profile);
                 if (amount > 0) {
@@ -183,7 +185,7 @@ public class Lottery extends Event {
                             "%profile", profile.toString());
                     out = out.replaceAll("%winner", winner);
                     out = out.replaceAll("%amount", Integer.toString(amount));
-                    bot.sendIRCMessage(channel, out);
+                    bot.sendIRCMessage(chan, out);
                 }
             }
 
@@ -216,6 +218,7 @@ public class Lottery extends Event {
         out = out.replaceAll("%percent", Integer.toString(LOTTERYPERCENT));
         out = out.replaceAll("%cmd", COMMAND);
 
-        bot.sendIRCMessage(channel, out);
+        Channel chan = bot.getUserChannelDao().getChannel(channel);
+        bot.sendIRCMessage(chan, out);
     }
 }

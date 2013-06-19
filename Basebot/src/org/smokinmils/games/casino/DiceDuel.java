@@ -223,7 +223,7 @@ public class DiceDuel extends Event {
         String username = user.getNick();
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         DB db = DB.getInstance();
         String p1 = username; // user who is calling
@@ -234,8 +234,8 @@ public class DiceDuel extends Event {
 
         // check to see if someone is playing themselves...
         if (p1.equalsIgnoreCase(p2)) {
-            bot.sendIRCMessage(
-                    channel, NO_SELFPLAY.replaceAll("%username", username));
+            bot.sendIRCMessage(channel,
+                               NO_SELFPLAY.replaceAll("%username", username));
         } else if (p2 != null) {
             Bet found = null;
             boolean foundb = false;
@@ -313,15 +313,13 @@ public class DiceDuel extends Event {
                                                                   // nice
                             ArrayList<String> players = new ArrayList<String>();
                             players.add(loser);
-                            Rake.jackpotWon(
-                                    loserProfile, GamesType.DICE_DUEL, players,
-                                    bot, null);
+                            Rake.jackpotWon(loserProfile, GamesType.DICE_DUEL, 
+                                            players, bot, null);
                         } else if (Rake.checkJackpot(bet.getAmount())) {
                             ArrayList<String> players = new ArrayList<String>();
                             players.add(winner);
-                            Rake.jackpotWon(
-                                    winnerProfile, GamesType.DICE_DUEL,
-                                    players, bot, null);
+                            Rake.jackpotWon(winnerProfile, GamesType.DICE_DUEL,
+                                            players, bot, null);
                         }
                         
                         int losed = d1;
@@ -369,7 +367,7 @@ public class DiceDuel extends Event {
         throws SQLException {
         User user = event.getUser();
         String username = user.getNick();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         DB db = DB.getInstance();
         // try to locate and cancel the bet else ignore
@@ -432,8 +430,9 @@ public class DiceDuel extends Event {
                                         Utils.chipsToString(bet.getAmount()));
                 }
                 String line = OPEN_WAGERS.replaceAll("%wagers", wagers);
-
-                irc.sendIRCMessage(channel, line);
+                
+                Channel chan = irc.getUserChannelDao().getChannel(channel);
+                irc.sendIRCMessage(chan, line);
             }
         }
     }

@@ -10,6 +10,7 @@ package org.smokinmils.cashier.tasks;
 
 import java.util.TimerTask;
 
+import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.cashier.rake.Rake;
 
@@ -51,7 +52,8 @@ public class JackpotAnnounce extends TimerTask {
                    + "%c041%%c01 chance per 1000%c01 chips). To see the current"
                    + " jackpot sizes use %c04!jackpots%c01.";
         if (Rake.JACKPOTENABLED) {
-            bot.sendIRCMessage(channel, out);
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
+            bot.sendIRCMessage(chan, out);
         }
     }
 }

@@ -100,7 +100,7 @@ public class GiveChips extends Event {
                                 out = out.replaceAll("%profile",
                                                      profile.toString());
                                 
-                                bot.sendIRCMessage(chan.getName(), out);
+                                bot.sendIRCMessage(chan, out);
 
                                 out = GIVECHIPSPM.replaceAll("%amount",
                                         Utils.chipsToString(amount));
@@ -109,15 +109,18 @@ public class GiveChips extends Event {
                                                      sender.getNick());
                                 out = out.replaceAll("%profile",
                                         profile.toString());
-                                bot.sendIRCNotice(user, out);
+                                
+                                User usr = bot.getUserChannelDao()
+                                                                 .getUser(user);
+                                bot.sendIRCNotice(usr, out);
+                                
                             } else {
                                 EventLog.log(sender + " attempted to give "
                                         + "someone chips and the database "
                                         + "failed", "GiveChips", "message");
                             }
                         } else {
-                            bot.sendIRCMessage(chan.getName(),
-                                    IrcBot.VALID_PROFILES);
+                            bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                         }
                     } else {
                         bot.invalidArguments(event.getUser(), FORMAT);

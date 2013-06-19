@@ -555,15 +555,13 @@ public class RPSGame extends Event {
         if (Rake.checkJackpot(amount)) {
             ArrayList<String> players = new ArrayList<String>();
             players.add(loser.getNick());
-            Rake.jackpotWon(
-                    wprof, GamesType.ROCKPAPERSCISSORS, players, bot,
-                    chan.getName());
+            Rake.jackpotWon(wprof, GamesType.ROCKPAPERSCISSORS, players, bot,
+                            chan);
         } else if (Rake.checkJackpot(amount)) {
             ArrayList<String> players = new ArrayList<String>();
             players.add(winner.getNick());
-            Rake.jackpotWon(
-                    wprof, GamesType.ROCKPAPERSCISSORS, players, bot,
-                    chan.getName());
+            Rake.jackpotWon(wprof, GamesType.ROCKPAPERSCISSORS, players, bot,
+                            chan);
         }
     }
 
@@ -758,7 +756,9 @@ public class RPSGame extends Event {
                     bets += betstr;
                 }
                 String out = OPENBETS.replaceAll("%bets", bets);
-                irc.sendIRCMessage(channel, out);
+                
+                Channel chan = irc.getUserChannelDao().getChannel(channel);
+                irc.sendIRCMessage(chan, out);
             }
         }
     }

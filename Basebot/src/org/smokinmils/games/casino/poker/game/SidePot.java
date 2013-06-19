@@ -144,7 +144,17 @@ public class SidePot implements Comparable<SidePot> {
         pot -= rake;
         return rake;
     }
-
+    
+    /**
+     * (non-Javadoc).
+     * @see java.lang.Object#hashCode()
+     * @return the hash code
+     */
+    @Override
+    public final int hashCode() {
+        return bet;
+    }
+    
     /**
      * (non-Javadoc).
      * @see java.lang.Object#equals(java.lang.Object)
@@ -155,7 +165,7 @@ public class SidePot implements Comparable<SidePot> {
     public final boolean equals(final Object obj) {
         boolean ret = false;
         if (obj instanceof SidePot) {
-            return ((SidePot) obj).bet == this.bet;
+            ret = ((SidePot) obj).hashCode() == hashCode();
         }
         return ret;
     }

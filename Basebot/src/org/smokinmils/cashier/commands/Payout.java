@@ -95,10 +95,9 @@ public class Payout extends Event {
                             String out = CheckIdentified.NOT_IDENTIFIED
                                                      .replaceAll("%user", user);
                             
-                            bot.sendIRCMessage(sender, out);
+                            bot.sendIRCMessage(senderu, out);
                         } else if (profile == null) {
-                            bot.sendIRCMessage(chan.getName(),
-                                                IrcBot.VALID_PROFILES);
+                            bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                         } else if (chips < amount) {
                             String out = NOCHIPSMSG.replaceAll("%chips",
                                     Utils.chipsToString(amount));
@@ -133,8 +132,10 @@ public class Payout extends Event {
                                 out = out.replaceAll("%sender", sender);
                                 out = out.replaceAll("%profile",
                                         profile.toString());
-                                
-                                bot.sendIRCNotice(user, out);
+
+                                User usr = bot.getUserChannelDao()
+                                                                 .getUser(user);
+                                bot.sendIRCNotice(usr, out);
                             } else {
                                 EventLog.log(sender + "database failed",
                                         "Payout", "message");

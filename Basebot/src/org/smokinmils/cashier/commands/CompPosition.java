@@ -93,11 +93,11 @@ public class CompPosition extends Event {
 
                 ProfileType profile = ProfileType.fromString(msg[1]);
                 if (profile == null) {
-                    bot.sendIRCMessage(chan.getName(), IrcBot.VALID_PROFILES);
+                    bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                 } else if (!profile.hasComps()) {
                     String out = NOCOMPETITION.replaceAll("%sender", sender);
                     out = out.replaceAll("%profile", profile.toString());
-                    bot.sendIRCMessage(chan.getName(), out);
+                    bot.sendIRCMessage(chan, out);
                 } else {
                     BetterInfo better = null;
                     try {
@@ -123,7 +123,7 @@ public class CompPosition extends Event {
                     out = out.replaceAll("%sender", sender);
                     out = out.replaceAll("%who", who);
 
-                    bot.sendIRCMessage(chan.getName(), out);
+                    bot.sendIRCMessage(chan, out);
 
                     DB db = DB.getInstance();
                     for (ProfileType prof : ProfileType.values()) {

@@ -579,8 +579,7 @@ public class Table extends Room {
         out = out.replaceAll("%player", name);
         out = out.replaceAll("%chips", Integer.toString(chips));
         getIrcClient().getBot().sendIRCMessage(getChannel(), out);
-        getIrcClient().getBot().sendIRCNotice(
-                player.getName(),
+        getIrcClient().getBot().sendIRCNotice(player.getUser(),
                 PokerStrs.PlayerLeavesPM.replaceAll(
                         "%id", Integer.toString(tableID)));
         setTopic();
@@ -1334,7 +1333,7 @@ public class Table extends Room {
                 out = out.replaceAll("%invalid", action.getName());
                 out = out.replaceAll("%valid", allowedActions.toString());
                 getIrcClient().getBot().sendIRCMessage(getChannel(), out);
-                getIrcClient().getBot().sendIRCNotice(actor.getName(), out);
+                getIrcClient().getBot().sendIRCNotice(actor.getUser(), out);
             } else {
                 Integer amount = Utils.tryParse(extra);
                 if (amount == null) {
@@ -1825,9 +1824,8 @@ public class Table extends Room {
                 if (Rake.checkJackpot(player.getBet())) {
                     List<String> plyrs = new ArrayList<String>();
                     plyrs.add(player.getName());
-                    Rake.jackpotWon(
-                            profile, GamesType.POKER, plyrs, getIrcClient()
-                                    .getBot(), getChannel().getName());
+                    Rake.jackpotWon(profile, GamesType.POKER, plyrs,
+                                    getIrcClient().getBot(), getChannel());
                 }
             }
             Rake.getPokerRake(player.getName(), indrake, profile);
@@ -1940,7 +1938,7 @@ public class Table extends Room {
             out = out.replaceAll("%id", Integer.toString(tableID));
             out = out.replaceAll("%card1", holeCards.get(0).toIRCString());
             out = out.replaceAll("%card2", holeCards.get(1).toIRCString());
-            getIrcClient().getBot().sendIRCMessage(player.getName(), out);
+            getIrcClient().getBot().sendIRCMessage(player.getUser(), out);
         }
         getIrcClient().getBot().sendIRCMessage(
                 getChannel(),
@@ -1995,7 +1993,7 @@ public class Table extends Room {
             out = out.replaceAll("%id", Integer.toString(tableID));
             out = out.replaceAll("%round", phase);
             out = out.replaceAll("%cards", cardstr);
-            getIrcClient().getBot().sendIRCMessage(player.getName(), out);
+            getIrcClient().getBot().sendIRCMessage(player.getUser(), out);
         }
 
     }

@@ -58,6 +58,7 @@ public class ReferalUser {
     public final int hashCode() {
         return this.getUser().hashCode();
     }
+    
     /**
      * (non-Javadoc).
      * @see java.lang.Enum#equals()

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Bet;
@@ -232,9 +233,9 @@ public class Roulette extends Event {
         String[] msg = event.getMessage().split(" ");
 
         if (state == CLOSE) {
-            bot.sendIRCMessage(channel, BETS_CLOSED);
+            bot.sendIRCMessage(event.getChannel(), BETS_CLOSED);
         } else if (msg.length < BET_CMD_LEN) {
-            bot.sendIRCNotice(username, INVALID_BET);
+            bot.sendIRCNotice(user, INVALID_BET);
         } else {
             Double amount = Utils.tryParseDbl(msg[1]);
             double betsize = db.checkCredits(username, amount);
@@ -242,9 +243,9 @@ public class Roulette extends Event {
             Integer choicenum = Utils.tryParse(msg[2]);
             ProfileType profile = db.getActiveProfile(username);
             if (amount == null) {
-                bot.sendIRCNotice(username, INVALID_BET);
+                bot.sendIRCNotice(user, INVALID_BET);
             } else if (amount <= 0) {
-                bot.sendIRCNotice(username, INVALID_BETSIZE);
+                bot.sendIRCNotice(user, INVALID_BETSIZE);
             } else if (!((choice.equalsIgnoreCase("red")
                     || choice.equalsIgnoreCase("black")
                     || choice.equalsIgnoreCase("1st")
@@ -253,7 +254,7 @@ public class Roulette extends Event {
                     || choice.equalsIgnoreCase("even") || choice
                         .equalsIgnoreCase("odd")) || (choicenum != null
                     && choicenum >= 0 && choicenum <= NUMBER))) {
-                bot.sendIRCNotice(username, INVALID_BET);
+                bot.sendIRCNotice(user, INVALID_BET);
             } else if ((choicenum != null
                         && choicenum >= 0 && choicenum <= NUMBER)
                     && amount > Variables.MAXBET_ROUL_NUM) {
@@ -261,7 +262,7 @@ public class Roulette extends Event {
             } else if (amount > Variables.MAXBET) {
                 bot.maxBet(user, event.getChannel(), Variables.MAXBET);
             } else if (betsize <= 0.0) {
-                bot.sendIRCNotice(username, NO_CHIPS);
+                bot.sendIRCNotice(user, NO_CHIPS);
             } else {
                 Bet bet = new Bet(user, profile, betsize, choice);
                 allBets.add(bet);
@@ -274,7 +275,7 @@ public class Roulette extends Event {
                 String out = BET_MADE.replaceAll("%username", username);
                 out = out.replaceAll("%choice", choice);
                 out = out.replaceAll("%amount", Utils.chipsToString(betsize));
-                bot.sendIRCMessage(channel, out);
+                bot.sendIRCMessage(event.getChannel(), out);
             }
         }
     }
@@ -289,8 +290,10 @@ public class Roulette extends Event {
     private void cancel(final Message event)
         throws SQLException {
             DB db = DB.getInstance();
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
+            
             if (state == CLOSE) {
-                bot.sendIRCMessage(channel, BETS_CLOSED);
+                bot.sendIRCMessage(chan, BETS_CLOSED);
             } else {
             User user = event.getUser();
             String username = event.getUser().getNick();
@@ -312,7 +315,7 @@ public class Roulette extends Event {
                     allBets.remove(bet);
                 }
                 
-                bot.sendIRCMessage(channel,
+                bot.sendIRCMessage(chan,
                         BETS_CANCELLED.replaceAll("%username", username));
             }
         }
@@ -321,11 +324,13 @@ public class Roulette extends Event {
 
     /**
      * Outputs the board to irc.
+     * 
+     * @param chan the channel to announce to.
      */
-    private void printBoard() {
-        bot.sendIRCMessage(channel, BOARDL1);
-        bot.sendIRCMessage(channel, BOARDL2);
-        bot.sendIRCMessage(channel, BOARDL3);
+    private void printBoard(final Channel chan) {
+        bot.sendIRCMessage(chan, BOARDL1);
+        bot.sendIRCMessage(chan, BOARDL2);
+        bot.sendIRCMessage(chan, BOARDL3);
     }
     
     /**
@@ -370,6 +375,8 @@ public class Roulette extends Event {
     private void endGame(final IrcBot ib)
         throws SQLException {
         DB db = DB.getInstance();
+        Channel chan = bot.getUserChannelDao().getChannel(channel);
+        
         // Let's "roll"
         int winner = Random.nextInt(RANDGENNUM);
         if (winner > NUMBER) {
@@ -452,7 +459,7 @@ public class Roulette extends Event {
         board += winner + " ";
 
         winline = winline.replaceAll("%board", board);
-        bot.sendIRCMessage(channel, winline);
+        bot.sendIRCMessage(chan, winline);
 
         // announce winners
         if (nameList.size() > 0) {
@@ -460,13 +467,13 @@ public class Roulette extends Event {
             for (String user : nameList) {
                 names += user + " ";
             }
-            bot.sendIRCMessage(
-                    channel, CONGRATULATIONS.replaceAll("%names", names));
+            bot.sendIRCMessage(chan,
+                               CONGRATULATIONS.replaceAll("%names", names));
         }
 
-        bot.sendIRCMessage(channel, NEW_GAME);
-        printBoard();
-        bot.sendIRCMessage(channel, PLACE_BETS);
+        bot.sendIRCMessage(chan, NEW_GAME);
+        printBoard(chan);
+        bot.sendIRCMessage(chan, PLACE_BETS);
 
         // clear the bets
         allBets.clear();
@@ -499,7 +506,8 @@ public class Roulette extends Event {
         @Override
         public void run() {
             state = CLOSE;
-            irc.sendIRCMessage(channel, SPINNING);
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
+            irc.sendIRCMessage(chan, SPINNING);
             gameTimer.schedule(new End(irc, channel),
                                NOBETSDELAYSECS * Utils.MS_IN_SEC);
         }

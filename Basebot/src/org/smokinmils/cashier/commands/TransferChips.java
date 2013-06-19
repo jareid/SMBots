@@ -128,7 +128,10 @@ public class TransferChips extends Event {
                                             Integer.toString(amount));
                                     out = out.replaceAll("%profile",
                                             profile.toString());
-                                    bot.sendIRCNotice(user, out);
+
+                                    User usr = bot.getUserChannelDao()
+                                                                 .getUser(user);
+                                    bot.sendIRCNotice(usr, out);
 
                                     // Send notice to user
                                     out = TRANSFERCHIPSSENDER.replaceAll(

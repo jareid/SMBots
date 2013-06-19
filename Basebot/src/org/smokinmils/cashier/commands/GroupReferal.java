@@ -125,7 +125,7 @@ public class GroupReferal extends Event {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         String sender = event.getUser().getNick();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         if (msg.length >= REF_CMD_LEN) {
             DB db = DB.getInstance();
@@ -203,7 +203,8 @@ public class GroupReferal extends Event {
         throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
-        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
 
         if (msg.length >= 2) {
             DB db = DB.getInstance();
@@ -217,7 +218,7 @@ public class GroupReferal extends Event {
                 if (refs.size() == 0) {
                     String line = REFER_CHECK_NONE.replaceAll("%user", user);
                     line = line.replaceAll("%sender", sender);
-                    bot.sendIRCNotice(sender, line);
+                    bot.sendIRCNotice(senderu, line);
                 } else {
                     String[] words = Utils.listToString(refs)
                                                         .split("(?=[\\s\\.])");
@@ -238,7 +239,7 @@ public class GroupReferal extends Event {
                             line += words[i];
                             i++;
                         }
-                        bot.sendIRCNotice(sender, line);
+                        bot.sendIRCNotice(senderu, line);
                     }
                 }
             }

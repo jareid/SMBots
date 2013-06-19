@@ -192,7 +192,7 @@ public class ManagerSystem extends Event {
             } else if (managerChan.equalsIgnoreCase(chan.getName())
                     && Utils.startsWith(message, LOGIN_CMD)) {
                 if (loggedInUser != null) {
-                    irc.sendIRCNotice(sender,
+                    irc.sendIRCNotice(senderu,
                             CANTLOGIN.replaceAll("%who", loggedInUser));
                 } else {
                     managerLoggedIn(sender);
@@ -247,7 +247,8 @@ public class ManagerSystem extends Event {
         if (loggedInUser != null) {
             String out = INACTIVEDLOGGEDOUT.replaceAll("%who", loggedInUser);
             out = out.replaceAll("%actchan", activityChan);
-            bot.sendIRCMessage(managerChan, out);
+            Channel chan = bot.getUserChannelDao().getChannel(managerChan);
+            bot.sendIRCMessage(chan, out);
             managerLoggedOut();
         }
     }

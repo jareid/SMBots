@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
+import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.cashier.commands.Lottery;
@@ -122,6 +123,8 @@ public class Competition extends TimerTask {
             }
         }
 
+        Channel chan = bot.getUserChannelDao().getChannel(channel);
+        
         Map<ProfileType, List<Integer>> allprizes = readPrizes();
         for (ProfileType profile : ProfileType.values()) {
             if (profile.hasComps()) {
@@ -136,7 +139,7 @@ public class Competition extends TimerTask {
                                 "Not enough prizes for " + profile.toString(),
                                 "Competition", "end");
                         bot.sendIRCMessage(
-                                channel,
+                                chan,
                                 "%b%c04No competition prizes set for + "
                                         + profile.toString()
                                         + ", please talk to an admin");
@@ -152,7 +155,7 @@ public class Competition extends TimerTask {
                     out = out.replaceAll("%prizes", prizestr);
                     out = out.replaceAll("%players", allwins);
 
-                    bot.sendIRCMessage(channel, out);
+                    bot.sendIRCMessage(chan, out);
                 } catch (Exception e) {
                     EventLog.log(e, "Competition", "run");
                 }
@@ -165,6 +168,7 @@ public class Competition extends TimerTask {
      */
     private void end() {
         // End weekly lottery
+        Channel chan = bot.getUserChannelDao().getChannel(channel);
         Lottery.endLottery(bot, channel);
 
         // End the competition
@@ -186,8 +190,7 @@ public class Competition extends TimerTask {
                         EventLog.log(
                                 "Not enough prizes for " + profile.toString(),
                                 "Competition", "end");
-                        bot.sendIRCMessage(
-                                channel,
+                        bot.sendIRCMessage(chan,
                                 "%b%c04No competition prizes set for + "
                                         + profile.toString()
                                         + ", please talk to an admin");
@@ -216,7 +219,7 @@ public class Competition extends TimerTask {
 
                     out = out.replaceAll("%players", allwins);
 
-                    bot.sendIRCMessage(channel, out);
+                    bot.sendIRCMessage(chan, out);
                 } catch (Exception e) {
                     EventLog.log(e, "Competition", "end");
                 }
@@ -240,7 +243,7 @@ public class Competition extends TimerTask {
     private Map<ProfileType, List<Integer>> readPrizes() {
         Map<ProfileType, List<Integer>> results =
                 new HashMap<ProfileType, List<Integer>>();
-
+        Channel chan = bot.getUserChannelDao().getChannel(channel);
         for (ProfileType profile : ProfileType.values()) {
             if (profile.hasComps()) {
                 List<Integer> prizes = new ArrayList<Integer>();
@@ -259,8 +262,8 @@ public class Competition extends TimerTask {
                     EventLog.log(
                             "No data for " + profile.toString(), "Competition",
                             "end");
-                    bot.sendIRCMessage(
-                            channel, "%b%c04No competition prizes set for + "
+                    bot.sendIRCMessage(chan,
+                                       "%b%c04No competition prizes set for + "
                                     + profile.toString()
                                     + " please talk to an admin");
                     continue;

@@ -121,9 +121,8 @@ public class CreateTimedRoll extends Event {
                 if (profile != null) {
                     TimedRollComp trc = games.get(channel.toLowerCase());
                     if (trc != null) {
-                        bot.sendIRCMessage(
-                                chan.getName(),
-                                EXIST.replaceAll("%chan", channel));
+                        bot.sendIRCMessage(chan,
+                                            EXIST.replaceAll("%chan", channel));
                     } else {
                         try {
                             trc = new TimedRollComp(bot, channel, profile,
@@ -142,8 +141,7 @@ public class CreateTimedRoll extends Event {
 
                             games.put(channel.toLowerCase(), trc);
                         } catch (IllegalArgumentException e) {
-                            bot.sendIRCNotice(
-                                    senderu,
+                            bot.sendIRCNotice(senderu,
                                     "%b%c12Received the following error: %c04"
                                             + e.getMessage());
                         }
@@ -177,13 +175,12 @@ public class CreateTimedRoll extends Event {
             if (!channel.isEmpty()) {
                 TimedRollComp trc = games.remove(channel.toLowerCase());
                 if (trc == null) {
-                    bot.sendIRCMessage(
-                            chan.getName(),
-                            NOEXIST.replaceAll("%chan", channel));
+                    bot.sendIRCMessage(chan,
+                                       NOEXIST.replaceAll("%chan", channel));
                 } else {
                     trc.close();
-                    bot.sendIRCMessage(
-                            chan.getName(), ENDED.replaceAll("%chan", channel));
+                    bot.sendIRCMessage(chan,
+                                       ENDED.replaceAll("%chan", channel));
                 }
             } else {
                 bot.invalidArguments(senderu, END_FORMAT);
@@ -203,7 +200,8 @@ public class CreateTimedRoll extends Event {
                                   final IrcBot bot) {
         TimedRollComp trc = games.remove(channel.toLowerCase());
         if (trc != null) {
-            bot.sendIRCMessage(channel, ENDED.replaceAll("%chan", channel));
+            Channel chan = bot.getUserChannelDao().getChannel(channel);
+            bot.sendIRCMessage(chan, ENDED.replaceAll("%chan", channel));
         }
     }
 }

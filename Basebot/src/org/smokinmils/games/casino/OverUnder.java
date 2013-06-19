@@ -223,7 +223,7 @@ public class OverUnder extends Event {
         User user = event.getUser();
         String username = user.getNick();
         IrcBot bot = event.getBot();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
 
         boolean found = false;
         Bet foundbet = null;
@@ -332,7 +332,7 @@ public class OverUnder extends Event {
         DB db = DB.getInstance();
         User user = event.getUser();
         String username = user.getNick();
-        String channel = event.getChannel().getName();
+        Channel channel = event.getChannel();
         Bet found = null;
         for (Bet bet : openBets) {
             if (bet.getUser().compareTo(user) == 0) {

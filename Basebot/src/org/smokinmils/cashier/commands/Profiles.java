@@ -8,6 +8,7 @@
  */
 package org.smokinmils.cashier.commands;
 
+import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -56,7 +57,7 @@ public class Profiles extends Event {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
         User sender = event.getUser();
-        String chan = event.getChannel().getName();
+        Channel chan = event.getChannel();
 
         if (isValidChannel(event.getChannel().getName())
                 && bot.userIsIdentified(sender)) {
