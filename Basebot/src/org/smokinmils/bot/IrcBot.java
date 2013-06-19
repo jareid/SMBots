@@ -83,7 +83,10 @@ public class IrcBot extends PircBotX {
      * 
      * @param target The place where the message is being sent
      * @param in The message to send with formatting variables
+     * 
+     * @deprecated
      */ 
+    @Deprecated
     public final void sendIRCNotice(final String target, final String in) {
         if (isConnected()) {
             for (String line: replaceIRCVariables(in).split("\n")) {
@@ -127,7 +130,10 @@ public class IrcBot extends PircBotX {
      * 
      * @param target The place where the message is being sent
      * @param in The message to send with formatting variables
+     * 
+     * @deprecated
      */
+    @Deprecated
     public final void sendIRCMessage(final String target, final String in) {
         if (isConnected()) {
             for (String line: replaceIRCVariables(in).split("\n")) {

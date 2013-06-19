@@ -57,7 +57,7 @@ public class Bot {
         }
         
         BaseBot basebot = BaseBot.getInstance();
-        boolean debug = true;
+        boolean debug = false;
         boolean refund = true;
         basebot.initialise("SM_BOT", "5w807", "smokinmils", debug, refund);
         String swift_irc = "SwiftIRC";

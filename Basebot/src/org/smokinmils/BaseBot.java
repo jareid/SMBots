@@ -151,6 +151,7 @@ public final class BaseBot {
     */
    @SuppressWarnings("unchecked")
    public void addServer(final String name, final String addr, final int port) {
+       boolean useident = !debug;
        ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();
 	   Configuration configuration =  new Configuration.Builder()
                    .setName(nick) //Set the nick of the bot.
@@ -160,7 +161,7 @@ public final class BaseBot {
                    .setCapEnabled(true) //Enable CAP features
                    .setFinger(FINGER_MSG)
                    .setAutoReconnect(true)
-                   .setIdentServerEnabled(true)
+                   .setIdentServerEnabled(useident)
                    .setServerPort(port)
                    .setServerHostname(addr)
                    .setMessageDelay(1)
