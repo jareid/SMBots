@@ -85,8 +85,10 @@ public class IrcBot extends PircBotX {
      * @param in The message to send with formatting variables
      */ 
     public final void sendIRCNotice(final String target, final String in) {
-        for (String line: replaceIRCVariables(in).split("\n")) {
-            sendRaw().rawLine("NOTICE " + target + " " + line);
+        if (isConnected()) {
+            for (String line: replaceIRCVariables(in).split("\n")) {
+                sendRaw().rawLine("NOTICE " + target + " " + line);
+            }
         }
     }
 	
@@ -127,8 +129,10 @@ public class IrcBot extends PircBotX {
      * @param in The message to send with formatting variables
      */
     public final void sendIRCMessage(final String target, final String in) {
-        for (String line: replaceIRCVariables(in).split("\n")) {
-            sendRaw().rawLine("PRIVMSG " + target + " " + line);
+        if (isConnected()) {
+            for (String line: replaceIRCVariables(in).split("\n")) {
+                sendRaw().rawLine("PRIVMSG " + target + " " + line);
+            }
         }
     }
 	

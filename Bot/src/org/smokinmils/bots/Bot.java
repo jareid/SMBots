@@ -65,16 +65,17 @@ public class Bot {
         IrcBot swift_bot = basebot.getBot(swift_irc);
 
         String[] all_swift_chans = { "#SMGamer", "#sm_tournaments",
-                "#sm_overunder",
-                "#sm_roulette", "#sm_ranks", "#managers",
-                "#sm_express", "#sm_vip" };
+                "#sm_overunder",  "#sm_roulette", "#sm_ranks", "#managers",
+                "#sm_express", "#sm_vip", "#Private1"};
         String[] dd_swift_chans = { "#SMGamer", "#sm_tournaments", "#sm_vip",
-                "#sm_express" };
+                                    "#sm_express", "#Private1" };
         String[] ou_swift_chans = { "#sm_overunder", "#sm_tournaments",
-                "#sm_vip", "#sm_express" };
+                                    "#sm_vip", "#sm_express", "#Private1" };
         String[] host_swift_chans = { "#sm_ranks", "#managers" };
         String[] mgrs_swift_chans = { "#managers" };
         String poker_lobby_swift = "#SMGamer";
+        
+        Thread.sleep(250); // wait for some time to allow bot to connect.
 
         Client poker = new Client(swift_irc, poker_lobby_swift);
         poker.initialise();
@@ -92,17 +93,18 @@ public class Bot {
         basebot.addListener(swift_irc, new RankGroups(), mgrs_swift_chans);
 
         basebot.addListener(swift_irc, new Roulette(5, "#SMGamer", swift_bot));
-        basebot.addListener(swift_irc, new Roulette(1, "#sm_roulette",
-                swift_bot));
-        basebot.addListener(
-                swift_irc, new Roulette(1, "#sm_express", swift_bot));
-        basebot.addListener(swift_irc, new Roulette(2, "#sm_tournaments",
-                swift_bot));
+        basebot.addListener(swift_irc,
+                            new Roulette(1, "#sm_roulette", swift_bot));
+        basebot.addListener(swift_irc,
+                             new Roulette(1, "#sm_express", swift_bot));
+        basebot.addListener(swift_irc,
+                            new Roulette(2, "#sm_tournaments", swift_bot));
         basebot.addListener(swift_irc, new Roulette(3, "#sm_vip", swift_bot));
+        basebot.addListener(swift_irc, new Roulette(3, "#Private1", swift_bot));
 
         basebot.addListener(swift_irc, new OverUnder(), ou_swift_chans);
-        basebot.addListener(
-                swift_irc, new DiceDuel(swift_bot, "#SMGamer"), dd_swift_chans);
+        basebot.addListener(swift_irc, new DiceDuel(swift_bot, "#SMGamer"),
+                            dd_swift_chans);
         basebot.addListener(swift_irc, new CheckChips(), all_swift_chans);
         basebot.addListener(swift_irc, new CompPosition(), all_swift_chans);
         basebot.addListener(swift_irc, new GiveChips(), all_swift_chans);

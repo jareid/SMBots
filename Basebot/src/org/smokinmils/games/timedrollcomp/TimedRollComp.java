@@ -91,7 +91,7 @@ public class TimedRollComp extends Event {
     /** The prize for each round. */
     private int                              prize;
     
-    /** The profile this game awrds prizes for. */
+    /** The profile this game awards prizes for. */
     private ProfileType                      profile;
     
     /** The number of rounds to play. */

@@ -66,7 +66,7 @@ public final class BaseBot {
 	private static final String FINGER_MSG = "Leave me alone, kthx!";
 
 	/** The socket timeout value. */
-    private static final int SOCKET_TIMEOUT = 20000;
+    private static final int SOCKET_TIMEOUT = 5000;
 	
 	/** The default IRC port. */
 	private static final int DEFAULT_PORT = 6667;
@@ -118,7 +118,10 @@ public final class BaseBot {
     	           System.exit(0);
     	       }
 	       }
-	       IdentServer.startServer();
+	       
+	       if (!debug) {
+	           IdentServer.startServer();
+	       }
 	   }
 	   return ret;
    }
@@ -160,7 +163,7 @@ public final class BaseBot {
                    .setIdentServerEnabled(true)
                    .setServerPort(port)
                    .setServerHostname(addr)
-                   .setMessageDelay(0)
+                   .setMessageDelay(1)
                    .setNickservPassword(password)
                    .setListenerManager(lm)
                .setSocketTimeout(SOCKET_TIMEOUT)

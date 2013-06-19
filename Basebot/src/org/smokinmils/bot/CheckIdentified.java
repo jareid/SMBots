@@ -36,6 +36,7 @@ import org.smokinmils.bot.events.Quit;
 import org.smokinmils.bot.events.UserList;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.UserCheck;
+import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -99,9 +100,9 @@ public class CheckIdentified extends Event {
     public final void message(final Message event) {
         IrcBot bot = event.getBot();
         User user = event.getUser();
-        boolean test = bot.userIsIdentified(user);
-        if (!test
-                && event.getMessage().startsWith("!")) {
+        if (!bot.userIsIdentified(user)
+                && event.getMessage().startsWith("!")
+                && event.getMessage().startsWith(TimedRollComp.CMD)) {
             checkThread.addUser(user);
             // If we already told this user, don't tell them again
             if (!sentNoIdent.contains(user.getNick())) {
@@ -176,7 +177,12 @@ public class CheckIdentified extends Event {
      * @return true if the user meets the required status
      */
     public final boolean manualStatusRequest(final User user) {
-        return checkThread.manualStatusRequest(user);
+        Boolean ident = checkThread.checkIdentified(user);
+        boolean ret = false;
+        if (ident) {
+            ret = true;
+        }
+        return ret;
     }
     
     /**
@@ -251,7 +257,7 @@ public class CheckIdentified extends Event {
          * 
          * @return true if the user meets the required status
          */
-        public Boolean checkIdentified(final User user) {
+        private Boolean checkIdentified(final User user) {
             Boolean ret = null;
             ExecutorService executor = Executors.newFixedThreadPool(1);
             FutureTask<Boolean> choicetask =
@@ -267,23 +273,6 @@ public class CheckIdentified extends Event {
             }   
             executor.shutdown();
             
-            return ret;
-        }
-        
-        /**
-         * Sends a request to NickServ to check a user's status with the server
-         * and waits for the response.
-         * 
-         * @param user the username
-         * 
-         * @return true if the user meets the required status
-         */
-        public boolean manualStatusRequest(final User user) {
-            Boolean ident = sendStatusRequest(user);
-            boolean ret = false;
-            if (ident) {
-                ret = true;
-            }
             return ret;
         }
         
