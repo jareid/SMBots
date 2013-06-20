@@ -161,7 +161,8 @@ public class CheckIdentified extends Event {
         for (User usr: event.getUsers()) {
             String nick = usr.getNick();
             if (!nick.equalsIgnoreCase(bot.getNick()) 
-                    && !nick.equalsIgnoreCase("X")) {
+                    && !nick.equalsIgnoreCase("X")
+                    && !bot.userIsIdentified(usr)) {
                 bot.removeIdentifiedUser(usr.getNick());
                 checkThread.addUser(usr);
             }

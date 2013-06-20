@@ -109,7 +109,7 @@ public class Chips extends Event {
 
                 if (amount != null && amount > 0.0) {
                     // Check valid profile
-                    if (!bot.userIsIdentified(user) && bot.manualStatusRequest(user)) {
+                    if (bot.manualStatusRequest(user)) {
                         String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
                         bot.sendIRCMessage(sender, out);
                     } else if (profile != null) {
@@ -191,8 +191,7 @@ public class Chips extends Event {
                         EventLog.log(e, "Payout", "message");
                     }
 
-                    if (!bot.userIsIdentified(user)
-                            && bot.manualStatusRequest(user)) {
+                    if (bot.manualStatusRequest(user)) {
                         String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
                         
                         bot.sendIRCMessage(senderu, out);

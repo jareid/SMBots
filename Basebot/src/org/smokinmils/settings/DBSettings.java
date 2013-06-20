@@ -33,6 +33,6 @@ public final class DBSettings {
     public static final String DB_USER = "smbot";
 
     /** The password of the database. */
-    public static final String DB_PASS = "SM_bot_2013$";
+    public static final String DB_PASS = "SM_bot_2013$"; // forum / smforum / SM_f0ru^^_2013$
 
 }

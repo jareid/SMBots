@@ -294,8 +294,11 @@ public class IrcBot extends PircBotX {
 	 * @param user	The nickname to check
 	 */
 	public final void addIdentifiedUser(final User user) {
+	    String nick = user.getNick().toLowerCase();
         synchronized (identifiedUsers) {
-            identifiedUsers.add(user.getNick().toLowerCase());
+            if (identifiedUsers.contains(nick)) {
+                identifiedUsers.add(nick);
+            }
         }
 	}
 	
