@@ -109,7 +109,7 @@ public final class Utils {
      * @return A string representing the chips
      */
     public static String chipsToString(final double chips) {
-        double out = Math.round(chips * CHIPS_ROUND) / CHIPS_ROUND;
+        double out = Math.floor(chips * CHIPS_ROUND) / CHIPS_ROUND;
         DecimalFormat df = new DecimalFormat("#.#");
         return df.format(out);
     }

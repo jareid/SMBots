@@ -208,7 +208,7 @@ public class Chips extends Event {
                         boolean success = false;
                         try {                                
                             DB db = DB.getInstance();
-                            success = db.adjustChips(user, amount, profile,
+                            success = db.adjustChips(user, -amount, profile,
                                                      GamesType.ADMIN, TransactionType.PAYOUT);
 
                             db.addChipTransaction(user, sender, amount, 
