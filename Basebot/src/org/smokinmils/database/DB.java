@@ -1963,9 +1963,9 @@ public final class DB {
                 + ChipsTransactionsTable.COL_AMOUNT + ", "
                 + ChipsTransactionsTable.COL_PROFILETYPE + ") VALUES(" + "("
                 + getTzxTypeIDSQL(tzxtype) + "), ("
-                + getUserIDSQL(username) + "), "
-                + getUserIDSQL(admin) + "), "
-                + Double.toString(amount) + "), ("
+                + getUserIDSQL(username) + "), ("
+                + getUserIDSQL(admin) + "), '"
+                + Double.toString(amount) + "', ("
                 + getProfileIDSQL(proftype) + "))";
 
         runBasicQuery(sql);

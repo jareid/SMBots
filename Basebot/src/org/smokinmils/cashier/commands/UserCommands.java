@@ -100,7 +100,7 @@ public class UserCommands extends Event {
 	public static final String OTHERPROFILES       = "%c04%name%c12 (%c04%amount%c12)";
 	
 	/** Used to specify the user has no credits. */
-	public static final String NOCREDITS           = "%b%c04%sender: %user %c12currently "
+	public static final String NOCREDITS           = "%b%c04%sender: %c04%user%c12 %c12currently "
 	                                               + "has %c04no%c12 available chips.";
 
     /** Profile changed message. */
@@ -238,11 +238,11 @@ public class UserCommands extends Event {
                 } else {
                     credstr = NOCREDITS;
                 }
-                credstr = credstr.replaceAll("%user", user);
 
                 if (user.equalsIgnoreCase(sender)) {
-                    sender = "You";
+                    user = "You";
                 }
+                credstr = credstr.replaceAll("%user", user);
                 credstr = credstr.replaceAll("%sender", sender);
 
                 bot.sendIRCMessage(event.getChannel(), credstr);

@@ -266,7 +266,9 @@ public class Referrals extends Event {
                     } else if (Utils.startsWith(message, CHK_CMD)) {
                         referCheck(event);
                     }
-                } else if (isMgrValidChannel(cname)) {
+                }
+                // TODO: clean up logic here. Should be a single if
+                if (isMgrValidChannel(cname)) {
                     if (Utils.startsWith(message, REN_CMD)) {
                         renameGroup(event);
                     } else if (Utils.startsWith(message, NEW_CMD)) {

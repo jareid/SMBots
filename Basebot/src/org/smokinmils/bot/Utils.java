@@ -17,6 +17,9 @@ import java.util.List;
  * @author Jamie Reid
  */
 public final class Utils {
+    /** The number of digits we round decimals to. */
+    private static final double CHIPS_ROUND = 10.0;
+
     /**
      * Hiding the default constructor.
      */
@@ -106,8 +109,9 @@ public final class Utils {
      * @return A string representing the chips
      */
     public static String chipsToString(final double chips) {
+        double out = Math.round(chips * CHIPS_ROUND) / CHIPS_ROUND;
         DecimalFormat df = new DecimalFormat("#.#");
-        return df.format(chips);
+        return df.format(out);
     }
 
     /**

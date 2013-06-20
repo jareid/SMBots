@@ -102,7 +102,7 @@ public class CheckIdentified extends Event {
         User user = event.getUser();
         if (!bot.userIsIdentified(user)
                 && event.getMessage().startsWith("!")
-                && event.getMessage().startsWith(TimedRollComp.CMD)) {
+                && !event.getMessage().startsWith(TimedRollComp.CMD)) {
             checkThread.addUser(user);
             // If we already told this user, don't tell them again
             if (!sentNoIdent.contains(user.getNick())) {
