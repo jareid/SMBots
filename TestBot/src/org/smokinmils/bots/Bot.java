@@ -13,16 +13,9 @@ import java.util.Timer;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.cashier.ManagerSystem;
-import org.smokinmils.cashier.commands.CheckChips;
-import org.smokinmils.cashier.commands.CompPosition;
-import org.smokinmils.cashier.commands.GiveChips;
-import org.smokinmils.cashier.commands.GroupReferal;
-import org.smokinmils.cashier.commands.Jackpots;
-import org.smokinmils.cashier.commands.Payout;
-import org.smokinmils.cashier.commands.Profiles;
-import org.smokinmils.cashier.commands.RankGroups;
-import org.smokinmils.cashier.commands.Referral;
-import org.smokinmils.cashier.commands.TransferChips;
+import org.smokinmils.cashier.commands.Chips;
+import org.smokinmils.cashier.commands.Referrals;
+import org.smokinmils.cashier.commands.UserCommands;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.cashier.tasks.BetDetails;
 import org.smokinmils.cashier.tasks.Competition;
@@ -83,9 +76,8 @@ public class Bot {
         // Set up jackpot chan
         Rake.init("#testeroo");
 
-        basebot.addListener(swift_irc, new Referral(), all_swift_chans);
-        basebot.addListener(swift_irc, new GroupReferal(), host_swift_chans);
-        basebot.addListener(swift_irc, new RankGroups(), mgrs_swift_chans);
+        basebot.addListener(swift_irc, new Referrals(mgrs_swift_chans, host_swift_chans),
+                all_swift_chans);
 
         basebot.addListener(swift_irc, new Roulette(2, "#testeroo", swift_bot));
 
@@ -93,18 +85,13 @@ public class Bot {
         basebot.addListener(
                 swift_irc, new DiceDuel(swift_bot, "#testeroo"),
                 oudd_swift_chans);
-        basebot.addListener(swift_irc, new CheckChips(), all_swift_chans);
-        basebot.addListener(swift_irc, new CompPosition(), all_swift_chans);
-        basebot.addListener(swift_irc, new GiveChips(), all_swift_chans);
+        basebot.addListener(swift_irc, new UserCommands(), all_swift_chans);
         basebot.addListener(swift_irc, new Help(), all_swift_chans);
-        basebot.addListener(swift_irc, new Jackpots(), all_swift_chans);
         // basebot.addListener(swift_irc, new Lottery(), all_swift_chans);
         basebot.addListener(swift_irc,
                 new ManagerSystem("#testeroo", "#testeroo", swift_bot),
                 all_swift_chans);
-        basebot.addListener(swift_irc, new Payout(), all_swift_chans);
-        basebot.addListener(swift_irc, new Profiles(), all_swift_chans);
-        basebot.addListener(swift_irc, new TransferChips(), all_swift_chans);
+        basebot.addListener(swift_irc, new Chips(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);
 
         RPSGame rps_event = new RPSGame();

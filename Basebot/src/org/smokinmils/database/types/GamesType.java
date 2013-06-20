@@ -16,22 +16,37 @@ package org.smokinmils.database.types;
 public enum GamesType {
     /** Admin game. */
     ADMIN("admin"),
+    
+    /** Blackjack game. */
+    BLACKJACK("Blackjack"),
+    
     /** Competitions. */
     COMPETITIONS("competitions"),
+    
     /** DD game. */
     DICE_DUEL("Dice Duel"),
+    
+    /** Blackjack game. */
+    IDM("iDM"),
+    
     /** Lottery game. */
     LOTTERY("Lottery"),
+    
     /** OU game. */
     OVER_UNDER("Over Under"),
+    
     /** Poker game. */
     POKER("Poker"),
+    
     /** Roulette game. */
     ROULETTE("Roulette"),
+    
     /** Rock Paper Scissors game. */
     ROCKPAPERSCISSORS("Rock Paper Scissors"),
+    
     /** Timed Roll game. */
     TIMEDROLL("Timed Roll"),
+    
     /**
      * Other games. Used for historical reasons
      */

@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 
 import org.smokinmils.bot.Utils;
 import org.smokinmils.database.tables.BetsTable;
+import org.smokinmils.database.tables.ChipsTransactionsTable;
 import org.smokinmils.database.tables.CompetitionIDTable;
 import org.smokinmils.database.tables.CompetitionView;
 import org.smokinmils.database.tables.FullReferersTextView;
@@ -1918,6 +1919,58 @@ public final class DB {
                 TransactionType.REFERRAL);
     }
 
+    /**
+     * Adds a new transaction to the transaction table.
+     * 
+     * @param username The username
+     * @param admin The admin's username
+     * @param amount The amount
+     * @param tzxtype The type of transaction
+     * @param proftype The type of profile
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public void addChipTransaction(final String username,
+                                   final String admin,
+                                   final int amount,
+                                   final TransactionType tzxtype,
+                                   final ProfileType proftype)
+        throws SQLException {
+        addChipTransaction(username, admin, (double) amount, tzxtype, proftype);
+    }
+    
+    /**
+     * Adds a new transaction to the transaction table.
+     * 
+     * @param username The username
+     * @param admin The admin username
+     * @param amount The amount
+     * @param tzxtype The type of transaction
+     * @param proftype The type of profile
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public void addChipTransaction(final String username,
+                                   final String admin,
+                                   final double amount,
+                                   final TransactionType tzxtype,
+                                   final ProfileType proftype)
+        throws SQLException {
+        String sql = "INSERT INTO " + ChipsTransactionsTable.NAME + "("
+                + ChipsTransactionsTable.COL_TYPEID + ", "
+                + ChipsTransactionsTable.COL_ADMINID + ", "
+                + ChipsTransactionsTable.COL_USERID + ", "
+                + ChipsTransactionsTable.COL_AMOUNT + ", "
+                + ChipsTransactionsTable.COL_PROFILETYPE + ") VALUES(" + "("
+                + getTzxTypeIDSQL(tzxtype) + "), ("
+                + getUserIDSQL(username) + "), "
+                + getUserIDSQL(admin) + "), "
+                + Double.toString(amount) + "), ("
+                + getProfileIDSQL(proftype) + "))";
+
+        runBasicQuery(sql);
+    }
+    
     /**
      * Adds a new transaction to the transaction table.
      * 
