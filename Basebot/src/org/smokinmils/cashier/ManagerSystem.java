@@ -34,8 +34,6 @@ import org.smokinmils.logging.EventLog;
  * @author Jamie
  */
 public class ManagerSystem extends Event {
-
-
     /** The command used to check who is logged in. */
     public static final String         ON_CMD           = "!on";
 
@@ -114,7 +112,7 @@ public class ManagerSystem extends Event {
      */
     public ManagerSystem(final String activechan, final String managerchan,
             final IrcBot irc) {
-        loggedInUser = null;
+        setLoggedInUser(null);
         managerTimes = new HashMap<String, Double>();
         inactiveTime = DEFAULTINACTIVETIME;
         activityChan = activechan;
@@ -126,7 +124,7 @@ public class ManagerSystem extends Event {
             if (inifile.exists()) {
                 // read from the file
                 Ini ini = new Ini(new FileReader(FILENAME));
-                loggedInUser = ini.get("loggedin", "who");
+                setLoggedInUser(ini.get("loggedin", "who"));
                 Integer temp = ini.get("inactive", "maxtime", Integer.class);
                 inactiveTime = DEFAULTINACTIVETIME;
                 if (temp != null) {
@@ -152,7 +150,7 @@ public class ManagerSystem extends Event {
         nextMin.scheduleAtFixedRate(
                 new IncreaseTime(), Utils.MS_IN_MIN, Utils.MS_IN_MIN);
 
-        if (loggedInUser != null) {
+        if (getLoggedInUser() != null) {
             inactive = new Timer(true);
             inactive.schedule(
                     new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
@@ -173,7 +171,7 @@ public class ManagerSystem extends Event {
         Channel chan = event.getChannel();
 
         if (irc.userIsIdentified(senderu)) {
-            if (sender.equalsIgnoreCase(loggedInUser)
+            if (sender.equalsIgnoreCase(getLoggedInUser())
                     && chan.getName().equalsIgnoreCase(activityChan)) {
                 inactive.cancel();
                 inactive = new Timer(true);
@@ -183,17 +181,17 @@ public class ManagerSystem extends Event {
 
             if (isValidChannel(chan.getName())
                     && Utils.startsWith(message, ON_CMD)) {
-                if (loggedInUser == null) {
+                if (getLoggedInUser() == null) {
                     irc.sendIRCMessage(event.getChannel(), NOLOGGEDON);
                 } else {
                     irc.sendIRCMessage(event.getChannel(),
-                            LOGGEDON.replaceAll("%who", loggedInUser));
+                            LOGGEDON.replaceAll("%who", getLoggedInUser()));
                 }
             } else if (managerChan.equalsIgnoreCase(chan.getName())
                     && Utils.startsWith(message, LOGIN_CMD)) {
-                if (loggedInUser != null) {
+                if (getLoggedInUser() != null) {
                     irc.sendIRCNotice(senderu,
-                            CANTLOGIN.replaceAll("%who", loggedInUser));
+                            CANTLOGIN.replaceAll("%who", getLoggedInUser()));
                 } else {
                     managerLoggedIn(sender);
                     irc.sendIRCMessage(chan,
@@ -201,8 +199,8 @@ public class ManagerSystem extends Event {
                 }
             } else if (managerChan.equalsIgnoreCase(chan.getName())
                     && Utils.startsWith(message, LOGOUT_CMD)) {
-                if (loggedInUser == null
-                        || !loggedInUser.equalsIgnoreCase(sender)) {
+                if (getLoggedInUser() == null
+                        || !getLoggedInUser().equalsIgnoreCase(sender)) {
                     irc.sendIRCNotice(senderu, NOTLOGGEDON);
                 } else {
                     managerLoggedOut();
@@ -224,7 +222,7 @@ public class ManagerSystem extends Event {
         }
         inactive = new Timer(true);
         inactive.schedule(new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
-        loggedInUser = who;
+        setLoggedInUser(who);
     }
 
     /**
@@ -234,7 +232,7 @@ public class ManagerSystem extends Event {
         if (inactive != null) {
             inactive.cancel();
         }
-        loggedInUser = null;
+        setLoggedInUser(null);
     }
 
     /**
@@ -244,8 +242,8 @@ public class ManagerSystem extends Event {
         if (inactive != null) {
             inactive.cancel();
         }
-        if (loggedInUser != null) {
-            String out = INACTIVEDLOGGEDOUT.replaceAll("%who", loggedInUser);
+        if (getLoggedInUser() != null) {
+            String out = INACTIVEDLOGGEDOUT.replaceAll("%who", getLoggedInUser());
             out = out.replaceAll("%actchan", activityChan);
             Channel chan = bot.getUserChannelDao().getChannel(managerChan);
             bot.sendIRCMessage(chan, out);
@@ -258,12 +256,12 @@ public class ManagerSystem extends Event {
      */
     public static void nextMinute() {
         checkData();
-        String user = loggedInUser;
+        String user = getLoggedInUser();
         if (user == null) {
             user = "NOBODY";
         }
 
-        if (loggedInUser != null) {
+        if (getLoggedInUser() != null) {
             Double current = managerTimes.get(user);
             if (current == null) {
                 current = 0.0;
@@ -299,7 +297,7 @@ public class ManagerSystem extends Event {
             File inifile = new File(FILENAME);
             Wini ini = new Wini(inifile);
 
-            ini.put("loggedin", "who", loggedInUser);
+            ini.put("loggedin", "who", getLoggedInUser());
             ini.put("inactive", "maxtime", inactiveTime);
             for (Entry<String, Double> entry : managerTimes.entrySet()) {
                 ini.put("times", entry.getKey(), entry.getValue());
@@ -308,6 +306,20 @@ public class ManagerSystem extends Event {
         } catch (IOException e) {
             EventLog.log(e, "ManagerSystem", "saveData");
         }
+    }
+
+    /**
+     * @return the loggedInUser
+     */
+    public static String getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    /**
+     * @param user the loggedInUser to set
+     */
+    private static void setLoggedInUser(final String user) {
+        ManagerSystem.loggedInUser = user;
     }
 }
 

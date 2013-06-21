@@ -6,8 +6,10 @@
  * 
  * Copyright (C) 2013 Jamie Reid & Carl Clegg
  */
-package org.smokinmils.bots;
+package org.smokinmils.testbots;
 
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.Timer;
 
 import org.smokinmils.BaseBot;
@@ -31,6 +33,8 @@ import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.help.Help;
 
+import com.sun.jna.platform.win32.Kernel32;
+
 /**
  * Starts the Cashier bot with the correct servers and channels
  * 
@@ -49,10 +53,19 @@ public class Bot {
             }
         }
         
+        //TODO: read from args.
+        String nick = "TESTSM_BOT";
+        
+        // Store the process PID. note only windows.
+        int pid = Kernel32.INSTANCE.GetCurrentProcessId();
+        Writer wr = new FileWriter(nick + ".pid");
+        wr.write(Integer.toString(pid));
+        wr.close();
+        
         BaseBot basebot = BaseBot.getInstance();
         boolean debug = true;
         boolean refund = false;
-        basebot.initialise("TESTSM_BOT", "5w807", "smokinmils", debug, refund);
+        basebot.initialise(nick, "5w807", "smokinmils", debug, refund);
         String swift_irc = "SwiftIRC";
         basebot.addServer(swift_irc, server, 6667);
         IrcBot swift_bot = basebot.getBot(swift_irc);

@@ -296,7 +296,7 @@ public class IrcBot extends PircBotX {
 	public final void addIdentifiedUser(final User user) {
 	    String nick = user.getNick().toLowerCase();
         synchronized (identifiedUsers) {
-            if (identifiedUsers.contains(nick)) {
+            if (!identifiedUsers.contains(nick)) {
                 identifiedUsers.add(nick);
             }
         }

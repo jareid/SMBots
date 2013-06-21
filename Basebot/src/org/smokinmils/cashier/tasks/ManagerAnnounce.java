@@ -19,6 +19,7 @@ import org.ini4j.Ini;
 import org.ini4j.Profile.Section;
 import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -110,6 +111,7 @@ public class ManagerAnnounce extends TimerTask {
             interval = intervals.remove(0);
             
             Channel chan = bot.getUserChannelDao().getChannel(channel);
+            out = out.replaceAll("%manager", ManagerSystem.getLoggedInUser());
             bot.sendIRCMessage(chan, out);
         }
 
