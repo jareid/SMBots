@@ -42,7 +42,7 @@ public class TimedRollComp extends Event {
     
     /** The message when someone rolls. */
     public static final String               ROLLED          = "%b%c04%who%c12 "
-                           + "has used his roll and rolled a... %c04%roll%c12.";
+                           + "has used his free roll and rolled a... %c04%roll%c12.";
 
     /** The message when someone rolls. */
     public static final String               NEWLEADER       = "%b%c04%winner"
