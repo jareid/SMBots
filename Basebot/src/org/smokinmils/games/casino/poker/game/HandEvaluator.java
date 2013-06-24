@@ -8,7 +8,7 @@
  */
 package org.smokinmils.games.casino.poker.game;
 
-import org.smokinmils.games.casino.carddeck.Card;
+import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.games.casino.poker.enums.HandValueType;
 
 /**

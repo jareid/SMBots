@@ -1,14 +1,12 @@
-package org.smokinmils.games.casino.blackjack.game;
+package org.smokinmils.games.casino.cards;
 
-import org.smokinmils.games.casino.carddeck.Card;
-import org.smokinmils.games.casino.carddeck.Deck;
 
 /**
  * Extends the Deck class such that we can have 8 decks in one.
  * @author cjc
  *
  */
-public class BJDeck extends Deck {
+public class Shoe extends Deck {
 
     /** Number of decks we want in the game. */
     private static final int NO_OF_DECKS    = 8;
@@ -26,7 +24,7 @@ public class BJDeck extends Deck {
      * 
      * Starts as a full, ordered deck.
      */
-    public BJDeck() {
+    public Shoe() {
         cards = new Card[NO_OF_CARDS];
         int index = 0;
         for (int deck = NO_OF_DECKS - 1; deck >= 0; deck--) {

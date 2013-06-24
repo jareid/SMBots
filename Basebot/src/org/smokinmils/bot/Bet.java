@@ -80,7 +80,7 @@ public class Bet {
 		this.time = System.currentTimeMillis();
 
         DB db = DB.getInstance();
-        db.adjustChips(user.getNick(), amount, profile, game, TransactionType.BET);
+        db.adjustChips(user.getNick(), -amount, profile, game, TransactionType.BET);
         db.addBet(user.getNick(), "", amount, profile, game);
 	}
 	

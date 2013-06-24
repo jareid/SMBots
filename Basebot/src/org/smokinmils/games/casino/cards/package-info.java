@@ -3,4 +3,4 @@
  * 
  * @since 1.0
  */
-package org.smokinmils.games.casino.carddeck;
+package org.smokinmils.games.casino.cards;

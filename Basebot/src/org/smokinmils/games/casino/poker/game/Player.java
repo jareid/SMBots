@@ -13,7 +13,7 @@ import java.util.Timer;
 
 import org.pircbotx.User;
 import org.smokinmils.bot.Utils;
-import org.smokinmils.games.casino.carddeck.Card;
+import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.games.casino.poker.enums.ActionType;
 import org.smokinmils.games.casino.poker.game.rooms.Table;
 import org.smokinmils.games.casino.poker.tasks.SittingOut;

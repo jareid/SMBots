@@ -27,6 +27,7 @@ import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.DiceDuel;
 import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
+import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
 import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
@@ -82,9 +83,9 @@ public class Bot {
             basebot.addChannel(swift_irc, chan);
         }
 
-        Client poker = new Client(swift_irc, poker_lobby_swift);
-        poker.initialise();
-        basebot.addListener(swift_irc, poker);
+        //Client poker = new Client(swift_irc, poker_lobby_swift);
+        //poker.initialise();
+        //basebot.addListener(swift_irc, poker);
 
         // Set up jackpot chan
         Rake.init("#testeroo");
@@ -92,25 +93,29 @@ public class Bot {
         basebot.addListener(swift_irc, new Referrals(mgrs_swift_chans, host_swift_chans),
                 all_swift_chans);
 
-        basebot.addListener(swift_irc, new Roulette(2, "#testeroo", swift_bot));
+       // basebot.addListener(swift_irc, new Roulette(2, "#testeroo", swift_bot));
 
-        basebot.addListener(swift_irc, new OverUnder(), oudd_swift_chans);
+        //basebot.addListener(swift_irc, new OverUnder(), oudd_swift_chans);
         basebot.addListener(
                 swift_irc, new DiceDuel(swift_bot, "#testeroo"),
                 oudd_swift_chans);
         basebot.addListener(swift_irc, new UserCommands(), all_swift_chans);
-        basebot.addListener(swift_irc, new Help(), all_swift_chans);
+        //basebot.addListener(swift_irc, new Help(), all_swift_chans);
         // basebot.addListener(swift_irc, new Lottery(), all_swift_chans);
         basebot.addListener(swift_irc,
                 new ManagerSystem("#testeroo", "#testeroo", swift_bot),
                 all_swift_chans);
         basebot.addListener(swift_irc, new Coins(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);
-
+/*
         RPSGame rps_event = new RPSGame();
         rps_event.addValidChan(all_swift_chans);
         rps_event.addAnnounce("#testeroo", swift_bot);
         basebot.addListener(swift_irc, rps_event);
+        */
+        BJGame bj_event = new BJGame(swift_bot);
+        bj_event.addValidChan("#testeroo");
+        basebot.addListener(swift_irc, bj_event);
 
         // add timed roll for Smoking_Dice every 24hours with a 100chip prize
         @SuppressWarnings("unused")

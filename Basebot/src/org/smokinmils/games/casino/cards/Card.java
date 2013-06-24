@@ -6,7 +6,7 @@
  * 
  * Copyright (C) 2013 Jamie Reid
  */
-package org.smokinmils.games.casino.carddeck;
+package org.smokinmils.games.casino.cards;
 
 import org.smokinmils.settings.PokerStrs;
 
