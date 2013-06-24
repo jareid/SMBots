@@ -16,11 +16,9 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
-import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 
@@ -224,8 +222,7 @@ public class Roulette extends Event {
      * 
      * @throws SQLException when the system failed to perform db tasks
      */
-    private void bet(final Message event)
-        throws SQLException {
+    private void bet(final Message event) throws SQLException {
         // if we are not accepting bets
         DB db = DB.getInstance();
         User user = event.getUser();
@@ -264,13 +261,8 @@ public class Roulette extends Event {
             } else if (betsize <= 0.0) {
                 bot.sendIRCNotice(user, NO_CHIPS);
             } else {
-                Bet bet = new Bet(user, profile, betsize, choice);
+                Bet bet = new Bet(user, profile, GamesType.ROULETTE, betsize, choice);
                 allBets.add(bet);
-                db.adjustChips(
-                        username, -betsize, profile, GamesType.ROULETTE,
-                        TransactionType.BET);
-                db.addBet(
-                        username, choice, betsize, profile, GamesType.ROULETTE);
 
                 String out = BET_MADE.replaceAll("%username", username);
                 out = out.replaceAll("%choice", choice);
@@ -285,41 +277,30 @@ public class Roulette extends Event {
      * 
      * @param event the message event.
      * 
-     * @throws SQLException when the system failed to perform db tasks
+     * @throws SQLException if a bet failed to cancel.
      */
-    private void cancel(final Message event)
-        throws SQLException {
-            DB db = DB.getInstance();
-            Channel chan = bot.getUserChannelDao().getChannel(channel);
+    private void cancel(final Message event) throws SQLException {
+        Channel chan = bot.getUserChannelDao().getChannel(channel);
             
-            if (state == CLOSE) {
-                bot.sendIRCMessage(chan, BETS_CLOSED);
-            } else {
+        if (state == CLOSE) {
+            bot.sendIRCMessage(chan, BETS_CLOSED);
+        } else {
             User user = event.getUser();
-            String username = event.getUser().getNick();
             List<Bet> found = new ArrayList<Bet>();
             for (Bet bet : allBets) {
                 if (bet.getUser().compareTo(user) == 0) {
                     found.add(bet);
-                    db.adjustChips(
-                            username, bet.getAmount(), bet.getProfile(),
-                            GamesType.ROULETTE, TransactionType.CANCEL);
                 }
             }
-            
     
-            if (found.size() > 0) {
-                db.deleteBet(username, GamesType.ROULETTE);
-                
+            if (found.size() > 0) {                
                 for (Bet bet: found)  {
+                    bet.cancel();
                     allBets.remove(bet);
                 }
-                
-                bot.sendIRCMessage(chan,
-                        BETS_CANCELLED.replaceAll("%username", username));
+                bot.sendIRCMessage(chan, BETS_CANCELLED.replaceAll("%username", user.getNick()));
             }
         }
-
     }
 
     /**
@@ -372,9 +353,7 @@ public class Roulette extends Event {
      * 
      * @throws SQLException when something goes wrong in the db.
      */
-    private void endGame(final IrcBot ib)
-        throws SQLException {
-        DB db = DB.getInstance();
+    private void endGame(final IrcBot ib) throws SQLException {
         Channel chan = bot.getUserChannelDao().getChannel(channel);
         
         // Let's "roll"
@@ -394,24 +373,22 @@ public class Roulette extends Event {
             Integer choicenum = Utils.tryParse(choice);
             User user = bet.getUser();
             String username = user.getNick();
-            ProfileType profile = bet.getProfile();
             
             int winamount = 0;
             boolean win = false;
-            if ((choice.equalsIgnoreCase("red") || choice
-                    .equalsIgnoreCase("black"))
+            if ((choice.equalsIgnoreCase("red") || choice.equalsIgnoreCase("black"))
                     && choice.equalsIgnoreCase(getColour(winner))
                     && winner != 0) {
                 winamount = ODDS_EVENS;
                 win = true;
-            } else if (((choice.equalsIgnoreCase("even") && isEven) || (choice
-                    .equalsIgnoreCase("odd") && !isEven)) && winner != 0) {
+            } else if (((choice.equalsIgnoreCase("even") && isEven) 
+                    || (choice.equalsIgnoreCase("odd") && !isEven)) && winner != 0) {
                 win = true;
                 winamount = ODDS_EVENS;
             } else if (winner != 0
                     && (choice.equalsIgnoreCase("1st")
-                            || choice.equalsIgnoreCase("2nd") || choice
-                                .equalsIgnoreCase("3rd"))
+                            || choice.equalsIgnoreCase("2nd") 
+                            || choice.equalsIgnoreCase("3rd"))
                     && choice.equalsIgnoreCase(getRow(winner))) {
                 win = true;
                 winamount = ODDS_ROW;
@@ -428,20 +405,11 @@ public class Roulette extends Event {
                 if (!nameList.contains(username)) {
                     nameList.add(username);
                 }
-
-                db.adjustChips(username, bet.getAmount() * winamount, profile,
-                        GamesType.ROULETTE, TransactionType.WIN);
+                bet.win(winamount);
             }
-            Rake.getRake(username, bet.getAmount(), profile);
-
-            double amount = bet.getAmount();
-            if (Rake.checkJackpot(amount)) {
-                ArrayList<String> players = new ArrayList<String>();
-                players.add(username);
-                Rake.jackpotWon(profile, GamesType.ROULETTE,
-                                players, bot, null);
-            }
-            db.deleteBet(username, GamesType.ROULETTE);
+            bet.getRake();
+            bet.checkJackpot(ib);
+            bet.close();
         }
 
         // Construct the winning string
@@ -467,8 +435,7 @@ public class Roulette extends Event {
             for (String user : nameList) {
                 names += user + " ";
             }
-            bot.sendIRCMessage(chan,
-                               CONGRATULATIONS.replaceAll("%names", names));
+            bot.sendIRCMessage(chan, CONGRATULATIONS.replaceAll("%names", names));
         }
 
         bot.sendIRCMessage(chan, NEW_GAME);
