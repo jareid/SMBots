@@ -117,6 +117,9 @@ public class BJGame extends Event {
     
     /** String to inform the user of their current hand. */
     private static final String STATE = "%b%c04%who%c12: You have %c04%hand %c12%pscore";
+    
+    /** String to notify on winnings / amount returned for a draw. */
+    private static final String WINNINGS = "%b%c04%who%c12: You receive %coins coins";
 
 
     
@@ -335,6 +338,11 @@ public class BJGame extends Event {
             out = out.replaceAll("%dhand", handToString(dhand, false));
             
             bot.sendIRCMessage(chan, out);
+            
+            out = WINNINGS.replaceAll("%coins", Double.toString(amount * PUSH_WIN));
+            out = out.replaceAll("%who", player.getNick());
+            bot.sendIRCNotice(player, out);
+            
         } catch (Exception e) {
             EventLog.log(e, "BJGame", "playerDraw");
         }
@@ -347,6 +355,7 @@ public class BJGame extends Event {
      * The player won, give them winnings!
      * @param event the event from which we can get channel sender etc from
      * @param usergame the game that was won
+     * @param multiplayer
      */
     private void doWin(final Message event, 
                        final Game usergame,
@@ -391,6 +400,11 @@ public class BJGame extends Event {
             out = out.replaceAll("%dhand", handToString(dhand, false));
             
             bot.sendIRCMessage(chan, out);
+           
+            out = WINNINGS.replaceAll("%coins", Double.toString(win));
+            out = out.replaceAll("%who", winner.getNick());
+            bot.sendIRCNotice(winner, out);
+            
         } catch (Exception e) {
             EventLog.log(e, "BJGame", "playerWin");
         }
@@ -419,6 +433,9 @@ public class BJGame extends Event {
         User sender = event.getUser();
         Channel chan = event.getChannel();
         
+        // remove the game from the list dummy
+        removeGame(usergame.getUser());
+        
         ArrayList<Card> phand = usergame.getPlayerHand();
         ArrayList<Card> dhand = usergame.getDealerHand();
         
@@ -440,8 +457,7 @@ public class BJGame extends Event {
             Rake.jackpotWon(usergame.getProfile(), GamesType.BLACKJACK, players, bot,
                             chan);
         } 
-        // remove the game from the list dummy
-        removeGame(usergame.getUser());
+       
    
     }
 
@@ -455,15 +471,15 @@ public class BJGame extends Event {
         User sender = event.getUser();
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
-        
+        Game game = null;
         if (msg.length == 2) {
             boolean playbet = false;
             boolean hasopen = false;
             ProfileType profile = null;
             Double betsize = 0.0;
             synchronized (BaseBot.getLockObject()) {
-                for (Game game : openGames) {
-                    if (game.getUser().compareTo(sender.getNick()) == 0) {
+                for (Game g : openGames) {
+                    if (g.getUser().compareTo(sender.getNick()) == 0) {
                         hasopen = true;
                         break;
                     }
@@ -484,12 +500,18 @@ public class BJGame extends Event {
                         try {
                             profile = db.getActiveProfile(sender.getNick());
                             betsize = db.checkCredits(sender.getNick(),
-                                                      amount);
-                            if (betsize > 0.0) {
+                                    amount);
+                            if (amount < 0.0)
+                            {
+                                bot.invalidArguments(sender, BJ_FORMAT);
+                            }
+                            else if (betsize > 0.0) {
                                 playbet = true;
+                                game = new Game(sender.getNick(), betsize, profile);
+                                openGames.add(game);
                             } else {
                                 String out = NOCHIPS.replaceAll(
-                                     "%chips", Utils.chipsToString(amount));
+                                     "%chips", Utils.chipsToString(betsize));
                                 out = out.replaceAll("%profile",
                                                      profile.toString());
                                 bot.sendIRCNotice(sender, out);
@@ -506,8 +528,6 @@ public class BJGame extends Event {
                 try {
                     // deal game, remove chips, check if auto win (natural)
                     
-                    // deal game
-                    Game game = new Game(sender.getNick(), betsize, profile);
                     
                     // remove chips
                     db.adjustChips(sender.getNick(), -betsize, profile,
@@ -540,8 +560,7 @@ public class BJGame extends Event {
                         // player auto win
                         doWin(event, game, BJ_WIN);
                     } else {
-                        // no 21 (or unknown dealer 21) add the game to the openGames
-                        openGames.add(game);
+                        // no 21 (or unknown dealer 21) 
                         out = BJ_OPTIONS.replaceAll("%who", sender.getNick());
                         bot.sendIRCNotice(sender, out);  
                     }
