@@ -28,7 +28,7 @@ public final class PokerStrs {
 	public static final char 	CommandChar =		'!';
 	
 	/** 
-	 * This defines the output of a card
+	 * This defines the output of a card.
 	 * 
 	 * %suitC - The colour for this suit
 	 * %rank - The card rank
@@ -37,7 +37,7 @@ public final class PokerStrs {
 	public static final String CardText = " %suitC %rank  %suit %n";
 	
 	/**
-	 * This defines the text for suits
+	 * This defines the text for suits.
 	 */
 	public static final String CardText_Diamonds = "dia";
 	public static final String CardText_Hearts = "hea";
@@ -45,7 +45,7 @@ public final class PokerStrs {
 	public static final String CardText_Spades = "spa";	
 	
 	/**
-	 * This defines the colour for suits
+	 * This defines the colour for suits.
 	 */
 	public static final String CardColours_Diamonds = "00,05";
 	public static final String CardColours_Hearts = "00,04";
@@ -53,18 +53,18 @@ public final class PokerStrs {
 	public static final String CardColours_Spades = "00,14";
 	
 	/**
-	 * This string is output when the user does not meet the above status with NickServ
+	 * This string is output when the user does not meet the above status with NickServ.
 	 */
 	public static final String NotIdentifiedMsg = "%b%c12You must be identified with %c04NickServ%c12 to use the bot commands";
 	
 	/**
-	 * This string is output the poker announcement
+	 * This string is output the poker announcement.
 	 */
 	public static final String PokerAnnounce = "%b%c01Poker games now running. Use %c04!tables%c01 for a list of open tables. Use %c04!poker%c01 for a list of commands.";
 	
 	
 	/**
-	 * The following list of settings are the commands for the lobby in the following order
+	 * The following list of settings are the commands for the lobby in the following order.
 	 * Info command
 	 * Chips command
 	 * Tables command
@@ -98,7 +98,7 @@ public final class PokerStrs {
 	public static final String JoinCommand_Format = "%b%c12" + JoinCommand + " <table id> ?buy in?";
 	
 	/**
-	 * The following list of settings are the commands for tables in the following order
+	 * The following list of settings are the commands for tables in the following order.
 	 * Check command
 	 * Description of Check command
 	 * Bet command
@@ -156,13 +156,13 @@ public final class PokerStrs {
 	public static final String InvalidArgs = "%b%c12You provided invalid arguments for the command. The format is:";
 	
 	/**
-	 * This string is used for the topic in every lobby
+	 * This string is used for the topic in every lobby.
 	 */
 	public static final String LobbyTopic = "%b%c12Welcome to the %c04Smokin Mils Poker Lobby%c12 - Type %c04" 
 											+ InfoCommand + "%c12 for help. Ready for testing, ask a host for play chips, ensure you do %c04!profile play%c12 before playing ";
 	
 	/**
-	 * This string is used for the topic in each poker room
+	 * This string is used for the topic in each poker room.
 	 * 
 	 * %id - The tableID
 	 * %sb - The table's small blind
@@ -203,28 +203,14 @@ public final class PokerStrs {
 	public static final String CheckChipsUserFailed =  "%b%c12[Table %c04%id%c12] %c04%user%c12 is not currently seated on the table";
 	
 	/**
-	 * This string is used to specify the message sent when a user checks their credit in the system
-	 * 
-	 * %sender - the person who sent the command
-	 * %user - the person who the credit check is for
-	 * %creds - the amount of credits
-	 * %active - the active profile name
-	 */
-	public static final String CheckCreditMsg =  "%b%c04%sender%c12: %user %c12currently has %c04%creds%c12 chips on the active profile(%c04%active%c12)";
-	public static final String CheckCreditSelfMsg =  "%b%c04%sender%c12: You %c12currently have %c04%creds%c12 chips on the active profile(%c04%active%c12)";
-	public static final String CreditsOtherProfiles = "%c04%name%c12(%c04%amount%c12)";
-	public static final String NoCredits = "%b%c04%sender: %user %c12currently has %c04no%c12 available chips.";
-	public static final String NoCreditsSelf = "%b%c04%sender%c12: %c04You %c12currently has %c04no%c12 available chips.";
-	
-	/**
-	 * This string is used when a user asks for all tables
+	 * This string is used when a user asks for all tables.
 	 * 
 	 * %count - The big blind the user searched for
 	 */
 	public static final String AllTablesMsg = "%b%c12There are currently %c04%count%c12 tables. They are:";
 
 	/**
-	 * This string is used for the output of each individual table
+	 * This string is used for the output of each individual table.
 	 * 
 	 * %id - The table ID
 	 * %bb - The blind blind for this table
@@ -237,7 +223,7 @@ public final class PokerStrs {
 	
 	/**
 	 * This string is used to specify the message sent when a user searches for tables and:
-	 * - Finds none
+	 * - Finds none.
 	 * 
 	 * %bb - The big blind the user searched for
 	 */
@@ -246,7 +232,7 @@ public final class PokerStrs {
 	
 	/**
 	 * This string is used to specify the message sent when a user searches for tables and:
-	 * - Finds some
+	 * - Finds some.
 	 * 
 	 * %bb - The big blind the user searched for
 	 * %count - the number of tables found
@@ -257,7 +243,7 @@ public final class PokerStrs {
 	
 	
 	/**
-	 * This string is used when a user tries to create a table with a invalid size
+	 * This string is used when a user tries to create a table with a invalid size.
 	 * 
 	 * %size - The size of table the user tried to create
 	 * %allowed - The allowed tables list
@@ -266,7 +252,7 @@ public final class PokerStrs {
 													+ "%b%c12Valid Table Sizes are: %c04%allowed";
 	
 	/**
-	 * This string is used when a user tries to create a table with a invalid size
+	 * This string is used when a user tries to create a table with a invalid size.
 	 * 
 	 * %bb - The size of table the user tried to create
 	 * %allowed - The allowed tables list

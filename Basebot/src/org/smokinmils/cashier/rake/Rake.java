@@ -9,7 +9,10 @@
  */
 package org.smokinmils.cashier.rake;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
@@ -18,6 +21,7 @@ import org.smokinmils.bot.Utils;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -214,5 +218,38 @@ public final class Rake {
         String jackpotstr = Rake.getJackpotsString();
         String out = JACKPOTANNOUNCE.replaceAll("%jackpots", jackpotstr);
         return out;
+    }
+    
+    /**
+     * Process rank point earnings.
+     * 
+     * @throws SQLException when a database error occurs.
+     */
+    public static void processPoints() throws SQLException {
+        DB db = DB.getInstance();
+        // get the total points
+        int points = db.getPointTotal();
+        
+        for (ProfileType profile: ProfileType.values()) {
+            double pointearnings = db.checkCredits("POINTS", profile);
+            double eachpoint = pointearnings / points;
+            if (eachpoint == Double.NaN) {
+                eachpoint = 0.0;
+            }
+        
+            // calculate each users 
+            Map<String, Integer> allpoints = db.getPoints();
+            for (Entry<String, Integer> ent: allpoints.entrySet()) {
+                if (ent.getValue() > 0) {
+                    double amnt = ent.getValue() * eachpoint;
+    
+                    db.adjustChips(ent.getKey(), amnt, profile,
+                                   GamesType.ADMIN, TransactionType.POINTS);
+                }
+            }
+        }
+        
+        // reset points
+        db.resetPoints();
     }
 }

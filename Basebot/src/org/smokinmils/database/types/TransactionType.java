@@ -16,30 +16,46 @@ package org.smokinmils.database.types;
 public enum TransactionType {
     /** admin transactions. */
 	ADMIN("admin"),
+	
     /** bet transactions. */
 	BET("bet"),
+	
     /** cancel transactions. */
 	CANCEL("cancel"),
+	
     /** credit transactions. */
 	CREDIT("credit"),
+	
     /** lottery transactions. */
 	LOTTERY("lottery"),
+	
     /** loterry win transactions. */
 	LOTTERY_WIN("lotterywin"),
+	
     /** payout transactions. */
 	PAYOUT("payout"),
+	
     /** jackpot transactions. */
 	JACKPOT("pkrjackpot"),
+	
+    /** referral transactions. */
+    POINTS("points"),
+    
     /** poker buy in transactions. */
 	POKER_BUYIN("pokerbuy"),
+	
     /** poker cash out transactions. */
 	POKER_CASHOUT("pokercash"),
+	
     /** referral transactions. */
     REFERRAL("referral"),
+    
     /** reset transactions. */
 	RESET("reset"),
+	
     /** transfer transactions. */
 	TRANSFER("transfer"),
+	
     /** win transactions. */
 	WIN("win");
 	

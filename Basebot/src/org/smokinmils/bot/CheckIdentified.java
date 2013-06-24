@@ -11,9 +11,7 @@ package org.smokinmils.bot;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -106,7 +104,7 @@ public class CheckIdentified extends Event {
             checkThread.addUser(user);
             // If we already told this user, don't tell them again
             if (!sentNoIdent.contains(user.getNick())) {
-                bot.sendIRCMessage(user, NOT_IDENTIFIED_MSG);
+                bot.sendIRCNotice(user, NOT_IDENTIFIED_MSG);
                 sentNoIdent.add(user.getNick());
             }
         }
@@ -201,7 +199,8 @@ public class CheckIdentified extends Event {
         private final IrcBot bot;
         
         /** A map that stores when this user last requested an ident check. */
-        private final Map<User, Long> userMap;
+        //private final Map<User, Long> userMap;
+        // TODO: reimplement for performance.
         
         /** The number of milliseconds to wait for network services responses.*/
         private static final int WAIT_MS = 3500;
@@ -221,7 +220,7 @@ public class CheckIdentified extends Event {
          */
         private CheckUserQueue(final IrcBot irc) {
             users = new ArrayDeque<User>();
-            userMap = new HashMap<User, Long>();
+            //userMap = new HashMap<User, Long>();
             bot = irc;
             this.start();
         }
@@ -289,16 +288,16 @@ public class CheckIdentified extends Event {
             Boolean identd = checkIdentified(user);
             // Only add users with the correct levels
             if (identd == null) {
-                bot.sendIRCMessage(user, NO_SERVICES);
+                bot.sendIRCNotice(user, NO_SERVICES);
             } else if (identd) {
                 EventLog.info(user.getNick() + " identified", "CheckIdentified",
                               "sendStatusRequest");
                 sentNoIdent.remove(user);
                 try {
-                    UserCheck res = DB.getInstance()
-                           .checkUserExists(user.getNick(), user.getHostmask());
+                    UserCheck res = DB.getInstance().checkUserExists(user.getNick(),
+                                                                     user.getHostmask());
                     if (res == UserCheck.FAILED) {
-                        bot.sendIRCMessage(user, TOO_MANY_ACCS);
+                        bot.sendIRCNotice(user, TOO_MANY_ACCS);
                     } else {
                         bot.addIdentifiedUser(user);
                         if (res == UserCheck.CREATED) {
@@ -323,13 +322,16 @@ public class CheckIdentified extends Event {
          */
         public void addUser(final User user) {
             //Long time = UserMap.get(user);
-            Long now = System.currentTimeMillis();
+            //Long now = System.currentTimeMillis();
             // Only check users if they are not awaiting a check
             // Or they haven't been checked in the last three seconds
             // && !(time != null && (time-now) < 3000)
-            if (!users.contains(user)) {
+            List<String> restrict = new ArrayList<String>();
+            restrict.add("HOUSE");
+            restrict.add("POINTS");
+            if (!restrict.contains(user.getNick().toUpperCase()) && !users.contains(user)) {
                 users.addLast(user);
-                userMap.put(user, now);
+                //userMap.put(user, now);
             }
         }
     }
@@ -385,8 +387,7 @@ class CheckUser implements Callable<Boolean> {
                 "CheckUser::CheckIdentified", "call");
         
         WaitForQueue queue = new WaitForQueue(bot);
-        bot.sendRaw().rawLine("PRIVMSG NickServ "
-                                + NICKSERV_STATUS + " " + user.getNick());
+        bot.sendRaw().rawLine("PRIVMSG NickServ " + NICKSERV_STATUS + " " + user.getNick());
         
         boolean received = false;
         Boolean ret = false;

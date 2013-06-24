@@ -28,19 +28,6 @@ public final class UsersView {
 	/** Column for the username. */
 	public static final String COL_USERNAME = "username";
 	
-	/** Column for the current chips.
-	 * @deprecated */
-	public static final String COL_CHIPS = "chips";
-	
-	/** Column for the number of wins. */
-	public static final String COL_WINS = "wins";
-	
-	/** Column for the number of losses. */
-	public static final String COL_LOSSES = "losses";
-	
-	/** Column for the total amount bet. */
-	public static final String COL_TOTALBETS = "total_bets";
-	
 	/** Column for the active profile. */
 	public static final String COL_ACTIVEPROFILE = "active_profile";
 }

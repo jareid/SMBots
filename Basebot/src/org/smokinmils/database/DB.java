@@ -1625,14 +1625,16 @@ public final class DB {
     /**
      * Creates a new rank group.
      * 
+     * @param owner The owner name
      * @param group The group name
      * 
      * @throws SQLException when a database error occurs
      */
-    public void newRankGroup(final String group)
+    public void newRankGroup(final String owner, final String group)
         throws SQLException {
         String sql = "INSERT INTO " + HostGroupsTable.NAME + "("
-                + HostGroupsTable.COL_NAME + ")" + " VALUES('" + group + "')";
+                    + HostGroupsTable.COL_NAME + "," + HostGroupsTable.COL_OWNER + ")"
+                    + " VALUES('" + group + "', (" + getUserIDSQL(owner) + "))";
 
         checkUserExists(group, group + "!" + group + "@" + group);
         runBasicQuery(sql);
@@ -1795,6 +1797,120 @@ public final class DB {
         runBasicQuery(sql);
     }
 
+
+    /**
+     * Gives a rank a number of points.
+     * 
+     * @param who   The rank to give points to
+     * @param points The number of points to give, can be negative.
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public void givePoints(final String who,
+                           final int points) throws SQLException {
+        String sql = "UPDATE " + HostGroupUsersTable.NAME 
+                + " SET " + HostGroupUsersTable.COL_POINTS
+                + " = (" + HostGroupUsersTable.COL_POINTS
+                + " + " + Integer.toString(points) + ")"
+                + " WHERE " + HostGroupUsersTable.COL_USERID
+                + " = (" + getUserIDSQL(who) + ")";
+        
+        runBasicQuery(sql);
+    }
+
+    /**
+     * Checks the number of points a rank has.
+     * 
+     * @param who The rank to check
+     * 
+     * @return the number of points
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public int checkPoints(final String who) throws SQLException {
+        String sql = "SELECT " + HostGroupUsersTable.COL_POINTS 
+                   + " FROM " + HostGroupUsersTable.NAME
+                   + " WHERE " + HostGroupUsersTable.COL_USERID
+                   + " = (" + getUserIDSQL(who) + ")";
+        return runGetIntQuery(sql);
+    }
+    
+    /**
+     * @return The total number of points this week.
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public int getPointTotal() throws SQLException {
+        String sql = "SELECT SUM(" + HostGroupUsersTable.COL_POINTS 
+                + ") FROM " + HostGroupUsersTable.NAME
+                + " WHERE 1";
+        return runGetIntQuery(sql);
+    }
+    
+
+    /**
+     * @return a map of all users and the points they earned.
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public Map<String, Integer> getPoints() throws SQLException {
+        Map<String, Integer> res = new HashMap<String, Integer>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT u." + UsersTable.COL_USERNAME
+                        + ", hgu." + HostGroupUsersTable.COL_POINTS
+                   + " FROM " + HostGroupUsersTable.NAME + " hgu" + " JOIN "
+                   + UsersTable.NAME + " u ON u." + UsersTable.COL_ID + " = "
+                   + "hgu." + HostGroupUsersTable.COL_USERID + " WHERE 1";
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                String user = rs.getString("u." + UsersTable.COL_USERNAME);
+                int points = rs.getInt("hgu." + HostGroupUsersTable.COL_POINTS);
+                res.put(user, points);
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Resets the points and the points earnings.
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public void resetPoints() throws SQLException {
+        String sql = "UPDATE " + HostGroupUsersTable.NAME
+                   + " SET " + HostGroupUsersTable.COL_POINTS + " = '0'"
+                   + " WHERE 1";
+        runBasicQuery(sql);
+        
+        sql = "UPDATE " + UserProfilesTable.NAME
+            + " SET " + UserProfilesTable.COL_AMOUNT + " = '0'"
+            + " WHERE " + UserProfilesTable.COL_USERID + " = ("
+            + getUserIDSQL("POINTS") + ")";
+        runBasicQuery(sql);
+    }
+    
     /**
      * Gets a user's referral type.
      * 
@@ -1898,8 +2014,29 @@ public final class DB {
                                final String user,
                                final ProfileType profile)
         throws SQLException {
-        adjustChips(
-                user, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
+        adjustChips(user, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
+    }
+    
+    /**
+     * Gives a group owner an amount of referral fees.
+     * 
+     * @param fee The amount earnt
+     * @param group The group who's owner is receiving the fees
+     * @param profile The profile type
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public void giveOwnerFee(final double fee,
+                               final String group,
+                               final ProfileType profile)
+        throws SQLException {
+        String sql = "SELECT uu." + UsersTable.COL_USERNAME
+                   + " FROM " + HostGroupsTable.NAME + " hgu"
+                   + " JOIN " + UsersTable.NAME + " uu ON uu."
+                              + UsersTable.COL_ID + " = hgu." + HostGroupsTable.COL_OWNER
+                   + " WHERE " + HostGroupsTable.COL_NAME + " LIKE '" + group + "'";
+        String owner = runGetStringQuery(sql);
+        adjustChips(owner, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
     }
 
     /**
@@ -1914,11 +2051,24 @@ public final class DB {
                           final ProfileType profile)
         throws SQLException {
         checkUserExists("HOUSE", "HOUSE!HOUSE@HOUSE");
-        adjustChips(
-                "HOUSE", fee, profile, GamesType.ADMIN,
-                TransactionType.REFERRAL);
+        adjustChips("HOUSE", fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
     }
 
+    /**
+     * Gives the POINTS an amount of referral fees.
+     * 
+     * @param fee The amount earnt
+     * @param profile The profile type
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public void pointFees(final double fee,
+                          final ProfileType profile)
+        throws SQLException {
+        checkUserExists("POINTS", "POINTS!POINTS@POINTS");
+        adjustChips("POINTS", fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
+    }
+    
     /**
      * Adds a new transaction to the transaction table.
      * 
@@ -1963,8 +2113,8 @@ public final class DB {
                 + ChipsTransactionsTable.COL_AMOUNT + ", "
                 + ChipsTransactionsTable.COL_PROFILETYPE + ") VALUES(" + "("
                 + getTzxTypeIDSQL(tzxtype) + "), ("
-                + getUserIDSQL(username) + "), ("
-                + getUserIDSQL(admin) + "), '"
+                + getUserIDSQL(admin) + "), ("
+                + getUserIDSQL(username) + "), '"
                 + Double.toString(amount) + "', ("
                 + getProfileIDSQL(proftype) + "))";
 

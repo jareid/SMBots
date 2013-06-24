@@ -304,7 +304,8 @@ public class DiceDuel extends Event {
                                 winner, win, winnerProfile,
                                 GamesType.DICE_DUEL, TransactionType.WIN);
 
-                        db.deleteBet(username, GamesType.DICE_DUEL);
+                        db.deleteBet(winner, GamesType.DICE_DUEL);
+                        db.deleteBet(loser, GamesType.DICE_DUEL);
 
                         // jackpot stuff
                         if (Rake.checkJackpot(bet.getAmount())) { // loser

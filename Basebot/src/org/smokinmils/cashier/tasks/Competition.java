@@ -21,6 +21,7 @@ import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.cashier.commands.Lottery;
+import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.BetterInfo;
 import org.smokinmils.database.types.GamesType;
@@ -228,6 +229,7 @@ public class Competition extends TimerTask {
 
         // Update the database for next competition
         try {
+            Rake.processPoints();
             db.competitionEnd();
             Lottery.announceReset(bot, channel);
         } catch (Exception e) {

@@ -143,18 +143,17 @@ public class Chips extends Event {
                             bot.sendIRCNotice(usr, out);
                             
                         } else {
-                            EventLog.log(sender + " attempted to give "
-                                    + "someone chips and the database "
-                                    + "failed", "GiveChips", "message");
+                            EventLog.log(sender.getNick() + " attempted to give someone chips and "
+                                         + "the database failed", "GiveChips", "message");
                         }
                     } else {
                         bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                     }
                 } else {
-                    bot.invalidArguments(event.getUser(), GIVEFMT);
+                    bot.invalidArguments(sender, GIVEFMT);
                 }
             } else {
-                bot.invalidArguments(event.getUser(), GIVEFMT);
+                bot.invalidArguments(sender, GIVEFMT);
             }
         } else {
             EventLog.info(sender + " attempted to give someone chips",  "GiveChips", "message");
@@ -234,8 +233,7 @@ public class Chips extends Event {
                             User usr = bot.getUserChannelDao().getUser(user);
                             bot.sendIRCNotice(usr, out);
                         } else {
-                            EventLog.log(sender + "database failed",
-                                    "Payout", "message");
+                            EventLog.log(sender + "database failed", "Payout", "message");
                         }
                     }
                 } else {

@@ -27,4 +27,7 @@ public final class HostGroupsTable {
 	
 	/** Column for the name of the group. */
 	public static final String COL_NAME = "name";
+	
+    /** Column for the owner of the group. */
+    public static final String COL_OWNER = "owner_id";
 }

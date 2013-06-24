@@ -19,4 +19,7 @@ public final class HostGroupUsersTable {
     
     /** Column for the user id. */
     public static final String COL_USERID = "user_id";
+    
+    /** Column for the points. */
+    public static final String COL_POINTS = "points";
 }

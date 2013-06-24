@@ -110,17 +110,26 @@ public class Referrals extends Event {
     /** The command format. */
     private static final String KIK_FRMT      = "%b%c12" + KIK_CMD + " <user>";
 
-    /** The rename command. */
+    /** The groups command. */
     private static final String GRPS_CMD      = "!groups";
 
-    /** The command format. */
+    /** The groups command format. */
     private static final String GRPS_FRMT     = "%b%c12" + GRPS_CMD + "";
 
-    /** The rename command. */
+    /** The group list command. */
     private static final String GL_CMD        = "!grouplist";
 
-    /** The command format. */
+    /** The group list command format. */
     private static final String GL_FRMT       = "%b%c12" + GL_CMD + " <group>";
+
+    /** The command to check points. */
+    public static final String MYPOINTS_CMD   = "!mypoints";  
+    
+    /** The command to give points. */
+    public static final String  POINTS_CMD    = "!points";
+    
+    /** The group list command format. */
+    private static final String POINTS_FRMT   = "%b%c12" + POINTS_CMD + " <user> <amount>";
     
     /** Max line length for the output of check. */
     private static final int MAX_LINE         = 80;
@@ -217,6 +226,15 @@ public class Referrals extends Event {
     /** Message when the referral failed. */
     private static final String ADDFAILED     = "%b%c04%sender%c12: "
                                               + "%c04%who%c12 already has a referrer.";
+    
+    /** Message when the points are checked. */
+    private static final String POINTS        = "%b%c04%sender%c12: "
+                                              + "%c04%who%c12 has %c04%points%c12 points this week";
+    
+    /** Message when the points are checked. */
+    private static final String GIVEPOINTS    = "%b%c04%sender%c12: "
+                                              + "%c04%who%c12 has been given %c04%points%c12 points"
+                                              + " and now has %c04%newpoints%c12 points";
 
     /** The valid channels for rank only commands. */
     private final List<String> rankValidChans;
@@ -265,6 +283,8 @@ public class Referrals extends Event {
                         groupRefer(event);
                     } else if (Utils.startsWith(message, CHK_CMD)) {
                         referCheck(event);
+                    } else if (Utils.startsWith(message, MYPOINTS_CMD)) {
+                        checkPoints(event);
                     }
                 }
                 // TODO: clean up logic here. Should be a single if
@@ -287,6 +307,8 @@ public class Referrals extends Event {
                         removeReferrer(event);
                     } else if (Utils.startsWith(message, AR_CMD)) {
                         addReferrer(event);
+                    } else if (Utils.startsWith(message, POINTS_CMD)) {
+                        givePoints(event);
                     }
                 }
             }
@@ -514,7 +536,9 @@ public class Referrals extends Event {
                 out = out.replaceAll("%sender", event.getUser().getNick());
                 bot.sendIRCMessage(channel, out);
             } else if (!db.isRank(who)) {
-                bot.sendIRCMessage(channel, NOT_RANKED.replaceAll("%who", who));
+                String out =  NOT_RANKED.replaceAll("%who", who);
+                out = out.replaceAll("%sender", event.getUser().getNick());
+                bot.sendIRCMessage(channel, out);
             } else {
                 String group = db.getRankGroup(who);
                 db.kickRank(who);
@@ -610,14 +634,20 @@ public class Referrals extends Event {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         Channel channel = event.getChannel();
-
-        if (msg.length == 2) {
+        
+        int cmdlen = 1 + 1 + 1;
+        if (msg.length == cmdlen) {
             DB db = DB.getInstance();
             String group = msg[1];
-            if (db.isRankGroup(group)) {
+            String owner = msg[2];
+            if (!db.checkUserExists(owner)) {
+                String out = NO_USER.replaceAll("%sender", event.getUser().getNick());
+                out = out.replaceAll("%who", owner);
+                bot.sendIRCMessage(channel, out);
+            } else if (db.isRankGroup(group)) {
                 bot.sendIRCMessage(channel, GROUP_EXISTS.replaceAll("%group", group));
             } else {
-                db.newRankGroup(group);
+                db.newRankGroup(owner, group);
                 bot.sendIRCMessage(channel, GROUP_CREATED.replaceAll("%group", group));
             }
         } else {
@@ -767,8 +797,7 @@ public class Referrals extends Event {
      * 
      * @throws SQLException on a database error
      */
-    private void addReferrer(final Message event)
-        throws SQLException {
+    private void addReferrer(final Message event) throws SQLException {
         IrcBot bot = event.getBot();
         String[] msg = event.getMessage().split(" ");
         User senderu = event.getUser();
@@ -808,4 +837,78 @@ public class Referrals extends Event {
             bot.invalidArguments(senderu, AR_FRMT);
         }
     }
+    
+    /**
+     * Checks the number of points a rank has.
+     * 
+     * @param event The message event.
+     * @throws SQLException When the database fails.
+     */
+    private void checkPoints(final Message event) throws SQLException {
+        IrcBot bot = event.getBot();
+        Channel channel = event.getChannel();
+        String[] msg = event.getMessage().split(" ");
+        User user = event.getUser();
+        
+        DB db = DB.getInstance();
+
+        String sender = user.getNick();
+        String who = user.getNick();
+        
+        if (msg.length > 1) {
+            who = msg[1];
+        }
+        
+        if (db.isRank(who)) {
+            int rankpoints = db.checkPoints(who);
+            
+            String out = POINTS.replaceAll("%points", Integer.toString(rankpoints));
+            out = out.replaceAll("%who", who);
+            out = out.replaceAll("%sender", sender);
+            bot.sendIRCMessage(channel, out);
+        } else {
+            String out =  NOT_RANKED.replaceAll("%who", who);
+            out = out.replaceAll("%sender", sender);
+            bot.sendIRCMessage(channel, out);
+        }
+    }
+
+    /**
+     * Gives a rank a number of points.
+     * 
+     * @param event The message event.
+     * 
+     * @throws SQLException When the database fails.
+     */
+    private void givePoints(final Message event) throws SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        Channel channel = event.getChannel();
+
+        int cmdlen = 1 + 1 + 1;
+        if (msg.length == cmdlen) {
+            DB db = DB.getInstance();
+            String who = msg[1];
+            Integer points = Utils.tryParse(msg[2]);
+            
+            if (points == null) {
+                bot.invalidArguments(event.getUser(), POINTS_FRMT);
+            } else if (!db.isRank(who)) {
+                String out =  NOT_RANKED.replaceAll("%who", who);
+                out = out.replaceAll("%sender", event.getUser().getNick());
+                bot.sendIRCMessage(channel, out);
+            } else {
+                db.givePoints(who, points);
+                int newpoints = db.checkPoints(who);
+                String out = GIVEPOINTS.replaceAll("%who", who);
+                out = out.replaceAll("%sender", event.getUser().getNick());
+                out = out.replaceAll("%points", Integer.toString(points));
+                out = out.replaceAll("%newpoints", Integer.toString(newpoints));
+                bot.sendIRCMessage(channel, out);
+            }
+        } else {
+            bot.invalidArguments(event.getUser(), POINTS_FRMT);
+        }
+    }
+
 }

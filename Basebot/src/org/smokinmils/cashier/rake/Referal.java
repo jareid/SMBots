@@ -35,9 +35,18 @@ public final class Referal {
 
     /** The percentage of the rake provided that goes to group referral fees. */
     private static final double  GROUP_PERCENT   = 0.20;
+    
+    /** The percentage of the rake provided that goes to group user referral fees. */
+    private static final double  GUSER_PERCENT    = 0.14;
+    
+    /** The percentage of the group provided that goes to poiny referral fees. */
+    private static final double  POINTS_PERCENT   = 0.33;
+    
+    /** The percentage of the group provided that goes to poiny referral fees. */
+    private static final double  GOWNER_PERCENT   = 0.33;
 
     /** The percentage of the rake provided that goes to user referral fees. */
-    private static final double  USER_PERCENT    = 0.20;
+    private static final double  USER_PERCENT    = 0.10;
 
     /** A queue of events this room needs to process. */
     private static Deque<Event>  rakeQueue;
@@ -100,7 +109,7 @@ public final class Referal {
             }
 
             if (reftype == ReferrerType.GROUP) {
-                housepercent -= (GROUP_PERCENT + USER_PERCENT);
+                housepercent -= (GROUP_PERCENT + GUSER_PERCENT);
                 doGroupReferal(event);
             } else if (reftype == ReferrerType.PUBLIC) {
                 housepercent -= USER_PERCENT;
@@ -147,8 +156,11 @@ public final class Referal {
         throws SQLException {
         DB db = DB.getInstance();
 
-        double reffee = event.getAmount() * USER_PERCENT;
+        double reffee = event.getAmount() * GUSER_PERCENT;
         double grpfee = event.getAmount() * GROUP_PERCENT;
+        double pntsfee = grpfee * POINTS_PERCENT;
+        double ownerfee = grpfee * GOWNER_PERCENT;
+        grpfee -= (pntsfee + ownerfee);
 
         List<ReferalUser> referals = db.getReferalUsers(event.getUser());
         Map<String, Integer> groups = new HashMap<String, Integer>();
@@ -168,14 +180,18 @@ public final class Referal {
             db.giveReferalFee(userfee, user.getUser(), event.getProfile());
         }
 
+        // Give the fees to the points table.
+        db.pointFees(pntsfee, event.getProfile());
+
         // Give each group an equivalent amount based on number of users
         // in the group with that referral
         if (groupusers > 0) {
             double eachgrpfee = grpfee / groupusers;
+            double eachownfee = ownerfee / groupusers;
             for (Entry<String, Integer> group : groups.entrySet()) {
-                db.giveReferalFee(
-                        eachgrpfee * group.getValue(), group.getKey(),
-                        event.getProfile());
+                db.giveReferalFee(eachgrpfee * group.getValue(), group.getKey(),
+                                  event.getProfile());
+                db.giveOwnerFee(eachownfee, group.getKey(), event.getProfile());
             }
         } else {
             db.houseFees(grpfee, event.getProfile());
