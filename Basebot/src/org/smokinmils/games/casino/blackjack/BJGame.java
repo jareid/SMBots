@@ -533,15 +533,6 @@ public class BJGame extends Event {
                 try {
                     // deal game, remove chips, check if auto win (natural)
                     
-                    
-                    // remove chips
-                    db.adjustChips(sender.getNick(), -betsize, profile,
-                            GamesType.BLACKJACK,
-                            TransactionType.BET);
-                    /* DONE BY BET NOW?
-                    db.addBet(sender.getNick(), "Blackjack Hand?",
-                            betsize,
-                            profile, GamesType.BLACKJACK);*/
 
                     ArrayList<Card> phand = game.getPlayerHand();
                     ArrayList<Card> dhand = game.getDealerHand();
