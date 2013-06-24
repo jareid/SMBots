@@ -25,6 +25,9 @@ public class Bet {
 	
 	/** The choice made on the bet, may be blank, i.e for DD bets. */
 	private final String choice;
+
+    /** The time the bet was made. */
+    private final long time;
 	
 	/** 
 	 * Used to activate bets to stop double bets.
@@ -56,6 +59,7 @@ public class Bet {
 		this.choice = chce;
 		this.valid = true;
 		this.profile = prof;
+		this.time = System.currentTimeMillis();
 	}
 	
 	/**
@@ -100,6 +104,13 @@ public class Bet {
 	 * @return The choice.
 	 */
 	public final String getChoice() { return choice; }
+	
+	/**
+     * Returns this bet's choice.
+     * 
+     * @return The time.
+     */
+    public final long getTime() { return time; }
 	
 	/**
      * Returns this bet's validity.
