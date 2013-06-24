@@ -57,9 +57,9 @@ public class DiceDuel extends Event {
     private static final String  NO_WAGER        = "%b%c04%username%c12: "
                                         + "I can't find a record of that wager";
     
-    /** Not enough chips message. */
+    /** Not enough coins message. */
     private static final String  NO_CHIPS        = "%b%c04%username%c12: "
-                                     + "You do not have enough chips for that!";
+                                     + "You do not have enough coins for that!";
     
     /** Can't play against yourself message. */
     private static final String  NO_SELFPLAY     = "%b%c04%username%c12: "
@@ -67,16 +67,16 @@ public class DiceDuel extends Event {
     
     /** New bet made message.*/
     private static final String  NEW_WAGER       = "%b%c04%username%c12 has "
-           + "opened a new dice duel wager of %c04%amount %proftype%c12  chips!"
+           + "opened a new dice duel wager of %c04%amount %proftype%c12  coins!"
            + "To call this wager type %c04!call %username";
     
     /** Play vs real message. */
     private static final String  PLAY_VS         = "%b%c04%username%c12: you "
-                            + "need to use play chips to call a play chips dd!";
+                            + "need to use play coins to call a play coins dd!";
     
     /** Real vs play message. */
     private static final String  REAL_VS         = "%b%c04%username%c12: you "
-                            + "need to use real chips to call a real chips dd!";
+                            + "need to use real coins to call a real coins dd!";
     
     /** Bet called message. */
     private static final String  ROLL            = "%b%c04%winner%c12 rolled "

@@ -15,7 +15,7 @@ import java.util.Timer;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.cashier.ManagerSystem;
-import org.smokinmils.cashier.commands.Chips;
+import org.smokinmils.cashier.commands.Coins;
 import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
 import org.smokinmils.cashier.rake.Rake;
@@ -57,10 +57,10 @@ public class Bot {
         String nick = "TESTSM_BOT";
         
         // Store the process PID. note only windows.
-        int pid = Kernel32.INSTANCE.GetCurrentProcessId();
-        Writer wr = new FileWriter("nick.pid");
-        wr.write(Integer.toString(pid));
-        wr.close();
+        //int pid = Kernel32.INSTANCE.GetCurrentProcessId();
+        //Writer wr = new FileWriter("nick.pid");
+        //wr.write(Integer.toString(pid));
+        //wr.close();
         
         BaseBot basebot = BaseBot.getInstance();
         boolean debug = true;
@@ -104,7 +104,7 @@ public class Bot {
         basebot.addListener(swift_irc,
                 new ManagerSystem("#testeroo", "#testeroo", swift_bot),
                 all_swift_chans);
-        basebot.addListener(swift_irc, new Chips(), all_swift_chans);
+        basebot.addListener(swift_irc, new Coins(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);
 
         RPSGame rps_event = new RPSGame();

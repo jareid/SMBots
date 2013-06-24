@@ -15,7 +15,7 @@ import java.util.Timer;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.cashier.ManagerSystem;
-import org.smokinmils.cashier.commands.Chips;
+import org.smokinmils.cashier.commands.Coins;
 import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
 import org.smokinmils.cashier.rake.Rake;
@@ -116,7 +116,7 @@ public class Bot {
         basebot.addListener(swift_irc,
                 new ManagerSystem("#SMGamer", "#managers", swift_bot),
                 all_swift_chans);
-        basebot.addListener(swift_irc, new Chips(), all_swift_chans);
+        basebot.addListener(swift_irc, new Coins(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);
 
         RPSGame rps_event = new RPSGame();

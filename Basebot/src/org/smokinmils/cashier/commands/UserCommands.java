@@ -79,29 +79,29 @@ public class UserCommands extends Event {
 
     /** The transfer message for the channel. */
     private static final String TRANSFERRERD    = "%b%c04%sender%c12 has transfered %c04%amount%c12"
-                                                + " chips to the %c04%profile%c12 account of "
+                                                + " coins to the %c04%profile%c12 account of "
                                                 + "%c04%who%c12";
 
     /** The transfer message for the receiver. */
-    private static final String TRANSFERCHIPSUSER   = "%b%c12You have had %c04%amount%c12 chips "
+    private static final String TRANSFERCHIPSUSER   = "%b%c12You have had %c04%amount%c12 coins "
                                                     + "transfered into your %c04%profile%c12"
                                                     + " account by %c04%sender%c12";
 
     /** The transfer message for the sender. */
     private static final String TRANSFERCHIPSSENDER = "%b%c12You have transferred %c04%amount%c12 "
-                                                    + "chips from your %c04%profile%c12"
+                                                    + "coins from your %c04%profile%c12"
                                                     + " account to %c04%who%c12";
 
 	/** Used to specify the Check message on another user. */
 	public static final String CHECKCREDITSMSG     =  "%b%c04%sender%c12: %user %c12currently has"
-	                               + " %c04%creds%c12 chips on the active profile(%c04%active%c12)";
+	                               + " %c04%creds%c12 coins on the active profile(%c04%active%c12)";
 	
 	/** Used to specify the other profiles in the check message. */
 	public static final String OTHERPROFILES       = "%c04%name%c12 (%c04%amount%c12)";
 	
 	/** Used to specify the user has no credits. */
 	public static final String NOCREDITS           = "%b%c04%sender: %c04%user%c12 %c12currently "
-	                                               + "has %c04no%c12 available chips.";
+	                                               + "has %c04no%c12 available coins.";
 
     /** Profile changed message. */
     public static final String PROFILE_CHANGED     = "%b%c04%user %c12is now " 
@@ -121,7 +121,7 @@ public class UserCommands extends Event {
     /** Message for a user's position in the competition. */
     private static final String       POSITION          = "%b%c04%sender:%c12 "
            + "%c04%who%c12 is currently in position %c04%position%c12 for the "
-           + "%c04%profile%c12 competition with %c04%chips%c12 chips bet";
+           + "%c04%profile%c12 competition with %c04%coins%c12 coins bet";
     
     /** Message when a user is not ranked for the competition. */
     private static final String       NOTRANKED         = "%b%c04%sender:%c12 "
@@ -131,8 +131,8 @@ public class UserCommands extends Event {
     /** Last 30 days message. */
     private static final String       LAST30DAYS        =
            "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 "
-       + "%c04%who%c12 highest bet was %c04%hb_chips%c12 on %c04%hb_game%c12 | "
-       + "%c04%who%c12 bet total is %c04%hbt_chips%c12";
+       + "%c04%who%c12 highest bet was %c04%hb_coins%c12 on %c04%hb_game%c12 | "
+       + "%c04%who%c12 bet total is %c04%hbt_coins%c12";
     
     
     /** No data for the last 30 days message. */
@@ -443,7 +443,7 @@ public class UserCommands extends Event {
                             profile.toString());
                     out = out.replaceAll("%position",
                             Integer.toString(better.getPosition()));
-                    out = out.replaceAll("%chips",
+                    out = out.replaceAll("%coins",
                             Long.toString(better.getAmount()));
                 }
 
@@ -469,9 +469,9 @@ public class UserCommands extends Event {
                             } else {
                                 out = LAST30DAYS.replaceAll("%hb_game",
                                         highbet.getGame().toString());
-                                out = out.replaceAll("%hb_chips",
+                                out = out.replaceAll("%hb_coins",
                                         Long.toString(highbet.getAmount()));
-                                out = out.replaceAll("%hbt_chips",
+                                out = out.replaceAll("%hbt_coins",
                                         Long.toString(topbet.getAmount()));
                                 out = out.replaceAll("%who",
                                         highbet.getUser());

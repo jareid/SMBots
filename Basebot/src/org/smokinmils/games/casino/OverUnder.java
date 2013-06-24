@@ -54,7 +54,7 @@ public class OverUnder extends Event {
 
     /** Not enough chips message. */
     private static final String  NO_CHIPS        = "%b%c04%username%c12: You do"
-                                           + " not have enough chips for that!";
+                                           + " not have enough coins for that!";
 
     /** Invalid bet choice message. */
     private static final String  NO_WAGER        = "%b%c04%username%c12: I "

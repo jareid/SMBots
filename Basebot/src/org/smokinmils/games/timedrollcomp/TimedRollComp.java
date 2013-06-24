@@ -51,17 +51,17 @@ public class TimedRollComp extends Event {
     /** The message when there is one winner. */
     public static final String               SINGLEWINNER    = "%b%c04%winner"
           + "%c01 has won this round with a roll of %c04%roll%c01 and has been "
-          + "awarded %c04%chips %profile%c01 chips.";
+          + "awarded %c04%coins %profile%c01 coins.";
     
     /** The message when there is one winner. */
     public static final String               CANTWIN    = "%b%c04%winner"
           + "%c01 has won this round with a roll of %c04%roll%c01 and can't be"
-          + "awarded %c04%chips %profile%c01 chips. Please message an admin!";
+          + "awarded %c04%coins %profile%c01 coins. Please message an admin!";
     
     /** The message when there is more than one winner. */
     public static final String               MULTIPLEWINS = "%b%c04%winner%c01"
                    + " have won this round with rolls of %c04%roll%c01 and have"
-                   + "been awarded %c04%chips %profile%c01 chips each.";
+                   + "been awarded %c04%coins %profile%c01 coins each.";
 
     /** The message when a new round is started. */
     public static final String               NEWGAME         = "%b%c12A new "
@@ -244,7 +244,7 @@ public class TimedRollComp extends Event {
 
             out = out.replaceAll("%winner", winstr);
             out = out.replaceAll("%roll", Integer.toString(winroll));
-            out = out.replaceAll("%chips", Utils.chipsToString(win));
+            out = out.replaceAll("%coins", Utils.chipsToString(win));
             out = out.replaceAll("%profile", profile.toString());
 
             irc.sendIRCMessage(vchan, out);
@@ -261,7 +261,7 @@ public class TimedRollComp extends Event {
                     } else {
                         out = CANTWIN.replaceAll("%winner", winstr);
                         out = out.replaceAll("%roll", Integer.toString(winroll));
-                        out = out.replaceAll("%chips", Utils.chipsToString(win));
+                        out = out.replaceAll("%coins", Utils.chipsToString(win));
                         out = out.replaceAll("%profile", profile.toString());
 
                         irc.sendIRCMessage(vchan, out);

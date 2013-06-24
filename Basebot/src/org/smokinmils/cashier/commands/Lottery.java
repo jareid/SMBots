@@ -43,19 +43,19 @@ public class Lottery extends Event {
 
     /** Message when someone buys tickets. */
     private static final String  BOUGHTTICKETS  = "%b%c01The %c04%profile%c01 "
-            + "Weekly Lottery is now at a total of %c04%amount%c01 chips! It's "
-            + "1 chip per ticket, %c04%percent%%c01 of the pot is paid out. "
+            + "Weekly Lottery is now at a total of %c04%amount%c01 coins! It's "
+            + "1 coin per ticket, %c04%percent%%c01 of the pot is paid out. "
             + "Time to draw: %c04%timeleft%c01. To buy 1 ticket with your " 
             + "active profile type %c04%cmd 1";
     
     /** Message for a lottery ending. */
     private static final String  LOTTERYENDED   = "%b%c01The %c04%profile%c01 "
             + "Weekly Lottery has now ended! This week's winner was " 
-            + "%c04%winner%c01 and they won %c04%amount%c01 chips!";
+            + "%c04%winner%c01 and they won %c04%amount%c01 coins!";
     
     /** Message for a new lottery beginning. */
     private static final String  RESET          = "%b%c01A new weekly lottery "
-            + "has begun! It's 1 chip per ticket, %c04%percent%%c01 of the pot "
+            + "has begun! It's 1 coin per ticket, %c04%percent%%c01 of the pot "
             + "is paid out. Time to draw: %c04%timeleft%c01. To buy 1 ticket "
             + "with your active profile type %c04%cmd 1";
 

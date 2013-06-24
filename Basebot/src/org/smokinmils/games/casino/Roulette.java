@@ -52,7 +52,7 @@ public class Roulette extends Event {
     
     /** The no chips message. */
     private static final String  NO_CHIPS        = "%b%c12You do not have "
-                                                 + "enough chips for that!";
+                                                 + "enough coins for that!";
     
     /** The invalid bet choice message. */
     private static final String  INVALID_BET     = "%b%c12\"%c04!bet <amount> "

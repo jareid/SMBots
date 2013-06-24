@@ -41,7 +41,7 @@ import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 
 /**
- * Provides the functionality to give a user some chips.
+ * Provides the functionality to give a user some coins.
  * 
  * @author Jamie
  */
@@ -87,20 +87,20 @@ public class RPSGame extends Event {
 
     /** Message to say you opened a new bet. */
     private static final String OPENEDWAGER    = "%b%c04%who%c12: has opened a "
-                   + "new RPS wager of %c04%amount%c12 %profile chips! To call "
+                   + "new RPS wager of %c04%amount%c12 %profile coins! To call "
                    + "this wager type %c04" + CALL_CMD + " %who";
     
-    /** Message when user hasn't got enough chips. */
-    private static final String NOCHIPS        = "%b%c12Sorry, you do not have "
-           + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
+    /** Message when user hasn't got enough coins. */
+    private static final String NOCOINS        = "%b%c12Sorry, you do not have "
+           + "%c04%coins%c12 coins available for the %c04%profile%c12 profile.";
     
     /** Message for mixed profile bets. */
-    private static final String REALCHIPSONLY  = "%b%c04%who%c12: : you need "
-        + "to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
+    private static final String REALCOINSONLY  = "%b%c04%who%c12: : you need "
+        + "to use %c04%profile%c12 coins to call a %c04%profile%c12 coins rps!";
     
     /** Message when someone wins. */
     private static final String WIN            = "%b%c12%winstring. " 
-              + "%c04%loser%c12 loses and %c04%winner%c12 wins %c04%chips%c12!";
+              + "%c04%loser%c12 loses and %c04%winner%c12 wins %c04%coins%c12!";
     
     /** Message when someone draws. */
     private static final String DRAW           = "%b%c04%better%c12 and "
@@ -109,7 +109,7 @@ public class RPSGame extends Event {
     /** Message when a replay failed. */
     private static final String REPLAYFAIL     = "%b%c12Replay between "
            + "%c04%better%c12 and %c04%caller%c12 failed as %c04%who%c12 didn't"
-              + " respond. Both users have been refunded %c04%chips%c12 chips!";
+              + " respond. Both users have been refunded %c04%coins%c12 coins!";
     
     /** Output of valid choices. */
     private static final String VALIDCHOICES   = "%b%c04%who%c12: Please "
@@ -269,15 +269,15 @@ public class RPSGame extends Event {
                             amount = found.getAmount();
         
                             if (callerprof != betterprof) {
-                                String out = REALCHIPSONLY.replaceAll(
+                                String out = REALCOINSONLY.replaceAll(
                                         "%who", caller.getNick());
                                 out = out.replaceAll(
                                         "%profile", betterprof.toString());
                                 bot.sendIRCMessage(chan, out);
                             } else if (db.checkCredits(
                                     caller.getNick()) < amount) {
-                                String out = NOCHIPS.replaceAll(
-                                     "%chips", Utils.chipsToString(amount));
+                                String out = NOCOINS.replaceAll(
+                                     "%coins", Utils.chipsToString(amount));
                                 out = out.replaceAll(
                                         "%profile", callerprof.toString());
                                 bot.sendIRCMessage(chan, out);
@@ -378,8 +378,8 @@ public class RPSGame extends Event {
                                 pendingBets.add(sender.getNick());
                                 // Add a lock to a temp bet list
                             } else {
-                                String out = NOCHIPS.replaceAll(
-                                     "%chips", Utils.chipsToString(amount));
+                                String out = NOCOINS.replaceAll(
+                                     "%coins", Utils.chipsToString(amount));
                                 out = out.replaceAll("%profile",
                                                      profile.toString());
                                 bot.sendIRCMessage(chan, out);
@@ -395,7 +395,7 @@ public class RPSGame extends Event {
             if (playbet) {
                 DB db = DB.getInstance();
                 try {
-                    // add bet, remove chips, notify channel
+                    // add bet, remove coins, notify channel
                     GameLogic choice = getChoice(event.getUser(),
                                                  event.getBot());
                     if (choice != null) {
@@ -531,7 +531,7 @@ public class RPSGame extends Event {
                        final IrcBot bot,
                        final Channel chan) {
         DB db = DB.getInstance();
-        // Take the rake and give chips to winner
+        // Take the rake and give coins to winner
         double rake = Rake.getRake(winner.getNick(), amount, wprof)
                 + Rake.getRake(loser.getNick(), amount, lprof);
         double win = (amount * 2) - rake;
@@ -541,11 +541,11 @@ public class RPSGame extends Event {
                     winner.getNick(), win, wprof, GamesType.ROCKPAPERSCISSORS,
                     TransactionType.WIN);
 
-            // Announce winner and give chips
+            // Announce winner and give coins
             String out = WIN.replaceAll("%winstring", winstring);
             out = out.replaceAll("%winner", winner.getNick());
             out = out.replaceAll("%loser", loser.getNick());
-            out = out.replaceAll("%chips", Utils.chipsToString(win));
+            out = out.replaceAll("%coins", Utils.chipsToString(win));
             bot.sendIRCMessage(chan, out);
         } catch (Exception e) {
             EventLog.log(e, "RPSGame", "updateJackpot");
@@ -585,7 +585,7 @@ public class RPSGame extends Event {
                         final IrcBot bot,
                         final Channel chan,
                         final GameLogic choice) {
-        // Announce winner and give chips
+        // Announce winner and give coins
         String out = DRAW.replaceAll("%choice", choice.toString());
         out = out.replaceAll("%better", better.getNick());
         out = out.replaceAll("%caller", caller.getNick());
@@ -622,7 +622,7 @@ public class RPSGame extends Event {
                 fail = fail.replaceAll("%better", better.getNick());
                 fail = fail.replaceAll("%caller", caller.getNick());
                 fail = fail.replaceAll("%who", who);
-                fail = fail.replaceAll("%chips", Utils.chipsToString(amount));
+                fail = fail.replaceAll("%coins", Utils.chipsToString(amount));
                 bot.sendIRCMessage(chan, fail);
             } catch (Exception e) {
                 EventLog.log(e, "RPSGame", "doDraw");

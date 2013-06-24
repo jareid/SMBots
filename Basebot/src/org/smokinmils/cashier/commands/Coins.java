@@ -26,7 +26,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie
  */
-public class Chips extends Event {
+public class Coins extends Event {
     /** The payout command. */
     public static final String  PAYCMD       = "!payout";
 
@@ -37,7 +37,7 @@ public class Chips extends Event {
     public static final int     PAY_CMD_LEN     = 4;
     
     /** The give command. */
-    public static final String  GIVECMD     = "!chips";
+    public static final String  GIVECMD     = "!coins";
 
     /** The give command format. */
     public static final String  GIVEFMT      = "%b%c12" + GIVECMD + " <user> <amount> <profile>";
@@ -46,25 +46,25 @@ public class Chips extends Event {
     public static final int     GIVE_CMD_LEN     = 4;
 
     /** The message to the channel on success. */
-    private static final String PAYOUTCHIPS   = "%b%c04%sender:%c12 Paid out %c04%amount%c12 chips "
+    private static final String PAYOUTCHIPS   = "%b%c04%sender:%c12 Paid out %c04%amount%c12 coins "
                                               + "from the %c04%profile%c12 account of %c04%who%c12";
     
     /** The message to the user. */
-    private static final String PAYOUTCHIPSPM = "%b%c12You have had %c04%amount%c12 chips " 
+    private static final String PAYOUTCHIPSPM = "%b%c12You have had %c04%amount%c12 coins " 
                                               + "paid out from your account by %c04%sender%c12";
     
     /** Message when the user doesn't have enough chips. */
     public static final String  NOCHIPSMSG    = "%b%c12Sorry, %c04%user%c12 does not have "
-                                              + "%c04%chips%c12 chips available for the "
+                                              + "%c04%coins%c12 coins available for the "
                                               + "%c04%profile%c12 profile.";
 
     /** The message sent to the channel on success. */
     private static final String GIVECHIPS   = "%b%c04%sender:%c12 Added "
-      + "%c04%amount%c12 chips to the %c04%profile%c12 account of %c04%who%c12";
+      + "%c04%amount%c12 coins to the %c04%profile%c12 account of %c04%who%c12";
     
     /** Message sent to the user on success. */
     private static final String GIVECHIPSPM = "%b%c12You have had "
-      + "%c04%amount%c12 chips deposited into your account by %c04%sender%c12";
+      + "%c04%amount%c12 coins deposited into your account by %c04%sender%c12";
 
     /**
      * This method handles the chips commands.
@@ -143,7 +143,7 @@ public class Chips extends Event {
                             bot.sendIRCNotice(usr, out);
                             
                         } else {
-                            EventLog.log(sender.getNick() + " attempted to give someone chips and "
+                            EventLog.log(sender.getNick() + " attempted to give someone coins and "
                                          + "the database failed", "GiveChips", "message");
                         }
                     } else {
@@ -156,7 +156,7 @@ public class Chips extends Event {
                 bot.invalidArguments(sender, GIVEFMT);
             }
         } else {
-            EventLog.info(sender + " attempted to give someone chips",  "GiveChips", "message");
+            EventLog.info(sender + " attempted to give someone coins",  "GiveChips", "message");
         }
     }
 
@@ -197,7 +197,7 @@ public class Chips extends Event {
                     } else if (profile == null) {
                         bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                     } else if (chips < amount) {
-                        String out = NOCHIPSMSG.replaceAll("%chips", Utils.chipsToString(amount));
+                        String out = NOCHIPSMSG.replaceAll("%coins", Utils.chipsToString(amount));
                         out = out.replaceAll("%profile", profile.toString());
                         out = out.replaceAll("%user", user);
                         
@@ -243,7 +243,7 @@ public class Chips extends Event {
                 bot.invalidArguments(senderu, PAYFMT);
             }
         } else {
-            EventLog.info(sender + " attempted to pay out someone chips", "Payout", "message");
+            EventLog.info(sender + " attempted to pay out someone coins", "Payout", "message");
         }
     }
 }
