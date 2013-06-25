@@ -120,11 +120,10 @@ public class Lobby extends Room {
                 event.getBot().sendIRCNotice(sender, line);
             }
         } else if (msg.length == 2) {
-            CommandType infocmd = CommandType.fromString(PokerStrs.CommandChar
-                    + msg[1]);
+            CommandType infocmd = CommandType.fromString(PokerStrs.CommandChar + msg[1]);
             if (infocmd != null) {
                 sendFullCommand(sender, infocmd);
-            } else if (msg[0].compareToIgnoreCase("table") == 0) {
+            } else if (msg[1].compareToIgnoreCase("table") == 0) {
                 CommandType[] tcmds = { CommandType.CHECK,
                         CommandType.RAISE, CommandType.FOLD,
                         CommandType.TBLCHIPS, CommandType.REBUY,
@@ -133,7 +132,7 @@ public class Lobby extends Room {
                 for (CommandType item : tcmds) {
                     sendFullCommand(sender, item);
                 }
-            } else if (msg[0].compareToIgnoreCase("lobby") == 0) {
+            } else if (msg[1].compareToIgnoreCase("lobby") == 0) {
                 CommandType[] lcmds = { CommandType.INFO,
                         CommandType.TABLES, CommandType.NEWTABLE,
                         CommandType.WATCHTBL,

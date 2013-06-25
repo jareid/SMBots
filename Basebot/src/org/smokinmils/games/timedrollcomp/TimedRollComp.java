@@ -190,8 +190,10 @@ public class TimedRollComp extends Event {
         synchronized (this) {
             if (Utils.startsWith(message, CMD)
                     && validChan.equalsIgnoreCase(chan.getName())) {
-                if (!userlist.containsValue(host)
-                        && !userlist.containsKey(sender)) {
+                boolean isidentd = bot.userIsIdentified(senderu);
+                boolean hasrolled = userlist.containsKey(sender);
+                if ((!hasrolled && !userlist.containsValue(host))
+                    || (userlist.containsValue(host) && isidentd && !hasrolled)) {
                     int userroll = Random.nextInt(MAXROLL);
 
                     String out = ROLLED.replaceAll("%who", sender);

@@ -405,7 +405,7 @@ public class Roulette extends Event {
                 if (!nameList.contains(username)) {
                     nameList.add(username);
                 }
-                bet.win(winamount);
+                bet.win(winamount * bet.getAmount());
             }
             bet.getRake();
             bet.checkJackpot(ib);

@@ -7,7 +7,6 @@ import java.util.TimerTask;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
-
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -27,7 +26,6 @@ import org.smokinmils.settings.Variables;
  * @author cjc
  */
 public class BJGame extends Event {
-
     /** The stand command. */
     public static final String BJ_CMD = "!deal";
     
@@ -74,13 +72,9 @@ public class BJGame extends Event {
     private static final String TIMEOUT_WARNING = "%b%c04%who%c12: Your open Blackjack game is"
                                                                           + " about to time out!";
     /** String letting user know they have an open game already. */
-    private static final String OPENGAME = "%b%c04%who%c12: You already "
-                                                   + "have a game open, "
-                                                   + "Type %c04"
-                                                   + HIT_CMD
-                                                   + "%c12 to take another card or %c04"
-                                                   + STAND_CMD 
-                                                   + "%c12 to stand";
+    private static final String OPENGAME = "%b%c04%who%c12: You already have a game open, Type %c04"
+                                         + HIT_CMD + "%c12 to take another card or %c04" + STAND_CMD
+                                         + "%c12 to stand";
 
     /** The BJ Command format. */
     private static final String BJ_FORMAT = "%b%c12" + BJ_CMD + " <amount>";
@@ -90,9 +84,9 @@ public class BJGame extends Event {
            + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 
     /** String to show hand that has been dealt. */
-    private static final String DEALT_HANDS = "%b%c04%who%c12: You have been dealt %c04%phand %c12%b" 
-                                                    + "%pscore and the dealer has been dealt "
-                                                    +  "%c04%dhand";
+    private static final String DEALT_HANDS = "%b%c04%who%c12: You have been dealt %c04%phand " 
+                                            + "%c12%b %pscore and the dealer has been dealt "
+                                            +  "%c04%dhand";
     
     /** String informing user of their options. */
     private static final String BJ_OPTIONS = "%b%c04%who%c12: You now "
@@ -126,11 +120,11 @@ public class BJGame extends Event {
     private static final String WINNINGS = "%b%c04%who%c12: You receive %coins coins";
 
     /** timer that is used to check for idle games. */
-    private Timer gameTimer;
+    private final Timer gameTimer;
     
     
     /** List of open games. */
-    private ArrayList<BJBet> openGames;
+    private final ArrayList<BJBet> openGames;
     
     /**
      * Constructor.
@@ -422,10 +416,6 @@ public class BJGame extends Event {
             Rake.jackpotWon(wprof, GamesType.BLACKJACK, players, bot,
                             chan);
         }
-       
-       
-      
-        
     }
 
     /** Player has lost the game.
@@ -506,8 +496,7 @@ public class BJGame extends Event {
                         DB db = DB.getInstance();
                         try {
                             profile = db.getActiveProfile(sender.getNick());
-                            betsize = db.checkCredits(sender.getNick(),
-                                    amount);
+                            betsize = db.checkCredits(sender.getNick(), amount);
                             if (amount < 0.0) {
                                 bot.invalidArguments(sender, BJ_FORMAT);
                             } else if (betsize > 0.0) {
@@ -515,10 +504,9 @@ public class BJGame extends Event {
                                 game = new BJBet(sender, betsize, profile, chan);
                                 openGames.add(game);
                             } else {
-                                String out = NOCHIPS.replaceAll(
-                                     "%chips", Utils.chipsToString(betsize));
-                                out = out.replaceAll("%profile",
-                                                     profile.toString());
+                                String out = NOCHIPS.replaceAll("%chips",
+                                                                Utils.chipsToString(betsize));
+                                out = out.replaceAll("%profile", profile.toString());
                                 bot.sendIRCNotice(sender, out);
                             }
                         } catch (Exception e) {
@@ -531,8 +519,6 @@ public class BJGame extends Event {
             if (playbet) {
                 try {
                     // deal game, remove chips, check if auto win (natural)
-                    
-
                     ArrayList<Card> phand = game.getPlayerHand();
                     ArrayList<Card> dhand = game.getDealerHand();
                     
@@ -565,9 +551,7 @@ public class BJGame extends Event {
                 }
             }
         }
-        
     }
-    
     
     /**
      * Checks to see if a hand is a natural 21.

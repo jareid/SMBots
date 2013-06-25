@@ -228,13 +228,12 @@ public class DiceDuel extends Event {
         IrcBot bot = event.getBot();
         Channel channel = event.getChannel();
 
-        DB db = DB.getInstance();
-
         // check to see if someone is playing themselves...
         Bet found = null;
         boolean foundb = false;
         for (Bet bet : openBets) {
             if (bet.getUser().getNick().equalsIgnoreCase(username)) {
+                foundb = true;
                 // Check Bet Time
                 long now = System.currentTimeMillis();
                 long diff = now - bet.getTime();
@@ -243,7 +242,6 @@ public class DiceDuel extends Event {
                     bot.sendIRCMessage(channel, NOHOUSECALL.replaceAll("%username", username));
                 } else {
                     found = bet;
-                    foundb = true;
                     // play this wager
                     int d1 = 0;
                     int d2 = 0;
@@ -265,16 +263,8 @@ public class DiceDuel extends Event {
                         winner = "the house";
                         loser = username;
                     }
-                    
-                    db.deleteBet(username, GamesType.DICE_DUEL);
 
-                    // jackpot stuff
-                    if (Rake.checkJackpot(bet.getAmount())) { 
-                        ArrayList<String> players = new ArrayList<String>();
-                        players.add(username);
-                        Rake.jackpotWon(bet.getProfile(), GamesType.DICE_DUEL, 
-                                        players, bot, null);
-                    }
+                    bet.checkJackpot(bot);
                     
                     int losed = d1;
                     int wind = d1;
@@ -293,15 +283,16 @@ public class DiceDuel extends Event {
                 }
                 break;
             }
+        }
 
-            if (!foundb) {
-                // if we reach here the game doesn't exist
-                bot.sendIRCMessage(channel, NO_WAGER.replaceAll("%username", username));
-            }
-
-            if (found != null) {
-                openBets.remove(found);
-            }
+        if (!foundb) {
+            // if we reach here the game doesn't exist
+            bot.sendIRCMessage(channel, NO_WAGER.replaceAll("%username", username));
+        }
+        
+        if (found != null) {
+            found.close();
+            openBets.remove(found);
         }
     }
     
