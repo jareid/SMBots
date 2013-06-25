@@ -9,6 +9,7 @@
 package org.smokinmils.database;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -60,6 +62,12 @@ import com.mchange.v2.c3p0.DataSources;
  * @author Jamie Reid
  */
 public final class DB {
+    /** The user for the points' chips. */
+    public static final String POINTS_USER = "POINTS";
+
+    /** The user for the house chips. */
+    public static final String HOUSE_USER = "HOUSE";
+
     /** Number of minutes the connections can be idle for. */
     private static final int MAX_IDLE_MINS = 15;
 
@@ -845,50 +853,33 @@ public final class DB {
                                final GamesType game,
                                final TransactionType tzxtype)
         throws SQLException {
-        String chipssql = "SELECT COUNT(*) FROM " + UserProfilesView.NAME
-                + " WHERE " + UserProfilesView.COL_PROFILE + " LIKE " + "'"
-                + profile.toString() + "'" + " AND "
-                + UserProfilesView.COL_USERNAME + " LIKE " + "'" + username
-                + "'";
-
         String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
-                + UserProfilesTable.COL_USERID + ", "
-                + UserProfilesTable.COL_TYPEID + ", "
-                + UserProfilesTable.COL_AMOUNT + ") VALUES(("
-                + getUserIDSQL(username) + "), (" + getProfileIDSQL(profile)
-                + "), " + "'" + Double.toString(amount) + "') ";
+                      + UserProfilesTable.COL_USERID + ", "
+                      + UserProfilesTable.COL_TYPEID + ", "
+                      + UserProfilesTable.COL_AMOUNT + ") " 
+                      + "VALUES((" + getUserIDSQL(username) + "), ("
+                      + getProfileIDSQL(profile)
+                      + "), '" + Double.toString(amount) + "') "
+                      + "ON DUPLICATE KEY UPDATE " + UserProfilesTable.COL_AMOUNT
+                      + "= (" + UserProfilesTable.COL_AMOUNT
+                      + " + " + Double.toString(amount) + ")";
 
         String insusersql = "INSERT INTO " + UsersTable.NAME + "("
-                + UsersTable.COL_USERNAME + ") VALUES('" + username + "')";
-
-        String updsql = "UPDATE " + UserProfilesTable.NAME + " SET "
-                + UserProfilesTable.COL_AMOUNT + "= ("
-                + UserProfilesTable.COL_AMOUNT + " + " + amount + ")"
-                + " WHERE " + UserProfilesTable.COL_TYPEID + " LIKE ("
-                + getProfileIDSQL(profile) + ") AND "
-                + UserProfilesTable.COL_USERID + " LIKE ("
-                + getUserIDSQL(username) + ")";
+                          + UsersTable.COL_USERNAME + ") VALUES('" + username + "')";
+        
         boolean result = false;
 
         int profileid = runGetIntQuery(getProfileIDSQL(profile));
         // check valid profile
         if (profileid != -1) {
-            // decide whether to insert or update
-            if (runGetIntQuery(chipssql) >= 1) {
-                // update
-                result = (runBasicQuery(updsql) == 1);
-            } else {
-                // check user exists
-                if (runGetIntQuery(getUserIDSQL(username)) > 0) {
-                    // user exists so just add to profiles
-                    result = (runBasicQuery(inssql) == 1);
-                } else {
-                    // user didnt exist so add to both users and profiles
-                    int numrows = runBasicQuery(insusersql);
-                    if (numrows == 1) {
-                        result = (runBasicQuery(inssql) == 1);
-                    }
-                }
+            int numrows = 1;
+            // check user exists
+            if (runGetIntQuery(getUserIDSQL(username)) < 1) {
+                numrows = runBasicQuery(insusersql);
+            }
+            
+            if (numrows == 1) {
+                result = (runBasicQuery(inssql) == 1);
             }
         }
 
@@ -1907,7 +1898,7 @@ public final class DB {
         sql = "UPDATE " + UserProfilesTable.NAME
             + " SET " + UserProfilesTable.COL_AMOUNT + " = '0'"
             + " WHERE " + UserProfilesTable.COL_USERID + " = ("
-            + getUserIDSQL("POINTS") + ")";
+            + getUserIDSQL(POINTS_USER) + ")";
         runBasicQuery(sql);
     }
     
@@ -2018,55 +2009,120 @@ public final class DB {
     }
     
     /**
-     * Gives a group owner an amount of referral fees.
+     * Gives a user an amount of referral fees.
      * 
-     * @param fee The amount earnt
-     * @param group The group who's owner is receiving the fees
+     * Does not check if the user exists, as they already should since we got this 
+     * info from the database in the first place.
+     * 
+     * @param fees The amount earnt and by who
      * @param profile The profile type
      * 
      * @throws SQLException when a database error occurs
      */
-    public void giveOwnerFee(final double fee,
-                               final String group,
-                               final ProfileType profile)
-        throws SQLException {
+    public void giveReferalFees(final Map<String, Double> fees,
+                                final ProfileType profile) throws SQLException {
+        Connection conn = null;
+        PreparedStatement tstmt = null;
+        PreparedStatement insstmt = null;
+        
+        String usersql = "SELECT uu." + UsersTable.COL_ID + " FROM "
+                       + UsersTable.NAME + " uu" + " WHERE uu."
+                       + UsersTable.COL_USERNAME + " LIKE ? LIMIT 1";
+        
+        String tsql = "INSERT INTO " + TransactionsTable.NAME + "("
+                    + TransactionsTable.COL_TYPEID + ", "
+                    + TransactionsTable.COL_GAMEID + ", "
+                    + TransactionsTable.COL_USERID + ", "
+                    + TransactionsTable.COL_AMOUNT + ", "
+                    + TransactionsTable.COL_PROFILETYPE + ") VALUES(("
+                    + getTzxTypeIDSQL(TransactionType.REFERRAL) + "), ("
+                    + getGameIDSQL(GamesType.ADMIN) + "), ("
+                    + usersql + "), ?, "
+                    + "(" + getProfileIDSQL(profile) + "))";
+        
+        String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
+                      + UserProfilesTable.COL_USERID + ", "
+                      + UserProfilesTable.COL_TYPEID + ", "
+                      + UserProfilesTable.COL_AMOUNT + ") " 
+                      + "VALUES((" + usersql + "), (" + getProfileIDSQL(profile)
+                      + "), ?) "
+                      + "ON DUPLICATE KEY UPDATE " + UserProfilesTable.COL_AMOUNT
+                      + "= (" + UserProfilesTable.COL_AMOUNT + " + ?)";
+        
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+            tstmt = conn.prepareStatement(tsql);
+            insstmt = conn.prepareStatement(inssql);
+            
+            int profileid = runGetIntQuery(getProfileIDSQL(profile));
+            // check valid profile
+            if (profileid != -1) {            
+                for (Entry<String, Double> entry: fees.entrySet()) {
+                    String user = entry.getKey();
+                    Double amnt = entry.getValue();
+                    
+                    int i = 0;
+                    insstmt.setString(++i, user);
+                    insstmt.setDouble(++i, amnt);
+                    insstmt.setDouble(++i, amnt);
+                    insstmt.executeUpdate();
+                    
+                    i = 0;
+                    tstmt.setString(++i, user);
+                    tstmt.setDouble(++i, amnt);
+                    tstmt.executeUpdate();
+                    
+                    conn.commit();
+                }
+            }
+        } catch (SQLException ex) {
+            throw ex;
+        } finally {
+            try {
+                if (tstmt != null) {
+                    tstmt.close();
+                }
+                if (insstmt != null) {
+                    insstmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+
+    }
+    
+    /**
+     * Gets the owner of a group.
+     * 
+     * @param group The group who's owner we want to retrieve
+     * 
+     * @return the name of the group owner.
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public String getOwner(final String group) throws SQLException {
         String sql = "SELECT uu." + UsersTable.COL_USERNAME
                    + " FROM " + HostGroupsTable.NAME + " hgu"
                    + " JOIN " + UsersTable.NAME + " uu ON uu."
                               + UsersTable.COL_ID + " = hgu." + HostGroupsTable.COL_OWNER
                    + " WHERE " + HostGroupsTable.COL_NAME + " LIKE '" + group + "'";
-        String owner = runGetStringQuery(sql);
-        adjustChips(owner, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
+        return runGetStringQuery(sql);
     }
 
     /**
-     * Gives the HOUSE an amount of referral fees.
-     * 
-     * @param fee The amount earnt
-     * @param profile The profile type
+     * Checks HOUSE and POINTS exist.
      * 
      * @throws SQLException when a database error occurs
      */
-    public void houseFees(final double fee,
-                          final ProfileType profile)
+    public void checkDBUsersExist()
         throws SQLException {
-        checkUserExists("HOUSE", "HOUSE!HOUSE@HOUSE");
-        adjustChips("HOUSE", fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
-    }
-
-    /**
-     * Gives the POINTS an amount of referral fees.
-     * 
-     * @param fee The amount earnt
-     * @param profile The profile type
-     * 
-     * @throws SQLException when a database error occurs
-     */
-    public void pointFees(final double fee,
-                          final ProfileType profile)
-        throws SQLException {
-        checkUserExists("POINTS", "POINTS!POINTS@POINTS");
-        adjustChips("POINTS", fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
+        checkUserExists(HOUSE_USER, "HOUSE!HOUSE@HOUSE");
+        checkUserExists(POINTS_USER, "POINTS!POINTS@POINTS");
     }
     
     /**

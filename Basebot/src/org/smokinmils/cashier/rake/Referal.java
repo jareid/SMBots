@@ -101,6 +101,8 @@ public final class Referal {
         DB db = DB.getInstance();
 
         try {
+            db.checkDBUsersExist();
+            
             ReferrerType reftype = db.getRefererType(event.getUser());
 
             double housepercent = 1.0;
@@ -117,7 +119,7 @@ public final class Referal {
             }
 
             double housefee = event.getAmount() * housepercent;
-            db.houseFees(housefee, event.getProfile());
+            db.giveReferalFee(housefee, DB.HOUSE_USER, event.getProfile());
 
             if (Rake.JACKPOTENABLED) {
                 updateJackpot(event.getAmount(), event.getProfile());
@@ -138,11 +140,11 @@ public final class Referal {
         throws SQLException {
         DB db = DB.getInstance();
 
-        double reffee = event.getAmount() * USER_PERCENT;
+        double amnt = event.getAmount() * USER_PERCENT;
 
         ReferalUser referer = db.getReferalUsers(event.getUser()).get(0);
 
-        db.giveReferalFee(reffee, referer.getUser(), event.getProfile());
+        db.giveReferalFee(amnt, referer.getUser(), event.getProfile());
     }
 
     /**
@@ -161,12 +163,15 @@ public final class Referal {
         double pntsfee = grpfee * POINTS_PERCENT;
         double ownerfee = grpfee * GOWNER_PERCENT;
         grpfee -= (pntsfee + ownerfee);
+        
+        Map<String, Double> fees = new HashMap<String, Double>();
 
         List<ReferalUser> referals = db.getReferalUsers(event.getUser());
         Map<String, Integer> groups = new HashMap<String, Integer>();
         double userfee = reffee / referals.size();
         int groupusers = 0;
         for (ReferalUser user : referals) {
+            // TODO: if group is null, should be not still give something?
             if (user.getGroup() != null) {
                 if (!groups.containsKey(user.getGroup())) {
                     groups.put(user.getGroup(), 1);
@@ -177,11 +182,11 @@ public final class Referal {
                 groupusers++;
             }
 
-            db.giveReferalFee(userfee, user.getUser(), event.getProfile());
+            fees.put(user.getUser(), userfee);
         }
 
         // Give the fees to the points table.
-        db.pointFees(pntsfee, event.getProfile());
+        fees.put(DB.POINTS_USER, pntsfee);
 
         // Give each group an equivalent amount based on number of users
         // in the group with that referral
@@ -189,13 +194,15 @@ public final class Referal {
             double eachgrpfee = grpfee / groupusers;
             double eachownfee = ownerfee / groupusers;
             for (Entry<String, Integer> group : groups.entrySet()) {
-                db.giveReferalFee(eachgrpfee * group.getValue(), group.getKey(),
-                                  event.getProfile());
-                db.giveOwnerFee(eachownfee, group.getKey(), event.getProfile());
+                fees.put(group.getKey(), eachgrpfee * group.getValue());
+                fees.put(db.getOwner(group.getKey()), eachownfee);
             }
         } else {
-            db.houseFees(grpfee, event.getProfile());
+            // TODO: if nobody is in the group, is this correct?
+            fees.put(DB.HOUSE_USER, grpfee);
         }
+        
+        db.giveReferalFees(fees, event.getProfile());
     }
 
     /**

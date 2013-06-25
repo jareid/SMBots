@@ -24,6 +24,7 @@ import org.smokinmils.cashier.tasks.ManagerAnnounce;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.DiceDuel;
 import org.smokinmils.games.casino.OverUnder;
+import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
 import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
@@ -87,7 +88,7 @@ public class Bot {
         basebot.addListener(swift_irc, new Referrals(mgrs_swift_chans, host_swift_chans),
                 all_swift_chans);
 
-       // basebot.addListener(swift_irc, new Roulette(2, "#testeroo", swift_bot));
+        basebot.addListener(swift_irc, new Roulette(2, "#testeroo", swift_bot));
 
         basebot.addListener(swift_irc, new BJGame(swift_bot), oudd_swift_chans);
         basebot.addListener(swift_irc, new OverUnder(), oudd_swift_chans);
