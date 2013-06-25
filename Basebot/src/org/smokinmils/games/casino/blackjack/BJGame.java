@@ -17,7 +17,6 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
@@ -239,6 +238,7 @@ public class BJGame extends Event {
                     out = out.replaceAll("%hand", handToString(phand, false));
                     out = out.replace("%pscore", scorelist);
                     bot.sendIRCNotice(sender, out);
+                    bot.sendIRCMessage(sender, out);
                     out = BJ_OPTIONS.replaceAll("%who", sender.getNick());
                     bot.sendIRCNotice(sender, out);
                 }
@@ -529,7 +529,6 @@ public class BJGame extends Event {
             }
             
             if (playbet) {
-                DB db = DB.getInstance();
                 try {
                     // deal game, remove chips, check if auto win (natural)
                     
@@ -547,6 +546,7 @@ public class BJGame extends Event {
                     out = out.replaceAll("%dscore", allHands(dhand).toString());
                     
                     bot.sendIRCNotice(sender, out);
+                    bot.sendIRCMessage(sender, out);
                     
                     // check for natural win / both 21 so push
                     if (natural(dhand) && natural(phand)) {
@@ -575,7 +575,14 @@ public class BJGame extends Event {
      * @return true if natural, false otherwise
      */
     private boolean natural(final ArrayList<Card> hand) {
-        return (hand.size() == BJBet.START_HAND_SIZE && countHand(hand) == MAX_POINTS);
+        boolean tenCheck = true;
+        for (Card card : hand) {
+            if (card.getRank() == Card.TEN) {
+                tenCheck = false;
+            }
+        }
+        return (hand.size() == BJBet.START_HAND_SIZE && countHand(hand) == MAX_POINTS
+                && tenCheck);
     }
     
     /** 
