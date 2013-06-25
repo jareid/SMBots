@@ -21,6 +21,7 @@ import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.database.types.ReferrerType;
+import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -87,7 +88,7 @@ public class Referrals extends Event {
     private static final String NEW_CMD       = "!newgroup";
 
     /** The command format. */
-    private static final String NEW_FRMT      = "%b%c12" + NEW_CMD + " <name>";
+    private static final String NEW_FRMT      = "%b%c12" + NEW_CMD + " <name> <owner>";
 
     /** The rename command. */
     private static final String DEL_CMD       = "!delgroup";
@@ -359,10 +360,12 @@ public class Referrals extends Event {
             ReferrerType reftype = db.getRefererType(sender);
             if (reftype == ReferrerType.NONE) {
                 String referrer = msg[1];
+                User ref = bot.getUserChannelDao().getUser(referrer);
                 if (referrer.equalsIgnoreCase(sender)) {
                     String out = NO_SELF.replaceAll("%sender", sender);
                     bot.sendIRCMessage(channel, out);
-                } else if (!db.checkUserExists(referrer)) {
+                } else if (!db.checkUserExists(referrer)
+                        || db.checkUserExists(referrer, ref.getHostmask()) == UserCheck.FAILED) {
                     String out = NO_USER.replaceAll("%sender", sender);
                     out = out.replaceAll("%who", referrer);
                     bot.sendIRCMessage(channel, out);
@@ -408,6 +411,7 @@ public class Referrals extends Event {
             boolean isok = true;
             for (int i = 2; i < msg.length; i++) {
                 String ref = msg[i];
+                User refer = bot.getUserChannelDao().getUser(ref);
                 if (ref.equalsIgnoreCase(user)) {
                     String out = NO_SELF.replaceAll("%sender", sender);
                     bot.sendIRCMessage(channel, out);
@@ -419,7 +423,8 @@ public class Referrals extends Event {
                     bot.sendIRCMessage(channel, out);
 
                     isok = false;
-                } else if (!db.checkUserExists(ref)) {
+                } else if (!db.checkUserExists(ref) 
+                        || db.checkUserExists(ref, refer.getHostmask()) == UserCheck.FAILED) {
                     String out = NO_USER.replaceAll("%sender", sender);
                     out = out.replaceAll("%who", ref);
                     bot.sendIRCMessage(channel, out);

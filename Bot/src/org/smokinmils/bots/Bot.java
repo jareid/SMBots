@@ -27,6 +27,7 @@ import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.DiceDuel;
 import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
+import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
 import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
@@ -107,6 +108,7 @@ public class Bot {
         basebot.addListener(swift_irc, new Roulette(3, "#sm_vip", swift_bot));
         basebot.addListener(swift_irc, new Roulette(3, "#Private1", swift_bot));
 
+        basebot.addListener(swift_irc, new BJGame(swift_bot), dd_swift_chans);
         basebot.addListener(swift_irc, new OverUnder(), ou_swift_chans);
         basebot.addListener(swift_irc, new DiceDuel(swift_bot, "#SMGamer"),
                             dd_swift_chans);

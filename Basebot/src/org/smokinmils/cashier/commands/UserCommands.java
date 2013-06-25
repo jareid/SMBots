@@ -196,11 +196,15 @@ public class UserCommands extends Event {
                 } else {
                     user = sender;
                 }
+                
                 Map<ProfileType, Double> creds = null;
-                try {
-                    creds = DB.getInstance().checkAllCredits(user);
-                } catch (Exception e) {
-                    EventLog.log(e, "CheckChips", "message");
+                boolean rsrct = (user.equalsIgnoreCase("HOUSE") || user.equalsIgnoreCase("POINTS"));
+                if ((rsrct && bot.userIsHalfOp(senderu, event.getChannel().getName())) || !rsrct) {
+                    try {
+                        creds = DB.getInstance().checkAllCredits(user);
+                    } catch (Exception e) {
+                        EventLog.log(e, "CheckChips", "message");
+                    }
                 }
 
                 String credstr;
