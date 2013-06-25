@@ -119,6 +119,9 @@ public class BJGame extends Event {
     /** String to notify on winnings / amount returned for a draw. */
     private static final String WINNINGS = "%b%c04%who%c12: You receive %coins coins";
 
+    /** String for points when they have Blackjack! */
+    private static final String BLACKJACK_STRING = "BlackJack!";
+
     /** timer that is used to check for idle games. */
     private final Timer gameTimer;
     
@@ -337,12 +340,23 @@ public class BJGame extends Event {
             
             // Announce winner and give chips
             String out = OUTCOME.replaceAll("%who", player.getNick());
-            out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
-            out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+            
             out = out.replaceAll("%outcome", PLAYER_DRAW);
             
             out = out.replaceAll("%phand", handToString(phand, false));
             out = out.replaceAll("%dhand", handToString(dhand, false));
+            
+            if (natural(usergame.getPlayerHand())) {
+                out = out.replaceAll("%pscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
+            }
+            if (natural(usergame.getDealerHand())) {
+                out = out.replaceAll("%dscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+
+            }
             
             bot.sendIRCMessage(chan, out);
             
@@ -392,8 +406,18 @@ public class BJGame extends Event {
             
             // Announce winner and give chips
             String out = OUTCOME.replaceAll("%who", winner.getNick());
-            out = out.replaceAll("%pscore", Integer.toString(countHand(usergame.getPlayerHand())));
-            out = out.replaceAll("%dscore", Integer.toString(countHand(usergame.getDealerHand())));
+            
+            if (natural(usergame.getPlayerHand())) {
+                out = out.replaceAll("%pscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
+            }
+            if (natural(usergame.getDealerHand())) {
+                out = out.replaceAll("%dscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+
+            }
             out = out.replaceAll("%outcome", PLAYER_WIN);
             
             out = out.replaceAll("%phand", handToString(phand, false));
@@ -437,8 +461,18 @@ public class BJGame extends Event {
         ArrayList<Card> dhand = usergame.getDealerHand();
         
         String out = OUTCOME.replaceAll("%who", sender.getNick());
-        out = out.replaceAll("%pscore", Integer.toString(countHand(usergame.getPlayerHand())));
-        out = out.replaceAll("%dscore", Integer.toString(countHand(usergame.getDealerHand())));
+        
+        if (natural(usergame.getPlayerHand())) {
+            out = out.replaceAll("%pscore", BLACKJACK_STRING);
+        } else {
+            out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
+        }
+        if (natural(usergame.getDealerHand())) {
+            out = out.replaceAll("%dscore", BLACKJACK_STRING);
+
+        } else {
+            out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+        }
         out = out.replaceAll("%outcome", PLAYER_LOSE);
         
         out = out.replaceAll("%phand", handToString(phand, false));
