@@ -70,7 +70,7 @@ public class DiceDuel extends Event {
     
     /** New bet made message.*/
     private static final String  NEW_WAGER       = "%b%c04%username%c12 has "
-           + "opened a new dice duel wager of %c04%amount %proftype%c12  coins!"
+           + "opened a new dice duel wager of %c04%amount %proftype%c12 coins! "
            + "To call this wager type %c04!call %username";
     
     /** Play vs real message. */
@@ -91,7 +91,7 @@ public class DiceDuel extends Event {
                              + "%wagers. To call a wager type %c04!call <name>";
     
     /** Open wage line. */
-    private static final String  WAGER           = "%c04%username%c12( %c04%amount %proftype%c12) ";
+    private static final String  WAGER           = "%c04%username%c12 (%c04%amount %proftype%c12) ";
     
     /** Open wages list message. */
     private static final String  HOUSE_AVAIL     = "%b%c12The following users can now use %c04"

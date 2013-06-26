@@ -19,6 +19,7 @@ import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
+import org.smokinmils.settings.XMLSettings;
 
 /** 
  * Provides the functionality for BlackJack via IRC.
@@ -26,6 +27,7 @@ import org.smokinmils.settings.Variables;
  * @author cjc
  */
 public class BJGame extends Event {
+    
     /** The stand command. */
     public static final String BJ_CMD = "!deal";
     
@@ -108,7 +110,7 @@ public class BJGame extends Event {
     private static final String PLAYER_WIN = "won";
 
     /** String to inform the user that it was a draw. */
-    private static final String PLAYER_DRAW = "drew!";
+    private static final String PLAYER_DRAW = "drew";
 
     /** String to inform the user they don't have a game open. */
     private static final String NO_OPEN_GAME = "Sorry %who, you don't have an open game";
