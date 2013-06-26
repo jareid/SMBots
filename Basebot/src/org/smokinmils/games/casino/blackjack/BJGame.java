@@ -19,6 +19,7 @@ import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
+import org.smokinmils.settings.XMLSettings;
 
 /** 
  * Provides the functionality for BlackJack via IRC.
@@ -26,6 +27,7 @@ import org.smokinmils.settings.Variables;
  * @author cjc
  */
 public class BJGame extends Event {
+    
     /** The stand command. */
     public static final String BJ_CMD = "!deal";
     
@@ -108,7 +110,7 @@ public class BJGame extends Event {
     private static final String PLAYER_WIN = "won";
 
     /** String to inform the user that it was a draw. */
-    private static final String PLAYER_DRAW = "drew!";
+    private static final String PLAYER_DRAW = "drew";
 
     /** String to inform the user they don't have a game open. */
     private static final String NO_OPEN_GAME = "Sorry %who, you don't have an open game";
@@ -118,6 +120,9 @@ public class BJGame extends Event {
     
     /** String to notify on winnings / amount returned for a draw. */
     private static final String WINNINGS = "%b%c04%who%c12: You receive %coins coins";
+
+    /** String for points when they have Blackjack! */
+    private static final String BLACKJACK_STRING = "BlackJack!";
 
     /** timer that is used to check for idle games. */
     private final Timer gameTimer;
@@ -232,6 +237,7 @@ public class BJGame extends Event {
                     out = out.replaceAll("%hand", handToString(phand, false));
                     out = out.replace("%pscore", scorelist);
                     bot.sendIRCNotice(sender, out);
+                    bot.sendIRCMessage(sender, out);
                     out = BJ_OPTIONS.replaceAll("%who", sender.getNick());
                     bot.sendIRCNotice(sender, out);
                 }
@@ -336,12 +342,23 @@ public class BJGame extends Event {
             
             // Announce winner and give chips
             String out = OUTCOME.replaceAll("%who", player.getNick());
-            out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
-            out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+            
             out = out.replaceAll("%outcome", PLAYER_DRAW);
             
             out = out.replaceAll("%phand", handToString(phand, false));
             out = out.replaceAll("%dhand", handToString(dhand, false));
+            
+            if (natural(usergame.getPlayerHand())) {
+                out = out.replaceAll("%pscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
+            }
+            if (natural(usergame.getDealerHand())) {
+                out = out.replaceAll("%dscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+
+            }
             
             bot.sendIRCMessage(chan, out);
             
@@ -391,8 +408,18 @@ public class BJGame extends Event {
             
             // Announce winner and give chips
             String out = OUTCOME.replaceAll("%who", winner.getNick());
-            out = out.replaceAll("%pscore", Integer.toString(countHand(usergame.getPlayerHand())));
-            out = out.replaceAll("%dscore", Integer.toString(countHand(usergame.getDealerHand())));
+            
+            if (natural(usergame.getPlayerHand())) {
+                out = out.replaceAll("%pscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
+            }
+            if (natural(usergame.getDealerHand())) {
+                out = out.replaceAll("%dscore", BLACKJACK_STRING);
+            } else {
+                out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+
+            }
             out = out.replaceAll("%outcome", PLAYER_WIN);
             
             out = out.replaceAll("%phand", handToString(phand, false));
@@ -436,8 +463,18 @@ public class BJGame extends Event {
         ArrayList<Card> dhand = usergame.getDealerHand();
         
         String out = OUTCOME.replaceAll("%who", sender.getNick());
-        out = out.replaceAll("%pscore", Integer.toString(countHand(usergame.getPlayerHand())));
-        out = out.replaceAll("%dscore", Integer.toString(countHand(usergame.getDealerHand())));
+        
+        if (natural(usergame.getPlayerHand())) {
+            out = out.replaceAll("%pscore", BLACKJACK_STRING);
+        } else {
+            out = out.replaceAll("%pscore", Integer.toString(countHand(phand)));
+        }
+        if (natural(usergame.getDealerHand())) {
+            out = out.replaceAll("%dscore", BLACKJACK_STRING);
+
+        } else {
+            out = out.replaceAll("%dscore", Integer.toString(countHand(dhand)));
+        }
         out = out.replaceAll("%outcome", PLAYER_LOSE);
         
         out = out.replaceAll("%phand", handToString(phand, false));
@@ -531,6 +568,7 @@ public class BJGame extends Event {
                     out = out.replaceAll("%dscore", allHands(dhand).toString());
                     
                     bot.sendIRCNotice(sender, out);
+                    bot.sendIRCMessage(sender, out);
                     
                     // check for natural win / both 21 so push
                     if (natural(dhand) && natural(phand)) {
@@ -557,7 +595,14 @@ public class BJGame extends Event {
      * @return true if natural, false otherwise
      */
     private boolean natural(final ArrayList<Card> hand) {
-        return (hand.size() == BJBet.START_HAND_SIZE && countHand(hand) == MAX_POINTS);
+        boolean tenCheck = true;
+        for (Card card : hand) {
+            if (card.getRank() == Card.TEN) {
+                tenCheck = false;
+            }
+        }
+        return (hand.size() == BJBet.START_HAND_SIZE && countHand(hand) == MAX_POINTS
+                && tenCheck);
     }
     
     /** 

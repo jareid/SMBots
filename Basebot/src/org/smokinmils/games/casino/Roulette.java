@@ -72,14 +72,14 @@ public class Roulette extends Event {
 
     /** The message for a new round starting. */
     private static final String  NEW_GAME        = "%b%c12A new roulette game "
-           + "is starting! Type %c04!info %c12for instructions on how to play.";
+           + "is starting! Type %c04!info roulette%c12for instructions on how to play.";
     
     /** The invalid bet choice message. */
     private static final String  PLACE_BETS      = "%b%c12Place your bets now!";
     
     /** The message displaying the winning number. */
     private static final String  WIN_LINE        = "%b%c12The winning number "
-                                       + "is: %c04%number %c12%colour %board%n";
+                                       + "is: %board%n";
     
     /** The winners' message. */
     private static final String  CONGRATULATIONS = "%b%c12Congratulations to"
@@ -413,8 +413,7 @@ public class Roulette extends Event {
         }
 
         // Construct the winning string
-        String winline = WIN_LINE.replaceAll("%colour", getColour(winner));
-        winline = winline.replaceAll("%number", Integer.toString(winner));
+        String winline = WIN_LINE;
 
         String board = "";
         if (getColour(winner).equalsIgnoreCase("red")) {
