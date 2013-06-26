@@ -17,6 +17,7 @@ import org.pircbotx.Colors;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.hooks.managers.ListenerManager;
 import org.smokinmils.BaseBot;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.settings.Variables;
@@ -52,6 +53,9 @@ public class IrcBot extends PircBotX {
 	/** The thread used to check identification. */
 	private CheckIdentified identCheck;
 	
+	/** The listener manager used for this bot. */
+	private ListenerManager<IrcBot> listenerManager;
+	
 	/**
 	 * Constructor.
 	 * 
@@ -59,7 +63,7 @@ public class IrcBot extends PircBotX {
 	 * 
 	 * @see org.pircbotx.PircBotX
 	 */
-	public IrcBot(final Configuration config) {
+	public IrcBot(final Configuration<IrcBot> config) {
 		super(config);
     	identifiedUsers = new ArrayList<String>();
     	validChannels = new ArrayList<String>();
@@ -412,4 +416,18 @@ public class IrcBot extends PircBotX {
 	public final List<String> getValidChannels() {
 		return validChannels;
 	}
+
+    /**
+     * @return the listenerManager
+     */
+    public final ListenerManager<IrcBot> getListenerManager() {
+        return listenerManager;
+    }
+
+    /**
+     * @param listman the listenerManager to set
+     */
+    public final void setListenerManager(final ListenerManager<IrcBot> listman) {
+        listenerManager = listman;
+    }
  }

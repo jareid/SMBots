@@ -111,7 +111,6 @@ public class TimedRollComp extends Event {
      * @param rnds      The number of rounds to play.
      * @param ctr       The parent object.
      */
-    @SuppressWarnings("unchecked")
     public TimedRollComp(final IrcBot bot, final String channel,
             final ProfileType prof, final int prze, final int mins,
             final int rnds, final CreateTimedRoll ctr) {
@@ -140,8 +139,10 @@ public class TimedRollComp extends Event {
 
             irc.sendIRC().joinChannel(validChan);
 
-            bot.getConfiguration().getListenerManager().addListener(this);
-
+            // TODO: check this new way works
+            //bot.getConfiguration().getListenerManager().addListener(this);
+            bot.getListenerManager().addListener(this);
+            
             // Start the timer
             gameTimer = new Timer(true);
             gameTimer.scheduleAtFixedRate(new TimedRollTask(),
@@ -153,14 +154,12 @@ public class TimedRollComp extends Event {
     /**
      * Ends the game prematurely.
      */
-    @SuppressWarnings("unchecked")
     public final void close() {
         if (gameTimer != null) {
             gameTimer.cancel();
         }
         
-        boolean isvalid = irc.getValidChannels().contains(
-                validChan.toLowerCase());
+        boolean isvalid = irc.getValidChannels().contains(validChan.toLowerCase());
         if (!isvalid) {
             Channel chan = irc.getUserChannelDao().getChannel(validChan);
             if (chan == null) {
@@ -170,7 +169,10 @@ public class TimedRollComp extends Event {
                 chan.send().part("Game was ended! Join #SMGamer for more!!!");
             }
         }
-        irc.getConfiguration().getListenerManager().removeListener(this);
+        
+        // TODO: check this new way works
+        //irc.getConfiguration().getListenerManager().removeListener(this);
+        irc.getListenerManager().removeListener(this);
     }
 
     /**
@@ -190,10 +192,7 @@ public class TimedRollComp extends Event {
         synchronized (this) {
             if (Utils.startsWith(message, CMD)
                     && validChan.equalsIgnoreCase(chan.getName())) {
-                boolean isidentd = bot.userIsIdentified(senderu);
-                boolean hasrolled = userlist.containsKey(sender);
-                if ((!hasrolled && !userlist.containsValue(host))
-                    || (userlist.containsValue(host) && isidentd && !hasrolled)) {
+                if ((!userlist.containsKey(sender) && !userlist.containsValue(host))) {
                     int userroll = Random.nextInt(MAXROLL);
 
                     String out = ROLLED.replaceAll("%who", sender);
@@ -254,13 +253,8 @@ public class TimedRollComp extends Event {
             for (String winner : winners) {
                 DB db = DB.getInstance();
                 try {
-                    UserCheck ckusr = db.checkUserExists(winner,
-                                                         userlist.get(winner));
-                    if (ckusr != UserCheck.FAILED) {
-                        db.adjustChips(
-                                winner, win, profile, GamesType.TIMEDROLL,
-                                TransactionType.WIN);
-                    } else {
+                    UserCheck ckusr = db.checkUserExists(winner, userlist.get(winner));
+                    if (ckusr == UserCheck.FAILED) {
                         out = CANTWIN.replaceAll("%winner", winstr);
                         out = out.replaceAll("%roll", Integer.toString(winroll));
                         out = out.replaceAll("%coins", Utils.chipsToString(win));
@@ -268,6 +262,7 @@ public class TimedRollComp extends Event {
 
                         irc.sendIRCMessage(vchan, out);
                     }
+                    db.adjustChips(winner, win, profile, GamesType.TIMEDROLL, TransactionType.WIN);
                 } catch (Exception e) {
                     EventLog.log(e, "TimedRollComp", "processRound");
                 }

@@ -8,9 +8,6 @@
  */ 
 package org.smokinmils.database.types;
 
-import java.sql.SQLException;
-
-import org.smokinmils.database.DB;
 
 /**
 * An enumerate for the DB's credits transaction types.
@@ -78,15 +75,4 @@ public enum ProfileType {
         }
         return null;
     }
-    
-	/**
-	 * Converts the type to it's integer from the database.
-	 * 
-	 * @return the integer that represents this ProfileType
-	 * 
-	 * @throws SQLException if something fails in the database.
-	 */
-	public int toInteger() throws SQLException {
-		return DB.getInstance().getProfileID(this);
-	}
 }

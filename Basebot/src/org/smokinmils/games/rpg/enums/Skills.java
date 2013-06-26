@@ -6,14 +6,14 @@
  * 
  * Copyright (C) 2013 Jamie Reid
  */
-package org.smokinmils.games.rpg;
+package org.smokinmils.games.rpg.enums;
 
 /**
- * An enumerate for the DB's credits transaction types.
+ * An enumerate for the RPG skill types.
  * 
  * @author Jamie Reid
  */
-public enum SkillNames {
+public enum Skills {
     /** Strength skill. */
     Strength ("strength", "Higher damage in base combat"),
     
@@ -52,7 +52,7 @@ public enum SkillNames {
      * @param txt textual representation.
      * @param desc a description.
      */
-    SkillNames(final String txt, final String desc) {
+    Skills(final String txt, final String desc) {
         text = txt;
         description = desc;
     }
@@ -92,10 +92,10 @@ public enum SkillNames {
      * @param text the string to check
      * @return the correct enumerate object
      */
-    public static SkillNames fromString(final String text) {
-        SkillNames ret = INVALID;
+    public static Skills fromString(final String text) {
+        Skills ret = INVALID;
         if (text != null) {
-            for (SkillNames gt : SkillNames.values()) {
+            for (Skills gt : Skills.values()) {
                 if (gt.getText().equals(text)) {
                     ret = gt;
                     break;

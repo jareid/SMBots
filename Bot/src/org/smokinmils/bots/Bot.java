@@ -10,6 +10,7 @@ package org.smokinmils.bots;
 
 import java.io.FileWriter;
 import java.io.Writer;
+import java.net.InetAddress;
 import java.util.Timer;
 
 import org.smokinmils.BaseBot;
@@ -54,8 +55,8 @@ public class Bot {
             }
         }
 
-        //TODO: read from args.
         String nick = "SM_BOT";
+        InetAddress local = InetAddress.getByName("bot.smgamer.com");
         
         // Store the process PID. note only windows.
         int pid = Kernel32.INSTANCE.GetCurrentProcessId();
@@ -68,7 +69,7 @@ public class Bot {
         boolean refund = true;
         basebot.initialise(nick, "5w807", "smokinmils", debug, refund);
         String swift_irc = "SwiftIRC";
-        basebot.addServer(swift_irc, server, 6667);
+        basebot.addServer(swift_irc, server, 6667, local);
         IrcBot swift_bot = basebot.getBot(swift_irc);
 
         String[] all_swift_chans = { "#SMGamer", "#sm_tournaments",

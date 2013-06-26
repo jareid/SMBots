@@ -11,6 +11,8 @@ import java.util.Map;
  * Copyright (C) 2013 Jamie Reid
  */
 
+import org.smokinmils.games.rpg.enums.Skills;
+
 /**
  * Provides the functionality for user stats such as level.
  * 
@@ -33,7 +35,7 @@ public class UserStats {
     private long experience;
     
     /** A map of the user's skills. */
-    private final Map<SkillNames, Skill> skills;
+    private final Map<Skills, Skill> skills;
     
     /**
      * Constructor.
@@ -43,8 +45,8 @@ public class UserStats {
         username = user;
         level = 0; // TODO: db fucntions
         increaseExperience(0); // TODO: db functions
-        skills = new HashMap<SkillNames, Skill>();
-        for (SkillNames skill: SkillNames.values()) {
+        skills = new HashMap<Skills, Skill>();
+        for (Skills skill: Skills.values()) {
             skills.put(skill, new Skill(user, skill));
         }
     }
@@ -53,7 +55,7 @@ public class UserStats {
      * @param skill the skill we want.
      * @return the user's skill object.
      */
-    public final Skill getSkill(final SkillNames skill) {
+    public final Skill getSkill(final Skills skill) {
         return skills.get(skill);
     }
 

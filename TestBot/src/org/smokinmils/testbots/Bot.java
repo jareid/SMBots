@@ -37,8 +37,7 @@ import org.smokinmils.help.Help;
  * @author Jamie Reid
  */
 public class Bot {
-    public static void main(String[] args)
-        throws Exception {        
+    public static void main(String[] args) throws Exception {        
         String server = "irc.SwiftIRC.net";
         if (args.length > 0) {
             try {
@@ -49,8 +48,9 @@ public class Bot {
             }
         }
 
-        //TODO: read from args.
         String nick = "TESTSM_BOT";
+        // TODO: Test only on server or address will fail.
+        //InetAddress local = InetAddress.getByName("bot.smgamer.com");
         
         // Store the process PID. note only windows.
         //int pid = Kernel32.INSTANCE.GetCurrentProcessId();
@@ -63,7 +63,7 @@ public class Bot {
         boolean refund = false;
         basebot.initialise(nick, "5w807", "smokinmils", debug, refund);
         String swift_irc = "SwiftIRC";
-        basebot.addServer(swift_irc, server, 6667);
+        basebot.addServer(swift_irc, server, 6667, local);
         IrcBot swift_bot = basebot.getBot(swift_irc);
 
         String[] all_swift_chans = { "#testeroo" };

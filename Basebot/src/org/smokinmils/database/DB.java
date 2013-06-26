@@ -159,17 +159,12 @@ public final class DB {
      * @throws SQLException when a database error occurs
      */
     public void addHostmask(final String username,
-                            final String hostmask)
-        throws SQLException {
-        String userexist = "SELECT " + UsersTable.COL_ID + " FROM "
-                + UsersTable.NAME + " WHERE " + UsersTable.COL_USERNAME
-                + " LIKE '" + username + "'";
-
+                            final String hostmask) throws SQLException {
         String inshost = "INSERT IGNORE INTO " + HostmasksTable.NAME + "("
                 + HostmasksTable.COL_HOST + ", " + HostmasksTable.COL_USERID
                 + ") " + "VALUES('" + hostmask + "', '%userid')";
 
-        int userid = runGetIntQuery(userexist);
+        int userid = runGetIntQuery(getUserIDSQL(username));
         if (userid != -1) {
             inshost = inshost.replaceAll("%userid", Integer.toString(userid));
             runBasicQuery(inshost);
@@ -193,8 +188,7 @@ public final class DB {
                           final String choice,
                           final double amount,
                           final ProfileType profile,
-                          final GamesType game)
-        throws SQLException {
+                          final GamesType game) throws SQLException {
         String sql = "INSERT INTO " + BetsTable.NAME + "("
                 + BetsTable.COL_USERID + ", " + BetsTable.COL_AMOUNT + ", "
                 + BetsTable.COL_CHOICE + ", " + BetsTable.COL_GAMEID + ", "
@@ -239,33 +233,11 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public ProfileType getActiveProfile(final String username)
-        throws SQLException {
+    public ProfileType getActiveProfile(final String username) throws SQLException {
         String sql = "SELECT " + UsersView.COL_ACTIVEPROFILE + " FROM "
                 + UsersView.NAME + " WHERE " + UsersView.COL_USERNAME
                 + " LIKE '" + username + "'";
         return ProfileType.fromString(runGetStringQuery(sql));
-    }
-
-    /**
-     * Getter method for a user's active profile ID.
-     * 
-     * Performs an SQL statement on the DB
-     * 
-     * @param username The username
-     * 
-     * @return The profile id
-     * 
-     * @throws SQLException when a database error occurs
-     */
-    public int getActiveProfileID(final String username)
-        throws SQLException {
-        ProfileType profile = getActiveProfile(username);
-        int id = -1;
-        if (profile != null) {
-            id = runGetIntQuery(getProfileIDSQL(profile));
-        }
-        return id;
     }
 
     /**
@@ -279,8 +251,7 @@ public final class DB {
      * @throws SQLException thrown when the database failed to execute.
      */
     public UserCheck checkUserExists(final String username,
-                                     final String hostmask)
-        throws SQLException {
+                                     final String hostmask) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + UsersTable.NAME + " WHERE "
                 + UsersTable.COL_USERNAME + " LIKE " + "'" + username + "'";
 
@@ -321,8 +292,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public boolean checkUserExists(final String username)
-        throws SQLException {
+    public boolean checkUserExists(final String username) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + UsersTable.NAME + " WHERE "
                 + UsersTable.COL_USERNAME + " LIKE " + "'" + username + "'";
 
@@ -340,8 +310,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public int checkCreditsAsInt(final String username)
-        throws SQLException {
+    public int checkCreditsAsInt(final String username) throws SQLException {
         return (int) Math.floor(checkCredits(username));
     }
 
@@ -356,8 +325,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public double checkCredits(final String username)
-        throws SQLException {
+    public double checkCredits(final String username) throws SQLException {
         ProfileType active = getActiveProfile(username);
         return checkCredits(username, active);
     }
@@ -375,8 +343,7 @@ public final class DB {
      * @throws SQLException when a database error occurs
      */
     public double checkCredits(final String username,
-                               final Double amount)
-        throws SQLException {
+                               final Double amount) throws SQLException {
         double ret = 0.0;
         if (amount != null) {
             ProfileType active = getActiveProfile(username);
@@ -419,8 +386,7 @@ public final class DB {
      * @throws SQLException when a database error occurs
      */
     public int checkCreditsAsInt(final String username,
-                                 final ProfileType profile)
-        throws SQLException {
+                                 final ProfileType profile) throws SQLException {
         return (int) Math.floor(checkCredits(username, profile));
     }
 
@@ -437,8 +403,7 @@ public final class DB {
      * @throws SQLException when a database error occurs
      */
     public double checkCredits(final String username,
-                               final ProfileType profile)
-        throws SQLException {
+                               final ProfileType profile) throws SQLException {
         String sql = "SELECT " + UserProfilesView.COL_AMOUNT + " FROM "
                 + UserProfilesView.NAME + " WHERE "
                 + UserProfilesView.COL_USERNAME + " = '" + username + "' AND "
@@ -463,8 +428,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public Map<ProfileType, Double> checkAllCredits(final String username)
-        throws SQLException {
+    public Map<ProfileType, Double> checkAllCredits(final String username) throws SQLException {
         Map<ProfileType, Double> res = new HashMap<ProfileType, Double>();
         Connection conn = null;
         Statement stmt = null;
@@ -517,8 +481,7 @@ public final class DB {
      * @throws SQLException when a database error occurs
      */
     public boolean updateActiveProfile(final String username,
-                                       final ProfileType profile)
-        throws SQLException {
+                                       final ProfileType profile) throws SQLException {
         String sql = "UPDATE " + UsersTable.NAME + " SET "
                 + UsersTable.COL_ACTIVEPROFILE + " = " + "("
                 + getProfileIDSQL(profile) + ")" + " WHERE "
@@ -571,8 +534,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void processRefunds()
-        throws SQLException {
+    public void processRefunds() throws SQLException {
         processOtherRefunds();
         processPokerRefunds();
     }
@@ -583,8 +545,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void processOtherRefunds()
-        throws SQLException {
+    public void processOtherRefunds() throws SQLException {
         String sqlsel = "SELECT ut." + UsersTable.COL_USERNAME + ", "
                 + BetsTable.COL_AMOUNT + ", " + " pt."
                 + ProfileTypeTable.COL_NAME + " FROM " + BetsTable.NAME + " bt"
@@ -643,8 +604,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void processPokerRefunds()
-        throws SQLException {
+    public void processPokerRefunds() throws SQLException {
         String sql = "SELECT " + PokerBetsTable.COL_USERID + ","
                 + PokerBetsTable.COL_PROFILEID + ","
                 + PokerBetsTable.COL_AMOUNT + " FROM " + PokerBetsTable.NAME;
@@ -714,45 +674,6 @@ public final class DB {
     }
 
     /**
-     * Getter method for profile name from id.
-     * 
-     * Performs an SQL statement on the DB
-     * 
-     * @param id the profile id
-     * 
-     * @return The list of profile types
-     * 
-     * @throws SQLException when a database error occurs
-     * 
-     * @deprecated
-     */
-    @Deprecated
-    public ProfileType getProfileName(final int id)
-        throws SQLException {
-        String sql = "SELECT " + ProfileTypeTable.COL_NAME + " FROM "
-                + ProfileTypeTable.NAME + " WHERE " + ProfileTypeTable.COL_ID
-                + " = '" + id + "'";
-
-        return ProfileType.fromString(runGetStringQuery(sql));
-    }
-
-    /**
-     * Getter method for profile id from profile type.
-     * 
-     * Performs an SQL statement on the DB
-     * 
-     * @param profile The profile ID
-     * 
-     * @return The list of profile types
-     * 
-     * @throws SQLException when a database error occurs
-     */
-    public int getProfileID(final ProfileType profile)
-        throws SQLException {
-        return runGetIntQuery(getProfileIDSQL(profile));
-    }
-
-    /**
      * Transfer's chips from one user to another.
      * 
      * Presumes both users exist and the sender has enough chips.
@@ -764,11 +685,8 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void transferChips(final String sender,
-                              final String user,
-                              final int amount,
-                              final ProfileType profile)
-        throws SQLException {
+    public void transferChips(final String sender, final String user,
+                              final int amount, final ProfileType profile) throws SQLException {
         String chipssql = "SELECT COUNT(*) FROM " + UserProfilesView.NAME
                 + " WHERE " + UserProfilesView.COL_PROFILE + " LIKE " + "'"
                 + profile.toString() + "'" + " AND "
@@ -782,6 +700,7 @@ public final class DB {
                 + UserProfilesTable.COL_USERID + " LIKE ("
                 + getUserIDSQL(sender) + ")";
 
+        // TODO: use insert or update as in adjustChips (or use adjust chips)
         String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
                 + UserProfilesTable.COL_USERID + ", "
                 + UserProfilesTable.COL_TYPEID + ", "
@@ -1482,8 +1401,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void endLottery()
-        throws SQLException {
+    public void endLottery() throws SQLException {
         String sql = "DELETE FROM " + LotteryTicketsTable.NAME;
 
         runBasicQuery(sql);
@@ -1498,8 +1416,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public boolean isRank(final String user)
-        throws SQLException {
+    public boolean isRank(final String user) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + HostGroupUsersTable.NAME
                 + " WHERE " + HostGroupUsersTable.COL_USERID + " = ("
                 + getUserIDSQL(user) + ")";
@@ -1515,9 +1432,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void addRank(final String user,
-                        final String group)
-        throws SQLException {
+    public void addRank(final String user, final String group) throws SQLException {
         String sql = "INSERT INTO " + HostGroupUsersTable.NAME + "("
                 + HostGroupUsersTable.COL_USERID + ", "
                 + HostGroupUsersTable.COL_GROUPID + ")" + " VALUES(("
@@ -1534,8 +1449,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public String getRankGroup(final String user)
-        throws SQLException {
+    public String getRankGroup(final String user) throws SQLException {
         String sql = "SELECT hg." + HostGroupsTable.COL_NAME + " FROM "
                 + HostGroupUsersTable.NAME + " hgu" + " JOIN "
                 + HostGroupsTable.NAME + " hg ON " + "hg."
@@ -1554,9 +1468,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void updateRank(final String user,
-                           final String group)
-        throws SQLException {
+    public void updateRank(final String user, final String group) throws SQLException {
         String sql = "UPDATE " + HostGroupUsersTable.NAME + " SET "
                 + HostGroupUsersTable.COL_GROUPID + " = ("
                 + getRankGroupIDSQL(group) + ")" + " WHERE "
@@ -1603,8 +1515,6 @@ public final class DB {
      * @param group The rank group
      * 
      * @throws SQLException when a database error occurs
-     * 
-     *             TODO: transfer the group's chips to HOUSE or other?
      */
     public void deleteRankGroup(final String group)
         throws SQLException {
@@ -1638,8 +1548,6 @@ public final class DB {
      * @param newgroup the new name
      * 
      * @throws SQLException when a database error occurs
-     * 
-     *             TODO: modify to move the chips too.
      */
     public void renameRankGroup(final String oldgroup,
                                 final String newgroup)

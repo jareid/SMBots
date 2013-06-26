@@ -9,6 +9,8 @@
 package org.smokinmils;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -138,22 +140,57 @@ public final class BaseBot {
     * 
     * @param name	The name of the server to add
     * @param addr	The address for the server
+    * 
+    * @throws UnknownHostException If we fail to get the localhost
     */
-   public void addServer(final String name, final String addr) {
-       addServer(name, addr, DEFAULT_PORT);
+   public void addServer(final String name, final String addr) throws UnknownHostException {
+       addServer(name, addr, DEFAULT_PORT, InetAddress.getLocalHost());
    }
    
    /**
     * Creates a new connection to a server.
-    * @param name	The name of the server to add
-    * @param addr	The address for the server
-    * @param port	The port for this server
+    * 
+    * @param name   The name of the server to add
+    * @param addr   The address for the IRC server
+    * @param port   The port for the IRC server
+    * 
+    * @throws UnknownHostException If we fail to get the localhost
     */
-   @SuppressWarnings("unchecked")
-   public void addServer(final String name, final String addr, final int port) {
+   public void addServer(final String name, final String addr,
+                         final int port) throws UnknownHostException {
+       addServer(name, addr, port, InetAddress.getLocalHost());
+   }
+   
+   /**
+    * Creates a new connection to a server.
+    * 
+    * @param name   The name of the server to add.
+    * @param addr   The address for the server.
+    * @param local  The local address the bot will use.
+    */
+   public void addServer(final String name, final String addr, final InetAddress local) {
+       addServer(name, addr, DEFAULT_PORT, local);
+   }
+   
+   /**
+    * Creates a new connection to a server.
+    * 
+    * @param name	The name of the server to add.
+    * @param addr	The address for the server.
+    * @param port	The port for this server.
+    * @param local  The local address the bot will use.
+    */
+   public void addServer(final String name, final String addr,
+                         final int port, final InetAddress local) {
        boolean useident = !debug;
+       IrcBot newbot = null;
+       
        ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();
-	   Configuration configuration =  new Configuration.Builder()
+
+       CheckIdentified cithread = new CheckIdentified(newbot);
+       lm.addListener(cithread);
+       
+	   Configuration<IrcBot> configuration =  new Configuration.Builder<IrcBot>()
                    .setName(nick) //Set the nick of the bot.
                    .setLogin(ident) //login part of hostmask, eg name:login@host
                    .setAutoNickChange(true) //Automatically change nick
@@ -167,13 +204,12 @@ public final class BaseBot {
                    .setMessageDelay(1)
                    .setNickservPassword(password)
                    .setListenerManager(lm)
-               .setSocketTimeout(SOCKET_TIMEOUT)
+                   .setLocalAddress(local)
+                   .setSocketTimeout(SOCKET_TIMEOUT)
                .buildConfiguration();
-       IrcBot newbot = new IrcBot(configuration);
        
-       CheckIdentified cithread = new CheckIdentified(newbot);
-	   newbot.getConfiguration().getListenerManager().addListener(cithread);
-	   newbot.setIdentCheck(cithread);
+	   newbot = new IrcBot(configuration);
+       newbot.setIdentCheck(cithread);
 	   
 	   bots.put(name, newbot);
 	   
@@ -219,14 +255,15 @@ public final class BaseBot {
     * 
     * @return true if action was successful
     */
-   @SuppressWarnings("unchecked")
-public boolean addListener(final String server, final Event listener) {
+   public boolean addListener(final String server, final Event listener) {
 	   boolean ret;
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
-		   bot.getConfiguration().getListenerManager().addListener(listener);
-		   EventLog.debug("Added new listener for " + server,
-		                  "SMBaseBot", "addListener");
+	       // TODO: check this new way works
+           //bot.getConfiguration().getListenerManager().addListener(listener);
+           bot.getListenerManager().addListener(listener);
+           
+		   EventLog.debug("Added new listener for " + server, "SMBaseBot", "addListener");
 		   ret = true;
 	   } else {
 		   EventLog.log("There is no bot currently connected to " + server,

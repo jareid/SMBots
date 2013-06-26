@@ -1,4 +1,6 @@
 package org.smokinmils.games.rpg;
+
+import org.smokinmils.games.rpg.enums.Skills;
 /**
  * This file is part of a commercial IRC bot that allows users to play online
  * IRC games.
@@ -21,7 +23,7 @@ public class Skill {
     private final String username;    
 
     /** The type of skill. */
-    private final SkillNames type;
+    private final Skills type;
 
     /** The amount of experience the user has in this skill. */
     private long experience;
@@ -34,7 +36,7 @@ public class Skill {
      * @param user the user name.
      * @param skill the type of skill.
      */
-    public Skill(final String user, final SkillNames skill) {
+    public Skill(final String user, final Skills skill) {
         username = user;
         type = skill;
         value = 0; // TODO: pull from database.
@@ -76,7 +78,7 @@ public class Skill {
     /**
      * @return the type
      */
-    public final SkillNames getType() {
+    public final Skills getType() {
         return type;
     }
 }
