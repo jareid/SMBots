@@ -229,9 +229,11 @@ public final class Rake {
         DB db = DB.getInstance();
         // get the total points
         int points = db.getPointTotal();
+        // TODO: int minpoints = db.getMinPoints();
+        // TODO: calculate failing groups
         
         for (ProfileType profile: ProfileType.values()) {
-            double pointearnings = db.checkCredits("POINTS", profile);
+            double pointearnings = db.checkCredits(DB.POINTS_USER, profile);
             double eachpoint = pointearnings / points;
             if (eachpoint == Double.NaN) {
                 eachpoint = 0.0;
@@ -247,6 +249,9 @@ public final class Rake {
                                    GamesType.ADMIN, TransactionType.POINTS);
                 }
             }
+            
+            db.adjustChips(DB.POINTS_USER, -pointearnings, profile,
+                    GamesType.ADMIN, TransactionType.POINTS);
         }
         
         // reset points

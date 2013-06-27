@@ -186,9 +186,6 @@ public final class BaseBot {
        IrcBot newbot = null;
        
        ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();
-
-       CheckIdentified cithread = new CheckIdentified(newbot);
-       lm.addListener(cithread);
        
 	   Configuration<IrcBot> configuration =  new Configuration.Builder<IrcBot>()
                    .setName(nick) //Set the nick of the bot.
@@ -204,13 +201,19 @@ public final class BaseBot {
                    .setMessageDelay(1)
                    .setNickservPassword(password)
                    .setListenerManager(lm)
-                   .setLocalAddress(local)
+                   // TODO: 
+                   //.setLocalAddress(local)
                    .setSocketTimeout(SOCKET_TIMEOUT)
                .buildConfiguration();
        
 	   newbot = new IrcBot(configuration);
-       newbot.setIdentCheck(cithread);
 	   
+       CheckIdentified cithread = new CheckIdentified(newbot);
+       lm.addListener(cithread);
+       newbot.setIdentCheck(cithread);
+       
+	   newbot.setListenerManager(lm);
+       
 	   bots.put(name, newbot);
 	   
 	   // Start connecting.

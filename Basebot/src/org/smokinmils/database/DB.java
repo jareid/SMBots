@@ -103,14 +103,11 @@ public final class DB {
                                             + DBSettings.DB_NAME
                                             + "?autoReconnect=true";
 
-    /** This is used to adjust bets to compare against one. */
-    private static final double CHIPS_ONE   = 1.0;
-
     /** This is used to adjust bets when they are approaching zero. */
     private static final double CHIPS_LTONE = 1.0;
 
     /** This is used to adjust bets when they aren't approaching zero. */
-    private static final double CHIPS_OTHER = 0.5;
+    private static final double CHIPS_OTHER = 0.05;
 
     /**
      * Constructor.
@@ -349,13 +346,8 @@ public final class DB {
             ProfileType active = getActiveProfile(username);
             double chips = checkCredits(username, active);
             double chipdiff = chips - amount;
-            if (amount <= CHIPS_ONE) {
-                if (chips >= CHIPS_ONE) {
-                    ret = CHIPS_ONE;
-                } else if (chips <= CHIPS_ONE) {
-                    ret = chips;
-                }
-            } else if (amount > chips) {
+
+            if (amount > chips) {
                 if (-chipdiff <= CHIPS_LTONE) {
                     ret = chips;
                 } else {

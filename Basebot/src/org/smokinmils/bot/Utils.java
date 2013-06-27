@@ -52,8 +52,6 @@ public final class Utils {
     private static final String MINIMUM_BET = "%b%c04%who%c12: If you have more than 1 coin "
                                                             + "you must bet more than 1 coin";
 
-    private static final double CHIP_DELTA = 0.05;
-
     /**
      * A method that will handle parsing of integers without throwing an
      * exception.
@@ -178,7 +176,7 @@ public final class Utils {
      * @return the credits 
      */
     public static double checkCredits(final User user, 
-                                      final double amount,
+                                      final Double amount,
                                       final IrcBot bot,
                                       final Channel chan) {
         double ret = 0.0;
@@ -186,18 +184,12 @@ public final class Utils {
         String username = user.getNick();
         
         try {
-            double total = db.checkCredits(username);
+            double total = db.checkCredits(username, amount);
             // check if betting lt one and having gt 1
             if (amount < ONE_CHIP && total > ONE_CHIP) {
                 // tell them they need to bet at least one coinchip
                 String out = MINIMUM_BET.replaceAll("%who", username);
                 bot.sendIRCMessage(chan, out);
-            } else {
-                ret = db.checkCredits(username, amount);
-            }
-            //found to total if within 0.05
-            if (total - ret <= CHIP_DELTA || Math.abs(ret - total) <= CHIP_DELTA) {
-                ret = total;
             }
         } catch (SQLException e) {
             // TODO Auto-generated catch block
