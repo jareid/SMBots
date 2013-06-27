@@ -790,7 +790,8 @@ public final class DB {
             }
             
             if (numrows == 1) {
-                result = (runBasicQuery(inssql) == 1);
+                //TODO: find out why this adjusts 2 rows
+                result = (runBasicQuery(inssql) >= 1);
             }
         }
 
