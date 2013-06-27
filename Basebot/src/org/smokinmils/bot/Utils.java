@@ -8,8 +8,14 @@
  */
 package org.smokinmils.bot;
 
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.List;
+
+import org.pircbotx.Channel;
+import org.pircbotx.User;
+import org.smokinmils.database.DB;
+import org.smokinmils.logging.EventLog;
 
 /**
  * A utility class that provides useful functions to the entire project.
@@ -19,6 +25,9 @@ import java.util.List;
 public final class Utils {
     /** The number of digits we round decimals to. */
     private static final double CHIPS_ROUND = 10.0;
+    
+    /** One credit. */
+    private static final int ONE_CHIP = 1;
 
     /**
      * Hiding the default constructor.
@@ -38,6 +47,12 @@ public final class Utils {
 
     /** The number of hours in a day. */
     private static final int HOUR_IN_DAY = 24;
+
+    /** Message for denying bets if they bet less than 1 coin with more than 1 on account. */
+    private static final String MINIMUM_BET = "%b%c04%who%c12: If you have more than 1 coin "
+                                                            + "you must bet more than 1 coin";
+
+    private static final double CHIP_DELTA = 0.05;
 
     /**
      * A method that will handle parsing of integers without throwing an
@@ -150,5 +165,44 @@ public final class Utils {
         int mins = ((secs % day) % (MIN_IN_HOUR * MIN_IN_HOUR)) / MIN_IN_HOUR;
         String duration = String.format(fmt, days, hours, mins);
         return duration;
+    }
+    
+    /**
+     * Wrapper for DB.checkCredits that prevents &lt; 1 chips bet when the
+     * user  has more than 1. Also makes the user bet their total if
+     * within current bet is within 0.05 of total on account.
+     * @param user  The user who is betting
+     * @param amount the amount being bet
+     * @param bot the bot so we can send errrrr messages
+     * @param chan the channel to send messages
+     * @return the credits 
+     */
+    public static double checkCredits(final User user, 
+                                      final double amount,
+                                      final IrcBot bot,
+                                      final Channel chan) {
+        double ret = 0.0;
+        DB db = DB.getInstance();
+        String username = user.getNick();
+        
+        try {
+            double total = db.checkCredits(username);
+            // check if betting lt one and having gt 1
+            if (amount < ONE_CHIP && total > ONE_CHIP) {
+                // tell them they need to bet at least one coinchip
+                String out = MINIMUM_BET.replaceAll("%who", username);
+                bot.sendIRCMessage(chan, out);
+            } else {
+                ret = db.checkCredits(username, amount);
+            }
+            //found to total if within 0.05
+            if (total - ret <= CHIP_DELTA || Math.abs(ret - total) <= CHIP_DELTA) {
+                ret = total;
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            EventLog.log(e, "Utils", "checkCredits");
+        }
+        return ret;
     }
 }

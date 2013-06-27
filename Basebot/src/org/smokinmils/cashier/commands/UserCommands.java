@@ -93,11 +93,11 @@ public class UserCommands extends Event {
                                                     + " account to %c04%who%c12";
 
 	/** Used to specify the Check message on another user. */
-	public static final String CHECKCREDITSMSG     =  "%b%c04%sender%c12: %user %c12currently has"
+	public static final String CHECKCREDITSMSG     =  "%b%c04%sender%c12: %user %c12currently has "
 	                               + "%c04%creds%c12 coins on the active profile (%c04%active%c12)";
 	
 	/** Used to specify the other profiles in the check message. */
-	public static final String OTHERPROFILES       = "| %c04%name%c12 (%c04%amount%c12)";
+	public static final String OTHERPROFILES       = " | %c04%name%c12 (%c04%amount%c12)";
 	
 	/** Used to specify the user has no credits. */
 	public static final String NOCREDITS           = "%b%c04%sender: %c04%user%c12 %c12currently "

@@ -189,7 +189,7 @@ public class DiceDuel extends Event {
             if (!found) {
                 // attempt to parse the amount
                 Double amount = Utils.tryParseDbl(msg[1]);
-                double betsize = db.checkCredits(username, amount);
+                double betsize = Utils.checkCredits(user, amount, bot, channel);
                 if (amount == null) {
                     bot.sendIRCMessage(channel, INVALID_BET);
                 } else if (amount <= 0) {

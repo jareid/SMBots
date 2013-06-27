@@ -349,7 +349,7 @@ public class RPSGame extends Event {
                         DB db = DB.getInstance();
                         try {
                             profile = db.getActiveProfile(sender.getNick());
-                            betsize = db.checkCredits(sender.getNick(), amount);
+                            betsize = Utils.checkCredits(sender, amount, bot, chan);
                             if (betsize > 0.0) {
                                 playbet = true;
                                 pendingBets.add(sender.getNick());

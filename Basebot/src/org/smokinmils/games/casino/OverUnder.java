@@ -169,7 +169,7 @@ public class OverUnder extends Event {
 
             Double amount = Utils.tryParseDbl(msg[1]);
             String choice = msg[2];
-            double betsize = db.checkCredits(username, amount);
+            double betsize = Utils.checkCredits(user, amount, bot, channel);
             if (found) {
                 bot.sendIRCMessage(
                         channel, OPEN_WAGER.replaceAll("%username", username));

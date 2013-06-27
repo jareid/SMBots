@@ -19,7 +19,7 @@ import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
-import org.smokinmils.settings.XMLSettings;
+//import org.smokinmils.settings.XMLSettings;
 
 /** 
  * Provides the functionality for BlackJack via IRC.
@@ -532,7 +532,7 @@ public class BJGame extends Event {
                         DB db = DB.getInstance();
                         try {
                             profile = db.getActiveProfile(sender.getNick());
-                            betsize = db.checkCredits(sender.getNick(), amount);
+                            betsize = Utils.checkCredits(sender, amount, bot, chan);
                             if (amount < 0.0) {
                                 bot.invalidArguments(sender, BJ_FORMAT);
                             } else if (betsize > 0.0) {

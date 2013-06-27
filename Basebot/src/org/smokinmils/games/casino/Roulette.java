@@ -235,7 +235,7 @@ public class Roulette extends Event {
             bot.sendIRCNotice(user, INVALID_BET);
         } else {
             Double amount = Utils.tryParseDbl(msg[1]);
-            double betsize = db.checkCredits(username, amount);
+            double betsize = Utils.checkCredits(user, amount, bot, event.getChannel());
             String choice = msg[2].toLowerCase();
             Integer choicenum = Utils.tryParse(msg[2]);
             ProfileType profile = db.getActiveProfile(username);
