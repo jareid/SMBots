@@ -679,14 +679,14 @@ public class BJGame extends Event {
     private String handToString(final ArrayList<Card> hand, 
                                 final boolean obs) {
         String out = "";
-        for (Card card : hand) {
-            if (obs && hand.indexOf(card) == 1) {
-                // do thing :/
-                out += " ";
-            } else {
-                out += card.toIRCString();
+        if (obs) {
+            out += hand.get(0).toIRCString();
+        } else {
+            for (Card card : hand) {
+                    out += card.toIRCString();
             }
         }
+        
         return out;
     }
     
