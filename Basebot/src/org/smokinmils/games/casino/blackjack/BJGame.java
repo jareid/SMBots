@@ -338,7 +338,7 @@ public class BJGame extends Event {
             usergame.win(amount * PUSH_WIN);
          // remove the game from the list dummy
             removeGame(usergame.getUser());
-        
+               
             ArrayList<Card> phand = usergame.getPlayerHand();
             ArrayList<Card> dhand = usergame.getDealerHand();
             
