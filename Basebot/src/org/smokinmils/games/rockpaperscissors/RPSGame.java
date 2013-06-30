@@ -383,9 +383,6 @@ public class RPSGame extends Event {
                         out = out.replaceAll("%amount", Utils.chipsToString(betsize));
                         bot.sendIRCMessage(chan, out);
                     } else {
-                        db.adjustChips(sender.getNick(), betsize, profile,
-                                GamesType.ROCKPAPERSCISSORS,
-                                TransactionType.CANCEL);
                         bot.sendIRCMessage(chan, 
                                          NOCHOICE.replaceAll("%who", event.getUser().getNick()));
                     }
