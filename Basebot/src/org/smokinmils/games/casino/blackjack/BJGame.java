@@ -332,6 +332,8 @@ public class BJGame extends Event {
 
         double amount = usergame.getAmount();        
         
+        Rake.getRake(player.getNick(), amount, usergame.getProfile());
+        
         try { 
             usergame.win(amount * PUSH_WIN);
          // remove the game from the list dummy
@@ -369,7 +371,14 @@ public class BJGame extends Event {
         } catch (Exception e) {
             EventLog.log(e, "BJGame", "playerDraw");
         }
-        
+
+        // jackpot stuff only one person, so no need for losers!
+       if (Rake.checkJackpot(amount)) {
+            ArrayList<String> players = new ArrayList<String>();
+            players.add(player.getNick());
+            Rake.jackpotWon(usergame.getProfile(), GamesType.BLACKJACK, players, bot,
+                            chan);
+        }
         
     }
 
@@ -387,16 +396,12 @@ public class BJGame extends Event {
                        final BJBet usergame,
                        final double multiplier) {
 
- 
-
-      
-        
         ProfileType wprof = usergame.getProfile();
         double amount = usergame.getAmount();
         double win = amount * multiplier;
         
-        @SuppressWarnings("unused") // we don't actually use the rake atm
-        double rake = Rake.getRake(winner.getNick(), amount, wprof);
+       
+        Rake.getRake(winner.getNick(), amount, wprof);
 
         try {
             usergame.win(win);
@@ -461,6 +466,8 @@ public class BJGame extends Event {
         
         ArrayList<Card> phand = usergame.getPlayerHand();
         ArrayList<Card> dhand = usergame.getDealerHand();
+        
+        Rake.getRake(sender.getNick(), usergame.getAmount(), usergame.getProfile());
         
         String out = OUTCOME.replaceAll("%who", sender.getNick());
         
@@ -595,14 +602,8 @@ public class BJGame extends Event {
      * @return true if natural, false otherwise
      */
     private boolean natural(final ArrayList<Card> hand) {
-        boolean tenCheck = true;
-        for (Card card : hand) {
-            if (card.getRank() == Card.TEN) {
-                tenCheck = false;
-            }
-        }
-        return (hand.size() == BJBet.START_HAND_SIZE && countHand(hand) == MAX_POINTS
-                && tenCheck);
+        
+        return (hand.size() == BJBet.START_HAND_SIZE && countHand(hand) == MAX_POINTS);
     }
     
     /** 
