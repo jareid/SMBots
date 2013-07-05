@@ -369,7 +369,6 @@ public class RPSGame extends Event {
             
             /* Play the bet outside of the synchronisation. */
             if (playbet) {
-                DB db = DB.getInstance();
                 try {
                     // add bet, remove coins, notify channel
                     GameLogic choice = getChoice(event.getUser(), event.getBot());

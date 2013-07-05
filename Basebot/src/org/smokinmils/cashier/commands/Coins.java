@@ -100,8 +100,7 @@ public class Coins extends Event {
 
         String[] msg = message.split(" ");
 
-        if (bot.userIsHalfOp(sender, chan.getName())
-                || bot.userIsOp(event.getUser(), chan.getName())) {
+        if (bot.userIsOp(event.getUser(), chan.getName())) {
             if (msg.length == GIVE_CMD_LEN) {
                 String user = msg[1];
                 Double amount = Utils.tryParseDbl(msg[GIVE_CMD_LEN - 2]);
@@ -174,8 +173,7 @@ public class Coins extends Event {
 
         String[] msg = message.split(" ");
 
-        if (bot.userIsHalfOp(event.getUser(), chan.getName()) 
-             || bot.userIsOp(event.getUser(), chan.getName())) {
+        if (bot.userIsOp(event.getUser(), chan.getName())) {
             if (msg.length == PAY_CMD_LEN) {
                 String user = msg[1];
                 Double amount = Utils.tryParseDbl(msg[2]);

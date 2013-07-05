@@ -51,6 +51,9 @@ public final class BaseBot {
    
 	/** Boolean on whether debug output is on. */
 	private static boolean debug = false;
+	
+    /** Boolean on whether ident server is on. */
+    private static boolean useident = false;
    
 	/** The bot nickname. */
 	private static String nick;
@@ -94,6 +97,7 @@ public final class BaseBot {
     * @param login    the ident name for this bot
     * @param dbg    if we should turn the debug on
     * @param refund   used to check if we should execute refunds when started
+    * @param createident used to check if we should start an ident server
     * 
     * @return true if the bot hasn't already been initialised
     */
@@ -101,7 +105,8 @@ public final class BaseBot {
                              final String pswd,
                              final String login,
                              final boolean dbg,
-                             final boolean refund) {
+                             final boolean refund,
+                             final boolean createident) {
 	   boolean ret = false;
 	   if (!initialised) {
 		   debug = dbg;
@@ -109,6 +114,7 @@ public final class BaseBot {
 		   password = pswd;
 		   ident = login;
 	       initialised = true;
+	       useident = createident;
 	       EventLog.create(nick, debug);
 	       ret = true;
 	       
@@ -121,7 +127,7 @@ public final class BaseBot {
     	       }
 	       }
 	       
-	       if (!debug) {
+	       if (createident) {
 	           IdentServer.startServer();
 	       }
 	   }
@@ -182,7 +188,6 @@ public final class BaseBot {
     */
    public void addServer(final String name, final String addr,
                          final int port, final InetAddress local) {
-       boolean useident = !debug;
        IrcBot newbot = null;
        
        ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();

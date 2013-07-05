@@ -37,7 +37,8 @@ public class Auctions extends Event {
     public static final int     ADD_CMD_LEN     = 4;
     
     /** Additional time on bids. */
-    private static final int ADDITIONAL_TIME = 30;
+    //TODO
+    //private static final int ADDITIONAL_TIME = 30;
 
     /**
      * This method handles the auction commands.

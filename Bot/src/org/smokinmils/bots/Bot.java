@@ -31,7 +31,6 @@ import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
-import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.help.Help;
 
@@ -67,7 +66,7 @@ public class Bot {
         BaseBot basebot = BaseBot.getInstance();
         boolean debug = false;
         boolean refund = true;
-        basebot.initialise(nick, "5w807", "smokinmils", debug, refund);
+        basebot.initialise(nick, "5w807", "smokinmils", debug, refund, true);
         String swift_irc = "SwiftIRC";
         basebot.addServer(swift_irc, server, 6667, local);
         IrcBot swift_bot = basebot.getBot(swift_irc);
@@ -117,11 +116,10 @@ public class Bot {
         basebot.addListener(swift_irc, new Help(), all_swift_chans);
         // basebot.addListener(swift_irc, new Lottery(), all_swift_chans);
         basebot.addListener(swift_irc,
-                new ManagerSystem("#SMGamer", "#managers", swift_bot),
+                new ManagerSystem("#SMGamer", "#managers", "#sm_ranks", swift_bot),
                 all_swift_chans);
         basebot.addListener(swift_irc, new Coins(), all_swift_chans);
-        basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);
-
+        
         RPSGame rps_event = new RPSGame();
         rps_event.addValidChan(all_swift_chans);
         rps_event.addAnnounce("#SMGamer", swift_bot);

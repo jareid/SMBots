@@ -715,12 +715,10 @@ public final class DB {
         }
         runBasicQuery(updminussql);
 
-        addTransaction(
-                sender, (0 - amount), GamesType.ADMIN,
-                TransactionType.TRANSFER, profile);
-        addTransaction(
-                user, amount, GamesType.ADMIN, TransactionType.TRANSFER,
-                profile);
+        addTransaction(sender, -amount, GamesType.ADMIN, TransactionType.TRANSFER, profile);
+        addTransaction(user, amount, GamesType.ADMIN, TransactionType.TRANSFER, profile);
+        addChipTransaction(sender, user, -amount, TransactionType.TRANSFER, profile);
+        addChipTransaction(user, sender, amount, TransactionType.TRANSFER, profile); 
     }
 
     /**

@@ -65,7 +65,7 @@ public class Bot {
         BaseBot basebot = BaseBot.getInstance();
         boolean debug = true;
         boolean refund = false;
-        basebot.initialise(nick, "5w807", "smokinmils", debug, refund);
+        basebot.initialise(nick, "5w807", "smokinmils", debug, refund, false);
         String swift_irc = "SwiftIRC";
         basebot.addServer(swift_irc, server, 6667);
         IrcBot swift_bot = basebot.getBot(swift_irc);
@@ -74,7 +74,7 @@ public class Bot {
         String[] oudd_swift_chans = { "#testeroo" };
         String[] host_swift_chans = { "#testeroo" };
         String[] mgrs_swift_chans = { "#testeroo" };
-        String poker_lobby_swift = "#testeroo";
+        //String poker_lobby_swift = "#testeroo";
         
         Thread.sleep(250); // wait for some time to allow bot to connect.
 
@@ -103,7 +103,7 @@ public class Bot {
         basebot.addListener(swift_irc, new Help(), all_swift_chans);
         // basebot.addListener(swift_irc, new Lottery(), all_swift_chans);
         basebot.addListener(swift_irc,
-                new ManagerSystem("#testeroo", "#testeroo", swift_bot),
+                new ManagerSystem("#testeroo", "#testeroo", "#testeroo", swift_bot),
                 all_swift_chans);
         basebot.addListener(swift_irc, new Coins(), all_swift_chans);
         basebot.addListener(swift_irc, new CreateTimedRoll(), host_swift_chans);

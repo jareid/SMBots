@@ -91,6 +91,9 @@ public class ManagerSystem extends Event {
     /** The channel the manager's can use commands. */
     private static String              managerChan;
 
+    /** The channel the manager's can use commands. */
+    private static String              hostChan;
+
     /** The IRC bot. */
     private static IrcBot              bot;
 
@@ -106,17 +109,19 @@ public class ManagerSystem extends Event {
     /**
      * Constructor.
      * 
-     * @param activechan the channel that is monitorred for activity.
-     * @param managerchan the channell the commands can be used on.
+     * @param activechan the channel that is monitored for activity.
+     * @param managerchan the channel the commands can be used on.
+     * @param hostchan the channel the commands can be used on.
      * @param irc The irc bot.
      */
     public ManagerSystem(final String activechan, final String managerchan,
-            final IrcBot irc) {
+                         final String hostchan, final IrcBot irc) {
         setLoggedInUser(null);
         managerTimes = new HashMap<String, Double>();
         inactiveTime = DEFAULTINACTIVETIME;
         activityChan = activechan;
         managerChan = managerchan;
+        hostChan = hostchan;
         bot = irc;
 
         try {
@@ -175,37 +180,35 @@ public class ManagerSystem extends Event {
                     && chan.getName().equalsIgnoreCase(activityChan)) {
                 inactive.cancel();
                 inactive = new Timer(true);
-                inactive.schedule(
-                        new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
+                inactive.schedule(new InactiveTask(), inactiveTime * Utils.MS_IN_MIN);
             }
 
-            if (isValidChannel(chan.getName())
-                    && Utils.startsWith(message, ON_CMD)) {
+            if (isValidChannel(chan.getName()) && Utils.startsWith(message, ON_CMD)) {
                 if (getLoggedInUser() == null) {
                     irc.sendIRCMessage(event.getChannel(), NOLOGGEDON);
                 } else {
                     irc.sendIRCMessage(event.getChannel(),
                             LOGGEDON.replaceAll("%who", getLoggedInUser()));
                 }
-            } else if (managerChan.equalsIgnoreCase(chan.getName())
-                    && Utils.startsWith(message, LOGIN_CMD)) {
+            } else if (Utils.startsWith(message, LOGIN_CMD)
+                    && (managerChan.equalsIgnoreCase(chan.getName())
+                        || (hostChan.equalsIgnoreCase(chan.getName())
+                             && bot.userIsHalfOp(senderu, chan.getName())))) {
                 if (getLoggedInUser() != null) {
-                    irc.sendIRCNotice(senderu,
-                            CANTLOGIN.replaceAll("%who", getLoggedInUser()));
+                    irc.sendIRCNotice(senderu, CANTLOGIN.replaceAll("%who", getLoggedInUser()));
                 } else {
                     managerLoggedIn(sender);
-                    irc.sendIRCMessage(chan,
-                            LOGGEDIN.replaceAll("%who", sender));
+                    irc.sendIRCMessage(chan, LOGGEDIN.replaceAll("%who", sender));
                 }
-            } else if (managerChan.equalsIgnoreCase(chan.getName())
-                    && Utils.startsWith(message, LOGOUT_CMD)) {
-                if (getLoggedInUser() == null
-                        || !getLoggedInUser().equalsIgnoreCase(sender)) {
+            } else if (Utils.startsWith(message, LOGOUT_CMD)
+                    && (managerChan.equalsIgnoreCase(chan.getName())
+                        || (hostChan.equalsIgnoreCase(chan.getName())
+                             && bot.userIsHalfOp(senderu, chan.getName())))) {
+                if (getLoggedInUser() == null || !getLoggedInUser().equalsIgnoreCase(sender)) {
                     irc.sendIRCNotice(senderu, NOTLOGGEDON);
                 } else {
                     managerLoggedOut();
-                    irc.sendIRCMessage(chan,
-                            LOGGEDOUT.replaceAll("%who", sender));
+                    irc.sendIRCMessage(chan, LOGGEDOUT.replaceAll("%who", sender));
                 }
             }
         }
