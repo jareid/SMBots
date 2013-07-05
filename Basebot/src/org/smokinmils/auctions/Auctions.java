@@ -21,19 +21,19 @@ import org.smokinmils.bot.events.Message;
  * @author Jamie
  */
 public class Auctions extends Event {
-    /** The payout command. */
+    /** The bid command. */
     public static final String  BIDCMD       = "!bid";
 
-    /** The payout command format. */
+    /** The bid command format. */
     public static final String  PAYFMT        = "%b%c12" + BIDCMD + " <item_id>";
     
-    /** The give command. */
+    /** The add command. */
     public static final String  ADDCMD     = "!additem";
 
-    /** The give command format. */
+    /** The add command format. */
     public static final String  ADDFMT      = "%b%c12" + ADDCMD + " <item> <length> <start_price>";
 
-    /** The give command length. */
+    /** The add command length. */
     public static final int     ADD_CMD_LEN     = 4;
     
     /** Additional time on bids. */
