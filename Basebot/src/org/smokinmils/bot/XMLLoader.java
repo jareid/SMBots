@@ -23,6 +23,7 @@ import org.smokinmils.cashier.tasks.Competition;
 import org.smokinmils.cashier.tasks.JackpotAnnounce;
 import org.smokinmils.cashier.tasks.ManagerAnnounce;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Invite;
 import org.smokinmils.games.casino.DiceDuel;
 import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
@@ -260,7 +261,8 @@ public final class XMLLoader {
                         } else if (type.equals("managersystem")) {
                           basebot.addListener(server,
                                     new ManagerSystem("#" + options.get("managementchan"), 
-                                            "#" + options.get("activechan"),/*FIXME*/"", bot),
+                                            "#" + options.get("activechan"), 
+                                            options.get("hostchan"), bot),
                                    chanarr);
                         }  else if (type.equals("rps")) {
                           RPSGame rpsevent = new RPSGame();
@@ -271,6 +273,10 @@ public final class XMLLoader {
                             Client poker = new Client(server, chanarr[0]);
                             poker.initialise();
                             basebot.addListener(server, poker);
+                        } else if (type.equals("invite")) {
+                            Invite invite = new Invite();
+                            invite.addValidChan(chanarr[0]);
+                            basebot.addListener(server, invite);
                         }
                        
                     }
@@ -422,7 +428,7 @@ public final class XMLLoader {
                 }
                 if (nick != null && botname != null && pass != null 
                         && server != null && port != 0) {
-                    basebot.initialise(nick, pass, botname, true, false, true);
+                    basebot.initialise(nick, pass, botname, true, false, false);
                     basebot.addServer(server, server, port);
                 } else {
                     EventLog.fatal(null, "XMLLoader", "initBaseBot");

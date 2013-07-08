@@ -7,6 +7,12 @@
 	<ip>127.0.0.1</ip>
 	<rake>SMGamer</rake>
 	
+	<db type="server">199.101.50.187</db>
+	<db type="port">3306</db>
+	<db type="dbname">live</db>
+	<db type="dbuser">smbot</db>
+	<db type="dbpass">SM_bot_2013$</db>
+	
 	<listener type="referrals">
 		<channel>testeroo</channel>
 	</listener>
@@ -30,37 +36,29 @@
 		<channel>sm_vip</channel>
 		<option type="time">3</option>
 	</listener>
-	<listener type="roulette" id="6">
-		<channel>Private1</channel>
-		<option type="time">3</option>
-	</listener>
 	<listener type="blackjack">
 		<channel>SMGamer</channel>
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 	</listener>
 	<listener type="overunder">
 		<channel>sm_overunder</channel>
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 	</listener>
 	<listener type="diceduel">
 		<channel>SMGamer</channel>
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 	</listener>
 	<listener type="usercommands">
 		<channel>SMGamer</channel>
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
 	</listener>
@@ -69,7 +67,6 @@
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
 	</listener>
@@ -78,31 +75,26 @@
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
 		<option type="managementchan">managers</option>
 		<option type="activechan">SMGamer</option>
+		<option type="hostchan">SM_ranks</option>
 	</listener>
 	<listener type="coins">
 		<channel>SMGamer</channel>
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
 	</listener>
-	<listener type="createtimedroll">
-		<channel>SM_Ranks</channel>
-		<channel>managers</channel>
-	</listener>
+	
 	<listener type="rps">
 		<channel>SMGamer</channel>
 		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
-		<channel>Private1</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
 		<option type="announce">SMGamer</option>

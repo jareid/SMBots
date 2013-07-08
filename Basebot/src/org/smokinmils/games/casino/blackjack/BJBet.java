@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.bot.Bet;
+import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.games.casino.cards.Shoe;
+import org.smokinmils.logging.EventLog;
 
 /**
  * Keeps track of the state of a game of blackjack.
@@ -37,6 +40,12 @@ public class BJBet extends Bet {
     
     /** the Dealer's Cards. */
     private ArrayList<Card> dealerHand;
+    
+    /** is this a double game? */
+    private boolean doubled = false;
+    
+    /** is this game insured? */
+    private boolean insured = false;
     
     /**
      * Constructor for a Bj hand, gets a new deck and deals the cards to player / dealer.
@@ -102,5 +111,76 @@ public class BJBet extends Bet {
      * @return the channel object
      */
     public final Channel getChannel() { return channel; };
+    
+    /**
+     * Perform a double.
+     */
+    public final void doubleru() {
+        DB db = DB.getInstance();
+        try {
+            //manually adjust since this isn't standard.
+            doubled = true;
+            db.adjustChips(getUser().getNick(), -getAmount(), 
+                    getProfile(), GamesType.BLACKJACK, TransactionType.BET);
+        } catch (SQLException e) {
+            
+            EventLog.log(e, "BJBet", "doubleru");
+        }
+    }
+
+    /**
+     * Checks if this is a game that has been doubled or not.
+     * @return true if it is else, false.
+     */
+    public final boolean isDoubleGame() {
+        return doubled;
+    }
+
+    /**
+     * insures a game TODO make this boolean for integration.
+     */
+    public final void insure() {
+        DB db = DB.getInstance();
+        insured = true;
+        try {
+            //manually adjust since this isn't standard.
+           
+            db.adjustChips(getUser().getNick(), -getAmount() / 2, 
+                    getProfile(), GamesType.BLACKJACK, TransactionType.BET);
+        } catch (SQLException e) {
+            
+            EventLog.log(e, "BJBet", "insure");
+        }
+        
+    }
+    
+    /**
+     * checks if the game has been insured against dealer blackjack!
+     * @return true if insured, false otherwise
+     */
+    public final boolean isInsured() {
+        return insured;
+    }
+
+    /**
+     * Pays out insurance!
+     */
+    public final void payInsurance() {
+        if (insured) {
+            DB db = DB.getInstance();
+           
+            try {
+                //manually adjust since this isn't standard.
+               
+                db.adjustChips(getUser().getNick(), getAmount(), 
+                        getProfile(), GamesType.BLACKJACK, TransactionType.WIN);
+                // TODO insurence transaction type?
+            } catch (SQLException e) {
+                
+                EventLog.log(e, "BJBet", "insure");
+            } 
+        }
+        
+    }
  
 }
