@@ -20,6 +20,9 @@ public enum TransactionType {
     /** bet transactions. */
 	BET("bet"),
 	
+	/** bid transactions. */
+	AUCTION_BID("auctionbid"),
+	
     /** cancel transactions. */
 	CANCEL("cancel"),
 	
@@ -29,8 +32,11 @@ public enum TransactionType {
     /** lottery transactions. */
 	LOTTERY("lottery"),
 	
-    /** loterry win transactions. */
+    /** lottery win transactions. */
 	LOTTERY_WIN("lotterywin"),
+	
+	/** Blackjack insurance. */
+	BJ_INSURE("bjinsure"),
 	
     /** payout transactions. */
 	PAYOUT("payout"),

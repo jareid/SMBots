@@ -17,6 +17,9 @@ public enum GamesType {
     /** Admin game. */
     ADMIN("admin"),
     
+    /** Auction game. */
+    AUCTION("auction"),
+    
     /** Blackjack game. */
     BLACKJACK("Blackjack"),
     

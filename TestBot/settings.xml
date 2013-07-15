@@ -65,6 +65,9 @@
 	<listener type="pokerDISABLED">
 		<channel>testeroo2</channel>
 	</listener>
+	<listener type="auctions">
+		<channel>testeroo2</channel>
+	</listener>
 	
 	<timer type="trc">
 		<channel>testeroo2</channel>
