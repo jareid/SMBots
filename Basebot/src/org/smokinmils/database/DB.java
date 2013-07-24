@@ -22,6 +22,8 @@ import java.util.Map.Entry;
 import javax.sql.DataSource;
 
 import org.smokinmils.bot.Utils;
+import org.smokinmils.database.tables.AuctionProfilesTable;
+import org.smokinmils.database.tables.AuctionsTable;
 import org.smokinmils.database.tables.BetsTable;
 import org.smokinmils.database.tables.ChipsTransactionsTable;
 import org.smokinmils.database.tables.CompetitionIDTable;
@@ -219,6 +221,70 @@ public final class DB {
         return runBasicQuery(sql) == 1;
     }
 
+    
+    /**
+     * Adds an auction to the database!
+     * @param itemname the name of the item
+     * @param amount the startign amount
+     * @param pr the auction profiles
+     * @return yay or nay?
+     * @throws SQLException when an error occues
+     */
+    public int addAuction(final String itemname,
+                              final double amount,
+                              final ArrayList<ProfileType> pr) 
+                                      throws SQLException {
+        String sql = "INSERT INTO " + AuctionsTable.NAME + "("
+                + AuctionsTable.COL_ITEMNAME + ", " + AuctionsTable.COL_AMOUNT + ", "
+                + AuctionsTable.COL_USERID + ") VALUES('"
+                + itemname + "', " + String.valueOf(amount) + ", (" 
+                + getUserIDSQL(HOUSE_USER) + "));";
+         
+        int newID = runGetIDQuery(sql);
+        for (ProfileType p : pr) {
+            sql = "INSERT INTO " + AuctionProfilesTable.NAME + "("
+                    + AuctionProfilesTable.COL_AUCTIONID + ", " + AuctionProfilesTable.COL_PROFILEID
+                    + ") VALUES(" + newID + ", (" + getProfileIDSQL(p) + "));";
+           
+            runBasicQuery(sql);
+        }
+        return newID;
+    }
+    
+    /**
+     * Updates an auction with the highest bid.
+     * @param itemname the item we are updating...
+     * @param amount the new amount 
+     * @param username the user who is bidding
+     * @return yay if it worked, nay if something went wrong :(
+     * @throws SQLException when an error occurs
+     */
+    public boolean updateAuction(final String itemname,
+                                 final double amount,
+                                 final String username) throws SQLException {
+        String sql = "UPDATE " + AuctionsTable.NAME + " SET " 
+                                 + AuctionsTable.COL_AMOUNT + "=" + String.valueOf(amount) + ", " 
+                                 + AuctionsTable.COL_USERID + "=(" + getUserIDSQL(username) 
+                             + ") WHERE "
+                                 + AuctionsTable.COL_ITEMNAME + "='" + itemname + "';";
+        return runBasicQuery(sql) == 1;
+    }
+    
+    /**
+     * Ends an auction.
+     * @param id the id of the item name we are ending
+     * @return yay or nay
+     * @throws SQLException  when an errors occures   
+     */
+    public boolean endAuction(final int id) throws SQLException {
+        String sql = "UPDATE " + AuctionsTable.NAME + " SET " 
+                + AuctionsTable.COL_FINISHED + "=1" 
+            + " WHERE "
+                + AuctionsTable.COL_ID + "=" + id + ";";
+        return runBasicQuery(sql) == 1;
+    }
+    
+    
     /**
      * Getter method for a user's active profile text.
      * 
