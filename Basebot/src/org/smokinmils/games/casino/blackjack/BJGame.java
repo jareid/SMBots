@@ -10,13 +10,13 @@ import org.pircbotx.User;
 import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
@@ -77,6 +77,15 @@ public class BJGame extends Event {
     /** The value that the house will stick at. */
     public static final int HOUSE_STICK_VALUE = 17;
 
+    /** 10 for checking for doubling. */
+    private static final int VALID_10 = 10;
+
+    /** 10 for checking for doubling. */
+    private static final int VALID_9 = 9;
+
+    /** 10 for checking for doubling. */
+    private static final int VALID_11 = 11;
+    
     /** String warning of a time out. */
     private static final String TIMEOUT_WARNING = "%b%c04%who%c12: Your open Blackjack game is"
                                                                           + " about to time out!";
@@ -165,20 +174,14 @@ public class BJGame extends Event {
     /** String letting the user know they have got insurance cash dollar back. */
     private static final String INSURANCE_PAID = "%b%c04%who%c12: Your insurance has paid";
     
-    /** 10 for checking for doubling. */
-    private static final int VALID_10 = 10;
-
-    /** 10 for checking for doubling. */
-    private static final int VALID_9 = 9;
-
-    /** 10 for checking for doubling. */
-    private static final int VALID_11 = 11;
-
+  
     /** timer that is used to check for idle games. */
     private final Timer gameTimer;
     
     /** List of open games. */
     private final ArrayList<BJBet> openGames;
+   
+
     
     /**
      * Constructor.
@@ -189,6 +192,7 @@ public class BJGame extends Event {
         
         gameTimer = new Timer(true);
         gameTimer.schedule(new BetTimeoutCheck(irc), Utils.MS_IN_MIN, Utils.MS_IN_MIN);
+
     }
     
     /* (non-Javadoc)
@@ -202,8 +206,9 @@ public class BJGame extends Event {
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
                 
-    
-        if (isValidChannel(chan.getName())
+        SpamEnforcer se = SpamEnforcer.getInstance();
+        
+        if (isValidChannel(chan.getName()) && se.check(event, "#NOPE")
                 && bot.userIsIdentified(sender)) {
             if (Utils.startsWith(message, BJ_CMD)) {
                 newGame(event);
@@ -212,20 +217,19 @@ public class BJGame extends Event {
             } else if (Utils.startsWith(message, STAND_CMD)) {
                 stand(sender, bot, chan);
             } else if (Utils.startsWith(message, DOUBLE_CMD)) {
-                doubleru(sender, bot, chan, msg);
+                doubleDown(sender, bot, chan, msg);
             } else if (Utils.startsWith(message, INSURE_CMD)) {
                 insure(sender, bot, chan, msg);
             }
         }
-        
     }
     
     /**
-     * This function handles the !insure cmd.
+     * This function handles the !insure command.
      * @param sender person insuring
      * @param bot the bot to reply with
-     * @param chan the chan to reply to
-     * @param msg the message to get values fram
+     * @param chan the channel to reply to
+     * @param msg the message to get values from
      */
     private void insure(final User sender,
                         final IrcBot bot,
@@ -245,20 +249,19 @@ public class BJGame extends Event {
                     String out = INSURE_NOT_VALID.replaceAll("%who", sender.getNick());
                     bot.sendIRCNotice(sender, out);
                 } else {
-                    double betsize = 0.0;
+                    double userTotalCoins = 0.0;
                     try {
-                        betsize = DB.getInstance().checkCredits(sender.getNick(), 
+                        userTotalCoins = DB.getInstance().checkCredits(sender.getNick(), 
                                         usergame.getProfile());
                     } catch (SQLException e) {
-                        // TODO Auto-generated catch block and tidy this shit up
-                        e.printStackTrace();
+                       EventLog.log(e, "BJGame", "insure");
                     }
                     
                     Double amount = Utils.tryParseDbl(msg[1]);
                     if (amount == null || amount == 0 || amount > usergame.getAmount() / 2) {
                         bot.invalidArguments(sender, CAN_INSURE); 
                     } else {
-                        if (betsize >= amount) {
+                        if (userTotalCoins >= amount) {
                             usergame.insure(amount);
                             String out = INSURE_TAKEN.replaceAll("%who", sender.getNick());
                             out = out.replaceAll("%coins", Utils.chipsToString(amount));
@@ -286,7 +289,7 @@ public class BJGame extends Event {
      * @param chan the channel to reply to
      * @param msg the message to get the amount from
      */
-    private void doubleru(final User sender,
+    private void doubleDown(final User sender,
                           final IrcBot bot,
                           final Channel chan,
                           final String[] msg) {
@@ -300,7 +303,7 @@ public class BJGame extends Event {
                 }
             }
             if (usergame != null) {
-                // if the game isn't valid, or is already doubleru'd
+                // if the game isn't valid, or is already doubleDowned
                 if (!canDouble(usergame.getPlayerHand()) || usergame.isDoubleGame()) {
                     String out = DOUBLE_NOT_VALID.replaceAll("%who", sender.getNick());
                     bot.sendIRCNotice(sender, out);
@@ -309,17 +312,15 @@ public class BJGame extends Event {
                     if (amount == null || amount == 0 || amount > usergame.getAmount()) {
                         bot.invalidArguments(sender, CAN_DOUBLE); 
                     } else {
-                        double betsize = 0.0;
+                        double userTotalCoins = 0.0;
                         try {
-                            betsize = DB.getInstance().checkCredits(sender.getNick(), 
+                            userTotalCoins = DB.getInstance().checkCredits(sender.getNick(), 
                                                                 usergame.getProfile());
-                            
-                            
                         } catch (SQLException e) {
-                            EventLog.log(e, "BJGame", "doubleru");
+                            EventLog.log(e, "BJGame", "doubleDown");
                         }
-                        if (betsize >= amount) {
-                            usergame.doubleru(amount);
+                        if (userTotalCoins >= amount) {
+                            usergame.doubleDown(amount);
                             usergame.dealPlayerCard();
                             dealerPlay(sender, bot, chan, usergame);
                         } else {
@@ -361,9 +362,7 @@ public class BJGame extends Event {
                 String out = NO_OPEN_GAME.replaceAll("%who", sender.getNick());
                 bot.sendIRCNotice(sender, out);
             }
-            
         }
-           
     }
     
     /**
@@ -387,8 +386,6 @@ public class BJGame extends Event {
             }
             
             if (usergame != null) {
-                // this is our game, lets hit
-                
                 // deal a card
                 usergame.dealPlayerCard();
                 
@@ -415,14 +412,11 @@ public class BJGame extends Event {
                     out += CAN_STAND;
                     bot.sendIRCNotice(sender, out);
                 }
-                
             }  else {
                 String out = NO_OPEN_GAME.replaceAll("%who", sender.getNick());
                 bot.sendIRCNotice(sender, out);
             }
-        }
-        
-        
+        }   
     }
      
     /**
@@ -439,39 +433,26 @@ public class BJGame extends Event {
         
         // dealer keep taking cards until 17 or >
         BJBet game = usergame;
-        if (natural(game.getDealerHand())) {
-            // instant win, game over since we check for natural push at the start of the game
-            // check insurance.
-            if (usergame.isInsured()) {
-                usergame.payInsurance();
-                String out = INSURANCE_PAID.replaceAll("%who", sender.getNick());
-                bot.sendIRCMessage(chan, out);   
-            } 
-            doLose(sender, bot, chan, game);
-            
-        } else {
-            while (countHand(game.getDealerHand()) < HOUSE_STICK_VALUE) {
-                game.dealDealerCard();
-            }
-            // if bust cry and player wins, else compare player and dealer scores
-            if (bust(game.getDealerHand())) {
-            // player wins    
-                doWin(sender, bot, chan, game, NORMAL_WIN);
-            } else {
-                // no one has busy, winner == highest score
-                int pscore = countHand(game.getPlayerHand());
-                int dscore = countHand(game.getDealerHand());
-                if (pscore > dscore) {
-                    doWin(sender, bot, chan, game, NORMAL_WIN);
-                } else if (dscore > pscore) {
-                    doLose(sender, bot, chan, game);
-                } else { // draw
-                    doDraw(sender, bot, chan, game);
-                }
-            }
+       
+        while (countHand(game.getDealerHand()) < HOUSE_STICK_VALUE) {
+            game.dealDealerCard();
         }
-
-        
+        // if bust cry and player wins, else compare player and dealer scores
+        if (bust(game.getDealerHand())) {
+        // player wins    
+            doWin(sender, bot, chan, game, NORMAL_WIN);
+        } else {
+            // no one has bust, winner == highest score
+            int pscore = countHand(game.getPlayerHand());
+            int dscore = countHand(game.getDealerHand());
+            if (pscore > dscore) {
+                doWin(sender, bot, chan, game, NORMAL_WIN);
+            } else if (dscore > pscore) {
+                doLose(sender, bot, chan, game);
+            } else { // draw
+                doDraw(sender, bot, chan, game);
+            }
+        }   
     }
 
     /**
@@ -485,18 +466,15 @@ public class BJGame extends Event {
                 endgame = game;
                 break;
             }
-        } //TODO change when we bets auto delete themselves
+        } 
         if (endgame != null) {
             openGames.remove(endgame);
-           
             try {
                endgame.close();
             } catch (SQLException e) {
                EventLog.log(e, "BJGame", "removeGame");
-            }
-            
-        }
-        
+            }   
+        }   
     }
 
     /**
@@ -680,7 +658,16 @@ public class BJGame extends Event {
         
         bot.sendIRCMessage(chan, out);
         
-        
+        // if dealer had natural and we lost (either via bj insta loss or going over 21
+        if (natural(usergame.getDealerHand())) {
+            // check insurance.
+            if (usergame.isInsured()) {
+                usergame.payInsurance();
+                out = INSURANCE_PAID.replaceAll("%who", sender.getNick());
+                bot.sendIRCMessage(chan, out);   
+            } 
+            
+        }
         // jackpot stuff only one person, so no need for losers!
        if (Rake.checkJackpot(usergame.getAmount())) {
             ArrayList<String> players = new ArrayList<String>();
