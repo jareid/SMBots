@@ -23,6 +23,9 @@ public enum TransactionType {
 	/** bid transactions. */
 	AUCTION_BID("auctionbid"),
 	
+	/** pay for auction. */
+	AUCTION_PAY("auctionpay"),
+	
     /** cancel transactions. */
 	CANCEL("cancel"),
 	
