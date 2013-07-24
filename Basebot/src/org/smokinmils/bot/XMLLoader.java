@@ -149,7 +149,6 @@ public final class XMLLoader {
         
         /**
          * Joins all channels in the xml file for the specific bot.
-         * @param xmldocument   the prepared xml document
          * @param serveraddr    the server we are doing this on
          */
         private void joinChannels(final String serveraddr) {
@@ -279,7 +278,7 @@ public final class XMLLoader {
                             invite.addValidChan(chanarr);
                             basebot.addListener(server, invite);
                         } else if (type.equals("auctions")) {
-                            Auctions auction = new Auctions(bot,chanarr[0]);
+                            Auctions auction = new Auctions(bot, chanarr[0]);
                             auction.addValidChan(chanarr);
                             basebot.addListener(server, auction);
                         }
@@ -293,8 +292,6 @@ public final class XMLLoader {
 
         /**
          * Goes through and loads all the timers and options in the xml file.
-         * @param name the name of the bot
-         * @param xmldocument the prepared xml doc
          * @param server    the server we are on
          * @param bot   the bot itself
          */
@@ -388,7 +385,6 @@ public final class XMLLoader {
 
         /**
          * Initialises basebot and returns the server name.
-         * @param xmldocument   the xmldocument that contains the settings
          * @return  the server address in string format
          */
         private String initBaseBot() {
