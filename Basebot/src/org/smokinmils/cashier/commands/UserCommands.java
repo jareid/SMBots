@@ -242,9 +242,9 @@ public class UserCommands extends Event {
                     credstr = NOCREDITS;
                 }
 
-                if (user.equalsIgnoreCase(sender)) {
+                /*if (user.equalsIgnoreCase(sender)) {
                     user = "You";
-                }
+                }*/ 
                 credstr = credstr.replaceAll("%user", user);
                 credstr = credstr.replaceAll("%sender", sender);
 
