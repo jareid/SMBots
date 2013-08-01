@@ -2551,4 +2551,261 @@ public final class DB {
                 + HostGroupsTable.COL_NAME + " LIKE '" + group + "')";
         return out;
     }
+    
+  
+    /**
+     * Gets the total profit, or loss for a game on a particular profile.
+     * @param game  the game
+     * @param date  the date in the format YYYY-MM-DD
+     * @param prof  the profile
+     * @return  the profit or loss
+     * @throws SQLException when a database error occurs
+     */
+    public double turnoverForGame(final GamesType game,
+                                  final String date,
+                                  final ProfileType prof)
+        throws SQLException {
+        double res = 0.0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
+                + TransactionsTable.NAME + " WHERE " + TransactionsTable.COL_GAMEID + "=(" 
+                + getGameIDSQL(game) + ") AND " + TransactionsTable.COL_PROFILETYPE + "=("
+                + getProfileIDSQL(prof) + ") AND "
+                + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
+                + date + " 00:00:00' AND '" + date + " 23:59:59'";
+              
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                res = rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        // return the negation since that is from the houses pov
+        return -res;
+    }
+    
+    /**
+     * Gets the total chips sold for a profile to users.
+     * @param date  the date in the format YYYY-MM-DD
+     * @param prof  the profile
+     * @return  the amount of chips sold to users
+     * @throws SQLException when a database error occurs
+     */
+    public double chipsSoldForProfile(final String date,
+                                  final ProfileType prof)
+        throws SQLException {
+        double res = 0.0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
+                + TransactionsTable.NAME + " WHERE " + TransactionsTable.COL_GAMEID + "=(" 
+                + getGameIDSQL(GamesType.ADMIN) + ") AND " + TransactionsTable.COL_PROFILETYPE + "=("
+                + getProfileIDSQL(prof) + ") AND " + TransactionsTable.COL_TYPEID + "=(" 
+                + getTzxTypeIDSQL(TransactionType.CREDIT) + ") AND "
+                + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
+                + date + " 00:00:00' AND '" + date + " 23:59:59'";
+              
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                res = rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        
+        return res;
+    }
+    
+    /**
+     * Gets the total chips paid out by a certain profile to users.
+     * @param date  the date in the format YYYY-MM-DD
+     * @param prof  the profile
+     * @return  the amount of chips sold to users
+     * @throws SQLException when a database error occurs
+     */
+    public double chipsPaidoutForProfile(final String date,
+                                  final ProfileType prof)
+        throws SQLException {
+        double res = 0.0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
+                + TransactionsTable.NAME + " WHERE " + TransactionsTable.COL_GAMEID + "=(" 
+                + getGameIDSQL(GamesType.ADMIN) + ") AND " + TransactionsTable.COL_PROFILETYPE + "=("
+                + getProfileIDSQL(prof) + ") AND " + TransactionsTable.COL_TYPEID + "=(" 
+                + getTzxTypeIDSQL(TransactionType.PAYOUT) + ") AND "
+                + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
+                + date + " 00:00:00' AND '" + date + " 23:59:59'";
+              
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                res = rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        
+        return -res;
+    }
+    
+ 
+    /**
+     * Given a profile and a date, get the total bet volume.
+     * @param date  the date we are looking at
+     * @param prof  the profile we are looking at
+     * @return the amount that was bet on that profile
+     * @throws SQLException when a database error occurs
+     */
+    public double betVolumeProfile(final String date,
+                                  final ProfileType prof)
+        throws SQLException {
+        double res = 0.0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
+                + TransactionsTable.NAME + " WHERE "  + TransactionsTable.COL_PROFILETYPE + "=("
+                + getProfileIDSQL(prof) + ") AND " + TransactionsTable.COL_AMOUNT + "<0 AND "
+                + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
+                + date + " 00:00:00' AND '" + date + " 23:59:59'";
+              
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                res = rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        // return the negation since that is from the houses pov
+        return -res;
+    }
+    
+    /**
+     * Gets the total bet volume game on a particular profile.
+     * @param game  the game
+     * @param date  the date in the format YYYY-MM-DD
+     * @param prof  the profile
+     * @return  the profit or loss
+     * @throws SQLException when a database error occurs
+     */
+    public double volumeForGame(final GamesType game,
+                                  final String date,
+                                  final ProfileType prof)
+        throws SQLException {
+        double res = 0.0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
+                + TransactionsTable.NAME + " WHERE " + TransactionsTable.COL_GAMEID + "=(" 
+                + getGameIDSQL(game) + ") AND " + TransactionsTable.COL_PROFILETYPE + "=("
+                + getProfileIDSQL(prof) + ") AND " + TransactionsTable.COL_AMOUNT + " < 0 AND "
+                + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
+                + date + " 00:00:00' AND '" + date + " 23:59:59'";
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                res = rs.getDouble("total");
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        // return the negation since that is from the houses pov
+        return -res;
+    }
 }
