@@ -44,7 +44,7 @@ public final class Rake {
     private static String       jackpotChannel;
     
     /** The 1 in X chance of winning the jack pot.*/
-    private static final int    JACKPOTCHANCE  = 100000;
+    private static final int    JACKPOTCHANCE  = 1000000;
     
     /** Amount of rake taken/generated from bets. */
     private static final double RAKE           = 0.05;
@@ -158,8 +158,7 @@ public final class Rake {
                     String out = JACKPOTWON.replaceAll(
                             "%chips", Integer.toString(jackpot));
                     out = out.replaceAll("%profile", profile.toString());
-                    out = out.replaceAll(
-                            "%winners", Utils.listToString(players));
+                    out = out.replaceAll("%winners", Utils.listToString(players));
                     out = out.replaceAll("%game", game.toString());
 
                     if (channel != null
@@ -169,8 +168,7 @@ public final class Rake {
                         bot.sendIRCMessage(channel, out);
                     }
                     
-                    Channel jpchan = bot.getUserChannelDao()
-                                                    .getChannel(jackpotChannel);
+                    Channel jpchan = bot.getUserChannelDao().getChannel(jackpotChannel);
 
                     bot.sendIRCMessage(jpchan, out);
                     bot.sendIRCMessage(jpchan, out);

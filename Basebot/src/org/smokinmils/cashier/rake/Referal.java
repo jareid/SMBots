@@ -31,18 +31,18 @@ import org.smokinmils.logging.EventLog;
  */
 public final class Referal {
     /** The percentage of the rake provided that goes to jackpot. */
-    private static final double  JACKPOT_PERCENT = 0.10;
+    private static final double  JACKPOT_PERCENT = 0.20;
 
     /** The percentage of the rake provided that goes to group referral fees. */
     private static final double  GROUP_PERCENT   = 0.20;
     
     /** The percentage of the rake provided that goes to group user referral fees. */
-    private static final double  GUSER_PERCENT    = 0.14;
+    private static final double  GUSER_PERCENT    = 0.2;
     
-    /** The percentage of the group provided that goes to poiny referral fees. */
+    /** The percentage of the group provided that goes to point referral fees. */
     private static final double  POINTS_PERCENT   = 0.33;
     
-    /** The percentage of the group provided that goes to poiny referral fees. */
+    /** The percentage of the group provided that goes to group  owner referral fees. */
     private static final double  GOWNER_PERCENT   = 0.33;
 
     /** The percentage of the rake provided that goes to user referral fees. */

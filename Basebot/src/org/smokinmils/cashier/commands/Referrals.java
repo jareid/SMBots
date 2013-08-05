@@ -11,6 +11,7 @@ package org.smokinmils.cashier.commands;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
@@ -19,6 +20,7 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
+import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.database.types.ReferrerType;
 import org.smokinmils.database.types.UserCheck;
@@ -132,6 +134,12 @@ public class Referrals extends Event {
     /** The group list command format. */
     private static final String POINTS_FRMT   = "%b%c12" + POINTS_CMD + " <user> <amount>";
     
+    /** The command to give points. */
+    public static final String  MINPOINTS_CMD    = "!points";
+    
+    /** The group list command format. */
+    private static final String MINPOINTS_FRMT   = "%b%c12" + MINPOINTS_CMD + " <points>";
+    
     /** Max line length for the output of check. */
     private static final int MAX_LINE         = 80;
     
@@ -232,10 +240,14 @@ public class Referrals extends Event {
     private static final String POINTS        = "%b%c04%sender%c12: "
                                               + "%c04%who%c12 has %c04%points%c12 points this week";
     
-    /** Message when the points are checked. */
+    /** Message when the points are given. */
     private static final String GIVEPOINTS    = "%b%c04%sender%c12: "
                                               + "%c04%who%c12 has been given %c04%points%c12 points"
                                               + " and now has %c04%newpoints%c12 points";
+    
+    /** Message when the minimum points is set. */
+    private static final String MINPOINTS    = "%b%c04%sender%c12: %c12The minimum points "
+                                              + "is set to %c04%points%c12 points";
 
     /** The valid channels for rank only commands. */
     private final List<String> rankValidChans;
@@ -310,6 +322,8 @@ public class Referrals extends Event {
                         addReferrer(event);
                     } else if (Utils.startsWith(message, POINTS_CMD)) {
                         givePoints(event);
+                    } else if (Utils.startsWith(message, MINPOINTS_CMD)) {
+                        setMinPoints(event);
                     }
                 }
             }
@@ -816,6 +830,7 @@ public class Referrals extends Event {
             String ref = msg[2];
             if (reftype == ReferrerType.NONE) {
                 if (ref.equalsIgnoreCase(user)) {
+                
                     String out = NO_SELF.replaceAll("%sender", sender);
                     bot.sendIRCMessage(channel, out);
                 } else if (!db.checkUserExists(ref)) {
@@ -852,7 +867,8 @@ public class Referrals extends Event {
     private void checkPoints(final Message event) throws SQLException {
         IrcBot bot = event.getBot();
         Channel channel = event.getChannel();
-        String[] msg = event.getMessage().split(" ");
+        String[]
+                msg = event.getMessage().split(" ");
         User user = event.getUser();
         
         DB db = DB.getInstance();
@@ -866,6 +882,8 @@ public class Referrals extends Event {
         
         if (db.isRank(who)) {
             int rankpoints = db.checkPoints(who);
+            int totalpoints = db.getPointTotal();
+            Map<ProfileType, Double> chips = db.checkAllCredits(DB.POINTS_USER);
             
             String out = POINTS.replaceAll("%points", Integer.toString(rankpoints));
             out = out.replaceAll("%who", who);
@@ -901,6 +919,7 @@ public class Referrals extends Event {
             } else if (!db.isRank(who)) {
                 String out =  NOT_RANKED.replaceAll("%who", who);
                 out = out.replaceAll("%sender", event.getUser().getNick());
+                
                 bot.sendIRCMessage(channel, out);
             } else {
                 db.givePoints(who, points);
@@ -916,4 +935,31 @@ public class Referrals extends Event {
         }
     }
 
+    /**
+     * Gives a rank a number of points.
+     * 
+     * @param event The message event.
+     * 
+     * @throws SQLException When the database fails.
+     */
+    private void setMinPoints(final Message event) throws SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        Channel channel = event.getChannel();
+
+        int cmdlen = 1 + 1;
+        if (msg.length == cmdlen) {
+            DB db = DB.getInstance();
+            Integer points = Utils.tryParse(msg[1]);
+            
+            if (points == null) {
+                bot.invalidArguments(event.getUser(), MINPOINTS_FRMT);
+            } else {
+                String out = MINPOINTS.replaceAll("%points", Integer.toString(points));
+                bot.sendIRCMessage(channel, out);
+            }
+        } else {
+            bot.invalidArguments(event.getUser(), MINPOINTS_FRMT);
+        }
+    }
 }

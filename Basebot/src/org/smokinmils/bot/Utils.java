@@ -186,7 +186,7 @@ public final class Utils {
         try {
             double total = db.checkCredits(username, amount);
             // check if betting lt one and having gt 1
-            if (amount < ONE_CHIP) {
+            if (amount != null && amount < ONE_CHIP) {
                 // tell them they need to bet at least one coinchip
                 String out = MINIMUM_BET.replaceAll("%who", username);
                 bot.sendIRCMessage(chan, out);

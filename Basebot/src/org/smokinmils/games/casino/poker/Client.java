@@ -124,7 +124,8 @@ public class Client extends Event {
         String joinee = event.getUser().getNick();
         // (Re-)Check the user's status with NickServ
         if (joinee.compareToIgnoreCase(event.getBot().getNick()) == 0
-              && channel.compareToIgnoreCase(lobbyChan) == 0) {
+              && channel.compareToIgnoreCase(lobbyChan) == 0
+              && validTables.size() == 0) {
             ProfileType[] profiles = ProfileType.values();
             for (Integer x : PokerVars.INITBB) {
                 for (Integer y : PokerVars.INITTBLSIZES) {
@@ -153,8 +154,7 @@ public class Client extends Event {
     @Override
     public final void part(final Part event) {
         // Notify the correct room if required
-        Room room = pokerValidChannels.get(event.getChannel().getName()
-                .toLowerCase());
+        Room room = pokerValidChannels.get(event.getChannel().getName().toLowerCase());
         if (room != null) {
             room.addEvent(event, EventType.PART);
         }

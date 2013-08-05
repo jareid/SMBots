@@ -100,48 +100,47 @@ public class Room extends Thread {
                             
                             onJoin((Join) event.getEvent());
                         } else {
-                            EventLog.log("Received Join event with invalid "
-                                         + "details", "Room", "run");
+                            EventLog.log("Received Join event with invalid  details",
+                                         "Room", "run");
                         }
                         break;
                     case MESSAGE:
                         if (event.getEvent() instanceof Message) {
                             onMessage((Message) event.getEvent());
                         } else {
-                            EventLog.log("Received Message event with invalid "
-                                         + "details", "Room", "run");
+                            EventLog.log("Received Message event with invalid  details",
+                                         "Room", "run");
                         }
                         break;
                     case NICKCHANGE:
                         if (event.getEvent() instanceof NickChange) {
                             onNickChange((NickChange) event.getEvent());
                         } else {
-                            EventLog.log("Received NickChange event with "
-                                         + "invalid details", "Room", "run");
+                            EventLog.log("Received NickChange event with  details", "Room", "run");
                         }
                         break;
                     case NOTICE:
                         if (event.getEvent() instanceof Notice) {
                             onNotice((Notice) event.getEvent());
                         } else {
-                            EventLog.log("Received Notice event with invalid "
-                                         + "details", "Room", "run");
+                            EventLog.log("Received Notice event with invalid details",
+                                         "Room", "run");
                         }
                         break;
                     case PART:
                         if (event.getEvent() instanceof Part) {
                             onPart((Part) event.getEvent());
                         } else {
+                            
                             EventLog.log("Received Part event with invalid "
-                                         + "details", "Room", "run");
+                                         + "details:" + event.getEvent().toString(), "Room", "run");
                         }
                         break;
                     case OP:
                         if (event.getEvent() instanceof Op) {
                             onOp((Op) event.getEvent());
                         } else {
-                            EventLog.log("Received Op event with invalid "
-                                         + "details", "Room", "run");
+                            EventLog.log("Received Op event with invalid details", "Room", "run");
                         }
                         break;
                     case TIMER:
@@ -150,9 +149,8 @@ public class Room extends Thread {
                         break;
                     }
                 } catch (Exception e) {
-                    getIrcClient().sendIRCMessage(
-                            "Something caused the bot to "
-                                    + "crash... please notify the staff.");
+                    getIrcClient().sendIRCMessage("Something caused the bot to crash..."
+                                                  + " please notify the staff.");
                     EventLog.fatal(e, "Room", "run");
                     System.exit(1);
                 }

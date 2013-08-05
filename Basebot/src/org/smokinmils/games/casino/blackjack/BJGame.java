@@ -16,7 +16,6 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
@@ -793,7 +792,8 @@ public class BJGame extends Event {
     }
     
     /**
-     * Checks if we can insure on a hand
+     * Checks if we can insure on a hand.
+     * 
      * @param hand the hand we want to check
      * @return true if we offer insurance, false otherwise
      */

@@ -18,7 +18,7 @@
 	</listener>
 	<listener type="roulette" id="1">
 		<channel>SMGamer</channel>
-		<option type="time">5</option>
+		<option type="time">10</option>
 	</listener>
 	<listener type="roulette" id="2">
 		<channel>sm_roulette</channel>

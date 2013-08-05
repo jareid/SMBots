@@ -52,6 +52,7 @@ import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.database.types.ReferrerType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.database.types.UserCheck;
+import org.smokinmils.database.types.UserStats;
 import org.smokinmils.settings.DBSettings;
 
 import com.mchange.v2.c3p0.DataSources;
@@ -2484,5 +2485,10 @@ public final class DB {
                 + HostGroupsTable.NAME + " hg" + " WHERE hg."
                 + HostGroupsTable.COL_NAME + " LIKE '" + group + "')";
         return out;
+    }
+
+    public Map<ProfileType, UserStats> checkStats(String user) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

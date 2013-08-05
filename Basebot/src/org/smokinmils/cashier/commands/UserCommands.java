@@ -23,6 +23,7 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.BetterInfo;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.database.types.UserStats;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -70,6 +71,9 @@ public class UserCommands extends Event {
     /** The position command format. */
     public static final String  POSFMT          = "%b%c12" + POSCMD + " <profile> <user>";
     
+    /** The stats command. */
+    public static final String STATCMD = "!stats";
+    
     /** The position command length. */
     public static final int     POS_CMD_LEN     = 3;
 
@@ -86,15 +90,24 @@ public class UserCommands extends Event {
     private static final String TRANSFERCHIPSUSER   = "%b%c12You have had %c04%amount%c12 coins "
                                                     + "transfered into your %c04%profile%c12"
                                                     + " account by %c04%sender%c12";
-
+            
     /** The transfer message for the sender. */
     private static final String TRANSFERCHIPSSENDER = "%b%c12You have transferred %c04%amount%c12 "
                                                     + "coins from your %c04%profile%c12"
-                                                    + " account to %c04%who%c12";
-
+                                                    + " account to %c04%who%c12";    
+    /** The no stats message. */
+    private static final String NOSTATS   = "%b%c04%sender%c12: %c04%user %c12 has disabled their"
+                                          + " public stats.";
+    
+    /** The stats message. */
+    private static final String STATS = "%b%c04%user %profile %c12 stats: "
+                                      + "Total Bet(%c04%bet_total%c12) "
+                                      + "Total Won(%c04%win_total%c12) "
+                                      + "Referral Earnings(%c04%refer_total%c12)";
+    
 	/** Used to specify the Check message on another user. */
-	public static final String CHECKCREDITSMSG     =  "%b%c04%sender%c12: %user %c12currently has "
-	                               + "%c04%creds%c12 coins on the active profile (%c04%active%c12)";
+	public static final String CHECKCREDITSMSG     =  "%b%c04%sender%c12: %c04%user %c12currently "
+	                           + "has %c04%creds%c12 coins on the active profile (%c04%active%c12)";
 	
 	/** Used to specify the other profiles in the check message. */
 	public static final String OTHERPROFILES       = " | %c04%name%c12 (%c04%amount%c12)";
@@ -159,6 +172,8 @@ public class UserCommands extends Event {
         if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)) {
             if (Utils.startsWith(message, CHKCMD)) {
                 checkChips(event);
+            } else if (Utils.startsWith(message, STATCMD)) {
+                checkStats(event);
             } else if (Utils.startsWith(message, TRANCMD)) {
                 transferChips(event);
             } else if (Utils.startsWith(message, JPCMD)) {
@@ -249,6 +264,71 @@ public class UserCommands extends Event {
                 credstr = credstr.replaceAll("%sender", sender);
 
                 bot.sendIRCMessage(event.getChannel(), credstr);
+            } else {
+                bot.invalidArguments(senderu, CHKFMT);
+            }
+        }
+    }
+    
+    /**
+     * This method handles the chips command.
+     * 
+     * @param event the Message event
+     */
+    public final void checkStats(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
+
+        if (isValidChannel(event.getChannel().getName())
+                && bot.userIsIdentified(senderu)
+                && Utils.startsWith(message, STATCMD)) {
+            String[] msg = message.split(" ");
+            String user = "";
+
+            if (msg.length == 1 || msg.length == 2) {
+                if (msg.length > 1) {
+                    user = msg[1];
+                } else {
+                    user = sender;
+                }
+                
+                Map<ProfileType, UserStats> stats = null;
+                boolean rsrct = (user.equalsIgnoreCase("HOUSE") || user.equalsIgnoreCase("POINTS"));
+                if ((rsrct && bot.userIsHalfOp(senderu, event.getChannel().getName())) || !rsrct) {
+                    try {
+                        stats = DB.getInstance().checkStats(user);
+                    } catch (Exception e) {
+                        EventLog.log(e, "CheckChips", "message");
+                    }
+                }
+                String statstr = "";
+                if (stats.size() != 0) {
+                    if (stats.size() > 1) {
+                        for (Entry<ProfileType, UserStats> cred : stats.entrySet()) {
+                            statstr = STATS;
+                            statstr = statstr.replaceAll("%user", user);
+                            statstr = statstr.replaceAll("%refer_total",
+                                    Utils.chipsToString(cred.getValue().getRefertotal()));
+                            statstr = statstr.replaceAll("%bet_total",
+                                    Utils.chipsToString(cred.getValue().getBettotal()));
+                            statstr = statstr.replaceAll("%win_total",
+                                    Utils.chipsToString(cred.getValue().getWintotal()));
+                            statstr = statstr.replaceAll("%profile", cred.getKey().toString());
+                        }
+                    }
+                } else {
+                    statstr = NOSTATS;
+                }
+
+                if (user.equalsIgnoreCase(sender)) {
+                    user = "You";
+                }
+                statstr = statstr.replaceAll("%user", user);
+                statstr = statstr.replaceAll("%sender", sender);
+
+                bot.sendIRCNotice(event.getChannel(), statstr);
             } else {
                 bot.invalidArguments(senderu, CHKFMT);
             }
@@ -459,16 +539,12 @@ public class UserCommands extends Event {
                 for (ProfileType prof : ProfileType.values()) {
                     if (profile.hasComps()) {
                         try {
-                            BetterInfo highbet = db.getHighestBet(prof,
-                                    who);
-                            BetterInfo topbet = db.getTopBetter(prof,
-                                    who);
+                            BetterInfo highbet = db.getHighestBet(prof, who);
+                            BetterInfo topbet = db.getTopBetter(prof, who);
 
-                            if (highbet.getUser() == null
-                                    || topbet.getUser() == null) {
+                            if (highbet.getUser() == null || topbet.getUser() == null) {
                                 out = LAST30DAYS_NODATA;
-                                out = out.replaceAll("%who",
-                                        who);
+                                out = out.replaceAll("%who", who);
                             } else {
                                 out = LAST30DAYS.replaceAll("%hb_game",
                                         highbet.getGame().toString());
@@ -476,11 +552,9 @@ public class UserCommands extends Event {
                                         Long.toString(highbet.getAmount()));
                                 out = out.replaceAll("%hbt_coins",
                                         Long.toString(topbet.getAmount()));
-                                out = out.replaceAll("%who",
-                                        highbet.getUser());
+                                out = out.replaceAll("%who", highbet.getUser());
                             }
-                            out = out.replaceAll("%profile",
-                                    prof.toString());
+                            out = out.replaceAll("%profile",  prof.toString());
 
                             bot.sendIRCNotice(senderu, out);
                         } catch (Exception e) {
