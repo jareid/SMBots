@@ -72,7 +72,7 @@ public class Roulette extends Event {
 
     /** The message for a new round starting. */
     private static final String  NEW_GAME        = "%b%c12A new roulette game "
-           + "is starting! Type %c04!info roulette%c12for instructions on how to play.";
+           + "is starting! Type %c04!info roulette%c12 for instructions on how to play.";
     
     /** The invalid bet choice message. */
     private static final String  PLACE_BETS      = "%b%c12Place your bets now!";

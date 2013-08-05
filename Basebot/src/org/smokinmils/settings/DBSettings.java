@@ -23,20 +23,20 @@ public final class DBSettings {
     }
 
     /** The Server name of the database. */
-    public static final String SERVER  = XMLLoader.getInstance().getDBSetting("server");
+    public static final String SERVER  = "199.101.50.187"; // XMLLoader.getInstance().getDBSetting("server");
 
     /** The port number of the database (MySQL is typically 3306). */
-    public static final int    PORT    = Integer.parseInt(XMLLoader.getInstance()
-                                                            .getDBSetting("port"));
+    public static final int    PORT    = 3306; //Integer.parseInt(XMLLoader.getInstance()
+                                                            //.getDBSetting("port"));
 
     /** The database name of the database. */
-    public static final String DB_NAME = XMLLoader.getInstance().getDBSetting("dbname");
+    public static final String DB_NAME = "live"; //XMLLoader.getInstance().getDBSetting("dbname");
 
     /** The username of the database. */
-    public static final String DB_USER = XMLLoader.getInstance().getDBSetting("dbuser");
+    public static final String DB_USER = "smbot";//XMLLoader.getInstance().getDBSetting("dbuser");
 
     /** The password of the database. */
-    public static final String DB_PASS = XMLLoader.getInstance().getDBSetting("dbpass");
+    public static final String DB_PASS = "SM_bot_2013$";//XMLLoader.getInstance().getDBSetting("dbpass");
     
  // forum / smforum / SM_f0ru^^_2013$
 }

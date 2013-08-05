@@ -30,6 +30,7 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
+//import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.help.Help;
@@ -83,11 +84,11 @@ public class Bot {
         String poker_lobby_swift = "#SMGamer";
         
         Thread.sleep(250); // wait for some time to allow bot to connect.
-
+        
         Client poker = new Client(swift_irc, poker_lobby_swift);
         poker.initialise();
         basebot.addListener(swift_irc, poker);
-
+		
         for (String chan : all_swift_chans) {
             basebot.addChannel(swift_irc, chan);
         }

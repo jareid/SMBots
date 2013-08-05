@@ -47,6 +47,12 @@ public class BJBet extends Bet {
     /** is this game insured? */
     private boolean insured = false;
     
+    /** the amount that we have double downeded. */
+    private double doubleAmount = 0.0;
+    
+    /** the amount that we have insured for. */
+    private double insureAmount = 0.0;
+    
     /**
      * Constructor for a Bj hand, gets a new deck and deals the cards to player / dealer.
      * @param user the user who is playing this game
@@ -113,18 +119,20 @@ public class BJBet extends Bet {
     public final Channel getChannel() { return channel; };
     
     /**
-     * Perform a double.
+     * Perform a double down.
+     * @param amount the amount we are double downing with
      */
-    public final void doubleru() {
+    public final void doubleDown(final double amount) {
         DB db = DB.getInstance();
         try {
             //manually adjust since this isn't standard.
             doubled = true;
-            db.adjustChips(getUser().getNick(), -getAmount(), 
+            doubleAmount = amount;
+            db.adjustChips(getUser().getNick(), -doubleAmount, 
                     getProfile(), GamesType.BLACKJACK, TransactionType.BET);
         } catch (SQLException e) {
             
-            EventLog.log(e, "BJBet", "doubleru");
+            EventLog.log(e, "BJBet", "doubleDown");
         }
     }
 
@@ -138,15 +146,16 @@ public class BJBet extends Bet {
 
     /**
      * insures a game TODO make this boolean for integration.
+     * @param amount the amount we are insuring for
      */
-    public final void insure() {
+    public final void insure(final double amount) {
         DB db = DB.getInstance();
         insured = true;
+        insureAmount = amount;
         try {
             //manually adjust since this isn't standard.
-           
-            db.adjustChips(getUser().getNick(), -getAmount() / 2, 
-                    getProfile(), GamesType.BLACKJACK, TransactionType.BET);
+            db.adjustChips(getUser().getNick(), -amount, 
+                    getProfile(), GamesType.BLACKJACK, TransactionType.BJ_INSURE);
         } catch (SQLException e) {
             
             EventLog.log(e, "BJBet", "insure");
@@ -171,10 +180,8 @@ public class BJBet extends Bet {
            
             try {
                 //manually adjust since this isn't standard.
-               
-                db.adjustChips(getUser().getNick(), getAmount(), 
+                db.adjustChips(getUser().getNick(), insureAmount * 2, 
                         getProfile(), GamesType.BLACKJACK, TransactionType.WIN);
-                // TODO insurence transaction type?
             } catch (SQLException e) {
                 
                 EventLog.log(e, "BJBet", "insure");
@@ -182,5 +189,22 @@ public class BJBet extends Bet {
         }
         
     }
+    
+    /**
+     * Gets the amount double downed with.
+     * @return the amount we double downed for
+     */
+    public final double getDouble() {
+        return doubleAmount;
+    }
+    
+    /**
+     * Get's the amount we insured for.
+     * @return the amount insured for
+     */
+    public final double getInsure() {
+        return insureAmount;
+    }
+
  
 }
