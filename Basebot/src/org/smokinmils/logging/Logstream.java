@@ -9,12 +9,13 @@
 package org.smokinmils.logging;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.BlockingQueue;
-import java.text.SimpleDateFormat;
 
 /**
  * Class interface through which all logging occurs.
@@ -76,7 +77,8 @@ public class Logstream implements Runnable {
    /**
     * 
     */
-   public final void run() {
+   @Override
+public final void run() {
        // logging never stops unless server is restarted so loop forever
        while (true) {
            try {
@@ -106,11 +108,9 @@ public class Logstream implements Runnable {
      * @param data the String object
      */
     private void flush(final String data) {
-
         BufferedWriter writer = null;
 
         try {
-
             System.out.println(data);
 
             writer = getOutputStream();
@@ -120,8 +120,7 @@ public class Logstream implements Runnable {
             writer.flush();             
         } catch (IOException ex) {
             // what to do if we can't even log to our log file????
-            System.out.println("IOException: EventLog.flush: "
-                                + ex.getMessage());
+            System.out.println("IOException: EventLog.flush: " + ex.getMessage());
         } finally {
             closeOutputStream(writer);
         }
@@ -171,7 +170,10 @@ public class Logstream implements Runnable {
      * @throws IOException if the creation of a BufferedWriter fails
      */
     private BufferedWriter getOutputStream() throws IOException {
-        return new BufferedWriter(new FileWriter(getPath(), true));         
+        String dirname = "logs";
+        File dir = new File(dirname);
+        File afile = new File(dir, getPath());
+        return new BufferedWriter(new FileWriter(afile, true));         
     }
 
     /**

@@ -8,6 +8,7 @@
  */ 
 package org.smokinmils.help;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -28,13 +29,13 @@ public final class Question {
 	                                        = new TreeMap<Integer, Question>();
 	
 	/** The topic of this question. */
-	private String topic;
+	private final String topic;
 	
 	/** The question. */
-	private String question;
+	private final String question;
 	
 	/** The answer. */
-	private String answer;
+	private final String answer;
 	
 	/**
 	 * Constructor.
@@ -96,14 +97,17 @@ public final class Question {
      * Load all the questions from the specified file.
      * 
      * @param filename the file to read from
+     * @param dirname the file to read from
      * 
      * @throws IOException if the file is not an ini or 
      *                     if the file doesn't exist or
      *                     if we fail to read the file
      */
-    public static void load(final String filename)
+    public static void load(final String dirname, final String filename)
             throws IOException {
-		Ini ini = new Ini(new FileReader(filename));
+        File dir = new File(dirname);
+        File afile = new File(dir, filename);
+		Ini ini = new Ini(new FileReader(afile));
     	for (String name: ini.keySet()) {
     		Section section = ini.get(name);
     		String q = section.get("question");

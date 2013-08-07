@@ -136,13 +136,10 @@ public class Competition extends TimerTask {
                     List<Integer> prizes = allprizes.get(profile);
                     // check there are enough prizes
                     if (prizes == null || prizes.size() < betters.size()) {
-                        EventLog.log(
-                                "Not enough prizes for " + profile.toString(),
+                        EventLog.log("Not enough prizes for " + profile.toString(),
                                 "Competition", "end");
-                        bot.sendIRCMessage(
-                                chan,
-                                "%b%c04No competition prizes set for + "
-                                        + profile.toString()
+                        bot.sendIRCMessage(chan,
+                                "%b%c04No competition prizes set for + " + profile.toString()
                                         + ", please talk to an admin");
                         continue;
                     }
@@ -150,8 +147,7 @@ public class Competition extends TimerTask {
                     String prizestr = Utils.listToString(prizes);
                     String allwins = Utils.listToString(betters);
 
-                    String out = ANNOUNCE_LINE.replaceAll(
-                            "%profile", profile.toString());
+                    String out = ANNOUNCE_LINE.replaceAll("%profile", profile.toString());
                     out = out.replaceAll("%timeleft", duration);
                     out = out.replaceAll("%prizes", prizestr);
                     out = out.replaceAll("%players", allwins);
@@ -178,8 +174,7 @@ public class Competition extends TimerTask {
         for (ProfileType profile : ProfileType.values()) {
             if (profile.hasComps()) {
                 try {
-                    List<BetterInfo> betters = db.getCompetition(
-                            profile, NUMBERWINNERS);
+                    List<BetterInfo> betters = db.getCompetition(profile, NUMBERWINNERS);
 
                     String out = WINNER_ANNOUNCE_LINE.replaceAll(
                             "%profile", profile.toString());
@@ -202,8 +197,7 @@ public class Competition extends TimerTask {
                     for (BetterInfo player : betters) {
                         int prize = prizes.get(i);
 
-                        String winner = WINNER_USERLINE.replaceAll(
-                                "%who", player.getUser());
+                        String winner = WINNER_USERLINE.replaceAll("%who", player.getUser());
                         allwins += winner;
                         if (i == (betters.size() - 2)) {
                             allwins += " and ";
@@ -211,8 +205,7 @@ public class Competition extends TimerTask {
                             allwins += ", ";
                         }
 
-                        db.adjustChips(
-                                player.getUser(), prize, profile,
+                        db.adjustChips(player.getUser(), prize, profile,
                                 GamesType.COMPETITIONS, TransactionType.WIN);
 
                         i++;
@@ -229,7 +222,7 @@ public class Competition extends TimerTask {
 
         // Update the database for next competition
         try {
-            Rake.processPoints();
+            Rake.processPoints(bot);
             db.competitionEnd();
             Lottery.announceReset(bot, channel);
         } catch (Exception e) {
@@ -252,8 +245,7 @@ public class Competition extends TimerTask {
                 // read the prizes from a file
                 try {
                     BufferedReader readFile = new BufferedReader(
-                            new FileReader("comp_" + "prizes."
-                                    + profile.toString()));
+                            new FileReader("settings\\comp_prizes." + profile.toString()));
                     String line = "";
                     while ((line = readFile.readLine()) != null) {
                         prizes.add(Utils.tryParse(line));

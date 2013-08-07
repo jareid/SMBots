@@ -17,6 +17,7 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.auctions.Auctions;
 import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.cashier.commands.Coins;
+import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.cashier.tasks.BetDetails;
@@ -88,8 +89,7 @@ public final class XMLLoader {
             try {
                 builder = builderFactory.newDocumentBuilder();
                
-                xmlDocument = builder.parse(
-                        new FileInputStream("settings.xml"));
+                xmlDocument = builder.parse(new FileInputStream("settings.xml"));
                 
                 serveraddr = initBaseBot();
                
@@ -101,15 +101,13 @@ public final class XMLLoader {
                 
                 loadListeners(serveraddr, bot);
                 
-                loadTimers(serveraddr, bot);
-                
+                loadTimers(serveraddr, bot);                
             } catch (Exception e) {
                 e.printStackTrace();  
             }
             //Client poker = new Client(swift_irc, poker_lobby_swift);
             //poker.initialise();
             //basebot.addListener(swift_irc, poker);
-
             
             return basebot;
         }
@@ -168,7 +166,7 @@ public final class XMLLoader {
                 
                     if (n.equals("channel")) {
                         
-                        channels.add("#" + nodeList.item(i).getTextContent());                       
+                        channels.add("#" + nodeList.item(i).getTextContent());
                     }
                 }
                 
@@ -213,7 +211,6 @@ public final class XMLLoader {
                             // if has id use that so we can distinguish between multiple listeners
                             // of the same type
                             if (el.hasAttribute("id")) {
-                                //System.out.println(el.getNodeName() + "::" + el.getAttribute("id"));
                                 expression = "/bot/listener[@type='"
                                         + el.getAttribute("type") + "' and @id='"
                                         + el.getAttribute("id") + "']/*";
@@ -255,8 +252,7 @@ public final class XMLLoader {
                         } else if (type.equals("createtimedroll")) {
                             basebot.addListener(server, new CreateTimedRoll(), chanarr);
                         } else if (type.equals("diceduel")) {
-                          basebot.addListener(
-                                  server, new DiceDuel(bot, chanarr[0]),
+                          basebot.addListener(server, new DiceDuel(bot, chanarr[0]),
                                    chanarr);
                         } else if (type.equals("managersystem")) {
                           basebot.addListener(server,
@@ -281,8 +277,10 @@ public final class XMLLoader {
                             Auctions auction = new Auctions(bot, chanarr[0]);
                             auction.addValidChan(chanarr);
                             basebot.addListener(server, auction);
-                        }
-                       
+                        } else if (type.equals("referrals")) {
+                            // TODO: this needs two separate channel lists...
+                            basebot.addListener(server, new Referrals(chanarr, chanarr), chanarr);
+                        }                       
                     }
                 }
             } catch (Exception e) {
@@ -319,7 +317,6 @@ public final class XMLLoader {
                             // if has id use that so we can distinguish between multiple listeners
                             // of the same type
                             if (el.hasAttribute("id")) {
-                                //System.out.println(el.getNodeName() + "::" + el.getAttribute("id"));
                                 expression = "/bot/timer[@type='"
                                         + el.getAttribute("type") + "' and @id='"
                                         + el.getAttribute("id") + "']/*";
@@ -328,7 +325,8 @@ public final class XMLLoader {
                                                              + el.getAttribute("type") + "']/*";
                             }
                             //read a nodelist using xpath
-                            NodeList cNodes = (NodeList) xPath.compile(expression).evaluate(xmlDocument, XPathConstants.NODESET);
+                            NodeList cNodes = (NodeList) xPath.compile(expression)
+                                                    .evaluate(xmlDocument, XPathConstants.NODESET);
                             //NodeList cNodes = el.getChildNodes();
                             for (int j = 0; j < cNodes.getLength(); j++) {
                                 Element subel = (Element) cNodes.item(j);
@@ -370,8 +368,8 @@ public final class XMLLoader {
                                     Utils.tryParse(options.get("period")) * Utils.MS_IN_MIN);
                         } else if (type.equals("jackpottimer")) {
                             Timer jkpttimer = new Timer(true);
-                            jkpttimer.scheduleAtFixedRate(new JackpotAnnounce(basebot.getBot(server),
-                                    chanarr[0]), 
+                            jkpttimer.scheduleAtFixedRate(
+                                    new JackpotAnnounce(basebot.getBot(server), chanarr[0]), 
                                     Utils.tryParse(options.get("delay")) * Utils.MS_IN_MIN, 
                                     Utils.tryParse(options.get("period")) * Utils.MS_IN_MIN);
                         }

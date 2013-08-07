@@ -46,7 +46,7 @@ public class Auctions extends Event {
     public static final String  ADDCMD     = "!additem";
 
     /** The add command format. */
-    public static final String  ADDFMT      = "%b%c12" + ADDCMD + " <item/chips> <length in minutes> "
+    public static final String  ADDFMT    = "%b%c12" + ADDCMD + " <item/chips> <length in minutes> "
             + "<start_price> <profile> <item name/amount of chips> ";
 
     /** The add command length. */
@@ -92,13 +92,13 @@ public class Auctions extends Event {
     private static final String ADD_CHIPS_VAR = "chips";
     
     /** The list of auctions that are active. */
-    private ArrayList<AnAuction> auctions;
+    private final ArrayList<AnAuction> auctions;
     
     /** The list of auctions that are in the final count down! */
-    private ArrayList<AnAuction> finalAuctions;
+    private final ArrayList<AnAuction> finalAuctions;
     
     /** Timer to announce auctions. */
-    private Timer auctionTimer;
+    private final Timer auctionTimer;
     
     /**
      * Constructor.

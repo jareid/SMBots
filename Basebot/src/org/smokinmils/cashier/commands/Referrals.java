@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
@@ -135,7 +136,7 @@ public class Referrals extends Event {
     private static final String POINTS_FRMT   = "%b%c12" + POINTS_CMD + " <user> <amount>";
     
     /** The command to give points. */
-    public static final String  MINPOINTS_CMD    = "!points";
+    public static final String  MINPOINTS_CMD    = "!minpoints";
     
     /** The group list command format. */
     private static final String MINPOINTS_FRMT   = "%b%c12" + MINPOINTS_CMD + " <points>";
@@ -153,11 +154,7 @@ public class Referrals extends Event {
     /** Message when the command was successful. */
     private static final String SUCCESS       = "%b%c04%sender%c12: Succesfully added "
                                               + "%c04%referrers%c12 as %c04%who%c12's referer(s).";
-    
-    // TODO: re-add this
-    // private static final String FAILED =
-    // "%b%c04%sender%c12: %c04%who%c12 is a public referral and can't be
-    // given to ranks.";
+   
 
     /** Start of check command line message. */
     private static final String REFER_CHECK_LINE  = "%b%c04";
@@ -238,7 +235,15 @@ public class Referrals extends Event {
     
     /** Message when the points are checked. */
     private static final String POINTS        = "%b%c04%sender%c12: "
-                                              + "%c04%who%c12 has %c04%points%c12 points this week";
+                                              + "%c04%who%c12 has %c04%points%c12 points this week."
+                                              + " The minimum is %c04%minpoints%c12 per user."
+                                              + " The total earnt this week is %c04%totpoints.";
+    
+    /** Message when the points are checked. */
+    private static final String POINTS_STATS  = "%b%c04%sender%c12: "
+                                              + "%c04%profile%c12 has %c04%coins%c12 coins so far"
+                                              + ". That is %c04%chippoint%c12 per point and "
+                                              + "%c04%user%c12 will get %c04%usercoins%c12.";
     
     /** Message when the points are given. */
     private static final String GIVEPOINTS    = "%b%c04%sender%c12: "
@@ -247,7 +252,7 @@ public class Referrals extends Event {
     
     /** Message when the minimum points is set. */
     private static final String MINPOINTS    = "%b%c04%sender%c12: %c12The minimum points "
-                                              + "is set to %c04%points%c12 points";
+                                              + "has been set to %c04%points%c12 points";
 
     /** The valid channels for rank only commands. */
     private final List<String> rankValidChans;
@@ -300,7 +305,7 @@ public class Referrals extends Event {
                         checkPoints(event);
                     }
                 }
-                // TODO: clean up logic here. Should be a single if
+                
                 if (isMgrValidChannel(cname)) {
                     if (Utils.startsWith(message, REN_CMD)) {
                         renameGroup(event);
@@ -415,12 +420,7 @@ public class Referrals extends Event {
         if (msg.length >= GREF_CMD_LEN) {
             DB db = DB.getInstance();
             String user = msg[1];
-            /*
-             * ReferrerType reftype = db.getRefererType(user);
-             * 
-             * TODO: check with J if this should be removed? if (reftype ==
-             * ReferrerType.NONE || reftype == ReferrerType.GROUP) {
-             */
+           
             List<String> refs = new ArrayList<String>();
             boolean isok = true;
             for (int i = 2; i < msg.length; i++) {
@@ -469,11 +469,6 @@ public class Referrals extends Event {
                 out = out.replaceAll("%referrers", Utils.listToString(refs));
                 bot.sendIRCMessage(channel, out);
             }
-            /*
-             * TODO: check with J if this should be removed? } else { String out
-             * = FAILED.replaceAll("%sender", sender); out =
-             * out.replaceAll("%who", user); bot.sendIRCMessage(channel, out); }
-             */
         } else {
             bot.invalidArguments(event.getUser(), GREF_FORMAT);
         }
@@ -867,8 +862,7 @@ public class Referrals extends Event {
     private void checkPoints(final Message event) throws SQLException {
         IrcBot bot = event.getBot();
         Channel channel = event.getChannel();
-        String[]
-                msg = event.getMessage().split(" ");
+        String[] msg = event.getMessage().split(" ");
         User user = event.getUser();
         
         DB db = DB.getInstance();
@@ -883,12 +877,34 @@ public class Referrals extends Event {
         if (db.isRank(who)) {
             int rankpoints = db.checkPoints(who);
             int totalpoints = db.getPointTotal();
+            int minpoints = db.getMinPoints();
             Map<ProfileType, Double> chips = db.checkAllCredits(DB.POINTS_USER);
             
             String out = POINTS.replaceAll("%points", Integer.toString(rankpoints));
             out = out.replaceAll("%who", who);
             out = out.replaceAll("%sender", sender);
+            out = out.replaceAll("%minpoints", Integer.toString(minpoints));
+            out = out.replaceAll("%totpoints", Integer.toString(totalpoints));
             bot.sendIRCMessage(channel, out);
+            
+            for (Entry<ProfileType, Double> entry: chips.entrySet()) {
+                double coin = entry.getValue();
+                double chippoint = coin / totalpoints;
+                if (chippoint == Double.NaN) {
+                    chippoint = 0.0;
+                }
+                
+                double usercoins = chippoint * rankpoints;
+                
+                out = POINTS_STATS;
+                out = out.replaceAll("%profile", entry.getKey().toString());
+                out = out.replaceAll("%chippoint", Utils.chipsToString(chippoint));
+                out = out.replaceAll("%usercoins", Utils.chipsToString(usercoins));
+                out = out.replaceAll("%coins", Utils.chipsToString(coin));
+                out = out.replaceAll("%user", who);
+                out = out.replaceAll("%sender", sender);
+                bot.sendIRCNotice(user, out);
+            }
         } else {
             String out =  NOT_RANKED.replaceAll("%who", who);
             out = out.replaceAll("%sender", sender);
@@ -955,7 +971,10 @@ public class Referrals extends Event {
             if (points == null) {
                 bot.invalidArguments(event.getUser(), MINPOINTS_FRMT);
             } else {
+                db.setMinPoints(points);
                 String out = MINPOINTS.replaceAll("%points", Integer.toString(points));
+                out = out.replaceAll("%sender", event.getUser().getNick());
+                
                 bot.sendIRCMessage(channel, out);
             }
         } else {

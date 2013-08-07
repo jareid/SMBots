@@ -38,15 +38,18 @@ public class Help extends Event {
 	public static final String INVALID_TOPIC = "%b%c12Sorry, %c04%topic%c12 is "
 	 + "not a valid topic. Please use %c04%cmd%c12 for valid questions/topics!";
 	
+    /**The directory where we store the questions. */
+    private static final String         DIRNAME         = "settings";
+	
 	/** The file where we store the questions. */
-	public static final String FILENAME = "faq.ini";
+	public static final String FILENAME    = "faq.ini";
 	
 	/**
 	 * Constructor.
 	 */
 	public Help() {
 		try {
-			Question.load(FILENAME);
+			Question.load(DIRNAME, FILENAME);
 		} catch (IOException e) {
 			EventLog.fatal(e, "Help", "Help");
 			System.exit(0);

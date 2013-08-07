@@ -26,7 +26,7 @@ public class AnAuction {
     
     /** String letting the user know to pay, pay now! */
     private static final String WINNER = "%b%c04%who%c12: You have won the auction for %c04%name"
-    		+ " %c12if the auction was for chips these have been added to your account, if an item " 
+    		+ " %c12if the auction was for chips these have been added to your account, if an item "
     		+ ", please query a member of staff! ";
    
     /** String for the final minute. */
@@ -74,7 +74,7 @@ public class AnAuction {
     private double chipsWin = 0.0;
     
     /** The profile for this auction. */
-    private ArrayList<ProfileType> profiles;
+    private final ArrayList<ProfileType> profiles;
     
     /**
      * Contructor.
@@ -126,7 +126,7 @@ public class AnAuction {
         User sender = event.getUser();
         Channel chan = event.getChannel();
         boolean ret = false;
-        if (Utils.checkCredits(sender, (double) BID_PRICE + price + Auctions.INCR_AMOUNT, bot, chan)
+        if (Utils.checkCredits(sender, BID_PRICE + price + Auctions.INCR_AMOUNT, bot, chan)
                                                                                     >= BID_PRICE) {
             DB db = DB.getInstance();
             try {

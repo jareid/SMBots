@@ -65,7 +65,6 @@ public class Duel extends Event {
      * @param event The message event.
      */
     private void train(final Message event) {
-        // TODO Auto-generated method stub
         
     }
 
@@ -75,7 +74,6 @@ public class Duel extends Event {
      * @param event The message event.
      */
     private void newDM(final Message event) {
-        // TODO Auto-generated method stub
         
     }
 }

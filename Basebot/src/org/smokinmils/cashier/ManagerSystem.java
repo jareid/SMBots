@@ -43,8 +43,11 @@ public class ManagerSystem extends Event {
     /** The command to logout. */
     public static final String         LOGOUT_CMD       = "!logout";
 
+    /**The directory the times are stored. */
+    private static final String         DIRNAME         = "settings";
+    
     /** The file where the times are stored. */
-    private static final String        FILENAME            = "managers.ini";
+    private static final String        FILENAME         = "managers.ini";
 
     /** Message when nobody is logged in. */
     private static final String        NOLOGGEDON          = "%b%c12[%c04Logged"
@@ -120,7 +123,7 @@ public class ManagerSystem extends Event {
         managerTimes = new HashMap<String, Double>();
         inactiveTime = DEFAULTINACTIVETIME;
         activityChan = activechan;
-        managerChan = managerchan;
+        setManagerChan(managerchan);
         hostChan = hostchan;
         bot = irc;
 
@@ -191,7 +194,7 @@ public class ManagerSystem extends Event {
                             LOGGEDON.replaceAll("%who", getLoggedInUser()));
                 }
             } else if (Utils.startsWith(message, LOGIN_CMD)
-                    && (managerChan.equalsIgnoreCase(chan.getName())
+                    && (getManagerChan().equalsIgnoreCase(chan.getName())
                         || (hostChan.equalsIgnoreCase(chan.getName())
                              && bot.userIsHalfOp(senderu, chan.getName())))) {
                 if (getLoggedInUser() != null) {
@@ -201,7 +204,7 @@ public class ManagerSystem extends Event {
                     irc.sendIRCMessage(chan, LOGGEDIN.replaceAll("%who", sender));
                 }
             } else if (Utils.startsWith(message, LOGOUT_CMD)
-                    && (managerChan.equalsIgnoreCase(chan.getName())
+                    && (getManagerChan().equalsIgnoreCase(chan.getName())
                         || (hostChan.equalsIgnoreCase(chan.getName())
                              && bot.userIsHalfOp(senderu, chan.getName())))) {
                 if (getLoggedInUser() == null || !getLoggedInUser().equalsIgnoreCase(sender)) {
@@ -248,7 +251,7 @@ public class ManagerSystem extends Event {
         if (getLoggedInUser() != null) {
             String out = INACTIVEDLOGGEDOUT.replaceAll("%who", getLoggedInUser());
             out = out.replaceAll("%actchan", activityChan);
-            Channel chan = bot.getUserChannelDao().getChannel(managerChan);
+            Channel chan = bot.getUserChannelDao().getChannel(getManagerChan());
             bot.sendIRCMessage(chan, out);
             managerLoggedOut();
         }
@@ -279,7 +282,8 @@ public class ManagerSystem extends Event {
      * Check's the manager file exists.
      */
     private static void checkData() {
-        File inifile = new File(FILENAME);
+        File dir = new File(DIRNAME);
+        File inifile = new File(dir, FILENAME);
         if (!inifile.exists()) {
             managerTimes.clear();
             try {
@@ -297,7 +301,8 @@ public class ManagerSystem extends Event {
      */
     private static void saveData() {
         try {
-            File inifile = new File(FILENAME);
+            File dir = new File(DIRNAME);
+            File inifile = new File(dir, FILENAME);
             Wini ini = new Wini(inifile);
 
             ini.put("loggedin", "who", getLoggedInUser());
@@ -323,6 +328,20 @@ public class ManagerSystem extends Event {
      */
     private static void setLoggedInUser(final String user) {
         ManagerSystem.loggedInUser = user;
+    }
+
+    /**
+     * @return the managerChan
+     */
+    public static String getManagerChan() {
+        return managerChan;
+    }
+
+    /**
+     * @param mchan the managerChan to set
+     */
+    private static void setManagerChan(final String mchan) {
+        managerChan = mchan;
     }
 }
 

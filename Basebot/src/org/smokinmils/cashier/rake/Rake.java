@@ -10,6 +10,7 @@
 package org.smokinmils.cashier.rake;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,6 +19,7 @@ import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
@@ -67,6 +69,10 @@ public final class Rake {
     /** The jackpot announce string for each jackpot. */
     private static final String JP_AMOUNT       = "%c04%profile%c01 "
                                                         + "(%c04%amount%c01) ";
+
+    /** The jackpot announce string. */
+    private static final String GROUP_FAIL   = "%b%c04%group%c12 has failed this week by "
+                                             + "%c04%points%c12 less than the minimum of %c04%min.";
 
     /**
      * Initialise.
@@ -191,8 +197,7 @@ public final class Rake {
         for (ProfileType profile : ProfileType.values()) {
             int jackpot = 0;
             try {
-                jackpot = (int) Math
-                        .floor(DB.getInstance().getJackpot(profile));
+                jackpot = (int) Math.floor(DB.getInstance().getJackpot(profile));
             } catch (Exception e) {
                 EventLog.log(e, "Jackpot", "getJackpotsString");
             }
@@ -221,14 +226,30 @@ public final class Rake {
     /**
      * Process rank point earnings.
      * 
+     * @param bot the irc bot instance.
+     * 
      * @throws SQLException when a database error occurs.
      */
-    public static void processPoints() throws SQLException {
+    public static void processPoints(final IrcBot bot) throws SQLException {
         DB db = DB.getInstance();
         // get the total points
         int points = db.getPointTotal();
-        // TODO: int minpoints = db.getMinPoints();
-        // TODO: calculate failing groups
+        int minpoints = db.getMinPoints();
+        Map<String, Integer> grouppoints = new HashMap<String, Integer>();
+        Map<String, Integer> groupusers = new HashMap<String, Integer>();
+        
+        Map<String, Integer> allpoints = db.getPoints();
+        for (Entry<String, Integer> ent: allpoints.entrySet()) {
+            // note how many points the group have.
+            String group = db.getRankGroup(ent.getKey());
+            if (!grouppoints.containsKey(group)) {
+                grouppoints.put(group, ent.getValue());
+                groupusers.put(group, 1);
+            } else {
+                grouppoints.put(group, grouppoints.get(group) + ent.getValue());
+                groupusers.put(group, groupusers.get(group) + 1);
+            }
+        }
         
         for (ProfileType profile: ProfileType.values()) {
             double pointearnings = db.checkCredits(DB.POINTS_USER, profile);
@@ -236,10 +257,9 @@ public final class Rake {
             if (eachpoint == Double.NaN) {
                 eachpoint = 0.0;
             }
-        
+            
             // calculate each users 
-            Map<String, Integer> allpoints = db.getPoints();
-            for (Entry<String, Integer> ent: allpoints.entrySet()) {
+            for (Entry<String, Integer> ent: allpoints.entrySet()) {            
                 if (ent.getValue() > 0) {
                     double amnt = ent.getValue() * eachpoint;
     
@@ -250,6 +270,23 @@ public final class Rake {
             
             db.adjustChips(DB.POINTS_USER, -pointearnings, profile,
                     GamesType.ADMIN, TransactionType.POINTS);
+        }
+        
+        // See which groups failed.
+        for (Entry<String, Integer> entry: grouppoints.entrySet()) {
+            Integer users = groupusers.get(entry.getKey());
+            if (users != null) {
+                int min = users * minpoints;
+                if (minpoints > entry.getValue()) {
+                    String out = GROUP_FAIL.replaceAll("%group", entry.getKey());
+                    out = out.replaceAll("%min", Integer.toString(min));
+                    out = out.replaceAll("%points", entry.getValue().toString());
+                    
+                    Channel chan = bot.getUserChannelDao().getChannel(
+                                                                    ManagerSystem.getManagerChan());
+                    bot.sendIRCMessage(chan, out);
+                }
+            }
         }
         
         // reset points

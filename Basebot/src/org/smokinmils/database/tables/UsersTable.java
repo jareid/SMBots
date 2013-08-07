@@ -29,13 +29,7 @@ public final class UsersTable {
 	public static final String COL_USERNAME = "username";
 	
 	/** Column for the number of wins. */
-	public static final String COL_WINS = "wins";
-	
-	/** Column for the number of losses. */
-	public static final String COL_LOSSES = "losses";
-	
-	/** Column for the total amount bet. */
-	public static final String COL_TOTALBETS = "total_bets";
+	public static final String COL_STATS = "public_stats";
 	
 	/** Column for the active profile. */
 	public static final String COL_ACTIVEPROFILE = "active_profile";

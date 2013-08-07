@@ -119,7 +119,9 @@ public final class Referal {
             }
 
             double housefee = event.getAmount() * housepercent;
-            db.giveReferalFee(housefee, DB.HOUSE_USER, event.getProfile());
+            Map<String, Double> fees = new HashMap<String, Double>();
+            fees.put(DB.HOUSE_USER, housefee);
+            db.giveReferalFees(event.getUser(), fees, event.getProfile());
 
             if (Rake.JACKPOTENABLED) {
                 updateJackpot(event.getAmount(), event.getProfile());
@@ -144,7 +146,9 @@ public final class Referal {
 
         ReferalUser referer = db.getReferalUsers(event.getUser()).get(0);
 
-        db.giveReferalFee(amnt, referer.getUser(), event.getProfile());
+        Map<String, Double> fees = new HashMap<String, Double>();
+        fees.put(referer.getUser(), amnt);
+        db.giveReferalFees(event.getUser(), fees, event.getProfile());
     }
 
     /**
@@ -202,7 +206,7 @@ public final class Referal {
             fees.put(DB.HOUSE_USER, grpfee);
         }
         
-        db.giveReferalFees(fees, event.getProfile());
+        db.giveReferalFees(event.getUser(), fees, event.getProfile());
     }
 
     /**

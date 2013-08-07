@@ -30,4 +30,25 @@ public final class UserProfilesView {
 	
 	/** Column for the amount. */
 	public static final String COL_AMOUNT = "amount";
+	
+	/** Column for the total won amount. */
+    public static final String COL_WINTOTAL = "win_total";
+    
+    /** Column for the total wins. */
+    public static final String COL_WINCOUNT = "win_count";
+    
+    /** Column for the total amount cancelled made. */
+    public static final String COL_CXLTOTAL = "cancel_total";
+    
+    /** Column for the total cancels made. */
+    public static final String COL_CXLCOUNT = "cancel_count";
+    
+    /** Column for the total referral fees earnt. */
+    public static final String COL_REFERTOTAL = "refer_total";
+    
+    /** Column for the total amount bet. */
+    public static final String COL_BETTOTAL = "bet_total";
+    
+    /** Column for the total bets made. */
+    public static final String COL_BETCOUNT = "bet_count";
 }

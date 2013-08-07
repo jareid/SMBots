@@ -35,11 +35,13 @@ import org.smokinmils.database.tables.HostGroupsTable;
 import org.smokinmils.database.tables.HostmasksTable;
 import org.smokinmils.database.tables.JackpotTable;
 import org.smokinmils.database.tables.LotteryTicketsTable;
+import org.smokinmils.database.tables.MinPointsTable;
 import org.smokinmils.database.tables.OrderedBetsView;
 import org.smokinmils.database.tables.PokerBetsTable;
 import org.smokinmils.database.tables.PokerHandsTable;
 import org.smokinmils.database.tables.ProfileTypeTable;
 import org.smokinmils.database.tables.ReferersTable;
+import org.smokinmils.database.tables.RefsTransactionsTable;
 import org.smokinmils.database.tables.TotalBetsView;
 import org.smokinmils.database.tables.TransactionTypesTable;
 import org.smokinmils.database.tables.TransactionsTable;
@@ -1102,8 +1104,7 @@ public final class DB {
      * 
      * @throws SQLException when a database error occurs
      */
-    public void competitionEnd()
-        throws SQLException {
+    public void competitionEnd() throws SQLException {
         String sql = "UPDATE " + CompetitionIDTable.NAME + " SET "
                 + CompetitionIDTable.COL_ID + " = ("
                 + CompetitionIDTable.COL_ID + " + 1), "
@@ -1804,7 +1805,32 @@ public final class DB {
         return runGetIntQuery(sql);
     }
     
+    /**
+     * Changes the minimum weekly points.
+     * 
+     * @param points the number of points
+     * @throws SQLException 
+     */
+    public void setMinPoints(final int points) throws SQLException {
+        String sql = "UPDATE " + MinPointsTable.NAME + " SET "
+                + MinPointsTable.COL_POINTS + " = " + Integer.toString(points);
 
+        runBasicQuery(sql);
+    }
+
+    /**
+     * Gets the minimum number of points.
+     * 
+     * @return the value
+     * 
+     * @throws SQLException when a database error occurs
+     */
+    public int getMinPoints() throws SQLException {
+        String sql = "SELECT " + MinPointsTable.COL_POINTS + " FROM "
+                   + MinPointsTable.NAME + " LIMIT 1";
+        return runGetIntQuery(sql);
+    }
+    
     /**
      * @return a map of all users and the points they earned.
      * 
@@ -1957,22 +1983,6 @@ public final class DB {
         }
         return referers;
     }
-
-    /**
-     * Gives a user an amount of referral fees.
-     * 
-     * @param fee The amount earnt
-     * @param user The user receiving the fees
-     * @param profile The profile type
-     * 
-     * @throws SQLException when a database error occurs
-     */
-    public void giveReferalFee(final double fee,
-                               final String user,
-                               final ProfileType profile)
-        throws SQLException {
-        adjustChips(user, fee, profile, GamesType.ADMIN, TransactionType.REFERRAL);
-    }
     
     /**
      * Gives a user an amount of referral fees.
@@ -1980,12 +1990,14 @@ public final class DB {
      * Does not check if the user exists, as they already should since we got this 
      * info from the database in the first place.
      * 
+     * @param fromuser The user the fee is from.
      * @param fees The amount earnt and by who
      * @param profile The profile type
      * 
      * @throws SQLException when a database error occurs
      */
-    public void giveReferalFees(final Map<String, Double> fees,
+    public void giveReferalFees(final String fromuser,
+                                final Map<String, Double> fees,
                                 final ProfileType profile) throws SQLException {
         Connection conn = null;
         PreparedStatement tstmt = null;
@@ -1995,16 +2007,17 @@ public final class DB {
                        + UsersTable.NAME + " uu" + " WHERE uu."
                        + UsersTable.COL_USERNAME + " LIKE ? LIMIT 1";
         
-        String tsql = "INSERT INTO " + TransactionsTable.NAME + "("
-                    + TransactionsTable.COL_TYPEID + ", "
-                    + TransactionsTable.COL_GAMEID + ", "
-                    + TransactionsTable.COL_USERID + ", "
-                    + TransactionsTable.COL_AMOUNT + ", "
-                    + TransactionsTable.COL_PROFILETYPE + ") VALUES(("
+        String tsql = "INSERT INTO " + RefsTransactionsTable.NAME + "("
+                    + RefsTransactionsTable.COL_TYPEID + ", "
+                    + RefsTransactionsTable.COL_GAMEID + ", "
+                    + RefsTransactionsTable.COL_USERID + ", "
+                    + RefsTransactionsTable.COL_AMOUNT + ", "
+                    + RefsTransactionsTable.COL_FROMUSERID + ", "
+                    + RefsTransactionsTable.COL_PROFILETYPE + ") VALUES(("
                     + getTzxTypeIDSQL(TransactionType.REFERRAL) + "), ("
                     + getGameIDSQL(GamesType.ADMIN) + "), ("
-                    + usersql + "), ?, "
-                    + "(" + getProfileIDSQL(profile) + "))";
+                    + usersql + "), ?, (" + usersql
+                    + "), (" + getProfileIDSQL(profile) + "))";
         
         String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
                       + UserProfilesTable.COL_USERID + ", "
@@ -2037,6 +2050,7 @@ public final class DB {
                     i = 0;
                     tstmt.setString(++i, user);
                     tstmt.setDouble(++i, amnt);
+                    tstmt.setString(++i, fromuser);
                     tstmt.executeUpdate();
                     
                     conn.commit();
@@ -2552,14 +2566,101 @@ public final class DB {
                 + HostGroupsTable.COL_NAME + " LIKE '" + group + "')";
         return out;
     }
-<<<<<<< HEAD
-
-    public Map<ProfileType, UserStats> checkStats(String user) {
-        // TODO Auto-generated method stub
-        return null;
-=======
     
-  
+    /** 
+     * Checks if a user has public stats or not.
+     * 
+     * @param user the user to get the stats for
+     * 
+     * @return true if the stats is public.
+     * @throws SQLException 
+     */
+    public boolean hasPublicStats(final String user) throws SQLException {
+        String sql = "SELECT " + UsersTable.COL_STATS + " FROM " + UsersTable.NAME
+                   + " WHERE " + UsersTable.COL_USERNAME + " LIKE '" + user + "'";
+        int col = runGetIntQuery(sql);
+        boolean res = true;
+        if (col == 0) {
+            res = false;
+        }
+           
+        return res;
+    }
+    
+    /** 
+     * Checks if a user has public stats or not.
+     * 
+     * @param user the user to get the stats for
+     * @param value the value to change it to.
+     * 
+     * @throws SQLException 
+     */
+    public void setPublicStats(final String user, final boolean value) throws SQLException {
+        int col = 0;
+        if (value) {
+            col = 1;
+        }
+        String sql = "UPDATE " + UsersTable.NAME
+                   + " SET " + UsersTable.COL_STATS + " = " + Integer.toString(col)
+                   + " WHERE " + UsersTable.COL_USERNAME + " LIKE '" + user + "'";
+        runBasicQuery(sql);
+    }
+    
+    
+    /** 
+     * Gets a users stats for each profile.
+     * 
+     * @param user the user to get the stats for
+     * 
+     * @return a map of profile and stats objects.
+     * 
+     * @throws SQLException 
+     */
+    public Map<ProfileType, UserStats> checkStats(final String user) throws SQLException {
+        Map<ProfileType, UserStats> res = new HashMap<ProfileType, UserStats>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + UserProfilesView.NAME + " WHERE "
+                + UserProfilesView.COL_USERNAME + " LIKE '" + user + "'";
+
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                UserStats userstat = new UserStats(rs.getDouble(UserProfilesView.COL_WINTOTAL),
+                                             rs.getInt(UserProfilesView.COL_WINCOUNT),
+                                             rs.getDouble(UserProfilesView.COL_CXLTOTAL),
+                                             rs.getInt(UserProfilesView.COL_CXLCOUNT),
+                                             rs.getDouble(UserProfilesView.COL_REFERTOTAL),
+                                             rs.getDouble(UserProfilesView.COL_BETTOTAL),
+                                             rs.getInt(UserProfilesView.COL_BETCOUNT));
+                
+                res.put(ProfileType.fromString(rs.getString(UserProfilesView.COL_PROFILE)),
+                        userstat);
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        return res;
+    }
+    
     /**
      * Gets the total profit, or loss for a game on a particular profile.
      * @param game  the game
@@ -2628,7 +2729,8 @@ public final class DB {
         ResultSet rs = null;
         String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
                 + TransactionsTable.NAME + " WHERE " + TransactionsTable.COL_GAMEID + "=(" 
-                + getGameIDSQL(GamesType.ADMIN) + ") AND " + TransactionsTable.COL_PROFILETYPE + "=("
+                + getGameIDSQL(GamesType.ADMIN) + ") AND " + TransactionsTable.COL_PROFILETYPE
+                + "=("
                 + getProfileIDSQL(prof) + ") AND " + TransactionsTable.COL_TYPEID + "=(" 
                 + getTzxTypeIDSQL(TransactionType.CREDIT) + ") AND "
                 + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
@@ -2679,7 +2781,8 @@ public final class DB {
         ResultSet rs = null;
         String sql = "SELECT sum(" + TransactionsTable.COL_AMOUNT + ") as total FROM " 
                 + TransactionsTable.NAME + " WHERE " + TransactionsTable.COL_GAMEID + "=(" 
-                + getGameIDSQL(GamesType.ADMIN) + ") AND " + TransactionsTable.COL_PROFILETYPE + "=("
+                + getGameIDSQL(GamesType.ADMIN) + ") AND " + TransactionsTable.COL_PROFILETYPE
+                + "=("
                 + getProfileIDSQL(prof) + ") AND " + TransactionsTable.COL_TYPEID + "=(" 
                 + getTzxTypeIDSQL(TransactionType.PAYOUT) + ") AND "
                 + TransactionsTable.COL_TIMESTAMP + " BETWEEN '" 
@@ -2814,6 +2917,5 @@ public final class DB {
         }
         // return the negation since that is from the houses pov
         return -res;
->>>>>>> branch 'master' of http://repo.smgamer.com/SMBots.git
     }
 }

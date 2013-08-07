@@ -932,9 +932,10 @@ public class BJGame extends Event {
          */
         @Override
         public final void run() {
-            
-            if (openGames.size() > 0) {
-               
+            // TODO: carl you got a ConcurrentModificationException, i couldnt see what it was
+            // from a quick look while testing but we need to figure it out. I fixed loads in 
+            // my timers in DD/OU
+            if (openGames.size() > 0) {               
                 for (BJBet bet : openGames) {
                    // if they are older than TIMEOUT auto stand them,
                     // else if they are older than WARNING message them

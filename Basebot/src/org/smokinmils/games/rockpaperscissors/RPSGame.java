@@ -453,18 +453,15 @@ public class RPSGame extends Event {
 
         if (order == -1) {
             // better won
-            doWin(
-                    better, bprof, bchoice, caller, cprof,
-                    cchoice, amount, winstr, bot, chan);
+            doWin(better, bprof, bchoice, caller, cprof,
+                  cchoice, amount, winstr, bot, chan);
         } else if (order == 1) {
             // caller won
-            doWin(
-                    caller, cprof, cchoice, better, bprof,
-                    bchoice, amount, winstr, bot, chan);
+            doWin(caller, cprof, cchoice, better, bprof,
+                  bchoice, amount, winstr, bot, chan);
         } else {
-            doDraw(
-                    better, bprof, caller, cprof, amount, bot,
-                    chan, cchoice);
+            doDraw(better, bprof, caller, cprof, amount, bot,
+                   chan, cchoice);
         }
     }
 

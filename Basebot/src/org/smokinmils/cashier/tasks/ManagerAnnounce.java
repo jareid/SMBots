@@ -8,6 +8,7 @@
  */
 package org.smokinmils.cashier.tasks;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class ManagerAnnounce extends TimerTask {
     /** The list of intervals for each message. */
     private final List<Integer> intervals;
 
+    /**The directory the messages are stored in. */
+    private static final String DIRNAME         = "settings";
+    
     /** The file name the messages are stored in. */
     private static final String FILENAME         = "messages.ini";
 
@@ -131,7 +135,9 @@ public class ManagerAnnounce extends TimerTask {
      */
     private void readData() {
         try {
-            Ini ini = new Ini(new FileReader(FILENAME));
+            File dir = new File(DIRNAME);
+            File file = new File(dir, FILENAME);
+            Ini ini = new Ini(new FileReader(file));
 
             for (String name : ini.keySet()) {
                 Section section = ini.get(name);

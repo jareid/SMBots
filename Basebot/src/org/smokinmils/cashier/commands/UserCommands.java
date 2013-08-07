@@ -74,6 +74,9 @@ public class UserCommands extends Event {
     /** The stats command. */
     public static final String STATCMD = "!stats";
     
+    /** The stats command. */
+    public static final String SHOWSTATCMD = "!showstats";
+    
     /** The position command length. */
     public static final int     POS_CMD_LEN     = 3;
 
@@ -94,13 +97,25 @@ public class UserCommands extends Event {
     /** The transfer message for the sender. */
     private static final String TRANSFERCHIPSSENDER = "%b%c12You have transferred %c04%amount%c12 "
                                                     + "coins from your %c04%profile%c12"
-                                                    + " account to %c04%who%c12";    
+                                                    + " account to %c04%who%c12";
+    /** The public stats message. */
+    private static final String PUBLIC_STATS   = "%b%c04%sender%c12: You have made your stats"
+    		                                   + " public";
+    
+    /** The public stats message. */
+    private static final String PRIVATE_STATS  = "%b%c04%sender%c12: You have made your stats"
+                                               + " private";
+    
     /** The no stats message. */
-    private static final String NOSTATS   = "%b%c04%sender%c12: %c04%user %c12 has disabled their"
+    private static final String NOSTATS   = "%b%c04%sender%c12: %c04%user%c12 has no stats to"
+                                          + " display.";
+    
+    /** The no stats message. */
+    private static final String HIDDENSTATS  = "%b%c04%sender%c12: %c04%user%c12 has disabled their"
                                           + " public stats.";
     
     /** The stats message. */
-    private static final String STATS = "%b%c04%user %profile %c12 stats: "
+    private static final String STATS = "%b%c04%user%c12's %c04%profile%c12 stats: "
                                       + "Total Bet(%c04%bet_total%c12) "
                                       + "Total Won(%c04%win_total%c12) "
                                       + "Referral Earnings(%c04%refer_total%c12)";
@@ -174,6 +189,8 @@ public class UserCommands extends Event {
                 checkChips(event);
             } else if (Utils.startsWith(message, STATCMD)) {
                 checkStats(event);
+            } else if (Utils.startsWith(message, SHOWSTATCMD)) {
+                showStats(event);
             } else if (Utils.startsWith(message, TRANCMD)) {
                 transferChips(event);
             } else if (Utils.startsWith(message, JPCMD)) {
@@ -271,7 +288,40 @@ public class UserCommands extends Event {
     }
     
     /**
-     * This method handles the chips command.
+     * This method handles the show stats command.
+     * 
+     * @param event the Message event
+     */
+    public final void showStats(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
+
+        if (isValidChannel(event.getChannel().getName())
+                && bot.userIsIdentified(senderu)
+                && Utils.startsWith(message, SHOWSTATCMD)) {
+            boolean canshow = false;
+            try {
+                canshow = DB.getInstance().hasPublicStats(sender);
+                DB.getInstance().setPublicStats(sender, !canshow);
+            } catch (Exception e) {
+                EventLog.log(e, "CheckChips", "message");
+            }
+            
+            String out = PRIVATE_STATS;
+            if (!canshow) {
+                out = PUBLIC_STATS;
+            }
+            
+            out = out.replaceAll("%sender", sender);
+            bot.sendIRCNotice(senderu, out);
+            
+        }
+    }
+    
+    /**
+     * This method handles the stats command.
      * 
      * @param event the Message event
      */
@@ -295,17 +345,26 @@ public class UserCommands extends Event {
                 }
                 
                 Map<ProfileType, UserStats> stats = null;
+                boolean canshow = true;
                 boolean rsrct = (user.equalsIgnoreCase("HOUSE") || user.equalsIgnoreCase("POINTS"));
-                if ((rsrct && bot.userIsHalfOp(senderu, event.getChannel().getName())) || !rsrct) {
+                if (!rsrct) {
                     try {
+                        if (user != sender) {
+                            canshow = DB.getInstance().hasPublicStats(user);
+                        }
                         stats = DB.getInstance().checkStats(user);
                     } catch (Exception e) {
                         EventLog.log(e, "CheckChips", "message");
                     }
                 }
+                
+                if (user.equalsIgnoreCase(sender)) {
+                    user = "You";
+                }
+                
                 String statstr = "";
-                if (stats.size() != 0) {
-                    if (stats.size() > 1) {
+                if (canshow) {
+                    if (stats.size() != 0) {
                         for (Entry<ProfileType, UserStats> cred : stats.entrySet()) {
                             statstr = STATS;
                             statstr = statstr.replaceAll("%user", user);
@@ -316,19 +375,26 @@ public class UserCommands extends Event {
                             statstr = statstr.replaceAll("%win_total",
                                     Utils.chipsToString(cred.getValue().getWintotal()));
                             statstr = statstr.replaceAll("%profile", cred.getKey().toString());
+                            statstr = statstr.replaceAll("%user", user);
+                            statstr = statstr.replaceAll("%sender", sender);
+
+                            bot.sendIRCNotice(senderu, statstr);
                         }
+                    } else {
+                        statstr = NOSTATS;
+                        
+                        statstr = statstr.replaceAll("%user", user);
+                        statstr = statstr.replaceAll("%sender", sender);
+
+                        bot.sendIRCNotice(senderu, statstr);
                     }
                 } else {
-                    statstr = NOSTATS;
-                }
+                    statstr = HIDDENSTATS;
+                    statstr = statstr.replaceAll("%user", user);
+                    statstr = statstr.replaceAll("%sender", sender);
 
-                if (user.equalsIgnoreCase(sender)) {
-                    user = "You";
+                    bot.sendIRCNotice(senderu, statstr);
                 }
-                statstr = statstr.replaceAll("%user", user);
-                statstr = statstr.replaceAll("%sender", sender);
-
-                bot.sendIRCNotice(event.getChannel(), statstr);
             } else {
                 bot.invalidArguments(senderu, CHKFMT);
             }
