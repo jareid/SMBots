@@ -53,7 +53,6 @@
 	</listener>
 	<listener type="usercommands">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
@@ -61,7 +60,6 @@
 	</listener>
 	<listener type="help">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
@@ -69,7 +67,6 @@
 	</listener>
 	<listener type="managersystem">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
@@ -80,7 +77,6 @@
 	</listener>
 	<listener type="coins">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
@@ -89,7 +85,6 @@
 	
 	<listener type="rps">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
