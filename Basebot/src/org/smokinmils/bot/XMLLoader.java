@@ -454,7 +454,34 @@ public final class XMLLoader {
             } catch (Exception e) {
                 EventLog.fatal(e, "XMLLoader", "initBaseBot");
             }
-           
+            initSpamEncorcer();
             return server;
+        }
+        
+        /**
+         * Initialises The spam enforcer.
+         */
+        private void initSpamEncorcer() {
+            try {
+                XPath xPath =  XPathFactory.newInstance().newXPath();
+                
+               String expression = "/bot/spam/*";
+                //read a nodelist using xpath
+                NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                            XPathConstants.NODESET);
+                
+                SpamEnforcer se = SpamEnforcer.getInstance();
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Element el = (Element) nodeList.item(i);
+                    String n = el.getNodeName();
+                    String content = el.getTextContent();
+                    if (n.equals("channel")) {
+                        se.add("#" + content);                
+                    } 
+                }
+            } catch (Exception e) {
+                EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
+            }
+
         }
     }
