@@ -558,9 +558,11 @@ public class UserCommands extends Event {
         User senderu = event.getUser();
         String sender = senderu.getNick();
         Channel chan = event.getChannel();
+        
 
         String[] msg = message.split(" ");
         if (msg.length == 2 || msg.length == POS_CMD_LEN) {
+            bot.bePatient(event.getUser());
             String who;
             if (msg.length == 2) {
                 who = sender;

@@ -70,7 +70,7 @@ public final class Rake {
     private static final String JP_AMOUNT       = "%c04%profile%c01 "
                                                         + "(%c04%amount%c01) ";
 
-    /** The jackpot announce string. */
+    /** The group failed announce string. */
     private static final String GROUP_FAIL   = "%b%c04%group%c12 has failed this week by "
                                              + "%c04%points%c12 less than the minimum of %c04%min.";
 

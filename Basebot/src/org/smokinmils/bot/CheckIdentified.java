@@ -73,16 +73,21 @@ public class CheckIdentified extends Event {
     /** Contains a separate thread to process identification checks. */
     private final CheckUserQueue checkThread;
     
+    /** Tells us whether to enable automatic checks or not. */
+    private final boolean isEnabled;
+    
     /**
      * Constructor.
      * 
      * @param bot The irc bot for this server's ident checks
+     * @param enabled If auto checks are on or not.
      * 
      * @see Event
      */
-    public CheckIdentified(final IrcBot bot) {
+    public CheckIdentified(final IrcBot bot, final boolean enabled) {
         super();
         checkThread = new CheckUserQueue(bot);
+        isEnabled = enabled;
     }
     
     @Override
@@ -321,17 +326,19 @@ public class CheckIdentified extends Event {
          * @see org.pircbotx.User
          */
         public void addUser(final User user) {
-            //Long time = UserMap.get(user);
-            //Long now = System.currentTimeMillis();
-            // Only check users if they are not awaiting a check
-            // Or they haven't been checked in the last three seconds
-            // && !(time != null && (time-now) < 3000)
-            List<String> restrict = new ArrayList<String>();
-            restrict.add("HOUSE");
-            restrict.add("POINTS");
-            if (!restrict.contains(user.getNick().toUpperCase()) && !users.contains(user)) {
-                users.addLast(user);
-                //userMap.put(user, now);
+            if (isEnabled) {
+                //Long time = UserMap.get(user);
+                //Long now = System.currentTimeMillis();
+                // Only check users if they are not awaiting a check
+                // Or they haven't been checked in the last three seconds
+                // && !(time != null && (time-now) < 3000)
+                List<String> restrict = new ArrayList<String>();
+                restrict.add("HOUSE");
+                restrict.add("POINTS");
+                if (!restrict.contains(user.getNick().toUpperCase()) && !users.contains(user)) {
+                    users.addLast(user);
+                    //userMap.put(user, now);
+                }
             }
         }
     }

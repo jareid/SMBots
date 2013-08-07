@@ -24,7 +24,7 @@ package org.smokinmils.settings;
  * @author Jamie Reid
  */
 public final class PokerStrs {
-	/** The letter than prefixes all command */
+	/** The letter than prefixes all command. */
 	public static final char 	CommandChar =		'!';
 	
 	/** 
@@ -207,7 +207,8 @@ public final class PokerStrs {
 	 * 
 	 * %count - The big blind the user searched for
 	 */
-	public static final String AllTablesMsg = "%b%c12There are currently %c04%count%c12 tables. They are:";
+	public static final String AllTablesMsg = "%b%c12There are currently %c04%count%c12 tables. "
+	                                        + "They are:";
 
 	/**
 	 * This string is used for the output of each individual table.
@@ -261,14 +262,14 @@ public final class PokerStrs {
 													+ "%b%c12Valid Big Blinds are: %c04%allowed";
 	
 	/**
-	 * This string is used when a user attempts to join a poker table with an incorrect ID
+	 * This string is used when a user attempts to join a poker table with an incorrect ID.
 	 * 
 	 * %id - The big blind the user searched for
 	 */
 	public static final String NoTableIDMsg = "%b%c12No poker table with ID %c04%id%c12 exists";
 	
 	/**
-	 * This string is used when a user attempts to join a table with:
+	 * This string is used when a user attempts to join a table with.
 	 * - less than the minimum buy in
 	 * - more than the maximum buy in
 	 * 
@@ -282,14 +283,14 @@ public final class PokerStrs {
 													+ "the table Big Blind (%c04%minbuy%c12 <= %c04%buyin%c12 <= %c04%maxbuy%c12)";
 	
 	/**
-	 * This string is used when a suer attempts to join a full table
+	 * This string is used when a suer attempts to join a full table.
 	 * 
 	 * %id - The table id
 	 */
 	public static final String TableFullMsg = "%b%c12Sorry you can not join table %c04%id%c12 as it is currently full";	
 	
 	/**
-	 * This string is used when a user doesn't have enough chips
+	 * This string is used when a user doesn't have enough chips.
 	 * 
 	 * %chips - The amount the user tried to spend
 	 */
@@ -297,30 +298,32 @@ public final class PokerStrs {
 	
 	/**
 	 * This string is used to specify the message sent when a user enters an invalid option
-	 * for the info command
+	 * for the info command.
 	 * 
 	 * %invalid - the invalid arguments supplied
 	 */
 	public static final String InvalidInfoArgs =  "%b%c04%invalid%c12 is invalid. Valid choices: "
-	  		  									+ "info chips tables promos start join watch profile profiles c r f rebuy leave sitdown sitout"; 
+	+ "info chips tables promos start join watch profile profiles c r f rebuy leave sitdown sitout";
 	
 	/**
-	 * This string is used to specify the message sent when a user attempts to watch a table they are already watching
+	 * This string is used to specify the message sent when a user attempts to watch
+	 * a table they are already watching.
 	 * 
 	 * %id - the table ID
 	 */
 	public static final String AlreadyWatchingMsg =  "%b%c12You are already watching table %c04%id";
 	
 	/**
-	 * This string is used to specify the message sent when a user attempts to join a table they are already playing at
+	 * This string is used to specify the message sent when a user attempts to join a table 
+	 * they are already playing at.
 	 * 
 	 * %id - the table ID
 	 */
-	public static final String AlreadyPlayingMsg =  "%b%c12You are already playing at table %c04%id";
+	public static final String AlreadyPlayingMsg = "%b%c12You are already playing at table %c04%id";
 	
 	/**
 	 * These settings set the amount of time between announcing the message and 
-	 * message we announce when we need players
+	 * message we announce when we need players.
 	 * 
 	 * Variables:
 	 * %needP - number of players required before play starts
@@ -332,7 +335,7 @@ public final class PokerStrs {
 	
 	/**
 	 * These setting set the amount of time between announcing the message and 
-	 * message we announce when we need players
+	 * message we announce when we need players.
 	 * 
 	 * Variables
 	 * %secs - Seconds until play begins
@@ -344,7 +347,7 @@ public final class PokerStrs {
 	
 	
 	/**
-	 * This setting is used for the message when a new hand commences
+	 * This setting is used for the message when a new hand commences.
 	 * 
 	 * %hiD - the id of the hand
 	 * %dealer - the name of the user in dealer position
@@ -354,7 +357,7 @@ public final class PokerStrs {
 	public static final String NewHandMessage = "%b%c12Hand ID#%c04%hID%c12 started (Dealer %c04%dealer%c12 | SB: %c04%sb%c12 | BB %c04%bb%c12)";
 	
 	/**
-	 * This setting is used for the message when a big blind is posted
+	 * This setting is used for the message when a big blind is posted.
 	 * 
 	 * %player - the name of the player
 	 * $bb - The name of the user in the bib blind position
@@ -362,7 +365,7 @@ public final class PokerStrs {
 	public static final String BigBlindPosted = "%b%c12Big blind (%c04%bb%c12) posted by %c04%player";
 	
 	/**
-	 * This setting is used for the message when a big blind is posted
+	 * This setting is used for the message when a big blind is posted.
 	 * 
 	 * %player - the name of the player
 	 * %sb - The name of the user in the bib blind position
@@ -370,7 +373,7 @@ public final class PokerStrs {
 	public static final String SmallBlindPosted = "%b%c12Small blind (%c04%sb%c12) posted by %c04%player";
 	
 	/**
-	 * This setting is used for the message when the player's hole cards have been dealt
+	 * This setting is used for the message when the player's hole cards have been dealt.
 	 * 
 	 * %id - the tableID
 	 * %hID - the hand ID
@@ -383,14 +386,14 @@ public final class PokerStrs {
 													+ "%b%c12[Table %c04%id%c12] (%c04#%hID%c12) %card1 %card2";
 	
 	/**
-	 * This setting is used for the message when the player's hole cards have been dealt
+	 * This setting is used for the message when the player's hole cards have been dealt.
 	 * 
 	 * %hID - the hand ID
 	 */
 	public static final String HoleCardsDealt = "%b%c12The hole cards for this hand (%c04#%hID%c12) have been dealt...";
 	
 	/**
-	 * This setting is used for the message when the player's hole cards have been dealt
+	 * This setting is used for the message when the player's hole cards have been dealt.
 	 * 
 	 * %hID - the hand ID
 	 * %round - the round name
@@ -402,7 +405,7 @@ public final class PokerStrs {
 											  + "%b(%c04#%hID%c12) %cards";
 	
 	/**
-	 * This setting is used for the message when the player's hole cards have been dealt
+	 * This setting is used for the message when the player's hole cards have been dealt.
 	 * 
 	 * %id - table ID
 	 * %hID - the hand ID
@@ -415,7 +418,7 @@ public final class PokerStrs {
 													+ "%b%c12[Table %c04%id%c12] (%c04#%hID%c12)%cards";
 	
 	/**
-	 * This setting is used for the message when a player acts out of turn
+	 * This setting is used for the message when a player acts out of turn.
 	 * 
 	 * %hID - the handID
 	 * %user - The user who tried to act
@@ -424,7 +427,7 @@ public final class PokerStrs {
 	public static final String InvalidActor = "%b%c12(%c04#%hID%c12) %c04%user%c12 acted out of turn, %c04%actor%c12 to act...";
 	
 	/**
-	 * This setting is used for the message when a player acts outside of a game
+	 * This setting is used for the message when a player acts outside of a game.
 	 * 
 	 * %hID - the handID
 	 * %user - The user who tried to act
@@ -432,7 +435,7 @@ public final class PokerStrs {
 	public static final String InvalidActTime = "%b%c04%user%c12 acted without a game/hand running...";
 	
 	/**
-	 * This setting is used for the message when a player acts out of turn
+	 * This setting is used for the message when a player acts out of turn.
 	 * 
 	 * %hID - the handID
 	 * %invalid - The invalid actions
@@ -441,7 +444,7 @@ public final class PokerStrs {
 	public static final String InvalidAction = "%b%c12(%c04#%hID%c12) %c04%invalid%c12 is not valid. Only %c04%valid";
 	
 	/**
-	 * This setting is used for the message when a player acts out of turn
+	 * This setting is used for the message when a player acts out of turn.
 	 * 
 	 * %hID - the handID
 	 * %valid - The valid actions
@@ -450,7 +453,7 @@ public final class PokerStrs {
 	public static final String GetAction = "%b%c12(%c04#%hID%c12) %c04%actor%c12 to act. Valid actions: %valid";
 	
 	/**
-	 * Table action
+	 * Table action.
 	 * 
 	 * %hID - the handID
 	 * %action - The action
@@ -461,7 +464,7 @@ public final class PokerStrs {
 	public static final String TableAction = "%b%c12(%c04#%hID%c12) %c04%actor %action %amount %c12(Pot: %c04%pot%c12) [%c04%actor%c12 has %c04%chips%c12 chips now]";
 	
 	/**
-	 * A message for when someone goes all in
+	 * A message for when someone goes all in.
 	 * 
 	 * %hID - the handID
 	 * %actor - The person who acted
@@ -469,7 +472,7 @@ public final class PokerStrs {
 	public static final String PlayerAllIn = "%b%c12(%c04#%hID%c12) %c04%actor%c12 is all in.";
 	
 	/**
-	 * A message for when someone is running out of time to act
+	 * A message for when someone is running out of time to act.
 	 * 
 	 * %hID - the handID
 	 * %actor - The person who failed to act
@@ -478,7 +481,7 @@ public final class PokerStrs {
 	public static final String NoActionWarning = "%b%c12(%c04#%hID%c12) %c04%actor%c12 has %c04%secs%c12 seconds to act.";
 	
 	/**
-	 * A message for when someone fails to act
+	 * A message for when someone fails to act.
 	 * 
 	 * %hID - the handID
 	 * %actor - The person who failed to act
@@ -486,7 +489,7 @@ public final class PokerStrs {
 	public static final String NoAction = "%b%c12(%c04#%hID%c12) No action received within the time. %c04%actor%c12 has folded";
 	
 	/**
-	 * Message when someone makes an invalid bet
+	 * Message when someone makes an invalid bet.
 	 * 
 	 * %hID - The hand ID
 	 * %pChips - Amount of chips the player has
@@ -496,7 +499,7 @@ public final class PokerStrs {
 	
 	
 	/**
-	 * Message when a new table is created
+	 * Message when a new table is created.
 	 * 
 	 * %tID - the table ID
 	 * %bb - The big blind
@@ -509,14 +512,14 @@ public final class PokerStrs {
 	public static final String NewTable = "%b%c12Table %c04%id%c12 has been created for the %c04%profile%c12 profile with %c04%Pmin%c12 to %c04%Pmax%c12 players with a BB of %c04%bb%c12 (SB: %c04%sb%c12) [Buy In: %c04%min%c12 to %c04%max%c12]";
 	
 	/**
-	 * Message when a table is closed
+	 * Message when a table is closed.
 	 * 
 	 * %tID - the table ID
 	 */
 	public static final String TableClosed = "%b%c12Table %c04%id%c12 has been shut down due to lack of players";
 	
 	/**
-	 * Message when someone joins a table
+	 * Message when someone joins a table.
 	 * 
 	 * %id - the table ID
 	 * %bb - The big blind
@@ -533,7 +536,7 @@ public final class PokerStrs {
 	public static final String NewPersonAtTable = "%b%c12[Table %c04%id%c12] SB: %c04%sb%c12 / BB: %c04%bb%c12 (Buy In: %c04%min%c12-%c04%max%c12) - Players: %c04%Pcur%c12 of %c04%Pmax%c12 (%c04%seats%c12 seats left)";
 
 	/**
-	 * Message when a player is joining
+	 * Message when a player is joining.
 	 * 
 	 * %id% - table id
 	 * %player - player who is sitting out
@@ -542,7 +545,7 @@ public final class PokerStrs {
 	public static final String PlayerJoins = "%b%c12[Table %c04%id%c12]: %c04%player%c12 has joined the table with %c04%chips%c12 chips.";
 	
 	/**
-	 * Message when a player is sitting out for parting/quiting/timing out
+	 * Message when a player is sitting out for parting/quiting/timing out.
 	 * 
 	 * %id% - table id
 	 * %player - player who is sitting out
@@ -551,21 +554,21 @@ public final class PokerStrs {
 	public static final String OutOfChips = "%b%c12[Table %c04%id%c12] %player is now sitting out as they have no chips left";
 
 	/**
-	 * Player can't sit out private message
+	 * Player can't sit out private message.
 	 * 
 	 * %id - table id
 	 */
 	public static final String SitOutFailed = "%b%c12[Table %c04%id%c12] You can not sit out, you are already sitting out";
 	
 	/**
-	 * Can't sit down, rebuy first message
+	 * Can't sit down, rebuy first message.
 	 * 
 	 * %id - table id
 	 */
 	public static final String SitDownFailed = "%b%c12[Table %c04%id%c12] You can not sit down, please rebuy first";
 	
 	/**
-	 * Rebuy successful message
+	 * Rebuy successful message.
 	 * 
 	 * %id - table id
 	 * %maxbuy - the maximum allowed buy in
@@ -574,7 +577,7 @@ public final class PokerStrs {
 	public static final String RebuyFailure = "%b%c12[Table %c04%id%c12] You can not rebuy more than %maxbuy. You have %total chips.";
 	
 	/**
-	 * Rebuy successful message
+	 * Rebuy successful message.
 	 * 
 	 * %id - table id
 	 * %user - The player
@@ -584,7 +587,7 @@ public final class PokerStrs {
 	public static final String RebuySuccess = "%b%c12[Table %c04%id%c12] %user has bought %new chips. They now have %total chips.";
 	
 	/**
-	 * Message when a player is rejoining
+	 * Message when a player is rejoining.
 	 * 
 	 * %id% - table id
 	 * %player - player who is sitting out
@@ -592,7 +595,7 @@ public final class PokerStrs {
 	public static final String PlayerSitsDown = "%b%c12[Table %c04%id%c12] %c04%player%c12 has sat down.";
 	
 	/**
-	 * Message when a player is leaving
+	 * Message when a player is leaving.
 	 * 
 	 * %id% - table id
 	 * %player - player who is sitting out
@@ -601,14 +604,14 @@ public final class PokerStrs {
 	public static final String PlayerLeaves = "%b%c12[Table %c04%id%c12] %c04%player%c12 has taken his chips (%c04%chips%c12) and left.";
 	
 	/**
-	 * Private message to user when they leave
+	 * Private message to user when they leave.
 	 * 
 	 * %id - table id
 	 */
 	public static final String PlayerLeavesPM = "%b%c12You have now left table %c04%id";
 	
 	/**
-	 * Private message when a player won a hand by means of everyone folding
+	 * Private message when a player won a hand by means of everyone folding.
 	 * 
 	 * %id - table id
 	 * %hID - hand id
@@ -616,11 +619,13 @@ public final class PokerStrs {
 	 * %amount - amount won
 	 * %total - player's new chip count
 	 */
-	public static final String PlayerWins = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Congratulations, %c04%who%c12 won %c04%amount%c12 (Chips: %c04%total%c12) [Rake: %c04%rake%c12]";
+	public static final String PlayerWins = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) "
+	         + "Congratulations, %c04%who%c12 won %c04%amount%c12 (Chips: %c04%total%c12) "
+	         + "[Rake: %c04%rake%c12]";
 	
 	
 	/**
-	 * This is used for formatting action's to string
+	 * This is used for formatting action's to string.
 	 * 
 	 * %action
 	 * %cmd
@@ -629,14 +634,15 @@ public final class PokerStrs {
 
 
 	/**
-	 * This is used for formatting the message when a player wins (part of) a pot
+	 * This is used for formatting the message when a player wins (part of) a pot.
 	 * 
 	 * %pot		- The pot name
 	 * %winner	- The winner's name
 	 * %amount	- The amount won
 	 * %hand	- The winning hand
 	 */
-	public static final String PotWinner = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) %c04%winner%c12 wins %c04%amount%c12 chips from %c04%pot%c12 with %c04%hand%c12";
+	public static final String PotWinner = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) "
+	        + "%c04%winner%c12 wins %c04%amount%c12 chips from %c04%pot%c12 with %c04%hand%c12";
 
 	/**
 	 * This is used for formatting the message for the amount of rake taken.
@@ -646,7 +652,7 @@ public final class PokerStrs {
 	public static final String RakeTaken = "%b%c12[Table %c04%id%c12] (#%c04%hID%c12) Rake: %c04%rake%c12";
 	
 	/**
-	 * This is used for formatting the message for a pot returned as there is only a single player
+	 * This is used for formatting the message for a pot returned as there is only a single player.
 	 * 
 	 * %winner	- The winner's name
 	 * %amount	- The amount returned
@@ -664,8 +670,8 @@ public final class PokerStrs {
 
 	public static final String JackpotWonTable = "%b%c12Congratulations to %c04%winners%c12 who won %c04%chips%c12 each from the %c04%profile%c12 Jackpot";
 	
-	public static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a poker hand! " +
-											"Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
+	public static final String JackpotWon = "%b%c12The %c04%profile%c12 jackpot of %c04%chips%c12 chips has been won in a poker hand! "
+										+ "Congratulations to the winner(s):%c04 %winners %c12who have shared the jackpot";
 	
 	public static final String JackpotAmount = "%c04%profile%c12(%c04%amount%c12) ";
 }

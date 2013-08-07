@@ -10,6 +10,7 @@ package org.smokinmils.cashier.commands;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -127,7 +128,13 @@ public class Referrals extends Event {
     private static final String GL_FRMT       = "%b%c12" + GL_CMD + " <group>";
 
     /** The command to check points. */
-    public static final String MYPOINTS_CMD   = "!mypoints";  
+    public static final String MYPOINTS_CMD   = "!mypoints";
+    
+    /** The command to check points. */
+    public static final String GRPPOINTS_CMD   = "!grppoints";
+    
+    /** The group list command format. */
+    private static final String GRPPOINTS_FRMT   = "%b%c12" + GRPPOINTS_CMD + " <group>";
     
     /** The command to give points. */
     public static final String  POINTS_CMD    = "!points";
@@ -253,6 +260,11 @@ public class Referrals extends Event {
     /** Message when the minimum points is set. */
     private static final String MINPOINTS    = "%b%c04%sender%c12: %c12The minimum points "
                                               + "has been set to %c04%points%c12 points";
+    
+    /** The group failed announce string. */
+    private static final String GROUP_FAILING = "%b%c04%sender%c12: %c04%group%c12 is failng this "
+                                              + "week by %c04%points%c12 less than the minimum of "
+                                              + "%c04%min.";
 
     /** The valid channels for rank only commands. */
     private final List<String> rankValidChans;
@@ -329,6 +341,8 @@ public class Referrals extends Event {
                         givePoints(event);
                     } else if (Utils.startsWith(message, MINPOINTS_CMD)) {
                         setMinPoints(event);
+                    } else if (Utils.startsWith(message, GRPPOINTS_CMD)) {
+                        checkGroupPoints(event);
                     }
                 }
             }
@@ -979,6 +993,61 @@ public class Referrals extends Event {
             }
         } else {
             bot.invalidArguments(event.getUser(), MINPOINTS_FRMT);
+        }
+    }
+    
+    /**
+     * Checks the number of points a group has.
+     * 
+     * @param event The message event.
+     * @throws SQLException When the database fails.
+     */
+    private void checkGroupPoints(final Message event) throws SQLException {
+        IrcBot bot = event.getBot();
+        Channel channel = event.getChannel();
+        String[] msg = event.getMessage().split(" ");
+        
+        if (msg.length == 2) {            
+            bot.bePatient(event.getUser());
+            
+            DB db = DB.getInstance();
+            String group = msg[1].toLowerCase();
+            if (!db.isRankGroup(group)) {
+                bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", group));
+            } else {
+                int minpoints = db.getMinPoints();
+                Map<String, Integer> grouppoints = new HashMap<String, Integer>();
+                Map<String, Integer> groupusers = new HashMap<String, Integer>();            
+                Map<String, Integer> allpoints = db.getPoints();
+                for (Entry<String, Integer> ent: allpoints.entrySet()) {
+                    // note how many points the group have.
+                    String grp = db.getRankGroup(ent.getKey()).toLowerCase();
+                    if (!grouppoints.containsKey(grp)) {
+                        grouppoints.put(grp, ent.getValue());
+                        groupusers.put(grp, 1);
+                    } else {
+                        grouppoints.put(grp, grouppoints.get(group) + ent.getValue());
+                        groupusers.put(grp, groupusers.get(group) + 1);
+                    }
+                }
+                
+                Integer users = groupusers.get(group);
+                Integer userpts = grouppoints.get(group);
+                if (users != null && userpts != null) {
+                    int min = users * minpoints;
+                    if (minpoints > userpts) {
+                        String out = GROUP_FAILING.replaceAll("%group", group);
+                        out = out.replaceAll("%min", Integer.toString(min));
+                        out = out.replaceAll("%points", userpts.toString());
+                        out = out.replaceAll("%sender", event.getUser().getNick());
+                        bot.sendIRCMessage(channel, out);
+                    }
+                } else {
+                    bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", group));
+                }
+            }
+        } else {
+            bot.invalidArguments(event.getUser(), GRPPOINTS_FRMT);
         }
     }
 }

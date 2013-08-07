@@ -12,7 +12,6 @@ import org.smokinmils.bot.events.Message;
  *
  */
 public final class SpamEnforcer {
-
     /** How long between bets can we do? */
     private static final long DELAY = 5 * Utils.MS_IN_SEC;
 
@@ -21,7 +20,7 @@ public final class SpamEnforcer {
     		                    + "For faster play join %chan";
     
     /** the list of Channel -> (User -> Time last used a command). */
-    private HashMap<String, HashMap<User, Long>> theList;
+    private final HashMap<String, HashMap<User, Long>> theList;
     
     /** Instance variable. */
     private static SpamEnforcer instance;

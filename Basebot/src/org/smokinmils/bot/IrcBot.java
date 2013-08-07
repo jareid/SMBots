@@ -44,6 +44,12 @@ public class IrcBot extends PircBotX {
 	public static final String NO_CHIPS_MSG = "%b%c12Sorry, you do not have "
 	       + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
 	
+	/**
+     * Tells a user to wait for the results.
+     */
+    public static final String BE_PATIENT = "%b%c12Please be patient, this command takes a few "
+    		                              + "seconds to complete.";
+	
 	/** List of users identified with NickServ. */
 	private final List<String> identifiedUsers;
 	
@@ -208,6 +214,16 @@ public class IrcBot extends PircBotX {
 		out = out.replaceAll("%profile", profile.toString());
 		sendIRCNotice(user, out);
 	}
+	
+	/**
+     * Outputs a notice to a user informing them to be patient.
+     * 
+     * @param user      The user
+     */
+    public final void bePatient(final User user) {
+        String out = BE_PATIENT.replaceAll("%sender", user.getNick());
+        sendIRCNotice(user, out);
+    }
 	
     /**
      * Sends a request to NickServ to check a user's status with the server

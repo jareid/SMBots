@@ -6,6 +6,7 @@
 	<port>6667</port>
 	<ip>127.0.0.1</ip>
 	<rake>SMGamer</rake>
+    <identon>true</identon>
 	
 	<db type="server">199.101.50.187</db>
 	<db type="port">3306</db>
@@ -14,7 +15,10 @@
 	<db type="dbpass">SM_bot_2013$</db>
 	
 	<listener type="referrals">
-		<channel>testeroo</channel>
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
+        <option type="managementchan">managers</option>
+        <option type="hostchan">SM_ranks</option>
 	</listener>
 	<listener type="roulette" id="1">
 		<channel>SMGamer</channel>
@@ -28,29 +32,22 @@
 		<channel>sm_express</channel>
 		<option type="time">1</option>
 	</listener>
-	<listener type="roulette" id="4">
-		<channel>sm_tournaments</channel>
-		<option type="time">2</option>
-	</listener>
 	<listener type="roulette" id="5">
 		<channel>sm_vip</channel>
 		<option type="time">3</option>
 	</listener>
 	<listener type="blackjack">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 	</listener>
 	<listener type="overunder">
 		<channel>sm_overunder</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 	</listener>
 	<listener type="diceduel">
 		<channel>SMGamer</channel>
-		<channel>sm_tournaments</channel>
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 	</listener>
@@ -99,8 +96,8 @@
 		<channel>sm_roulette</channel>
 		<option type="announce">SMGamer</option>
 	</listener>
-	<listener type="pokerDISABLED">
-		<channel>testeroo</channel>
+	<listener type="poker">
+		<channel>SMGamer</channel>
 	</listener>
 	
 	<timer type="trc">

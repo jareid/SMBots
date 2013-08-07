@@ -30,12 +30,12 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
-//import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.help.Help;
 
 import com.sun.jna.platform.win32.Kernel32;
+//import org.smokinmils.games.casino.poker.Client;
 
 /**
  * Starts the Cashier bot with the correct servers and channels
@@ -69,7 +69,7 @@ public class Bot {
         boolean refund = true;
         basebot.initialise(nick, "5w807", "smokinmils", debug, refund, true);
         String swift_irc = "SwiftIRC";
-        basebot.addServer(swift_irc, server, 6667, local);
+        basebot.addServer(swift_irc, server, 6667, local, true);
         IrcBot swift_bot = basebot.getBot(swift_irc);
 
         String[] all_swift_chans = { "#SMGamer", "#sm_tournaments",

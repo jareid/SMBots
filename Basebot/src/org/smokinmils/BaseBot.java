@@ -10,7 +10,6 @@ package org.smokinmils;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -141,31 +140,6 @@ public final class BaseBot {
         return lockObject;
     }
 
-   /**
-    * Creates a new connection to a server.
-    * 
-    * @param name	The name of the server to add
-    * @param addr	The address for the server
-    * 
-    * @throws UnknownHostException If we fail to get the localhost
-    */
-   public void addServer(final String name, final String addr) throws UnknownHostException {
-       addServer(name, addr, DEFAULT_PORT, InetAddress.getLocalHost());
-   }
-   
-   /**
-    * Creates a new connection to a server.
-    * 
-    * @param name   The name of the server to add
-    * @param addr   The address for the IRC server
-    * @param port   The port for the IRC server
-    * 
-    * @throws UnknownHostException If we fail to get the localhost
-    */
-   public void addServer(final String name, final String addr,
-                         final int port) throws UnknownHostException {
-       addServer(name, addr, port, InetAddress.getLocalHost());
-   }
    
    /**
     * Creates a new connection to a server.
@@ -173,9 +147,11 @@ public final class BaseBot {
     * @param name   The name of the server to add.
     * @param addr   The address for the server.
     * @param local  The local address the bot will use.
+    * @param autoident Turns the auto ident check on or off
     */
-   public void addServer(final String name, final String addr, final InetAddress local) {
-       addServer(name, addr, DEFAULT_PORT, local);
+   public void addServer(final String name, final String addr,
+                         final InetAddress local, final boolean autoident) {
+       addServer(name, addr, DEFAULT_PORT, local, autoident);
    }
    
    /**
@@ -185,9 +161,11 @@ public final class BaseBot {
     * @param addr	The address for the server.
     * @param port	The port for this server.
     * @param local  The local address the bot will use.
+    * @param autoident Turns the auto ident check on or off
     */
    public void addServer(final String name, final String addr,
-                         final int port, final InetAddress local) {
+                         final int port, final InetAddress local,
+                         final boolean autoident) {
        IrcBot newbot = null;
        
        ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();
@@ -213,7 +191,7 @@ public final class BaseBot {
        
 	   newbot = new IrcBot(configuration);
 	   
-       CheckIdentified cithread = new CheckIdentified(newbot);
+       CheckIdentified cithread = new CheckIdentified(newbot, autoident);
        lm.addListener(cithread);
        newbot.setIdentCheck(cithread);
        

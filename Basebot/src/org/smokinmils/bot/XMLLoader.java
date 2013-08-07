@@ -1,6 +1,7 @@
 package org.smokinmils.bot;
 
 import java.io.FileInputStream;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,6 +207,8 @@ public final class XMLLoader {
                     if (n.equals("listener")) {
                        HashMap<String, String> options = new HashMap<String, String>();
                        ArrayList<String> channels = new ArrayList<String>();
+                       ArrayList<String> hostchannels = new ArrayList<String>();
+                       ArrayList<String> mgrchannels = new ArrayList<String>();
                         //get child nodes of channel and options
                         if (el.hasChildNodes()) {
                             // if has id use that so we can distinguish between multiple listeners
@@ -230,7 +233,14 @@ public final class XMLLoader {
                                     String channel = "#" + subel.getTextContent();
                                     channels.add(channel);
                                 } else if (n2.equals("option")) {
-                                    options.put(subel.getAttribute("type"), subel.getTextContent());
+                                    if (subel.getAttribute("type").equals("managementchan")) {
+                                        mgrchannels.add("#" + subel.getTextContent());
+                                    } else if (subel.getAttribute("type").equals("hostchan")) {
+                                        hostchannels.add("#" + subel.getTextContent());
+                                    } else {
+                                        options.put(subel.getAttribute("type"),
+                                                    subel.getTextContent());
+                                    }
                                 }
                             }
                         }
@@ -278,8 +288,12 @@ public final class XMLLoader {
                             auction.addValidChan(chanarr);
                             basebot.addListener(server, auction);
                         } else if (type.equals("referrals")) {
-                            // TODO: this needs two separate channel lists...
-                            basebot.addListener(server, new Referrals(chanarr, chanarr), chanarr);
+                            String[] mgrchanarr = mgrchannels.toArray(
+                                                        new String[mgrchannels.size()]);
+                            String[] hcchanarr = hostchannels.toArray(
+                                                        new String[hostchannels.size()]);
+                            basebot.addListener(server,
+                                                new Referrals(mgrchanarr, hcchanarr), chanarr);
                         }                       
                     }
                 }
@@ -391,6 +405,9 @@ public final class XMLLoader {
             String botname = null;
             String pass = null;
             String server = null;
+            InetAddress ip = null;
+            boolean autoident = true;
+            
             int port = 0;
             
            
@@ -418,8 +435,9 @@ public final class XMLLoader {
                     } else if (n.equals("port")) {
                         port = Integer.parseInt(content);                
                     } else if (n.equals("ip")) {
-                        // FIXME What to do with the IP / host
-                        System.out.println("IP :: " + content);                
+                        ip = InetAddress.getByName(content);
+                    } else if (n.equals("identon")) {
+                        autoident = Boolean.parseBoolean(content);     
                     } else if (n.equals("rake")) {
                         // Set up jackpot chan
                         Rake.init("#" + content);
@@ -428,7 +446,7 @@ public final class XMLLoader {
                 if (nick != null && botname != null && pass != null 
                         && server != null && port != 0) {
                     basebot.initialise(nick, pass, botname, true, false, false);
-                    basebot.addServer(server, server, port);
+                    basebot.addServer(server, server, port, ip, autoident);
                 } else {
                     EventLog.fatal(null, "XMLLoader", "initBaseBot");
                     System.exit(-1);
