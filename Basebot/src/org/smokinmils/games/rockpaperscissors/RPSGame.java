@@ -30,6 +30,7 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
@@ -173,15 +174,16 @@ public class RPSGame extends Event {
         String message = event.getMessage();
         User sender = event.getUser();
         Channel chan = event.getChannel();
-        
+        SpamEnforcer se = SpamEnforcer.getInstance();
+
         if (isValidChannel(chan.getName())
-                && bot.userIsIdentified(sender)) {
+                && bot.userIsIdentified(sender)) { // TODO move to string^^
             if (Utils.startsWith(message, CXL_CMD)) {
-                cancel(event);
+                if (se.check(event, "#SM_Express")) { cancel(event); }
             } else if (Utils.startsWith(message, CALL_CMD)) {
-                call(event);
+                if (se.check(event, "#SM_Express")) { call(event); }
             } else if (Utils.startsWith(message, RPS_CMD)) {
-                newGame(event);
+                if (se.check(event, "#SM_Express")) { newGame(event); }
             }
         }
     }

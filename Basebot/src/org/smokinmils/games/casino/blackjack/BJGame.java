@@ -208,18 +208,18 @@ public class BJGame extends Event {
                 
         SpamEnforcer se = SpamEnforcer.getInstance();
         
-        if (isValidChannel(chan.getName()) && se.check(event, "#NOPE")
+        if (isValidChannel(chan.getName())
                 && bot.userIsIdentified(sender)) {
             if (Utils.startsWith(message, BJ_CMD)) {
-                newGame(event);
+                if (se.check(event, "#SM_Express")) { newGame(event); }
             } else if (Utils.startsWith(message, HIT_CMD)) {
-                hit(sender, bot, chan);
+                if (se.check(event, "#SM_Express")) { hit(sender, bot, chan); }
             } else if (Utils.startsWith(message, STAND_CMD)) {
-                stand(sender, bot, chan);
+                if (se.check(event, "#SM_Express")) { stand(sender, bot, chan); }
             } else if (Utils.startsWith(message, DOUBLE_CMD)) {
-                doubleDown(sender, bot, chan, msg);
+                if (se.check(event, "#SM_Express")) { doubleDown(sender, bot, chan, msg); }
             } else if (Utils.startsWith(message, INSURE_CMD)) {
-                insure(sender, bot, chan, msg);
+                if (se.check(event, "#SM_Express")) { insure(sender, bot, chan, msg); }
             }
         }
     }

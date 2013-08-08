@@ -68,26 +68,29 @@ public final class SpamEnforcer {
         String chan = event.getChannel().getName();
         User user = event.getUser();
         IrcBot bot = event.getBot();
-        
         boolean ret = true;
         // check if channel exists
         if (theList.containsKey(chan)) {
             HashMap<User, Long> thisChannel = theList.get(chan);
             if (thisChannel.containsKey(user)) {
-               if (System.currentTimeMillis() - thisChannel.get(user) >= DELAY) {
-                  //YAY
-                  thisChannel.put(user, System.currentTimeMillis());
-               } else {
-                   // NAY
+
+               if (System.currentTimeMillis() - thisChannel.get(user) < DELAY) {
+                // NAY
                    ret = false;
                    String out = MESSAGE.replaceAll("%chan", fastchan);
                    bot.sendIRCNotice(user, out);
+               } else {
+                // YAY
+                   thisChannel.put(user, System.currentTimeMillis());
+                   theList.put(chan, thisChannel);
                }
             } else {
                 //first time so YAY
                 thisChannel.put(user, System.currentTimeMillis());
+                theList.put(chan, thisChannel);
             }
         }
+        
         return ret;
     }
 }

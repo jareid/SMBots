@@ -13,6 +13,7 @@ import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
@@ -138,19 +139,20 @@ public class DiceDuel extends Event {
     public final void message(final Message event) {
         String message = event.getMessage();
         User sender = event.getUser();
+        SpamEnforcer se = SpamEnforcer.getInstance();
 
         synchronized (BaseBot.getLockObject()) {
             if (isValidChannel(event.getChannel().getName())
                     && event.getBot().userIsIdentified(sender)) {
                 try {
                     if (Utils.startsWith(message, CXL_CMD)) {
-                        cancel(event);
+                        if (se.check(event, "#SM_Express")) { cancel(event); }
                     } else if (Utils.startsWith(message, BET_CMD)) {
-                        dd(event);
+                        if (se.check(event, "#SM_Express")) { dd(event); }
                     } else if (Utils.startsWith(message, CALL_CMD)) {
-                        call(event);
+                        if (se.check(event, "#SM_Express")) { call(event); }
                     } else if (Utils.startsWith(message, HCALL_CMD)) {
-                        houseCall(event);
+                        if (se.check(event, "#SM_Express")) { houseCall(event); }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "DiceDuel", "message");
