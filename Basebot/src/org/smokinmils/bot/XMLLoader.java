@@ -69,6 +69,16 @@ public final class XMLLoader {
         /** private constructor. */
         private XMLLoader() { }
         
+        private String filename = "settings.xml";
+        
+        /**
+         * Sets a file name that will be loaded in loadBotSettings (Must be called before that).
+         * @param f the file name in string format
+         */
+        public void loadDocument(final String f) {
+            filename = f;
+        }
+        
         /**
          * Configures basebot based on XML data.
          * @throws UnknownHostException 
@@ -90,7 +100,7 @@ public final class XMLLoader {
             try {
                 builder = builderFactory.newDocumentBuilder();
 
-                xmlDocument = builder.parse(new FileInputStream("settings.xml"));
+                xmlDocument = builder.parse(new FileInputStream(filename));
 
                 serveraddr = initBaseBot();
 

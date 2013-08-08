@@ -561,6 +561,9 @@ public class UserCommands extends Event {
         
 
         String[] msg = message.split(" ");
+        
+        SpamEnforcer se = SpamEnforcer.getInstance();
+        
         if (msg.length == 2 || msg.length == POS_CMD_LEN) {
             bot.bePatient(event.getUser());
             String who;
@@ -578,61 +581,64 @@ public class UserCommands extends Event {
                 out = out.replaceAll("%profile", profile.toString());
                 bot.sendIRCMessage(chan, out);
             } else {
-                BetterInfo better = null;
-                try {
-                    better = DB.getInstance().competitionPosition(profile, who);
-                } catch (Exception e) {
-                    EventLog.log(e, "CompPosition", "message");
-                }
-
-                String out = "";
-                if (better.getPosition() == -1) {
-                    out = NOTRANKED.replaceAll("%profile",
-                            profile.toString());
-                } else {
-                    out = POSITION.replaceAll("%profile",
-                            profile.toString());
-                    out = out.replaceAll("%position",
-                            Integer.toString(better.getPosition()));
-                    out = out.replaceAll("%coins",
-                            Long.toString(better.getAmount()));
-                }
-
-                out = out.replaceAll("%sender", sender);
-                out = out.replaceAll("%who", who);
-
-                bot.sendIRCMessage(chan, out);
-
-                DB db = DB.getInstance();
-                for (ProfileType prof : ProfileType.values()) {
-                    if (profile.hasComps()) {
-                        try {
-                            BetterInfo highbet = db.getHighestBet(prof, who);
-                            BetterInfo topbet = db.getTopBetter(prof, who);
-
-                            if (highbet.getUser() == null || topbet.getUser() == null) {
-                                out = LAST30DAYS_NODATA;
-                                out = out.replaceAll("%who", who);
-                            } else {
-                                out = LAST30DAYS.replaceAll("%hb_game",
-                                        highbet.getGame().toString());
-                                out = out.replaceAll("%hb_coins",
-                                        Long.toString(highbet.getAmount()));
-                                out = out.replaceAll("%hbt_coins",
-                                        Long.toString(topbet.getAmount()));
-                                out = out.replaceAll("%who", highbet.getUser());
+                if (se.checkPosition(event)) {
+                    BetterInfo better = null;
+                    try {
+                        better = DB.getInstance().competitionPosition(profile, who);
+                    } catch (Exception e) {
+                        EventLog.log(e, "CompPosition", "message");
+                    }
+    
+                    String out = "";
+                    if (better.getPosition() == -1) {
+                        out = NOTRANKED.replaceAll("%profile",
+                                profile.toString());
+                    } else {
+                        out = POSITION.replaceAll("%profile",
+                                profile.toString());
+                        out = out.replaceAll("%position",
+                                Integer.toString(better.getPosition()));
+                        out = out.replaceAll("%coins",
+                                Long.toString(better.getAmount()));
+                    }
+    
+                    out = out.replaceAll("%sender", sender);
+                    out = out.replaceAll("%who", who);
+    
+                    bot.sendIRCMessage(chan, out);
+    
+                    DB db = DB.getInstance();
+                    for (ProfileType prof : ProfileType.values()) {
+                        if (profile.hasComps()) {
+                            try {
+                                BetterInfo highbet = db.getHighestBet(prof, who);
+                                BetterInfo topbet = db.getTopBetter(prof, who);
+    
+                                if (highbet.getUser() == null || topbet.getUser() == null) {
+                                    out = LAST30DAYS_NODATA;
+                                    out = out.replaceAll("%who", who);
+                                } else {
+                                    out = LAST30DAYS.replaceAll("%hb_game",
+                                            highbet.getGame().toString());
+                                    out = out.replaceAll("%hb_coins",
+                                            Long.toString(highbet.getAmount()));
+                                    out = out.replaceAll("%hbt_coins",
+                                            Long.toString(topbet.getAmount()));
+                                    out = out.replaceAll("%who", highbet.getUser());
+                                }
+                                out = out.replaceAll("%profile",  prof.toString());
+    
+                                bot.sendIRCNotice(senderu, out);
+                            } catch (Exception e) {
+                                EventLog.log(e, "BetDetails", "run");
                             }
-                            out = out.replaceAll("%profile",  prof.toString());
-
-                            bot.sendIRCNotice(senderu, out);
-                        } catch (Exception e) {
-                            EventLog.log(e, "BetDetails", "run");
                         }
                     }
-                }
+                }  
             }
         } else {
             bot.invalidArguments(senderu, POSFMT);
         }
     }
 }
+

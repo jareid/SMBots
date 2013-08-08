@@ -118,7 +118,7 @@ public final class SpamEnforcer {
         Long now = System.currentTimeMillis();
         if (positionMap.containsKey(user)) {
            
-           if (now - positionMap.get(user) < DELAY) {
+           if (now - positionMap.get(user) < POSITION_DELAY) {
             // NAY
                ret = false;
                bot.sendIRCNotice(user, POSITION_MESSAGE);

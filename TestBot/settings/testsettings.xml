@@ -6,12 +6,6 @@
 	<port>6667</port>
 	<ip>127.0.0.1</ip>
 	<rake>#testeroo2</rake>
-    <identon>true</identon>
-    
-    <!--  limits commands to be run every delay seconds -->
-    <spam>
-    	<channel delay="5">testeroo</channel>
-    </spam>
 	
 	<db type="server">199.101.50.187</db>
 	<db type="port">3306</db>
@@ -23,9 +17,7 @@
 		<channel>testeroo2</channel>
 	</listener>
 	<listener type="referrals">
-        <channel>testeroo2</channel>
-        <option type="managementchan">testeroo2</option>
-        <option type="hostchan">testeroo2</option>
+		<channel>testeroo2</channel>
 	</listener>
 	<listener type="roulette" id="1">
 		<channel>testeroo2</channel>
@@ -40,12 +32,15 @@
 	</listener>
 	<listener type="overunder">
 		<channel>testeroo2</channel>
+		<channel>testeroo2too</channel>
 	</listener>
 	<listener type="diceduel">
 		<channel>testeroo2</channel>
+		<channel>testeroo2too</channel>
 	</listener>
 	<listener type="usercommands">
 		<channel>testeroo2</channel>
+		<channel>testeroo2too</channel>
 	</listener>
 	<listener type="help">
 		<channel>testeroo2</channel>
