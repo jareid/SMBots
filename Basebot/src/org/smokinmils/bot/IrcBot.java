@@ -423,7 +423,15 @@ public class IrcBot extends PircBotX {
 	public final void addValidChannel(final String channel) {
 		validChannels.add(channel.toLowerCase());
 	}
-
+	
+	/**
+     * 
+     * @param channel The channel to remove as a valid channel for this server.
+     */
+    public final void delValidChannel(final String channel) {
+        validChannels.remove(channel.toLowerCase());
+    }
+	
 	/** 
 	 * Provides the list of channels for this IRC server.
 	 * 

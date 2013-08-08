@@ -20,7 +20,17 @@ public final class SpamEnforcer {
     		                    + "For faster play join %chan";
     
     /** the list of Channel -> (User -> Time last used a command). */
-    private final HashMap<String, HashMap<User, Long>> theList;
+    private final HashMap<String, HashMap<User, Long>> spamMap;
+    
+    /** how long between position commands. */
+    private static final long POSITION_DELAY = 30 * Utils.MS_IN_MIN;
+    
+    /** Message informing of them about the limits on !position. */
+    private static final String POSITION_MESSAGE = "You can only use the !position command every "
+            + "30 minutes";
+    
+    /** the map of user->time for profile restricting. */
+    private final HashMap<User, Long> positionMap;
     
     /** Instance variable. */
     private static SpamEnforcer instance;
@@ -47,7 +57,8 @@ public final class SpamEnforcer {
      */
     private SpamEnforcer() {
        //HAX TODO XMLerize this?
-        theList = new HashMap<String, HashMap<User, Long>>();
+        spamMap = new HashMap<String, HashMap<User, Long>>();
+        positionMap = new HashMap<User, Long>();
     }
     
     /**
@@ -55,8 +66,9 @@ public final class SpamEnforcer {
      * @param chan the channel to add to ENFORCEMENT!
      */
     public void add(final String chan) {
-        theList.put(chan, new HashMap<User, Long>());
+        spamMap.put(chan, new HashMap<User, Long>());
     }
+    
     /**
      * Checks if a user can issue a command or not.
      * @param event the ircevent to derive chan user etc from
@@ -70,8 +82,8 @@ public final class SpamEnforcer {
         IrcBot bot = event.getBot();
         boolean ret = true;
         // check if channel exists
-        if (theList.containsKey(chan)) {
-            HashMap<User, Long> thisChannel = theList.get(chan);
+        if (spamMap.containsKey(chan)) {
+            HashMap<User, Long> thisChannel = spamMap.get(chan);
             if (thisChannel.containsKey(user)) {
 
                if (System.currentTimeMillis() - thisChannel.get(user) < DELAY) {
@@ -82,14 +94,43 @@ public final class SpamEnforcer {
                } else {
                 // YAY
                    thisChannel.put(user, System.currentTimeMillis());
-                   theList.put(chan, thisChannel);
+                   spamMap.put(chan, thisChannel);
                }
             } else {
                 //first time so YAY
                 thisChannel.put(user, System.currentTimeMillis());
-                theList.put(chan, thisChannel);
+                spamMap.put(chan, thisChannel);
             }
         }
+        
+        return ret;
+    }
+    
+    /**
+     * Checks if a user can issue the position.
+     * @param event the irc event to derive channel user etc from
+     * @return yay if they can issue position, or nay otherwise
+     */
+    public boolean checkPosition(final Message event) {
+        User user = event.getUser();
+        IrcBot bot = event.getBot();
+        boolean ret = true;
+        Long now = System.currentTimeMillis();
+        if (positionMap.containsKey(user)) {
+           
+           if (now - positionMap.get(user) < DELAY) {
+            // NAY
+               ret = false;
+               bot.sendIRCNotice(user, POSITION_MESSAGE);
+           } else {
+            // YAY
+               positionMap.put(user, now);
+           }
+        } else {
+            //first time so... YAY
+            positionMap.put(user, now);
+        }
+        
         
         return ret;
     }
