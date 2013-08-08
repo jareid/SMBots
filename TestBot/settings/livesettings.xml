@@ -1,0 +1,127 @@
+<bot>
+	<nick>SM_BOT</nick>
+	<name>smokinmils</name>
+	<ircpw>5w807</ircpw>
+	<server>irc.SwiftIRC.net</server>
+	<port>6667</port>
+	<ip>127.0.0.1</ip>
+	<rake>SMGamer</rake>
+    <identon>true</identon>
+	
+	<db type="server">199.101.50.187</db>
+	<db type="port">3306</db>
+	<db type="dbname">live</db>
+	<db type="dbuser">smbot</db>
+	<db type="dbpass">SM_bot_2013$</db>
+	
+	<listener type="referrals">
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
+        <option type="managementchan">managers</option>
+        <option type="hostchan">SM_ranks</option>
+	</listener>
+	<listener type="roulette" id="1">
+		<channel>SMGamer</channel>
+		<option type="time">10</option>
+	</listener>
+	<listener type="roulette" id="2">
+		<channel>sm_roulette</channel>
+		<option type="time">1</option>
+	</listener>
+	<listener type="roulette" id="3">
+		<channel>sm_express</channel>
+		<option type="time">1</option>
+	</listener>
+	<listener type="roulette" id="5">
+		<channel>sm_vip</channel>
+		<option type="time">3</option>
+	</listener>
+	<listener type="blackjack">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+	</listener>
+	<listener type="overunder">
+		<channel>sm_overunder</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+	</listener>
+	<listener type="diceduel">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+	</listener>
+    <listener type="dm">
+        <channel>SMGamer</channel>
+        <channel>sm_vip</channel>
+    </listener>
+	<listener type="usercommands">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+		<channel>sm_overunder</channel>
+		<channel>sm_roulette</channel>
+	</listener>
+	<listener type="help">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+		<channel>sm_overunder</channel>
+		<channel>sm_roulette</channel>
+	</listener>
+	<listener type="managersystem">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+		<channel>sm_overunder</channel>
+		<channel>sm_roulette</channel>
+		<option type="managementchan">managers</option>
+		<option type="activechan">SMGamer</option>
+		<option type="hostchan">SM_ranks</option>
+	</listener>
+	<listener type="coins">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+		<channel>sm_overunder</channel>
+		<channel>sm_roulette</channel>
+	</listener>
+	
+	<listener type="rps">
+		<channel>SMGamer</channel>
+		<channel>sm_vip</channel>
+		<channel>sm_express</channel>
+		<channel>sm_overunder</channel>
+		<channel>sm_roulette</channel>
+		<option type="announce">SMGamer</option>
+	</listener>
+	<listener type="poker">
+		<channel>SMGamer</channel>
+	</listener>
+	
+	<timer type="trc">
+		<channel>SMGamer</channel>
+		<option type="profile">EOC</option>
+		<option type="prize">2</option>
+		<option type="mins">5</option>
+		<option type="rounds">-1</option>			
+	</timer>
+	<timer type="managerannounce">
+		<channel>SMGamer</channel>
+	</timer>
+	<timer type="bettimer">
+		<channel>SMGamer</channel>
+		<option type="delay">5</option>
+		<option type="period">60</option>
+	</timer>
+	<timer type="comptimer">
+		<channel>SMGamer</channel>
+		<option type="delay">1</option>
+		<option type="period">1</option>
+	</timer>
+	<timer type="jackpottimer">
+		<channel>SMGamer</channel>
+		<option type="delay">2</option>
+		<option type="period">60</option>
+	</timer>
+</bot>

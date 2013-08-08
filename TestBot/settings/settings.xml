@@ -1,0 +1,108 @@
+<bot>
+	<nick>TESTSM_BOT</nick>
+	<name>smokinmils</name>
+	<ircpw>5w807</ircpw>
+	<server>irc.SwiftIRC.net</server>
+	<port>6667</port>
+	<ip>127.0.0.1</ip>
+	<rake>testeroo2</rake>
+    <identon>true</identon>
+    
+    <!--  limits commands to be run every 5 seconds -->
+    <spam>
+    	<channel">testeroo</channel>
+    </spam>
+	
+	<db type="server">199.101.50.187</db>
+	<db type="port">3306</db>
+	<db type="dbname">test</db>
+	<db type="dbuser">smbot</db>
+	<db type="dbpass">SM_bot_2013$</db>
+	
+	<listener type="invite">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="referrals">
+        <channel>testeroo2</channel>
+        <option type="managementchan">testeroo2</option>
+        <option type="hostchan">testeroo2</option>
+	</listener>
+	<listener type="roulette" id="1">
+		<channel>testeroo2</channel>
+		<option type="time">1</option>
+	</listener>
+	<listener type="roulette" id="2">
+		<channel>testeroo2too</channel>
+		<option type="time">2</option>
+	</listener>
+	<listener type="blackjack">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="overunder">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="diceduel">
+		<channel>testeroo2</channel>
+	</listener>
+    <listener type="dm">
+        <channel>testeroo2</channel>
+        <channel>testeroo2too</channel>
+    </listener>
+	<listener type="usercommands">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="help">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="managersystem">
+		<channel>testeroo2</channel>
+		<option type="managementchan">testeroo2</option>
+		<option type="activechan">testeroo2</option>
+		<option type="hostchan">testeroo2</option>
+	</listener>
+	<listener type="coins">
+		<channel>testeroo2</channel>
+		<channel>testeroo2too</channel>
+	</listener>
+	<listener type="createtimedroll">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="rps">
+		<channel>testeroo2</channel>
+		<option type="announce">testeroo2</option>
+	</listener>
+	<listener type="pokerDISABLED">
+		<channel>testeroo2</channel>
+	</listener>
+	<listener type="auctions">
+		<channel>testeroo2</channel>
+	</listener>
+	
+	<timer type="trc">
+		<channel>testeroo2</channel>
+		<option type="profile">EOC</option>
+		<option type="prize">2</option>
+		<option type="mins">5</option>
+		<option type="rounds">-1</option>			
+	</timer>
+	<timer type="managerannounce">
+		<channel>testeroo2</channel>
+	</timer>
+	<timer type="bettimer">
+		<channel>testeroo2</channel>
+		<option type="delay">5</option>
+		<option type="period">60</option>
+	</timer>
+	<timer type="comptimer">
+		<channel>testeroo2</channel>
+		<option type="delay">1</option>
+		<option type="period">1</option>
+	</timer>
+	<timer type="jackpottimer">
+		<channel>testeroo2</channel>
+		<option type="delay">2</option>
+		<option type="period">60</option>
+	</timer>
+</bot>
+	
+	
