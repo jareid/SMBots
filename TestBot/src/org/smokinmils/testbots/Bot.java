@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.Writer;
 
 import org.smokinmils.bot.XMLLoader;
-import org.smokinmils.logging.EventLog;
 
 import com.sun.jna.platform.win32.Kernel32;
 
@@ -27,10 +26,10 @@ public class Bot {
         //InetAddress local = InetAddress.getByName("bot.smgamer.com");
         
         // Store the process PID. note only windows.
-        //int pid = Kernel32.INSTANCE.GetCurrentProcessId();
-        //Writer wr = new FileWriter("nick.pid");
-        //wr.write(Integer.toString(pid));
-        //wr.close();
+        int pid = Kernel32.INSTANCE.GetCurrentProcessId();
+        Writer wr = new FileWriter("nick.pid");
+        wr.write(Integer.toString(pid));
+        wr.close();
     	XMLLoader xl = XMLLoader.getInstance();
     	if (args.length == 1) {
     		xl.loadDocument(args[0]);

@@ -16,7 +16,6 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
-import org.smokinmils.logging.EventLog;
 
 /**
  * Allows managers to invite the bot into a channel with a certain game.
@@ -31,7 +30,7 @@ public class Invite extends Event {
     /** The command to uninvite. */
     private static final String UNINVITE_CMD = "!uninvite";
     
-    /** The length of the uninvite command */
+    /** The length of the uninvite command. */
     private static final int UNINVITE_LEN = 2;
     
     /** The format of the uninvite command. */
@@ -70,7 +69,7 @@ public class Invite extends Event {
      * actually leave a channel.
      * Map of Channel -> Arraylist of events
      */
-    private HashMap<String, ArrayList<Event>> tempListeners;
+    private final HashMap<String, ArrayList<Event>> tempListeners;
     
     
     /**
@@ -88,7 +87,6 @@ public class Invite extends Event {
         String message = event.getMessage();
         User sender = event.getUser();
         Channel chan = event.getChannel();
-        String[] msg = message.split(" ");
         
         if (isValidChannel(chan.getName())
                 && bot.userIsIdentified(sender)
