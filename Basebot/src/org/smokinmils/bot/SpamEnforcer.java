@@ -83,7 +83,6 @@ public final class SpamEnforcer {
                 // YAY
                    thisChannel.put(user, System.currentTimeMillis());
                    theList.put(chan, thisChannel);
-
                }
             } else {
                 //first time so YAY
