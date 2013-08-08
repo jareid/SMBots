@@ -40,27 +40,23 @@ public class Duel extends Event {
     public static final String  DM_CMD        = "!dm";
     
     /** The cancel command. */
-    private static final String  CXL_CMD         = "!ddcancel";
+    private static final String  CXL_CMD         = "!dmcancel";
     
     /** The call command. */
-    private static final String  CALL_CMD        = "!call";
+    private static final String  CALL_CMD        = "!dmcall";
     
     /** The train command. */
     public static final String  TRAIN_CMD       = "!train";
-
-
     
     /** The invalid bet message. */
-    private static final String  INVALID_BET     = "%b%c12\"%c04!dd <amount> "
+    private static final String  INVALID_BET     = "%b%c12\"%c04" + DM_CMD +  " <amount> "
                                                  + "%c12\". Error, Invalid Bet";
     
     /** The invalid bet size message. */
-    private static final String  INVALID_BETSIZE = "%b%c12You have to bet more"
-                                                 + "than %c040%c12!";
+    private static final String  INVALID_BETSIZE = "%b%c12You have to bet more than %c040%c12!";
     
     /** The bet cancelled message. */
-    private static final String  BET_CANCELLED   = "%b%c04%username%c12: "
-                                                 + "Cancelled your open wager";
+    private static final String  BET_CANCELLED   = "%b%c04%username%c12: Cancelled your open wager";
     
     /** The message when you already have a bet open. */
     private static final String  OPEN_WAGER      = "%b%c04%username%c12: "
@@ -80,8 +76,8 @@ public class Duel extends Event {
     
     /** New bet made message.*/
     private static final String  NEW_WAGER       = "%b%c04%username%c12 has "
-           + "opened a new dice duel wager of %c04%amount %proftype%c12 coins! "
-           + "To call this wager type %c04!call %username";
+           + "opened a new Death Match for %c04%amount %proftype%c12 coins! "
+           + "To call this wager type %c04!dmcall %username";
     
     /** Play vs real message. */
     private static final String  PLAY_VS         = "%b%c04%username%c12: you "
@@ -92,14 +88,14 @@ public class Duel extends Event {
                             + "need to use real coins to call a real coins dd!";
     
     /** Attack message. */
-    private static final String  HIT            = "%b%c04%attacker%c12 attacked %c04%defender%c12"
+    private static final String  HIT            = "%b%c04%attacker%c12 attacked %c04%defender%c12 "
                  + "and dealt a total of %c04%atkpoints%c12 damage but %c04%dfndpoints%c12 of that "
                  + "was deflected. %c04%defender%c12 now has %c04%health%c12";
     
     /** Attack message. */
-    private static final String  WIN            = "%b%c04%winner%c12 annihilated %c04%defender%c12"
-                                                + " and still has %c04%health%c12 health left."
-                                                + " wins the %c04%amount%c12 chip pot!";
+    private static final String  WIN        = "%b%c04%winner%c12 annihilated %c04%loser%c12"
+                                            + " and still has %c04%health%c12 health left."
+                                            + " %c04%winner%c12 wins the %c04%amount%c12 chip pot!";
     
     /** Open wages list message. */
     private static final String  OPEN_WAGERS     = "%b%c12Current open wagers: "
@@ -112,10 +108,10 @@ public class Duel extends Event {
     private static final int     ANNOUNCEDELAY   = 3;
 
     /** Random number. */
-    private static final int    ATTACK = 50;
+    private static final int    ATTACK = 20;
     
     /** Random number. */
-    private static final int    DEFENSE = 50;
+    private static final int    DEFENSE = 20;
     
     /** Health number. */
     private static final int    HEALTH = 100;
@@ -218,7 +214,7 @@ public class Duel extends Event {
                     bot.maxBet(user, channel, Variables.MAXBET);
                 } else if (betsize > 0.0) { // add bet, remove chips,notify channel
                     ProfileType profile = db.getActiveProfile(username);
-                    Bet bet = new Bet(user, profile, GamesType.DICE_DUEL, betsize, "");
+                    Bet bet = new Bet(user, profile, GamesType.DM, betsize, "");
                     openBets.add(bet);
 
                     String out = NEW_WAGER.replaceAll("%username", username);
@@ -291,7 +287,7 @@ public class Duel extends Event {
                         int h1 = HEALTH;
                         int h2 = HEALTH;
                         while (h1 > 0 && h2 > 0) {
-                            int attack = Random.nextInt(ATTACK) + 1;
+                            int attack = Random.nextInt(ATTACK) + 1 + ATTACK;
                             int defense = Random.nextInt(DEFENSE) + 1;
                             int total = attack - defense;
 
@@ -318,9 +314,16 @@ public class Duel extends Event {
                             out = out.replaceAll("%atkpoints", Integer.toString(attack));
                             out = out.replaceAll("%dfndpoints", Integer.toString(defense));
                             out = out.replaceAll("%health", Integer.toString(dfndh));
-                            bot.sendIRCMessage(channel, out);
+                            bot.sendIRCNotice(user, out);
+                            bot.sendIRCNotice(bet.getUser(), out);
                             
                             active = (active + 1) % 2;
+                            
+                            try {
+                                Thread.sleep(250);
+                            } catch (InterruptedException e) {
+                                EventLog.log(e, "Duel", "call");
+                            }
                         }
 
                         // Calculate rake.
@@ -346,7 +349,7 @@ public class Duel extends Event {
                         if (Rake.checkJackpot(bet.getAmount())) {
                             ArrayList<String> players = new ArrayList<String>();
                             players.add(caller);
-                            Rake.jackpotWon(cprof, GamesType.DICE_DUEL, players, bot, null);
+                            Rake.jackpotWon(cprof, GamesType.DM, players, bot, null);
                         }
 
                         String out = WIN.replaceAll("%winner", winner);

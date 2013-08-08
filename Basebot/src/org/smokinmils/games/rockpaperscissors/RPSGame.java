@@ -239,6 +239,10 @@ public class RPSGame extends Event {
             // check to see if someone is playing themselves...
             if (better.equalsIgnoreCase(caller.getNick())) {
                bot.sendIRCMessage(chan, SELFBET.replaceAll("%who", caller.getNick()));
+            } else if (pendingBets.contains(better)) {
+                // the bet has already been called.
+                String out = NOBET.replaceAll("%who", caller.getNick());
+                bot.sendIRCMessage(chan, out);
             } else {
                 DB db = DB.getInstance();
                 ProfileType callerprof = null;
@@ -271,6 +275,7 @@ public class RPSGame extends Event {
                                 bot.sendIRCMessage(chan, out);
                             } else {
                                 playbet = true;
+                                pendingBets.add(found.getUser().getNick());
                                 found.call(caller.getNick(), callerprof);
                             }
                         } catch (Exception e) {

@@ -30,7 +30,7 @@ public enum GamesType {
     DICE_DUEL("Dice Duel"),
     
     /** Blackjack game. */
-    IDM("iDM"),
+    DM("iDM"),
     
     /** Lottery game. */
     LOTTERY("Lottery"),
