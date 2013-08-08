@@ -10,6 +10,7 @@ import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
@@ -117,17 +118,18 @@ public class OverUnder extends Event {
         String message = event.getMessage();
         User sender = event.getUser();
         String channel = event.getChannel().getName();
+        SpamEnforcer se = SpamEnforcer.getInstance();
 
         synchronized (BaseBot.getLockObject()) {
             if (isValidChannel(channel)
-                    && event.getBot().userIsIdentified(sender)) {
+                    && event.getBot().userIsIdentified(sender)) { // TODO Move to string
                 try {
                     if (Utils.startsWith(message, ROLL_CMD)) {
-                        roll(event);
+                        if (se.check(event, "#SM_overunder")) { roll(event); }
                     } else if (Utils.startsWith(message, CXL_CMD)) {
-                        cancel(event);
+                        if (se.check(event, "#SM_overunder")) { cancel(event); }
                     } else if (Utils.startsWith(message, BET_CMD)) {
-                        ou(event);
+                        if (se.check(event, "#SM_overunder")) { ou(event); }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "OverUnder", "message");

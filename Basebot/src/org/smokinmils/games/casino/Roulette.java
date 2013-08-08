@@ -14,6 +14,7 @@ import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
@@ -198,15 +199,16 @@ public class Roulette extends Event {
     public final void message(final Message event) {
         String message = event.getMessage();
         User sender = event.getUser();
+        SpamEnforcer se = SpamEnforcer.getInstance();
 
         synchronized (BaseBot.getLockObject()) {
             if (channel.equalsIgnoreCase(event.getChannel().getName())
-                    && bot.userIsIdentified(sender)) {
+                    && bot.userIsIdentified(sender)) { // move string somewhere?
                 try {
                     if (Utils.startsWith(message, BET_CMD)) {
-                        bet(event);
+                        if (se.check(event, "#SM_Roulette")) { bet(event); }
                     } else if (Utils.startsWith(message, CXL_CMD)) {
-                        cancel(event);
+                        if (se.check(event, "#SM_Roulette")) { cancel(event); }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "Roulette", "message");

@@ -89,20 +89,23 @@ public final class XMLLoader {
             
             try {
                 builder = builderFactory.newDocumentBuilder();
-               
+
                 xmlDocument = builder.parse(new FileInputStream("settings.xml"));
-                
+
                 serveraddr = initBaseBot();
-               
+
                 bot = basebot.getBot(serveraddr);
-                
+
                 Thread.sleep(CONNECT_SLEEP_TIME); // wait for some time to allow bot to connect.
 
                 joinChannels(serveraddr);
-                
+
                 loadListeners(serveraddr, bot);
+
+                loadTimers(serveraddr, bot);  
+
+                initSpamEncorcer();
                 
-                loadTimers(serveraddr, bot);                
             } catch (Exception e) {
                 e.printStackTrace();  
             }
@@ -203,7 +206,7 @@ public final class XMLLoader {
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Element el = (Element) nodeList.item(i);
                     String n = el.getNodeName();
-                   
+                   Thread.sleep(Utils.MS_IN_SEC / 1 + 1 + 1 + 1 + 1); // TODO Seems to not work without this now
                     if (n.equals("listener")) {
                        HashMap<String, String> options = new HashMap<String, String>();
                        ArrayList<String> channels = new ArrayList<String>();
@@ -244,8 +247,10 @@ public final class XMLLoader {
                                 }
                             }
                         }
+                       
                         String[] chanarr = channels.toArray(new String[channels.size()]);
                         String type = el.getAttribute("type");
+                        System.out.println(type);
                         if (type.equals("blackjack")) {
                             basebot.addListener(server, new BJGame(bot), chanarr);
                         } else if (type.equals("help")) {
@@ -298,7 +303,7 @@ public final class XMLLoader {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                EventLog.log(e, "XMLLoader", "loadListeners");
             }
         }
 
@@ -454,7 +459,7 @@ public final class XMLLoader {
             } catch (Exception e) {
                 EventLog.fatal(e, "XMLLoader", "initBaseBot");
             }
-            initSpamEncorcer();
+            
             return server;
         }
         
@@ -476,7 +481,8 @@ public final class XMLLoader {
                     String n = el.getNodeName();
                     String content = el.getTextContent();
                     if (n.equals("channel")) {
-                        se.add("#" + content);                
+                        se.add("#" + content); 
+                        EventLog.log("Added to spam list: #" + content, "XMLLoader", "initSpamEnforcer");
                     } 
                 }
             } catch (Exception e) {

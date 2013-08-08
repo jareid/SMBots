@@ -17,6 +17,7 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
@@ -215,7 +216,6 @@ public class UserCommands extends Event {
         String message = event.getMessage();
         User senderu = event.getUser();
         String sender = senderu.getNick();
-
         if (isValidChannel(event.getChannel().getName())
                 && bot.userIsIdentified(senderu)
                 && Utils.startsWith(message, CHKCMD)) {

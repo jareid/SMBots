@@ -249,7 +249,7 @@ public final class BaseBot {
            //bot.getConfiguration().getListenerManager().addListener(listener);
            bot.getListenerManager().addListener(listener);
            
-		   EventLog.debug("Added new listener for " + server, "SMBaseBot", "addListener");
+		   EventLog.debug("Added new listener " + listener.toString() + " for " + server, "SMBaseBot", "addListener");
 		   ret = true;
 	   } else {
 		   EventLog.log("There is no bot currently connected to " + server,
