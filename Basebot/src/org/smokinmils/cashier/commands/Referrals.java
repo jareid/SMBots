@@ -244,7 +244,7 @@ public class Referrals extends Event {
     private static final String POINTS        = "%b%c04%sender%c12: "
                                               + "%c04%who%c12 has %c04%points%c12 points this week."
                                               + " The minimum is %c04%minpoints%c12 per user."
-                                              + " The total earnt this week is %c04%totpoints.";
+                                              + " The total points this week is %c04%totpoints.";
     
     /** Message when the points are checked. */
     private static final String POINTS_STATS  = "%b%c04%sender%c12: "
@@ -262,9 +262,8 @@ public class Referrals extends Event {
                                               + "has been set to %c04%points%c12 points";
     
     /** The group failed announce string. */
-    private static final String GROUP_FAILING = "%b%c04%sender%c12: %c04%group%c12 is failng this "
-                                              + "week by %c04%points%c12 less than the minimum of "
-                                              + "%c04%min.";
+    private static final String GROUP_FAILING = "%b%c04%sender%c12: %c04%group%c12 has "
+                                              + "%c04%points%c12 of %c04%min%c12 points  this week";
 
     /** The valid channels for rank only commands. */
     private final List<String> rankValidChans;
@@ -1035,13 +1034,12 @@ public class Referrals extends Event {
                 Integer userpts = grouppoints.get(group);
                 if (users != null && userpts != null) {
                     int min = users * minpoints;
-                    if (minpoints > userpts) {
-                        String out = GROUP_FAILING.replaceAll("%group", group);
-                        out = out.replaceAll("%min", Integer.toString(min));
-                        out = out.replaceAll("%points", userpts.toString());
-                        out = out.replaceAll("%sender", event.getUser().getNick());
-                        bot.sendIRCMessage(channel, out);
-                    }
+                    String out = GROUP_FAILING.replaceAll("%group", group);
+                    out = out.replaceAll("%min", Integer.toString(min));
+                    out = out.replaceAll("%points", Integer.toString(userpts));
+                    out = out.replaceAll("%sender", event.getUser().getNick());
+                    bot.sendIRCMessage(channel, out);
+
                 } else {
                     bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", group));
                 }

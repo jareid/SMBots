@@ -128,10 +128,11 @@ public class ManagerSystem extends Event {
         bot = irc;
 
         try {
-            File inifile = new File(FILENAME);
+            File dir = new File(DIRNAME);
+            File inifile = new File(dir, FILENAME);
             if (inifile.exists()) {
                 // read from the file
-                Ini ini = new Ini(new FileReader(FILENAME));
+                Ini ini = new Ini(new FileReader(inifile));
                 setLoggedInUser(ini.get("loggedin", "who"));
                 Integer temp = ini.get("inactive", "maxtime", Integer.class);
                 inactiveTime = DEFAULTINACTIVETIME;
