@@ -207,7 +207,8 @@ public final class XMLLoader {
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Element el = (Element) nodeList.item(i);
                     String n = el.getNodeName();
-                   Thread.sleep(Utils.MS_IN_SEC / 1 + 1 + 1 + 1 + 1); // TODO Seems to not work without this now
+                    // TODO Seems to not work without this now
+                    Thread.sleep(Utils.MS_IN_SEC / 1 + 1 + 1 + 1 + 1);
                     if (n.equals("listener")) {
                        HashMap<String, String> options = new HashMap<String, String>();
                        ArrayList<String> channels = new ArrayList<String>();
@@ -486,7 +487,8 @@ public final class XMLLoader {
                     String content = el.getTextContent();
                     if (n.equals("channel")) {
                         se.add("#" + content); 
-                        EventLog.log("Added to spam list: #" + content, "XMLLoader", "initSpamEnforcer");
+                        EventLog.log("Added to spam list: #" + content, "XMLLoader",
+                                     "initSpamEnforcer");
                     } 
                 }
             } catch (Exception e) {
