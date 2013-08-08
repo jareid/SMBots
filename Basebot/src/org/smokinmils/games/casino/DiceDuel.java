@@ -40,7 +40,7 @@ public class DiceDuel extends Event {
     /** The house call command. */
     private static final String  HCALL_CMD        = "!hcall";
 
-    /** THe invalid bet message. */
+    /** The invalid bet message. */
     private static final String  INVALID_BET     = "%b%c12\"%c04!dd <amount> "
                                                  + "%c12\". Error, Invalid Bet";
     

@@ -51,6 +51,10 @@
 		<channel>sm_vip</channel>
 		<channel>sm_express</channel>
 	</listener>
+    <listener type="dm">
+        <channel>SMGamer</channel>
+        <channel>sm_vip</channel>
+    </listener>
 	<listener type="usercommands">
 		<channel>SMGamer</channel>
 		<channel>sm_tournaments</channel>

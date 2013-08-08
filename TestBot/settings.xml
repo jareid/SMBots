@@ -41,6 +41,10 @@
 		<channel>testeroo2</channel>
 		<channel>testeroo2too</channel>
 	</listener>
+    <listener type="dm">
+        <channel>testeroo2</channel>
+        <channel>testeroo2too</channel>
+    </listener>
 	<listener type="usercommands">
 		<channel>testeroo2</channel>
 		<channel>testeroo2too</channel>

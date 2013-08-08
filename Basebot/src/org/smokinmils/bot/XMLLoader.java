@@ -33,6 +33,7 @@ import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
+import org.smokinmils.games.rpg.Duel;
 import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.help.Help;
@@ -263,6 +264,9 @@ public final class XMLLoader {
                             basebot.addListener(server, new CreateTimedRoll(), chanarr);
                         } else if (type.equals("diceduel")) {
                           basebot.addListener(server, new DiceDuel(bot, chanarr[0]),
+                                   chanarr);
+                        } else if (type.equals("dm")) {
+                          basebot.addListener(server, new Duel(bot, chanarr[0]),
                                    chanarr);
                         } else if (type.equals("managersystem")) {
                           basebot.addListener(server,
