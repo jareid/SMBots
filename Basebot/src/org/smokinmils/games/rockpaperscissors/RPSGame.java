@@ -155,6 +155,9 @@ public class RPSGame extends Event {
     /** The list of pending bets. */
     private final List<String>  pendingBets;
 
+    /** The fast channel for the game. */
+    private static final String FAST_CHAN = "#SM_Express";
+    
     /**
      * Constructor.
      */
@@ -179,11 +182,11 @@ public class RPSGame extends Event {
         if (isValidChannel(chan.getName())
                 && bot.userIsIdentified(sender)) { // TODO move to string^^
             if (Utils.startsWith(message, CXL_CMD)) {
-                if (se.check(event, "#SM_Express")) { cancel(event); }
+                if (se.check(event, FAST_CHAN)) { cancel(event); }
             } else if (Utils.startsWith(message, CALL_CMD)) {
-                if (se.check(event, "#SM_Express")) { call(event); }
+                if (se.check(event, FAST_CHAN)) { call(event); }
             } else if (Utils.startsWith(message, RPS_CMD)) {
-                if (se.check(event, "#SM_Express")) { newGame(event); }
+                if (se.check(event, FAST_CHAN)) { newGame(event); }
             }
         }
     }

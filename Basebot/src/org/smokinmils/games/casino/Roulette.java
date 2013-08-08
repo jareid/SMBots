@@ -169,6 +169,8 @@ public class Roulette extends Event {
     /** State variable. */
     private int                   state;
 
+    /** The fast channel for the game. */
+    private static final String FAST_CHAN = "#SM_roulette";
     
     /**
      * Constructor.
@@ -206,9 +208,9 @@ public class Roulette extends Event {
                     && bot.userIsIdentified(sender)) { // move string somewhere?
                 try {
                     if (Utils.startsWith(message, BET_CMD)) {
-                        if (se.check(event, "#SM_Roulette")) { bet(event); }
+                        if (se.check(event, FAST_CHAN)) { bet(event); }
                     } else if (Utils.startsWith(message, CXL_CMD)) {
-                        if (se.check(event, "#SM_Roulette")) { cancel(event); }
+                        if (se.check(event, FAST_CHAN)) { cancel(event); }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "Roulette", "message");

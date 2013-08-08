@@ -11,6 +11,7 @@ import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
+import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
@@ -116,9 +117,11 @@ public class Duel extends Event {
     /** Health number. */
     private static final int    HEALTH = 100;
     
-    
     /** All the open bets. */
     private final ArrayList<Bet> openBets;
+    
+    /** The fast channel for the game. */
+    private static final String FAST_CHAN = "#SM_Express";
     
     /**
      * Constructor.
@@ -145,18 +148,19 @@ public class Duel extends Event {
         String message = event.getMessage();
         User sender = event.getUser();
         Channel chan = event.getChannel();
+        SpamEnforcer se = SpamEnforcer.getInstance();
         
         if (isValidChannel(chan.getName())
                 && bot.userIsIdentified(sender)) {
             try {
                 if (Utils.startsWith(message, DM_CMD)) {
-                        newDM(event);
+                    if (se.check(event, FAST_CHAN)) { newDM(event); }
                 } else if (Utils.startsWith(message, CXL_CMD)) {
-                    cancel(event);
+                    if (se.check(event, FAST_CHAN)) { cancel(event); }
                 } else if (Utils.startsWith(message, CALL_CMD)) {
-                    call(event);
+                    if (se.check(event, FAST_CHAN)) { call(event); }
                 } else if (Utils.startsWith(message, TRAIN_CMD)) {
-                    train(event);
+                    if (se.check(event, FAST_CHAN)) { train(event); }
                 }
             } catch (Exception e) {
                 EventLog.log(e, "Duel", "message");

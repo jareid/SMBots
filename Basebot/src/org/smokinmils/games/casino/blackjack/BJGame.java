@@ -181,7 +181,8 @@ public class BJGame extends Event {
     /** List of open games. */
     private final ArrayList<BJBet> openGames;
    
-
+    /** The fast channel for the game. */
+    private static final String FAST_CHAN = "#SM_Express";
     
     /**
      * Constructor.
@@ -211,15 +212,15 @@ public class BJGame extends Event {
         if (isValidChannel(chan.getName())
                 && bot.userIsIdentified(sender)) {
             if (Utils.startsWith(message, BJ_CMD)) {
-                if (se.check(event, "#SM_Express")) { newGame(event); }
+                if (se.check(event, FAST_CHAN)) { newGame(event); }
             } else if (Utils.startsWith(message, HIT_CMD)) {
-                if (se.check(event, "#SM_Express")) { hit(sender, bot, chan); }
+                if (se.check(event, FAST_CHAN)) { hit(sender, bot, chan); }
             } else if (Utils.startsWith(message, STAND_CMD)) {
-                if (se.check(event, "#SM_Express")) { stand(sender, bot, chan); }
+                if (se.check(event, FAST_CHAN)) { stand(sender, bot, chan); }
             } else if (Utils.startsWith(message, DOUBLE_CMD)) {
-                if (se.check(event, "#SM_Express")) { doubleDown(sender, bot, chan, msg); }
+                if (se.check(event, FAST_CHAN)) { doubleDown(sender, bot, chan, msg); }
             } else if (Utils.startsWith(message, INSURE_CMD)) {
-                if (se.check(event, "#SM_Express")) { insure(sender, bot, chan, msg); }
+                if (se.check(event, FAST_CHAN)) { insure(sender, bot, chan, msg); }
             }
         }
     }

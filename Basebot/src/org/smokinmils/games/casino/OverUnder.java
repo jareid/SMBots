@@ -101,6 +101,9 @@ public class OverUnder extends Event {
     /** All open bets for OU. */
     private final ArrayList<Bet> openBets;
 
+    /** The fast channel for the game. */
+    private static final String FAST_CHAN = "#SM_overunder";
+    
     /**
      * Constructor.
      */
@@ -125,11 +128,11 @@ public class OverUnder extends Event {
                     && event.getBot().userIsIdentified(sender)) { // TODO Move to string
                 try {
                     if (Utils.startsWith(message, ROLL_CMD)) {
-                        if (se.check(event, "#SM_overunder")) { roll(event); }
+                        if (se.check(event, FAST_CHAN)) { roll(event); }
                     } else if (Utils.startsWith(message, CXL_CMD)) {
-                        if (se.check(event, "#SM_overunder")) { cancel(event); }
+                        if (se.check(event, FAST_CHAN)) { cancel(event); }
                     } else if (Utils.startsWith(message, BET_CMD)) {
-                        if (se.check(event, "#SM_overunder")) { ou(event); }
+                        if (se.check(event, FAST_CHAN)) { ou(event); }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "OverUnder", "message");

@@ -112,6 +112,9 @@ public class DiceDuel extends Event {
     /** Random number. */
     private static final int    RANDOM = 6;
     
+    /** The fast channel for the game. */
+    private static final String FAST_CHAN = "#SM_Express";
+    
     /** All the open bets. */
     private final ArrayList<Bet> openBets;
 
@@ -146,13 +149,13 @@ public class DiceDuel extends Event {
                     && event.getBot().userIsIdentified(sender)) {
                 try {
                     if (Utils.startsWith(message, CXL_CMD)) {
-                        if (se.check(event, "#SM_Express")) { cancel(event); }
+                        if (se.check(event, FAST_CHAN)) { cancel(event); }
                     } else if (Utils.startsWith(message, BET_CMD)) {
-                        if (se.check(event, "#SM_Express")) { dd(event); }
+                        if (se.check(event, FAST_CHAN)) { dd(event); }
                     } else if (Utils.startsWith(message, CALL_CMD)) {
-                        if (se.check(event, "#SM_Express")) { call(event); }
+                        if (se.check(event, FAST_CHAN)) { call(event); }
                     } else if (Utils.startsWith(message, HCALL_CMD)) {
-                        if (se.check(event, "#SM_Express")) { houseCall(event); }
+                        if (se.check(event, FAST_CHAN)) { houseCall(event); }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "DiceDuel", "message");
