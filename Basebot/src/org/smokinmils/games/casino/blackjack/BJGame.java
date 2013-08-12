@@ -938,9 +938,7 @@ public class BJGame extends Event {
                     // else if they are older than WARNING message them
                     long diff = System.currentTimeMillis() - bet.getTime();
                     if (diff > AUTO_STAND_TIME) {
-                        
-                        stand(bet.getUser(), irc, bet.getChannel());
-                        
+                        stand(bet.getUser(), irc, bet.getChannel()); 
                     } else if (diff > WARNING_TIME) {
                         String out = TIMEOUT_WARNING.replace("%who", bet.getUser().getNick());
                         irc.sendIRCNotice(bet.getUser(), out);

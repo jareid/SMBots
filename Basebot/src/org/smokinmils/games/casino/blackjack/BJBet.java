@@ -119,7 +119,7 @@ public class BJBet extends Bet {
     public final Channel getChannel() { return channel; };
     
     /**
-     * Perform a double down.
+     * Perform a double down. Assumes user has the coinchips
      * @param amount the amount we are double downing with
      */
     public final void doubleDown(final double amount) {
@@ -145,7 +145,8 @@ public class BJBet extends Bet {
     }
 
     /**
-     * insures a game TODO make this boolean for integration.
+     * insures a game Assumes user has chips and the amount is valid.
+     * TODO make this boolean for integration.
      * @param amount the amount we are insuring for
      */
     public final void insure(final double amount) {
@@ -156,8 +157,7 @@ public class BJBet extends Bet {
             //manually adjust since this isn't standard.
             db.adjustChips(getUser().getNick(), -amount, 
                     getProfile(), GamesType.BLACKJACK, TransactionType.BJ_INSURE);
-        } catch (SQLException e) {
-            
+        } catch (SQLException e) { 
             EventLog.log(e, "BJBet", "insure");
         }
         
