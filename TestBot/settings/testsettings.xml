@@ -18,6 +18,8 @@
 	</listener>
 	<listener type="referrals">
 		<channel>testeroo2</channel>
+        <option type="managementchan">testeroo2</option>
+        <option type="hostchan">testeroo2</option>
 	</listener>
 	<listener type="roulette" id="1">
 		<channel>testeroo2</channel>
@@ -33,7 +35,10 @@
 	<listener type="overunder">
 		<channel>testeroo2</channel>
 		<channel>testeroo2too</channel>
-	</listener>
+	</listener>	
+    <listener type="dm">
+        <channel>testeroo2</channel>
+    </listener>
 	<listener type="diceduel">
 		<channel>testeroo2</channel>
 		<channel>testeroo2too</channel>

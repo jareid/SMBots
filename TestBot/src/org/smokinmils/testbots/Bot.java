@@ -22,9 +22,6 @@ import com.sun.jna.platform.win32.Kernel32;
  */
 public class Bot {
     public static void main(String[] args) throws Exception {        
-        // TODO: Test only on server or address will fail.
-        //InetAddress local = InetAddress.getByName("bot.smgamer.com");
-        
         // Store the process PID. note only windows.
         int pid = Kernel32.INSTANCE.GetCurrentProcessId();
         Writer wr = new FileWriter("nick.pid");

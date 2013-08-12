@@ -61,11 +61,11 @@ public class Duel extends Event {
     
     /** The message when you already have a bet open. */
     private static final String  OPEN_WAGER      = "%b%c04%username%c12: "
-         + "You already have a wager open, Type %c04!ddcancel %c12to cancel it";
+         + "You already have a death match open, Type %c04!ddcancel %c12to cancel it";
     
     /** No bet exsits message. */
     private static final String  NO_WAGER        = "%b%c04%username%c12: "
-                                        + "I can't find a record of that wager";
+                                        + "I can't find a record of that death match";
     
     /** Not enough coins message. */
     private static final String  NO_CHIPS        = "%b%c04%username%c12: "
@@ -78,7 +78,7 @@ public class Duel extends Event {
     /** New bet made message.*/
     private static final String  NEW_WAGER       = "%b%c04%username%c12 has "
            + "opened a new Death Match for %c04%amount %proftype%c12 coins! "
-           + "To call this wager type %c04!dmcall %username";
+           + "To call this dm type %c04!dmcall %username";
     
     /** Play vs real message. */
     private static final String  PLAY_VS         = "%b%c04%username%c12: you "
@@ -99,8 +99,8 @@ public class Duel extends Event {
                                             + " %c04%winner%c12 wins the %c04%amount%c12 chip pot!";
     
     /** Open wages list message. */
-    private static final String  OPEN_WAGERS     = "%b%c12Current open wagers: "
-                             + "%wagers. To call a wager type %c04!call <name>";
+    private static final String  OPEN_WAGERS     = "%b%c12Current open death matches: "
+                             + "%wagers. To call a DM type %c04!dmcall <name>";
     
     /** Open wage line. */
     private static final String  WAGER           = "%c04%username%c12 (%c04%amount %proftype%c12) ";
@@ -323,6 +323,7 @@ public class Duel extends Event {
                             
                             active = (active + 1) % 2;
                             
+                            //TODO: remove this? or stop it from lagging the entire thread
                             try {
                                 Thread.sleep(250);
                             } catch (InterruptedException e) {

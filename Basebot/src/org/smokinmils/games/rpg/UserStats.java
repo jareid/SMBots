@@ -2,6 +2,8 @@ package org.smokinmils.games.rpg;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.smokinmils.games.rpg.enums.Skills;
 /**
  * This file is part of a commercial IRC bot that allows users to play online
  * IRC games.
@@ -10,8 +12,6 @@ import java.util.Map;
  * 
  * Copyright (C) 2013 Jamie Reid
  */
-
-import org.smokinmils.games.rpg.enums.Skills;
 
 /**
  * Provides the functionality for user stats such as level.
@@ -43,8 +43,8 @@ public class UserStats {
      */
     public UserStats(final String user) {
         username = user;
-        level = 0; // TODO: db fucntions
-        increaseExperience(0); // TODO: db functions
+        level = 0;
+        increaseExperience(0); 
         skills = new HashMap<Skills, Skill>();
         for (Skills skill: Skills.values()) {
             skills.put(skill, new Skill(user, skill));
@@ -79,8 +79,7 @@ public class UserStats {
      */
     public final long increaseExperience(final int amount) {
         experience += amount;
-        // TODO: db functions here.
-        // TODO: check for level ups.
+        // TODO: check for level ups && db functions here.
         // use (level_to_get*level_to_get+level_to_get+3)4 or
         //  base_xp * (level_to_get ^ factor)
         int nextlevel = level + 1;

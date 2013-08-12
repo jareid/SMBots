@@ -179,8 +179,7 @@ public class RPSGame extends Event {
         Channel chan = event.getChannel();
         SpamEnforcer se = SpamEnforcer.getInstance();
 
-        if (isValidChannel(chan.getName())
-                && bot.userIsIdentified(sender)) { // TODO move to string^^
+        if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)) {
             if (Utils.startsWith(message, CXL_CMD)) {
                 if (se.check(event, FAST_CHAN)) { cancel(event); }
             } else if (Utils.startsWith(message, CALL_CMD)) {

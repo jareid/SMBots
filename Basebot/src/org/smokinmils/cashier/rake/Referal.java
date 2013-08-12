@@ -175,7 +175,6 @@ public final class Referal {
         double userfee = reffee / referals.size();
         int groupusers = 0;
         for (ReferalUser user : referals) {
-            // TODO: if group is null, should be not still give something?
             if (user.getGroup() != null) {
                 if (!groups.containsKey(user.getGroup())) {
                     groups.put(user.getGroup(), 1);

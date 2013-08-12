@@ -125,7 +125,7 @@ public class OverUnder extends Event {
 
         synchronized (BaseBot.getLockObject()) {
             if (isValidChannel(channel)
-                    && event.getBot().userIsIdentified(sender)) { // TODO Move to string
+                    && event.getBot().userIsIdentified(sender)) {
                 try {
                     if (Utils.startsWith(message, ROLL_CMD)) {
                         if (se.check(event, FAST_CHAN)) { roll(event); }

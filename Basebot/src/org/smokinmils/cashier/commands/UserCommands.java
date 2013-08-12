@@ -231,7 +231,9 @@ public class UserCommands extends Event {
                 
                 Map<ProfileType, Double> creds = null;
                 boolean rsrct = (user.equalsIgnoreCase("HOUSE") || user.equalsIgnoreCase("POINTS"));
-                if ((rsrct && bot.userIsHalfOp(senderu, event.getChannel().getName())) || !rsrct) {
+                if ((rsrct && (bot.userIsHalfOp(senderu, event.getChannel().getName())
+                            || bot.userIsOp(senderu, event.getChannel().getName())))
+                     || !rsrct) {
                     try {
                         creds = DB.getInstance().checkAllCredits(user);
                     } catch (Exception e) {

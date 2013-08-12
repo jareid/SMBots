@@ -194,7 +194,6 @@ public final class Utils {
                 ret = total;
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             EventLog.log(e, "Utils", "checkCredits");
         }
         return ret;

@@ -805,10 +805,6 @@ public class BJGame extends Event {
     
     /**
      * Checks if we can insure on a hand.
-<<<<<<< HEAD
-     * 
-=======
->>>>>>> branch 'master' of http://repo.smgamer.com/SMBots.git
      * @param hand the hand we want to check
      * @return true if we offer insurance, false otherwise
      */
@@ -933,7 +929,7 @@ public class BJGame extends Event {
          */
         @Override
         public final void run() {
-            // TODO: carl you got a ConcurrentModificationException, i couldnt see what it was
+            // TODO: cjc  there's a ConcurrentModificationException, i couldn't see what it was
             // from a quick look while testing but we need to figure it out. I fixed loads in 
             // my timers in DD/OU
             if (openGames.size() > 0) {               

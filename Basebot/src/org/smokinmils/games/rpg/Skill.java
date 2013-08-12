@@ -39,8 +39,8 @@ public class Skill {
     public Skill(final String user, final Skills skill) {
         username = user;
         type = skill;
-        value = 0; // TODO: pull from database.
-        experience = 0; // TODO: pull from database.
+        value = 0;
+        experience = 0;
     }
 
     /**
@@ -56,14 +56,12 @@ public class Skill {
      */
     public final long increaseExperience(final int amount) {
         experience += amount;
-        // TODO: db functions here.
-        // TODO: check for level ups.
+        // check for level ups &&  db functions here.
         // use (level_to_get*level_to_get+level_to_get+3)4 or
         //  base_xp * (level_to_get ^ factor)
         long nextlevel = BASE_EXP * ((value + 1) ^ 2);
         if (experience >= nextlevel) {
             value++;
-            // TODO: store to database
         }
         return experience;
     }
