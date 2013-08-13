@@ -322,13 +322,6 @@ public class Duel extends Event {
                             bot.sendIRCNotice(bet.getUser(), out);
                             
                             active = (active + 1) % 2;
-                            
-                            //TODO: remove this? or stop it from lagging the entire thread
-                            try {
-                                Thread.sleep(250);
-                            } catch (InterruptedException e) {
-                                EventLog.log(e, "Duel", "call");
-                            }
                         }
 
                         // Calculate rake.

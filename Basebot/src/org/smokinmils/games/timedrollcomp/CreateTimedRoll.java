@@ -9,6 +9,7 @@ package org.smokinmils.games.timedrollcomp;
  * Copyright (C) 2013 Jamie Reid
  */
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +19,9 @@ import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
+import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.logging.EventLog;
 
 /**
  * Provides the functionality create a timed roll.
@@ -32,6 +35,16 @@ public class CreateTimedRoll extends Event {
     /** The Create format. */
     public static final String               CRE_FORMAT     = "%b%c12"
                   + CRE_CMD + " <channel> <minutes> <prize> <profile> <rounds>";
+    
+    /** The Ban command. */
+    public static final String               BAN_CMD        = "!rollban";
+    
+    /** The Ban/Unban format. */
+    public static final String               BAN_FORMAT     = "%b%c12"
+                  + BAN_CMD + " <user> ";
+    
+    /** The Unban command. */
+    public static final String               UBAN_CMD        = "!rollunban";
 
     /** The create command length. */
     public static final int                  CRE_CMD_LEN    = 6;
@@ -60,6 +73,16 @@ public class CreateTimedRoll extends Event {
     /** The message when a game doesn't exist. */
     public static final String               NOEXIST        = "%b%c12A timed "
                                   + "roll game doesn't exist in %c04%chan%c12!";
+    
+    /** The message when a user is banned. */
+    public static final String               BANNED        = "%b%c04%sender%c12: %c04%user%c12"
+                                  + " has been banned from using the roll promo "
+                                  + "(if they weren't already)";
+    
+    /** The message when a user is unbanned. */
+    public static final String               UNBANNED      = "%b%c04%sender%c12: %c04%user%c12"
+                                  + " has been unbanned from using the roll promo "
+                                  + "(if they were banned)";
 
     /** The map of games. */
     private final Map<String, TimedRollComp> games;
@@ -87,12 +110,16 @@ public class CreateTimedRoll extends Event {
                 createGame(event);
             } else if (Utils.startsWith(message, ENDCMD)) {
                 endGame(event);
+            } else if (Utils.startsWith(message, BAN_CMD)) {
+                ban(event);
+            } else if (Utils.startsWith(message, UBAN_CMD)) {
+                unban(event);
             }
         }
     }
 
     /**
-     * Handles the end command.
+     * Handles the create command.
      * 
      * @param event the message event.
      */
@@ -121,22 +148,17 @@ public class CreateTimedRoll extends Event {
                 if (profile != null) {
                     TimedRollComp trc = games.get(channel.toLowerCase());
                     if (trc != null) {
-                        bot.sendIRCMessage(chan,
-                                            EXIST.replaceAll("%chan", channel));
+                        bot.sendIRCMessage(chan, EXIST.replaceAll("%chan", channel));
                     } else {
                         try {
                             trc = new TimedRollComp(bot, channel, profile,
-                                    prize, mins, rounds, this);
+                                    prize, mins, rounds, this, false);
 
                             String out = CREATED.replaceAll("%chan", channel);
-                            out = out.replaceAll(
-                                    "%prize", Integer.toString(prize));
-                            out = out.replaceAll(
-                                    "%mins", Integer.toString(mins));
-                            out = out
-                                    .replaceAll("%profile", profile.toString());
-                            out = out.replaceAll(
-                                    "%rounds", Integer.toString(rounds));
+                            out = out.replaceAll("%prize", Integer.toString(prize));
+                            out = out.replaceAll("%mins", Integer.toString(mins));
+                            out = out.replaceAll("%profile", profile.toString());
+                            out = out.replaceAll("%rounds", Integer.toString(rounds));
                             bot.sendIRCMessage(chan, out);
 
                             games.put(channel.toLowerCase(), trc);
@@ -189,7 +211,59 @@ public class CreateTimedRoll extends Event {
             bot.invalidArguments(senderu, END_FORMAT);
         }
     }
+    
+    /**
+     * Handles the ban command.
+     * 
+     * @param event the message event.
+     */
+    private void ban(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        Channel chan = event.getChannel();
+        User senderu = event.getUser();
+        String[] msg = message.split(" ");
 
+        if (msg.length > 1) {
+            try {
+                DB.getInstance().addRollBan(msg[1]);
+                String out = BANNED.replaceAll("%sender", senderu.getNick());
+                out = out.replaceAll("%user", msg[1]);
+                bot.sendIRCMessage(chan, out);
+            } catch (SQLException e) {
+                EventLog.log(e, "CreateTimedRoll", "ban");
+            }
+        } else {
+            bot.invalidArguments(senderu, BAN_FORMAT);
+        }
+    }
+
+    /**
+     * Handles the unban command.
+     * 
+     * @param event the message event.
+     */
+    private void unban(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        Channel chan = event.getChannel();
+        User senderu = event.getUser();
+        String[] msg = message.split(" ");
+
+        if (msg.length > 1) {
+            try {
+                DB.getInstance().removeRollBan(msg[1]);
+                String out = UNBANNED.replaceAll("%sender", senderu.getNick());
+                out = out.replaceAll("%user", msg[1]);
+                bot.sendIRCMessage(chan, out);
+            } catch (SQLException e) {
+                EventLog.log(e, "CreateTimedRoll", "ban");
+            }
+        } else {
+            bot.invalidArguments(senderu, BAN_FORMAT);
+        }
+    }
+    
     /**
      * Ends the game in a channel.
      * 

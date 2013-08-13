@@ -97,8 +97,11 @@ public class TimedRollComp extends Event {
     /** The number of rounds already played. */
     private int                              roundsRun;
     
-    /** The creater of this game, can be null. */
+    /** The creator of this game, can be null. */
     private CreateTimedRoll                  parent;
+    
+    /** If this game uses bans. */
+    private boolean                          banEnabled;
 
     /**
      * Constructor.
@@ -110,10 +113,11 @@ public class TimedRollComp extends Event {
      * @param mins      The number of mins for each round.
      * @param rnds      The number of rounds to play.
      * @param ctr       The parent object.
+     * @param bans      If bans are turned on for this game.
      */
     public TimedRollComp(final IrcBot bot, final String channel,
             final ProfileType prof, final int prze, final int mins,
-            final int rnds, final CreateTimedRoll ctr) {
+            final int rnds, final CreateTimedRoll ctr, final boolean bans) {
         // check the channel is a valid IRC Channel name
         if (!channel.matches("([#&][^\\x07\\x2C\\s]{1,200})")) {
             throw new IllegalArgumentException(channel
@@ -136,11 +140,10 @@ public class TimedRollComp extends Event {
             rounds = rnds;
             roundsRun = 0;
             parent = ctr;
+            banEnabled = bans;
 
             irc.sendIRC().joinChannel(validChan);
 
-            // TODO: check this new way works
-            //bot.getConfiguration().getListenerManager().addListener(this);
             bot.getListenerManager().addListener(this);
             
             // Start the timer
@@ -169,9 +172,7 @@ public class TimedRollComp extends Event {
                 chan.send().part("Game was ended! Join #SMGamer for more!!!");
             }
         }
-        
-        // TODO: check this new way works
-        //irc.getConfiguration().getListenerManager().removeListener(this);
+
         irc.getListenerManager().removeListener(this);
     }
 
@@ -192,7 +193,16 @@ public class TimedRollComp extends Event {
         synchronized (this) {
             if (Utils.startsWith(message, CMD)
                     && validChan.equalsIgnoreCase(chan.getName())) {
-                if ((!userlist.containsKey(sender) && !userlist.containsValue(host))) {
+                boolean banned = false;
+                if (banEnabled) {
+                    try {
+                        banned = DB.getInstance().checkRollBan(sender);
+                    } catch (Exception e) {
+                        EventLog.log(e, "TimedRollComp", "message");
+                    }
+                }
+                if (!banned 
+                    && (!userlist.containsKey(sender) && !userlist.containsValue(host))) {
                     int userroll = Random.nextInt(MAXROLL);
 
                     String out = ROLLED.replaceAll("%who", sender);

@@ -70,6 +70,7 @@ public final class XMLLoader {
         /** private constructor. */
         private XMLLoader() { }
         
+        /** default file. */
         private String filename = "settings.xml";
         
         /**
@@ -383,7 +384,7 @@ public final class XMLLoader {
                                     Integer.parseInt(options.get("prize")), 
                                     Integer.parseInt(options.get("mins")), 
                                     Integer.parseInt(options.get("rounds")), 
-                                    null);
+                                    null, true);
                         } else if (type.equals("managerannounce")) {
                             ManagerAnnounce mgrano = new ManagerAnnounce(
                                     basebot.getBot(server), chanarr[0]);
