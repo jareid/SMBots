@@ -15,7 +15,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.smokinmils.BaseBot;
-import org.smokinmils.auctions.Auctions;
+import org.smokinmils.auctions.Auctioneer;
 import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.cashier.commands.Coins;
 import org.smokinmils.cashier.commands.Referrals;
@@ -69,8 +69,8 @@ public final class XMLLoader {
         
         /** private constructor. */
         private XMLLoader() { }
-        
-        /** default file. */
+
+		/** Default file name for xml settings. */
         private String filename = "settings.xml";
         
         /**
@@ -305,7 +305,7 @@ public final class XMLLoader {
                             invite.addValidChan(chanarr);
                             basebot.addListener(server, invite);
                         } else if (type.equals("auctions")) {
-                            Auctions auction = new Auctions(bot, chanarr[0]);
+                            Auctioneer auction = new Auctioneer(bot, chanarr[0]);
                             auction.addValidChan(chanarr);
                             basebot.addListener(server, auction);
                         } else if (type.equals("referrals")) {

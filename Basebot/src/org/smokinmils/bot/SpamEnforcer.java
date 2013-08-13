@@ -56,7 +56,6 @@ public final class SpamEnforcer {
      * Constructor.
      */
     private SpamEnforcer() {
-       //HAX TODO XMLerize this?
         spamMap = new HashMap<String, HashMap<User, Long>>();
         positionMap = new HashMap<User, Long>();
     }

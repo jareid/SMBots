@@ -17,12 +17,11 @@ import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 
 /**
- * Models an item / chips being auctioned
- * TODO - better name? (yay for refactoring)
+ * Models an item / chips being auctioned.
  * @author cjc
  *
  */
-public class AnAuction {
+public class Auction {
     
     /** String letting the user know to pay, pay now! */
     private static final String WINNER = "%b%c04%who%c12: You have won the auction for %c04%name"
@@ -83,7 +82,7 @@ public class AnAuction {
      * @param t the initial time in minutes 
      * @param pr valid profiles If selling chips, the first one is the chips we are selling too
      */
-    public AnAuction(final double p,
+    public Auction(final double p,
                      final String n, 
                      final int t,
                      final ArrayList<ProfileType> pr) {
@@ -107,7 +106,7 @@ public class AnAuction {
      * @param t the initial time in minutes
      * @param pr the profiles
      */
-    public AnAuction(final double p,
+    public Auction(final double p,
                      final double c, 
                      final int t,
                      final ArrayList<ProfileType> pr) {
@@ -126,7 +125,7 @@ public class AnAuction {
         User sender = event.getUser();
         Channel chan = event.getChannel();
         boolean ret = false;
-        if (Utils.checkCredits(sender, BID_PRICE + price + Auctions.INCR_AMOUNT, bot, chan)
+        if (Utils.checkCredits(sender, BID_PRICE + price + Auctioneer.INCR_AMOUNT, bot, chan)
                                                                                     >= BID_PRICE) {
             DB db = DB.getInstance();
             try {
@@ -137,7 +136,7 @@ public class AnAuction {
                 }
                 
                 // increase the bid amount
-                price += Auctions.INCR_AMOUNT;
+                price += Auctioneer.INCR_AMOUNT;
                 
                 // remove the bid price
                 db.adjustChips(sender.getNick(), -BID_PRICE, db.getActiveProfile(sender.getNick()), 

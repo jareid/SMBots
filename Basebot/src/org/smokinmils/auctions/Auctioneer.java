@@ -28,7 +28,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie & Carl
  */
-public class Auctions extends Event {
+public class Auctioneer extends Event {
     
     /** The Auctions command. */
     public static final String AUCCMD = "!auctions";
@@ -92,10 +92,10 @@ public class Auctions extends Event {
     private static final String ADD_CHIPS_VAR = "chips";
     
     /** The list of auctions that are active. */
-    private final ArrayList<AnAuction> auctions;
+    private final ArrayList<Auction> auctions;
     
     /** The list of auctions that are in the final count down! */
-    private final ArrayList<AnAuction> finalAuctions;
+    private final ArrayList<Auction> finalAuctions;
     
     /** Timer to announce auctions. */
     private final Timer auctionTimer;
@@ -105,10 +105,10 @@ public class Auctions extends Event {
      * @param irc the irc bot 
      * @param chan the channel we announce on
      */
-    public Auctions(final IrcBot irc,
+    public Auctioneer(final IrcBot irc,
                     final String chan) {
-        auctions = new ArrayList<AnAuction>();
-        finalAuctions = new ArrayList<AnAuction>();
+        auctions = new ArrayList<Auction>();
+        finalAuctions = new ArrayList<Auction>();
         
         auctionTimer = new Timer(true);
         auctionTimer.schedule(new AuctionTimer(irc, chan), Utils.MS_IN_MIN / 2, Utils.MS_IN_MIN);
@@ -148,7 +148,7 @@ public class Auctions extends Event {
     
         if (auctions.size() > 0) {
             bot.sendIRCMessage(chan, ACTIVE_AUCTIONS);
-            for (AnAuction a : auctions) {
+            for (Auction a : auctions) {
                 // check for open auctions, announce here
                 System.out.println(a.getTime());
                     String add = SINGLE_AUCTION.replaceAll("%name", a.getName());
@@ -182,8 +182,8 @@ public class Auctions extends Event {
             if (auctionId == 0) {
                 bot.invalidArguments(sender, BIDFMT);
             } else {
-                AnAuction a = null;
-                for (AnAuction anAuction : auctions) {
+                Auction a = null;
+                for (Auction anAuction : auctions) {
                     if (anAuction.getId() == auctionId) {
                         a = anAuction;
                         break;
@@ -191,7 +191,7 @@ public class Auctions extends Event {
                 } 
                 // if no auction, check auctions that are in the final count down
                 if (a == null) {
-                    for (AnAuction anAuction : finalAuctions) {
+                    for (Auction anAuction : finalAuctions) {
                         if (anAuction.getId() == auctionId) {
                             a = anAuction;
                             break;
@@ -221,7 +221,7 @@ public class Auctions extends Event {
                                     out = out.replaceAll("%id", String.valueOf(a.getId()));
                                     bot.sendIRCMessage(chan, out);
                                 } else {
-                                   bot.noChips(sender, AnAuction.BID_PRICE, profile);
+                                   bot.noChips(sender, Auction.BID_PRICE, profile);
                                 }
                             }
                         } else {
@@ -286,11 +286,11 @@ public class Auctions extends Event {
             if (price <= 0.0 || time <= 0.0 || pr == null) {
                 bot.invalidArguments(sender, ADDFMT); 
             } else {
-                AnAuction a  = null;
+                Auction a  = null;
                 if (chips != 0.0) {
-                    a = new AnAuction(price, chips, time, pr);
+                    a = new Auction(price, chips, time, pr);
                 } else {
-                    a = new AnAuction(price, item, time, pr);
+                    a = new Auction(price, item, time, pr);
                 }
                 
                 auctions.add(a);
@@ -337,7 +337,7 @@ public class Auctions extends Event {
         public final void run() {
             if (auctions.size() > 0) {
                 irc.sendIRCMessage(chan, ACTIVE_AUCTIONS);
-                for (AnAuction a : auctions) {
+                for (Auction a : auctions) {
                     // check for open auctions, announce here
 
                     String add = SINGLE_AUCTION.replaceAll("%name", a.getName());
@@ -368,7 +368,7 @@ public class Auctions extends Event {
             }
             
             // remove all members of final auctions from auctions
-            for (AnAuction a : finalAuctions) {
+            for (Auction a : finalAuctions) {
                 if (auctions.contains(a)) {
                     auctions.remove(a);
                 }
