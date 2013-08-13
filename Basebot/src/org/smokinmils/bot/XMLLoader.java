@@ -18,6 +18,7 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.auctions.Auctioneer;
 import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.cashier.commands.Coins;
+import org.smokinmils.cashier.commands.Lottery;
 import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
 import org.smokinmils.cashier.rake.Rake;
@@ -117,6 +118,8 @@ public final class XMLLoader {
                 loadTimers(serveraddr, bot);  
 
                 initSpamEncorcer();
+                
+                initLottery(serveraddr);
                 
             } catch (Exception e) {
                 e.printStackTrace();  
@@ -507,4 +510,37 @@ public final class XMLLoader {
             }
 
         }
+        
+        /**
+         * Initialises The Lottery.
+         */
+        private void initLottery(final String server) {
+            try {
+                XPath xPath =  XPathFactory.newInstance().newXPath();
+                
+                String expression = "/bot/lottery/*";
+                //read a nodelist using xpath
+                NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                            XPathConstants.NODESET);
+                
+                
+                ArrayList<String> channels = new ArrayList<String>();
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Element el = (Element) nodeList.item(i);
+                    String n = el.getNodeName();
+                    String content = el.getTextContent();
+                    if (n.equals("channel")) {
+                        channels.add("#" + content); 
+                    } 
+                }
+                String[] chanarr = (String[]) channels.toArray();
+                BaseBot.getInstance().addListener(server, new Lottery(), chanarr);
+                
+            } catch (Exception e) {
+                EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
+            }
+
+        }
     }
+
+// basebot.addListener(swift_irc, new Lottery(), all_swift_chans);
