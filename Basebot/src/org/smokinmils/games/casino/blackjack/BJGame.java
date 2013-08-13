@@ -237,10 +237,10 @@ public class BJGame extends Event {
      * @param chan the channel to reply to
      * @param msg the message to get values from
      */
-    private void cards(User sender,
-                       IrcBot bot,
-                       Channel chan,
-                       String[] msg) {
+    private void cards(final User sender,
+                       final IrcBot bot,
+                       final Channel chan,
+                       final String[] msg) {
         BJBet usergame = null;
         synchronized (BaseBot.getLockObject()) {
             for (BJBet game : openGames) {
