@@ -210,7 +210,7 @@ public class Roulette extends Event {
                     if (Utils.startsWith(message, BET_CMD)) {
                         if (se.check(event, FAST_CHAN)) { bet(event); }
                     } else if (Utils.startsWith(message, CXL_CMD)) {
-                        if (se.check(event, FAST_CHAN)) { cancel(event); }
+                        cancel(event);
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "Roulette", "message");

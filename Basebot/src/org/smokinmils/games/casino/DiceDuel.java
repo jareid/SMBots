@@ -149,7 +149,7 @@ public class DiceDuel extends Event {
                     && event.getBot().userIsIdentified(sender)) {
                 try {
                     if (Utils.startsWith(message, CXL_CMD)) {
-                        if (se.check(event, FAST_CHAN)) { cancel(event); }
+                        cancel(event);
                     } else if (Utils.startsWith(message, BET_CMD)) {
                         if (se.check(event, FAST_CHAN)) { dd(event); }
                     } else if (Utils.startsWith(message, CALL_CMD)) {

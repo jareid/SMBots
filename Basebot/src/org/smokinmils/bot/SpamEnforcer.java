@@ -13,7 +13,7 @@ import org.smokinmils.bot.events.Message;
  */
 public final class SpamEnforcer {
     /** How long between bets can we do? */
-    private static final long DELAY = 5 * Utils.MS_IN_SEC;
+    private long DELAY = 5 * Utils.MS_IN_SEC;
 
     /** Message to tell the user to go to the other channel. */
     private static final String MESSAGE = "You can only use a command once every 5 seconds here. "
@@ -132,5 +132,13 @@ public final class SpamEnforcer {
         
         
         return ret;
+    }
+    
+    /**
+     * Optionally changes the delay.
+     * @param delay the new delay in seconds for SE to act.
+     */
+    public void setDelay(final int delay) {
+        DELAY = delay * Utils.MS_IN_SEC;
     }
 }

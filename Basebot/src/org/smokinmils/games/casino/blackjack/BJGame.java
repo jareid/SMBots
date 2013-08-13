@@ -217,15 +217,15 @@ public class BJGame extends Event {
             if (Utils.startsWith(message, BJ_CMD)) {
                 if (se.check(event, FAST_CHAN)) { newGame(event); }
             } else if (Utils.startsWith(message, HIT_CMD)) {
-                if (se.check(event, FAST_CHAN)) { hit(sender, bot, chan); }
+               hit(sender, bot, chan);
             } else if (Utils.startsWith(message, STAND_CMD)) {
-                if (se.check(event, FAST_CHAN)) { stand(sender, bot, chan); }
+                stand(sender, bot, chan); 
             } else if (Utils.startsWith(message, DOUBLE_CMD)) {
-                if (se.check(event, FAST_CHAN)) { doubleDown(sender, bot, chan, msg); }
+                doubleDown(sender, bot, chan, msg);
             } else if (Utils.startsWith(message, INSURE_CMD)) {
-                if (se.check(event, FAST_CHAN)) { insure(sender, bot, chan, msg); }
+               insure(sender, bot, chan, msg);
             } else if (Utils.startsWith(message, CARDS_CMD)) {
-                if (se.check(event, FAST_CHAN)) { cards(sender, bot, chan, msg); }
+                cards(sender, bot, chan, msg);
             }
         }
     }
