@@ -44,6 +44,9 @@ public class BJGame extends Event {
     /** the insurance command. */
     private static final String INSURE_CMD = "!insure";
     
+    /** the cards command. */
+    private static final String CARDS_CMD = "!cards";
+    
     /** Time in minutes for the warning notice to be sent. */
     private static final int WARNING_TIME = 4 * Utils.MS_IN_MIN;
     
@@ -221,10 +224,55 @@ public class BJGame extends Event {
                 if (se.check(event, FAST_CHAN)) { doubleDown(sender, bot, chan, msg); }
             } else if (Utils.startsWith(message, INSURE_CMD)) {
                 if (se.check(event, FAST_CHAN)) { insure(sender, bot, chan, msg); }
+            } else if (Utils.startsWith(message, CARDS_CMD)) {
+                if (se.check(event, FAST_CHAN)) { cards(sender, bot, chan, msg); }
             }
         }
     }
     
+    /**
+     * This function handles the !cards command.
+     * @param sender person checking cards
+     * @param bot the bot to reply with
+     * @param chan the channel to reply to
+     * @param msg the message to get values from
+     */
+    private void cards(User sender,
+                       IrcBot bot,
+                       Channel chan,
+                       String[] msg) {
+        BJBet usergame = null;
+        synchronized (BaseBot.getLockObject()) {
+            for (BJBet game : openGames) {
+                if (game.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                    usergame = game;
+                    break;
+                }
+            }
+            
+            if (usergame != null) {
+                
+                ArrayList<Card> phand = usergame.getPlayerHand();
+                ArrayList<Card> dhand = usergame.getDealerHand();
+
+                String out = DEALT_HANDS.replaceAll("%who", sender.getNick());
+                
+                out = out.replaceAll("%phand", handToString(phand, false));
+                out = out.replaceAll("%dhand", handToString(dhand, true)); 
+                
+                out = out.replaceAll("%pscore", allHands(phand).toString());
+                out = out.replaceAll("%dscore", allHands(dhand).toString());
+                
+                bot.sendIRCNotice(sender, out);
+                bot.sendIRCMessage(sender, out);
+            } else {
+                String out = NO_OPEN_GAME.replaceAll("%who", sender.getNick());
+                bot.sendIRCNotice(sender, out);
+            }
+        }
+        
+    }
+
     /**
      * This function handles the !insure command.
      * @param sender person insuring
@@ -929,21 +977,26 @@ public class BJGame extends Event {
          */
         @Override
         public final void run() {
-            // TODO: cjc  there's a ConcurrentModificationException, i couldn't see what it was
-            // from a quick look while testing but we need to figure it out. I fixed loads in 
-            // my timers in DD/OU
-            if (openGames.size() > 0) {               
-                for (BJBet bet : openGames) {
-                   // if they are older than TIMEOUT auto stand them,
-                    // else if they are older than WARNING message them
-                    long diff = System.currentTimeMillis() - bet.getTime();
-                    if (diff > AUTO_STAND_TIME) {
-                        stand(bet.getUser(), irc, bet.getChannel()); 
-                    } else if (diff > WARNING_TIME) {
-                        String out = TIMEOUT_WARNING.replace("%who", bet.getUser().getNick());
-                        irc.sendIRCNotice(bet.getUser(), out);
+            try {
+                // create a shallow clone of openGames so that we don't run into a
+                // ConcurrentModificationException
+                ArrayList<BJBet> games = new ArrayList<BJBet>(openGames);
+                if (games.size() > 0) {
+                    for (BJBet bet : games) {
+                       // if they are older than TIMEOUT auto stand them,
+                        // else if they are older than WARNING message them
+                        long diff = System.currentTimeMillis() - bet.getTime();
+                        if (diff > AUTO_STAND_TIME) {
+                            stand(bet.getUser(), irc, bet.getChannel()); 
+                        } else if (diff > WARNING_TIME) {
+                            String out = TIMEOUT_WARNING.replace("%who", bet.getUser().getNick());
+                            irc.sendIRCNotice(bet.getUser(), out);
+                        }
                     }
                 }
+            } catch (Exception e) {
+                // if a game is added or removed when this is running?
+                EventLog.log(e, "BJGame", "Timer.run");
             }
         }
     }
