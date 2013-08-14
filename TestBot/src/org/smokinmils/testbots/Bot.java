@@ -22,17 +22,22 @@ import com.sun.jna.platform.win32.Kernel32;
  */
 public class Bot {
     public static void main(String[] args) throws Exception {        
-        // Store the process PID. note only windows.
-        int pid = Kernel32.INSTANCE.GetCurrentProcessId();
-        Writer wr = new FileWriter("nick.pid");
-        wr.write(Integer.toString(pid));
-        wr.close();
+        
     	XMLLoader xl = XMLLoader.getInstance();
     	if (args.length == 1) {
     		xl.loadDocument(args[0]);
     	} 
+    	// Store the process PID. note only windows.
+    	String pidfile = xl.getBotNick() + ".pid";
+    	
+        int pid = Kernel32.INSTANCE.GetCurrentProcessId();
+        Writer wr = new FileWriter(pidfile);
+        wr.write(Integer.toString(pid));
+        wr.close();
+        
+        // load and initialise the bot
     	xl.loadBotSettings();
-
+    	
         while (true) {
             Thread.sleep(10);
         }

@@ -83,6 +83,17 @@ public final class XMLLoader {
          */
         public void loadDocument(final String f) {
             filename = f;
+            // reparse the document
+            try {
+            DocumentBuilderFactory builderFactory =
+                    DocumentBuilderFactory.newInstance();
+            
+            builder = builderFactory.newDocumentBuilder();
+
+            xmlDocument = builder.parse(new FileInputStream(filename));
+            } catch (Exception e) {
+                EventLog.log(e, "XMLLoader", "loadDocument");
+            }
         }
         
         /**
@@ -519,6 +530,7 @@ public final class XMLLoader {
         
         /**
          * Initialises The Lottery.
+         * @param server the string representation of the server we are using
          */
         private void initLottery(final String server) {
             try {
@@ -547,6 +559,35 @@ public final class XMLLoader {
             }
 
         }
+        
+        /**
+         * Gets the bots nick.
+         * @return the nick of the bot from the xml file
+         */
+        public String getBotNick() {
+            String nick = "";
+            try {
+                
+            
+                XPath xPath =  XPathFactory.newInstance().newXPath();
+                String expression = "/bot/*";
+                //read a nodelist using xpath
+                NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                            XPathConstants.NODESET);
+                  
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Element el = (Element) nodeList.item(i);
+                    String n = el.getNodeName();
+                    String content = el.getTextContent();
+                    if (n.equals("nick")) {
+                        nick = content;
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                EventLog.log(e, "XMLLoader", "getBotNick");
+            }
+            return nick;
+        }
     }
 
-// basebot.addListener(swift_irc, new Lottery(), all_swift_chans);
