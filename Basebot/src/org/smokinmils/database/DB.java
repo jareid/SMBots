@@ -969,9 +969,7 @@ public final class DB {
 
         runBasicQuery(sql);
         runBasicQuery(reset);
-        addTransaction(
-                username, amount, GamesType.ADMIN, TransactionType.JACKPOT,
-                proftype);
+        addTransaction(username, amount, GamesType.ADMIN, TransactionType.JACKPOT, proftype);
     }
 
     /**
