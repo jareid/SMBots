@@ -34,6 +34,9 @@ public enum EventType {
 
     /** An action when a user / the parts joins a channel. */
     PART,
+    
+    /** An action when a user quits IRC. */
+    QUIT,
 
     /** Action used by timers. */
     TIMER;

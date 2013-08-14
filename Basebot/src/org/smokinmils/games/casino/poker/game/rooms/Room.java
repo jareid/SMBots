@@ -20,6 +20,7 @@ import org.smokinmils.bot.events.NickChange;
 import org.smokinmils.bot.events.Notice;
 import org.smokinmils.bot.events.Op;
 import org.smokinmils.bot.events.Part;
+import org.smokinmils.bot.events.Quit;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.casino.poker.enums.CommandType;
 import org.smokinmils.games.casino.poker.enums.EventType;
@@ -131,7 +132,14 @@ public class Room extends Thread {
                         if (event.getEvent() instanceof Part) {
                             onPart((Part) event.getEvent());
                         } else {
-                            
+                            EventLog.log("Received Part event with invalid "
+                                         + "details:" + event.getEvent().toString(), "Room", "run");
+                        }
+                        break;
+                    case QUIT:
+                        if (event.getEvent() instanceof Quit) {
+                            onQuit((Quit) event.getEvent());
+                        } else {
                             EventLog.log("Received Part event with invalid "
                                          + "details:" + event.getEvent().toString(), "Room", "run");
                         }
@@ -232,6 +240,18 @@ public class Room extends Thread {
      * @param event The event
      */
     protected void onPart(final Part event) {
+
+    }
+    
+    /**
+     * This method is called whenever someone quits from IRC
+     * <p>
+     * The implementation of this method in the Room abstract class performs no
+     * actions and may be overridden as required.
+     * 
+     * @param event The event
+     */
+    protected void onQuit(final Quit event) {
 
     }
 

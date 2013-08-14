@@ -218,8 +218,6 @@ public final class XMLLoader {
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Element el = (Element) nodeList.item(i);
                     String n = el.getNodeName();
-                    // TODO Seems to not work without this now
-                    Thread.sleep(Utils.MS_IN_SEC / 1 + 1 + 1 + 1 + 1);
                     if (n.equals("listener")) {
                        HashMap<String, String> options = new HashMap<String, String>();
                        ArrayList<String> channels = new ArrayList<String>();

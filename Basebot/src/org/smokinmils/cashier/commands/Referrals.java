@@ -1048,4 +1048,46 @@ public class Referrals extends Event {
             bot.invalidArguments(event.getUser(), GRPPOINTS_FRMT);
         }
     }
+    
+    /**
+     * Handles the command to make a rank user inactive.
+     * 
+     * @param event The message event
+     * 
+     * @throws SQLException when there is a database error
+     */
+    private void inactive(final Message event) throws SQLException {
+        IrcBot bot = event.getBot();
+        String[] msg = event.getMessage().split(" ");
+        Channel channel = event.getChannel();
+
+        if (msg.length == ADD_CMD_LEN) {
+            DB db = DB.getInstance();
+            String who = msg[1];
+            String group = msg[2];
+            if (!db.checkUserExists(who)) {
+                String out = NO_USER.replaceAll("%who", who);
+                out = out.replaceAll("%sender", event.getUser().getNick());
+                bot.sendIRCMessage(channel, out);
+            } else if (!db.isRankGroup(group)) {
+                bot.sendIRCMessage(channel, NO_GROUP.replaceAll("%group", group));
+            } else {
+                String out = null;
+                if (!db.isRank(who)) {
+                    out = ADDED;
+                    db.addRank(who, group);
+                } else if (db.isRank(who)) {
+                    String oldgroup = db.getRankGroup(who);
+                    out = MOVED.replaceAll("%oldgroup", oldgroup);
+                    db.updateRank(who, group);
+                }
+
+                out = out.replaceAll("%who", who);
+                out = out.replaceAll("%group", group);
+                bot.sendIRCMessage(channel, out);
+            }
+        } else {
+            bot.invalidArguments(event.getUser(), ADD_FRMT);
+        }
+    }
 }

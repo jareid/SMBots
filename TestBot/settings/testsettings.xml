@@ -67,7 +67,7 @@
 		<channel>testeroo2</channel>
 		<option type="announce">testeroo2</option>
 	</listener>
-	<listener type="pokerDISABLED">
+	<listener type="poker">
 		<channel>testeroo2</channel>
 	</listener>
 	<listener type="auctions">

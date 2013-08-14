@@ -84,6 +84,18 @@ public class Client extends Event {
             lobby.start();
             pokerValidChannels.put(lobbyChan.toLowerCase(), lobby);
         }
+        
+        // (Re-)Check the user's status with NickServ
+        if (validTables.size() == 0) {
+            ProfileType[] profiles = ProfileType.values();
+            for (Integer x : PokerVars.INITBB) {
+                for (Integer y : PokerVars.INITTBLSIZES) {
+                    for (int z = 0; z < profiles.length; z++) {
+                        newTable(x, y, profiles[z], false);
+                    }
+                }
+            }
+        }
 
         // Request invites from Chanserv and attempt to join all channels
         for (Entry<String, Room> entry : pokerValidChannels.entrySet()) {
@@ -122,24 +134,12 @@ public class Client extends Event {
     public final void join(final Join event) {
         String channel = event.getChannel().getName();
         String joinee = event.getUser().getNick();
-        // (Re-)Check the user's status with NickServ
-        if (joinee.compareToIgnoreCase(event.getBot().getNick()) == 0
-              && channel.compareToIgnoreCase(lobbyChan) == 0
-              && validTables.size() == 0) {
-            ProfileType[] profiles = ProfileType.values();
-            for (Integer x : PokerVars.INITBB) {
-                for (Integer y : PokerVars.INITTBLSIZES) {
-                    for (int z = 0; z < profiles.length; z++) {
-                        newTable(x, y, profiles[z], false);
-                    }
-                }
-            }
-        }
-
         // Notify the correct room if required
-        Room room = pokerValidChannels.get(channel.toLowerCase());
-        if (room != null) {
-            room.addEvent(event, EventType.JOIN);
+        if (!joinee.equalsIgnoreCase(event.getBot().getNick())) {
+            Room room = pokerValidChannels.get(channel.toLowerCase());
+            if (room != null) {
+                room.addEvent(event, EventType.JOIN);
+            }
         }
     }
 
@@ -174,7 +174,7 @@ public class Client extends Event {
         if (nick.compareToIgnoreCase(event.getBot().getNick()) != 0) {
             // Notify the correct room if required
             for (Room room : pokerValidChannels.values()) {
-                room.addEvent(event, EventType.PART);
+                room.addEvent(event, EventType.QUIT);
             }
         }
     }
