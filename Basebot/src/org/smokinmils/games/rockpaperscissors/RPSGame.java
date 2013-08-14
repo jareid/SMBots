@@ -181,9 +181,9 @@ public class RPSGame extends Event {
 
         if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)) {
             if (Utils.startsWith(message, CXL_CMD)) {
-                if (se.check(event, FAST_CHAN)) { cancel(event); }
+               cancel(event);
             } else if (Utils.startsWith(message, CALL_CMD)) {
-                if (se.check(event, FAST_CHAN)) { call(event); }
+                call(event);
             } else if (Utils.startsWith(message, RPS_CMD)) {
                 if (se.check(event, FAST_CHAN)) { newGame(event); }
             }

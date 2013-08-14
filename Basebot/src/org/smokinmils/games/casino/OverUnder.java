@@ -128,9 +128,9 @@ public class OverUnder extends Event {
                     && event.getBot().userIsIdentified(sender)) {
                 try {
                     if (Utils.startsWith(message, ROLL_CMD)) {
-                        if (se.check(event, FAST_CHAN)) { roll(event); }
+                        roll(event);
                     } else if (Utils.startsWith(message, CXL_CMD)) {
-                        if (se.check(event, FAST_CHAN)) { cancel(event); }
+                       cancel(event);
                     } else if (Utils.startsWith(message, BET_CMD)) {
                         if (se.check(event, FAST_CHAN)) { ou(event); }
                     }

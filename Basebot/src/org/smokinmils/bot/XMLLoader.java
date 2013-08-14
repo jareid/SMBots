@@ -18,6 +18,7 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.auctions.Auctioneer;
 import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.cashier.commands.Coins;
+import org.smokinmils.cashier.commands.Lottery;
 import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
 import org.smokinmils.cashier.rake.Rake;
@@ -48,6 +49,9 @@ import org.w3c.dom.NodeList;
  *
  */
 public final class XMLLoader {
+
+        /** The channel tag in the XML file. */
+        private static final String CHANNEL = "channel";
 
         /** create the singleton. */
         private static final XMLLoader INSTANCE = new XMLLoader();
@@ -118,6 +122,8 @@ public final class XMLLoader {
 
                 initSpamEncorcer();
                 
+                initLottery(serveraddr);
+                
             } catch (Exception e) {
                 e.printStackTrace();  
             }
@@ -180,7 +186,7 @@ public final class XMLLoader {
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     String n = nodeList.item(i).getNodeName();
                 
-                    if (n.equals("channel")) {
+                    if (n.equals(CHANNEL)) {
                         
                         channels.add("#" + nodeList.item(i).getTextContent());
                     }
@@ -242,7 +248,7 @@ public final class XMLLoader {
                             for (int j = 0; j < cNodes.getLength(); j++) {
                                 Element subel = (Element) cNodes.item(j);
                                 String n2 = subel.getNodeName();
-                                if (n2.equals("channel")) {
+                                if (n2.equals(CHANNEL)) {
                                     // if we have a channel, create the game
                                     String channel = "#" + subel.getTextContent();
                                     channels.add(channel);
@@ -364,7 +370,7 @@ public final class XMLLoader {
                             for (int j = 0; j < cNodes.getLength(); j++) {
                                 Element subel = (Element) cNodes.item(j);
                                 String n2 = subel.getNodeName();
-                                if (n2.equals("channel")) {
+                                if (n2.equals(CHANNEL)) {
                                     // if we have a channel, create the game
                                     String channel = "#" + subel.getTextContent();
                                     channels.add(channel);
@@ -494,15 +500,53 @@ public final class XMLLoader {
                     Element el = (Element) nodeList.item(i);
                     String n = el.getNodeName();
                     String content = el.getTextContent();
-                    if (n.equals("channel")) {
+                    if (n.equals(CHANNEL)) {
                         se.add("#" + content); 
                         EventLog.log("Added to spam list: #" + content, "XMLLoader",
                                      "initSpamEnforcer");
-                    } 
+                    } else if (n.equals("delay")) {
+                        int delay = Utils.tryParse(content);
+                        if (delay > 0) {
+                            se.setDelay(delay);
+                        }
+                    }
                 }
             } catch (Exception e) {
                 EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
             }
 
         }
+        
+        /**
+         * Initialises The Lottery.
+         */
+        private void initLottery(final String server) {
+            try {
+                XPath xPath =  XPathFactory.newInstance().newXPath();
+                
+                String expression = "/bot/lottery/*";
+                //read a nodelist using xpath
+                NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                            XPathConstants.NODESET);
+                
+                
+                ArrayList<String> channels = new ArrayList<String>();
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Element el = (Element) nodeList.item(i);
+                    String n = el.getNodeName();
+                    String content = el.getTextContent();
+                    if (n.equals(CHANNEL)) {
+                        channels.add("#" + content); 
+                    } 
+                }
+                String[] chanarr = (String[]) channels.toArray();
+                BaseBot.getInstance().addListener(server, new Lottery(), chanarr);
+                
+            } catch (Exception e) {
+                EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
+            }
+
+        }
     }
+
+// basebot.addListener(swift_irc, new Lottery(), all_swift_chans);

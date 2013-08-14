@@ -14,6 +14,10 @@
 	<db type="dbuser">smbot</db>
 	<db type="dbpass">SM_bot_2013$</db>
 	
+	<spam>
+    	<channel>SMGamer</channel>
+    </spam>
+	
 	<listener type="referrals">
         <channel>managers</channel>
         <channel>SM_ranks</channel>
