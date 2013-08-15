@@ -16,6 +16,7 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
+import org.smokinmils.games.rpg.Duel;
 
 /**
  * Allows managers to invite the bot into a channel with a certain game.
@@ -41,6 +42,9 @@ public class Invite extends Event {
     
     /** string representation for dice duel. */
     private static final String DD = "dd";
+    
+    /** string representation for dice duel. */
+    private static final String DUEL = "duel";
     
     /** string representation for overunder. */
     private static final String OU = "ou";
@@ -142,6 +146,10 @@ public class Invite extends Event {
                Event listener = null;
                if (game.equals(DD)) {
                    listener = new DiceDuel(bot, newchannel);
+                   listener.addValidChan(newchannel);
+                   bb.addListener(bot.getServer(), listener);
+               } else if (game.equals(DUEL)) {
+                   listener = new Duel(bot, newchannel);
                    listener.addValidChan(newchannel);
                    bb.addListener(bot.getServer(), listener);
                } else if (game.equals(OU)) {

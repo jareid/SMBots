@@ -501,7 +501,7 @@ public final class XMLLoader {
             try {
                 XPath xPath =  XPathFactory.newInstance().newXPath();
                 
-               String expression = "/bot/spam/*";
+                String expression = "/bot/spam/*";
                 //read a nodelist using xpath
                 NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
                                                             XPathConstants.NODESET);
@@ -524,8 +524,8 @@ public final class XMLLoader {
                 }
             } catch (Exception e) {
                 EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
+                e.printStackTrace();
             }
-
         }
         
         /**
@@ -541,23 +541,24 @@ public final class XMLLoader {
                 NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
                                                             XPathConstants.NODESET);
                 
-                
-                ArrayList<String> channels = new ArrayList<String>();
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Element el = (Element) nodeList.item(i);
-                    String n = el.getNodeName();
-                    String content = el.getTextContent();
-                    if (n.equals(CHANNEL)) {
-                        channels.add("#" + content); 
-                    } 
+                // Only continue if there are nodes to add
+                if (nodeList.getLength() > 0) {
+                    ArrayList<String> channels = new ArrayList<String>();
+                    for (int i = 0; i < nodeList.getLength(); i++) {
+                        Element el = (Element) nodeList.item(i);
+                        String n = el.getNodeName();
+                        String content = el.getTextContent();
+                        if (n.equals(CHANNEL)) {
+                            channels.add("#" + content); 
+                        } 
+                    }
+                    String[] chanarr = (String[]) channels.toArray();
+                    BaseBot.getInstance().addListener(server, new Lottery(), chanarr);
                 }
-                String[] chanarr = (String[]) channels.toArray();
-                BaseBot.getInstance().addListener(server, new Lottery(), chanarr);
                 
             } catch (Exception e) {
-                EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
+                EventLog.fatal(e, "XMLLoader", "initLottery");
             }
-
         }
         
         /**

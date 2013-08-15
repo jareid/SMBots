@@ -106,8 +106,7 @@ public final class DB {
     private final String        url         = "jdbc:mysql://"
                                             + DBSettings.SERVER + ":"
                                             + DBSettings.PORT + "/"
-                                            + DBSettings.DB_NAME
-                                            + "?autoReconnect=true";
+                                            + DBSettings.DB_NAME;
 
     /** This is used to adjust bets when they are approaching zero. */
     private static final double CHIPS_LTONE = 1.0;
@@ -130,6 +129,7 @@ public final class DB {
         props.put("maxPoolSize", "30");
         props.put("numHelperThreads", "12");
         props.put("aquireIncrement", "5");
+        props.put("autoReconnect", "true");
         props.put("maxIdleTime", new Integer(MAX_IDLE_MINS * Utils.MS_IN_MIN));
         
         unpooled = DataSources.unpooledDataSource(url,

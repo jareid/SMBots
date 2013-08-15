@@ -40,8 +40,7 @@ public class CreateTimedRoll extends Event {
     public static final String               BAN_CMD        = "!rollban";
     
     /** The Ban/Unban format. */
-    public static final String               BAN_FORMAT     = "%b%c12"
-                  + BAN_CMD + " <user> ";
+    public static final String               BAN_FORMAT     = "%b%c12" + BAN_CMD + " <user> ";
     
     /** The Unban command. */
     public static final String               UBAN_CMD        = "!rollunban";
