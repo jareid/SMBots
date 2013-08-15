@@ -46,14 +46,20 @@ public class Auctioneer extends Event {
     public static final String  ADDCMD     = "!additem";
 
     /** The add command format. */
-    public static final String  ADDFMT    = "%b%c12" + ADDCMD + " <item/chips> <length in minutes> "
-            + "<start_price> <profile> <item name/amount of chips> ";
+    public static final String  ADDFMT    = "%b%c12" + ADDCMD + " <item/coins> <length in minutes> "
+            + "<start_price> <profile> <item name/amount of coins> ";
 
     /** The add command length. */
     public static final int     ADD_CMD_LEN     = 6;
     
     /** The amount to increase each auction by. */
     public static final double INCR_AMOUNT = 0.5;
+    
+    /** If an auction is recovered with < this time, set to RECOVERY_NEW_TIME. */
+    public static final int RECOVERY_TIMEOUT = 10 * Utils.MIN_IN_HOUR;
+    
+    /** The time to change to if an auction was recovered with less than RECOVERY_TIMEOUT minutes. */
+    public static final int RECOVERY_NEW_TIME = 60 * Utils.MIN_IN_HOUR;
     
     /** String informing the user that no auction with that ID is available. */
     public static final String NO_AUC_ID = "%b%c04%who%c12: Unable to find the auction with that "
@@ -71,7 +77,7 @@ public class Auctioneer extends Event {
     /** String for each individual auction to be added to above. */
     private static final String SINGLE_AUCTION = " %b%c04%name %c12(id: %c04%id%c12, "
                                   + "Time left: %c04%time%c12,  Current bid: %c04%bid%c12 coins, "
-                                  + "Profile(s): %c04%profile%c12)";
+                                  + "Profile: %c04%profile%c12)";
     
     /** String announcing auction that is in the final minute. */
     private static final String FINAL_MINUTE = "%b%c04%name%c12 auction has only 1 minute left!" 
@@ -79,7 +85,7 @@ public class Auctioneer extends Event {
     
     /** String to inform the user they can't use the play profile. */
     private static final String WRONG_PROFILE = "%b%c04%who%c12: This auction is using the "
-            + "%c04%profile%c12 profile(s).";
+            + "%c04%profile%c12 profile.";
 
     /** String to indicate there is no current winner for the auction. */
     public static final String NO_WINNER = "No one";
@@ -89,7 +95,7 @@ public class Auctioneer extends Event {
     		+ "id:%c04%id";
 
     /** String to check for when adding a chips auction. */
-    private static final String ADD_CHIPS_VAR = "chips";
+    private static final String ADD_CHIPS_VAR = "coins";
     
     /** The list of auctions that are active. */
     private final ArrayList<Auction> auctions;
@@ -112,8 +118,30 @@ public class Auctioneer extends Event {
         
         auctionTimer = new Timer(true);
         auctionTimer.schedule(new AuctionTimer(irc, chan), Utils.MS_IN_MIN / 2, Utils.MS_IN_MIN);
+        
+        // recover and process any auctions
+        recoverAuctions();
     }
     
+    /**
+     * Loads auctions that are still in the database incase of a crashhhh.
+     */
+    private void recoverAuctions() {
+        DB db = DB.getInstance();
+        try {
+            for (Auction a : db.getUnfinishedAuctions()) {
+                if (a.getTime() <= RECOVERY_TIMEOUT) {
+                    a.setTime(RECOVERY_NEW_TIME);
+                }
+                auctions.add(a);
+            }
+        } catch (Exception e) {
+           EventLog.log(e, "Auctioneer", "recoverAuctions");
+        }
+       
+        
+    }
+
     /**
      * This method handles the auction commands.
      * 
@@ -150,12 +178,12 @@ public class Auctioneer extends Event {
             bot.sendIRCMessage(chan, ACTIVE_AUCTIONS);
             for (Auction a : auctions) {
                 // check for open auctions, announce here
-                System.out.println(a.getTime());
-                    String add = SINGLE_AUCTION.replaceAll("%name", a.getName());
-                    add = add.replaceAll("%id", String.valueOf(a.getId()));
-                    add = add.replaceAll("%time", Utils.secondsToString(a.getTime()));
-                    add = add.replaceAll("%bid", String.valueOf(a.getPrice()));
-                    bot.sendIRCMessage(chan, add);
+                
+                String add = SINGLE_AUCTION.replaceAll("%name", a.getName());
+                add = add.replaceAll("%id", String.valueOf(a.getId()));
+                add = add.replaceAll("%time", Utils.secondsToString(a.getTime()));
+                add = add.replaceAll("%bid", String.valueOf(a.getPrice()));
+                bot.sendIRCMessage(chan, add);
                    
             }
         }
@@ -229,7 +257,7 @@ public class Auctioneer extends Event {
                             bot.sendIRCMessage(chan, out);  
                         }
                     } catch (SQLException e) {
-                        EventLog.log(e, "Auctions", "placeBid");
+                        EventLog.log(e, "Auctioneer", "placeBid");
                      }
                 } else {
                     String out = NO_AUC_ID.replaceAll("%who", sender.getNick());
@@ -271,16 +299,12 @@ public class Auctioneer extends Event {
             
             // get profiles
             ArrayList<ProfileType> pr = new ArrayList<ProfileType>();
-            String[] profiles = msg[1 + 1 + 1 + 1].split(",");
-            for (String s : profiles) {
-                ProfileType p = ProfileType.fromString(s);
-                if (p != null) {
-                    pr.add(p);
-                } else {
-                    // if encounter a non valid profile, cry
-                    pr = null;
-                    break;
-                }
+            ProfileType p = ProfileType.fromString(msg[1 + 1 + 1 + 1]);
+            if (p != null) {
+                pr.add(p);
+            } else {
+                // if encounter a non valid profile, cry
+                pr = null;
             }
             
             if (price <= 0.0 || time <= 0.0 || pr == null) {
@@ -354,7 +378,7 @@ public class Auctioneer extends Event {
                         if (a.getWinner() == null) {
                             name = NO_WINNER;
                         } else {
-                            name = a.getWinner().getNick();
+                            name = a.getWinner();
                         }
                         String out = FINAL_MINUTE.replaceAll("%name", a.getName());
                         out = out.replaceAll("%id", String.valueOf(a.getId()));
@@ -362,6 +386,13 @@ public class Auctioneer extends Event {
                         out = out.replaceAll("%winner", name);
                         a.finalMinute(irc, chan);
                         irc.sendIRCMessage(chan, out);
+                    } else {
+                        DB db = DB.getInstance();
+                        try {
+                            db.updateAuctionTime(a.getId(), a.getTime() / Utils.MIN_IN_HOUR);
+                        } catch (SQLException e) {
+                           EventLog.log(e, "Auctioneer.AuctionTimer", "run");
+                        }
                     }
                 }
                 

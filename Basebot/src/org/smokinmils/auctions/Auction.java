@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
+import org.smokinmils.BaseBot;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
@@ -25,7 +26,7 @@ public class Auction {
     
     /** String letting the user know to pay, pay now! */
     private static final String WINNER = "%b%c04%who%c12: You have won the auction for %c04%name"
-    		+ " %c12if the auction was for chips these have been added to your account, if an item "
+    		+ " %c12if the auction was for coins these have been added to your account, if an item "
     		+ ", please query a member of staff! ";
    
     /** String for the final minute. */
@@ -37,7 +38,7 @@ public class Auction {
 
     /** String to announce auction winnor. */
     private static final String AUCTION_WON = "%b%c04%who%c12 has won %c04%item%c12 for"
-    		+ " %c04%price%c12 chips ";
+    		+ " %c04%price%c12 coins ";
 
     /** The cost to bid. */
     public static final int BID_PRICE = 20;
@@ -57,8 +58,8 @@ public class Auction {
     /** the ID of the item. */
     private int id = 0;
     
-    /** the winning user. */
-    private User winner = null;
+    /** the winning user's nick. */
+    private String winner = null;
     
     /** The profile the current winner is using. */
     private ProfileType winnerProf = null;
@@ -80,7 +81,7 @@ public class Auction {
      * @param p the price
      * @param n the name
      * @param t the initial time in minutes 
-     * @param pr valid profiles If selling chips, the first one is the chips we are selling too
+     * @param pr valid profile
      */
     public Auction(final double p,
                      final String n, 
@@ -92,9 +93,9 @@ public class Auction {
         profiles = pr;
         
         try {
-            id = DB.getInstance().addAuction(name, price, pr);
+            id = DB.getInstance().addAuction(name, price, pr, t, chipsWin);
         } catch (SQLException e) {
-            EventLog.log(e, "Auctions", "addItem");
+            EventLog.log(e, "Auction", "constructor");
         }
         
     }
@@ -110,9 +111,69 @@ public class Auction {
                      final double c, 
                      final int t,
                      final ArrayList<ProfileType> pr) {
-        this(p, Utils.chipsToString(c) + " " + pr.get(0) + " chips", t, pr);
         chips = true;
         chipsWin = c;
+        price = p;
+        name = Utils.chipsToString(c) + " " + pr.get(0) + " coins";
+        time = t * Utils.MIN_IN_HOUR;
+        profiles = pr;
+        
+        try {
+            id = DB.getInstance().addAuction(name, price, pr, t, chipsWin);
+        } catch (SQLException e) {
+            EventLog.log(e, "Auction", "constructor");
+        }
+    }
+    
+    /**
+     * Constructor for when recovering.
+     * @param i the id of the auction
+     * @param p the price
+     * @param n the name
+     * @param t the initial time in minutes
+     * @param w the current winner's name 
+     * @param pr valid profile
+     */
+    public Auction(final int i,
+                   final double p,
+                   final String n, 
+                   final int t,
+                   final String w,
+                   final ArrayList<ProfileType> pr) {
+        price = p;
+        name = n;
+        time = t * Utils.MIN_IN_HOUR;
+        profiles = pr;
+        winner = w;
+        id = i;
+        
+    }
+    
+    /**
+     * Constructor for when recovering.
+     * @param i the id of the auction
+     * @param p the price
+     * @param c the number of chips
+     * @param t the initial time in minutes
+     * @param w the current winner's name 
+     * @param pr valid profiles 
+     */
+    public Auction(final int i,
+                   final double p,
+                   final double c, 
+                   final int t,
+                   final String w,
+                   final ArrayList<ProfileType> pr) {
+        chips = true;
+        chipsWin = c;
+        
+        price = p;
+        name = Utils.chipsToString(c) + " " + pr.get(0) + " coins";
+        time = t * Utils.MIN_IN_HOUR;
+        profiles = pr;
+        winner = w;
+        id = i;
+        
     }
 
     /**
@@ -131,7 +192,7 @@ public class Auction {
             try {
                 // refund the previous winner
                 if (winnerProf != null) {
-                    db.adjustChips(winner.getNick(), price, winnerProf, 
+                    db.adjustChips(winner, price, winnerProf, 
                             GamesType.AUCTION, TransactionType.CANCEL);
                 }
                 
@@ -147,13 +208,13 @@ public class Auction {
                          GamesType.AUCTION, TransactionType.AUCTION_PAY);
                 
                 // update to the new winner / winner profile
-                winner = sender;
-                winnerProf = db.getActiveProfile(winner.getNick());
+                winner = sender.getNick();
+                winnerProf = db.getActiveProfile(winner);
                 
                 
                 ret = true;
             } catch (SQLException e) {
-                EventLog.log(e, "anAuction", "bid");
+                EventLog.log(e, "Auction", "bid");
             }
            
             if (time < END_TIME) {
@@ -194,7 +255,7 @@ public class Auction {
      * Gets the current winning bidder (or when over, the winner).
      * @return the user who is winning / won. or null
      */
-    public final User getWinner() {
+    public final String getWinner() {
         return winner;
     }
     
@@ -204,6 +265,14 @@ public class Auction {
      */
     public final int getTime() {
         return time;
+    }
+    
+    /**
+     * sets the time left in seconds (for use in recovery).
+     * @param newtime the new time to set to
+     */
+    public final void setTime(final int newtime) {
+        time = newtime;
     }
     
     /**
@@ -289,7 +358,7 @@ public class Auction {
             if (getWinner() == null) {
                 winnerName = "No one";
             } else {
-                winnerName = getWinner().getNick();
+                winnerName = winner;
             }
            
            int timeToTick = SPAM_EVERY_LT_MIN;
@@ -311,25 +380,25 @@ public class Auction {
            } else {
                
                try {
-                DB db = DB.getInstance();
-                db.endAuction(getId());
-                String out = AUCTION_WON.replaceAll("%who", winnerName);
-                out = out.replaceAll("%item", getName());
-                out = out.replaceAll("%price", Utils.chipsToString(getPrice()));
-                irc.sendIRCMessage(chan, out);
+                    DB db = DB.getInstance();
+                    db.endAuction(getId());
+                    String out = AUCTION_WON.replaceAll("%who", winnerName);
+                    out = out.replaceAll("%item", getName());
+                    out = out.replaceAll("%price", Utils.chipsToString(getPrice()));
+                    irc.sendIRCMessage(chan, out);
+                    
+                    if (chips) {
+                      db.adjustChips(winnerName, chipsWin, getProfiles().get(0), GamesType.AUCTION, 
+                              TransactionType.WIN); 
+                    }
+                    out = WINNER.replaceAll("%who", winnerName);
+                    out = out.replaceAll("%name", getName());
+                    out = out.replaceAll("%id", String.valueOf(getId()));
+                    irc.sendIRCNotice(getWinner(), out);
                 
-                if (chips) {
-                  db.adjustChips(winnerName, chipsWin, getProfiles().get(0), GamesType.AUCTION, 
-                          TransactionType.WIN); 
+                } catch (SQLException e) {
+                   EventLog.log(e, "Auction.FinalCountDown", "run");
                 }
-                out = WINNER.replaceAll("%who", winnerName);
-                out = out.replaceAll("%name", getName());
-                out = out.replaceAll("%id", String.valueOf(getId()));
-                irc.sendIRCNotice(getWinner(), out);
-                
-            } catch (SQLException e) {
-               EventLog.log(e, "AnAuction", "ending auction");
-            }
                
            } 
         }

@@ -31,4 +31,13 @@ public final class AuctionsTable {
     
     /** Column for the profile id for the bet. */
     public static final String COL_FINISHED = "finished";
+    
+    /** Column for the time left. */
+    public static final String COL_TIMELEFT = "timeleft";
+    
+    /** Column to determine if chips or not. */
+    public static final String COL_CHIPS = "chips";
+    
+    /** Profile for the auction. */
+    public static final String COL_PROFILE = "profile";
 }

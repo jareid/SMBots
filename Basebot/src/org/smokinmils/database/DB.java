@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
+import org.smokinmils.auctions.Auction;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.database.tables.AuctionProfilesTable;
 import org.smokinmils.database.tables.AuctionsTable;
@@ -231,27 +232,34 @@ public final class DB {
      * @param itemname the name of the item
      * @param amount the startign amount
      * @param pr the auction profiles
+     * @param time the duration of the auction
+     * @param chips are we adding chips or not!?
      * @return yay or nay?
      * @throws SQLException when an error occues
      */
     public int addAuction(final String itemname,
-                              final double amount,
-                              final ArrayList<ProfileType> pr) 
+                          final double amount,
+                          final ArrayList<ProfileType> pr,
+                          final int time,
+                          final double chips) 
                                       throws SQLException {
         String sql = "INSERT INTO " + AuctionsTable.NAME + "("
                 + AuctionsTable.COL_ITEMNAME + ", " + AuctionsTable.COL_AMOUNT + ", "
-                + AuctionsTable.COL_USERID + ") VALUES('"
+                + AuctionsTable.COL_USERID + ", " + AuctionsTable.COL_TIMELEFT + ", " 
+                + AuctionsTable.COL_CHIPS + ", " + AuctionsTable.COL_PROFILE + ") VALUES('"
                 + itemname + "', " + String.valueOf(amount) + ", (" 
-                + getUserIDSQL(HOUSE_USER) + "));";
+                + getUserIDSQL(HOUSE_USER) + "), " + time + ", " + chips + ", (" 
+                + getProfileIDSQL(pr.get(0)) + "));";
          
         int newID = runGetIDQuery(sql);
-        for (ProfileType p : pr) {
+        /* Multi profile support not yet implmented fully :( TODO ?
+         * for (ProfileType p : pr) {
             sql = "INSERT INTO " + AuctionProfilesTable.NAME + "("
                     + AuctionProfilesTable.COL_AUCTIONID + ", " + AuctionProfilesTable.COL_PROFILEID
                     + ") VALUES(" + newID + ", (" + getProfileIDSQL(p) + "));";
            
             runBasicQuery(sql);
-        }
+        }*/
         return newID;
     }
     
@@ -275,10 +283,26 @@ public final class DB {
     }
     
     /**
+     * Updates an auction's time left.
+     * @param id the id of the auction we are updating
+     * @param time the time left
+     * @return yay or nay
+     * @throws SQLException if something goes wrong!
+     */
+    public boolean updateAuctionTime(final int id,
+                                     final int time) throws SQLException {
+        String sql = "UPDATE " + AuctionsTable.NAME + " SET " 
+            + AuctionsTable.COL_TIMELEFT + "=" + String.valueOf(time)
+            + " WHERE "
+            + AuctionsTable.COL_ID + "=" + String.valueOf(id) + ";";
+        return runBasicQuery(sql) == 1;
+    }
+    
+    /**
      * Ends an auction.
      * @param id the id of the item name we are ending
      * @return yay or nay
-     * @throws SQLException  when an errors occures   
+     * @throws SQLException  when an errors occurs   
      */
     public boolean endAuction(final int id) throws SQLException {
         String sql = "UPDATE " + AuctionsTable.NAME + " SET " 
@@ -288,6 +312,81 @@ public final class DB {
         return runBasicQuery(sql) == 1;
     }
     
+    
+    /**
+     * Gets all auctions in the database that are unfinished so we can recover them.
+     * @return unfinished auctions
+     * @throws SQLException 
+     */
+    public ArrayList<Auction> getUnfinishedAuctions() throws SQLException {
+        ArrayList<Auction> retList = new ArrayList<Auction>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT " + UsersTable.NAME + "." + UsersTable.COL_USERNAME + ", " 
+                + AuctionsTable.NAME + "." + AuctionsTable.COL_TIMELEFT + ", "  
+                + AuctionsTable.NAME + "." + AuctionsTable.COL_AMOUNT + ", "  
+                + AuctionsTable.NAME + "." + AuctionsTable.COL_ID + ", "  
+                + AuctionsTable.NAME + "." + AuctionsTable.COL_ITEMNAME + ", " 
+                + AuctionsTable.NAME + "." + AuctionsTable.COL_CHIPS + ", " 
+                + ProfileTypeTable.NAME + "." + ProfileTypeTable.COL_NAME
+                + " FROM " + AuctionsTable.NAME + " JOIN " + UsersTable.NAME 
+                + " JOIN " + ProfileTypeTable.NAME
+                + " WHERE " + AuctionsTable.COL_FINISHED + "=0" 
+                + " AND " + AuctionsTable.NAME + "." + AuctionsTable.COL_USERID + "="
+                + UsersTable.NAME + "." + UsersTable.COL_ID
+                + " AND " + AuctionsTable.NAME + "." + AuctionsTable.COL_PROFILE + "="
+                + ProfileTypeTable.NAME + "." + ProfileTypeTable.COL_ID;
+       System.out.print(sql);
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            try {
+                
+                rs = stmt.executeQuery(sql);
+                
+                while (rs.next()) {
+                    double chips = rs.getInt(AuctionsTable.COL_CHIPS);
+                    int id = rs.getInt(AuctionsTable.COL_ID);
+                    int time = rs.getInt(AuctionsTable.COL_TIMELEFT);
+                    String user = rs.getString(UsersTable.COL_USERNAME);
+                    double amount = rs.getDouble(AuctionsTable.COL_AMOUNT);
+                    String itemname = rs.getString(AuctionsTable.COL_ITEMNAME);
+                    System.out.println(">>>>>> " + itemname);
+                    String profstr = rs.getString(ProfileTypeTable.COL_NAME);
+                    
+                    ProfileType prof = ProfileType.fromString(profstr);
+                    ArrayList<ProfileType> profiles = new ArrayList<ProfileType>();
+                    profiles.add(prof);
+                    
+                    if (chips > 0) {
+                        Auction a = new Auction(id, amount, chips, time, user, profiles);
+                        retList.add(a);
+                    } else {
+                        Auction a = new Auction(id, amount, itemname, time, user, profiles);
+                        retList.add(a);
+                    }
+                    
+                }
+            } catch (SQLException e) {
+                throw new DBException(e.getMessage(), sql);
+            }
+        } catch (DBException ex) {
+            throw ex;
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        return retList;
+    }
     
     /**
      * Getter method for a user's active profile text.
