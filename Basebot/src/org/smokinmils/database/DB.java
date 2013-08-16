@@ -23,7 +23,6 @@ import javax.sql.DataSource;
 
 import org.smokinmils.auctions.Auction;
 import org.smokinmils.bot.Utils;
-import org.smokinmils.database.tables.AuctionProfilesTable;
 import org.smokinmils.database.tables.AuctionsTable;
 import org.smokinmils.database.tables.BetsTable;
 import org.smokinmils.database.tables.ChipsTransactionsTable;
