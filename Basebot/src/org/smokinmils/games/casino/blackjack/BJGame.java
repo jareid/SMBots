@@ -655,7 +655,8 @@ public class BJGame extends Event {
             bot.sendIRCNotice(winner, out);
             
         } catch (Exception e) {
-            EventLog.log(e, "BJGame", "playerWin");
+            EventLog.log(e, 
+                    "BJGame", "playerWin");
         }
 
         // jackpot stuff only one person, so no need for losers!

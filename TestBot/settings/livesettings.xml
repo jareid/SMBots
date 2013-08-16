@@ -65,6 +65,8 @@
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
 	</listener>
 	<listener type="help">
 		<channel>SMGamer</channel>
@@ -72,6 +74,8 @@
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
 	</listener>
 	<listener type="managersystem">
 		<channel>SMGamer</channel>
@@ -79,6 +83,8 @@
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
 		<option type="managementchan">managers</option>
 		<option type="activechan">SMGamer</option>
 		<option type="hostchan">SM_ranks</option>
@@ -89,6 +95,8 @@
 		<channel>sm_express</channel>
 		<channel>sm_overunder</channel>
 		<channel>sm_roulette</channel>
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
 	</listener>
 	
 	<listener type="rps">

@@ -6,7 +6,7 @@
  * 
  * Copyright (C) 2013 Jamie Reid & Carl Clegg
  */
-package org.smokinmils.testbots;
+package org.smokinmils;
 
 import java.io.FileWriter;
 import java.io.Writer;

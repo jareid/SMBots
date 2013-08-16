@@ -296,6 +296,7 @@ public class RPSGame extends Event {
                         if (choice != null) {
                             found.close();
                             openBets.remove(found);
+                            pendingBets.remove(found.getUser().getNick());
     
                             GameLogic betterchoice = GameLogic.fromString(found.getChoice());
                             GameLogic callerchoice = choice;
