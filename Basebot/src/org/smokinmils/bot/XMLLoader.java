@@ -304,7 +304,7 @@ public final class XMLLoader {
                           basebot.addListener(server,
                                     new ManagerSystem("#" + options.get("activechan"),
                                             "#" + options.get("managementchan"), 
-                                            options.get("hostchan"), bot),
+                                            "#" + options.get("hostchan"), bot),
                                    chanarr);
                         }  else if (type.equals("rps")) {
                           RPSGame rpsevent = new RPSGame();
