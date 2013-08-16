@@ -1,4 +1,4 @@
-package org.smokinmils.testbots;
+package org.smokinmils;
 
 import java.io.File;
 import java.sql.Connection;
