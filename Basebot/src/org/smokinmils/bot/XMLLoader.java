@@ -302,8 +302,8 @@ public final class XMLLoader {
                                    chanarr);
                         } else if (type.equals("managersystem")) {
                           basebot.addListener(server,
-                                    new ManagerSystem("#" + options.get("managementchan"), 
-                                            "#" + options.get("activechan"), 
+                                    new ManagerSystem("#" + options.get("activechan"),
+                                            "#" + options.get("managementchan"), 
                                             options.get("hostchan"), bot),
                                    chanarr);
                         }  else if (type.equals("rps")) {
