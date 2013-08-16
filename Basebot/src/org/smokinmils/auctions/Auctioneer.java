@@ -72,7 +72,7 @@ public class Auctioneer extends Event {
 
     /** String informing users of the active auctions. */
     private static final String ACTIVE_AUCTIONS = "%b%c12The following auctions are active, to bid "
-                    + "type %c04!bid <itemid>%c12 or type %c04!info auctions%c12 for instructions";
+                    + "type %c04!bid <itemID>%c12 or type %c04!info auctions%c12 for instructions";
     
     /** String for each individual auction to be added to above. */
     private static final String SINGLE_AUCTION = " %b%c04%name %c12(id: %c04%id%c12, "
@@ -170,20 +170,19 @@ public class Auctioneer extends Event {
      * @param event the event from which the request was sent.
      */
     private void listAuctions(final Message event) {
-        Channel chan = event.getChannel();
         IrcBot bot = event.getBot();
-
+        User sender = event.getUser();
     
         if (auctions.size() > 0) {
-            bot.sendIRCMessage(chan, ACTIVE_AUCTIONS);
+            bot.sendIRCNotice(sender, ACTIVE_AUCTIONS);
             for (Auction a : auctions) {
                 // check for open auctions, announce here
-                
                 String add = SINGLE_AUCTION.replaceAll("%name", a.getName());
                 add = add.replaceAll("%id", String.valueOf(a.getId()));
                 add = add.replaceAll("%time", Utils.secondsToString(a.getTime()));
                 add = add.replaceAll("%bid", String.valueOf(a.getPrice()));
-                bot.sendIRCMessage(chan, add);
+                add = add.replaceAll("%profile", a.getProfiles().get(0).toString());
+                bot.sendIRCNotice(sender, add);
                    
             }
         }
