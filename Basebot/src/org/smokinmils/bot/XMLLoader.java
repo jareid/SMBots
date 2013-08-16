@@ -268,10 +268,10 @@ public final class XMLLoader {
                                         mgrchannels.add("#" + subel.getTextContent());
                                     } else if (subel.getAttribute("type").equals("hostchan")) {
                                         hostchannels.add("#" + subel.getTextContent());
-                                    } else {
-                                        options.put(subel.getAttribute("type"),
+                                    } 
+                                    options.put(subel.getAttribute("type"),
                                                     subel.getTextContent());
-                                    }
+                                    
                                 }
                             }
                         }
