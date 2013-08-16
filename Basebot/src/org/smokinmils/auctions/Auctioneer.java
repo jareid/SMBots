@@ -58,7 +58,7 @@ public class Auctioneer extends Event {
     /** If an auction is recovered with < this time, set to RECOVERY_NEW_TIME. */
     public static final int RECOVERY_TIMEOUT = 10 * Utils.MIN_IN_HOUR;
     
-    /** The time to change to if an auction was recovered with less than RECOVERY_TIMEOUT minutes. */
+    /** The time to change if an auction was recovered with less than RECOVERY_TIMEOUT minutes. */
     public static final int RECOVERY_NEW_TIME = 60 * Utils.MIN_IN_HOUR;
     
     /** String informing the user that no auction with that ID is available. */

@@ -7,7 +7,6 @@ import java.util.TimerTask;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
-import org.smokinmils.BaseBot;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
