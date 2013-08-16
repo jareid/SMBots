@@ -9,7 +9,6 @@
 package org.smokinmils.database;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -2097,59 +2096,53 @@ public final class DB {
                                 final Map<String, Double> fees,
                                 final ProfileType profile) throws SQLException {
         Connection conn = null;
-        PreparedStatement tstmt = null;
-        PreparedStatement insstmt = null;
+        Statement stmt = null;
         
         String usersql = "SELECT uu." + UsersTable.COL_ID + " FROM "
                        + UsersTable.NAME + " uu" + " WHERE uu."
-                       + UsersTable.COL_USERNAME + " LIKE ? LIMIT 1";
+                       + UsersTable.COL_USERNAME + " LIKE %user1 LIMIT 1";
         
         String tsql = "INSERT INTO " + RefsTransactionsTable.NAME + "("
-                    + RefsTransactionsTable.COL_TYPEID + ", "
-                    + RefsTransactionsTable.COL_GAMEID + ", "
-                    + RefsTransactionsTable.COL_USERID + ", "
-                    + RefsTransactionsTable.COL_AMOUNT + ", "
-                    + RefsTransactionsTable.COL_FROMUSERID + ", "
-                    + RefsTransactionsTable.COL_PROFILETYPE + ") VALUES(("
-                    + getTzxTypeIDSQL(TransactionType.REFERRAL) + "), ("
-                    + getGameIDSQL(GamesType.ADMIN) + "), ("
-                    + usersql + "), ?, (" + usersql
-                    + "), (" + getProfileIDSQL(profile) + "))";
+                + RefsTransactionsTable.COL_TYPEID + ", "
+                + RefsTransactionsTable.COL_GAMEID + ", "
+                + RefsTransactionsTable.COL_USERID + ", "
+                + RefsTransactionsTable.COL_AMOUNT + ", "
+                + RefsTransactionsTable.COL_FROMUSERID + ", "
+                + RefsTransactionsTable.COL_PROFILETYPE + ") VALUES(("
+                + getTzxTypeIDSQL(TransactionType.REFERRAL) + "), ("
+                + getGameIDSQL(GamesType.ADMIN) + "), ("
+                + usersql + "), ?, (" + usersql.replaceAll("%user1", "%user2")
+                + "), (" + getProfileIDSQL(profile) + "))";
         
         String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
                       + UserProfilesTable.COL_USERID + ", "
                       + UserProfilesTable.COL_TYPEID + ", "
                       + UserProfilesTable.COL_AMOUNT + ") " 
                       + "VALUES((" + usersql + "), (" + getProfileIDSQL(profile)
-                      + "), ?) "
+                      + "), %amnt) "
                       + "ON DUPLICATE KEY UPDATE " + UserProfilesTable.COL_AMOUNT
-                      + "= (" + UserProfilesTable.COL_AMOUNT + " + ?)";
+                      + "= (" + UserProfilesTable.COL_AMOUNT + " + %amnt)";
         
         try {
             conn = getConnection();
-            conn.setAutoCommit(false);
-            tstmt = conn.prepareStatement(tsql);
-            insstmt = conn.prepareStatement(inssql);
-            
+            stmt = conn.createStatement();
+            String sql = "";
+           
             int profileid = runGetIntQuery(getProfileIDSQL(profile));
             // check valid profile
             if (profileid != -1) {            
                 for (Entry<String, Double> entry: fees.entrySet()) {
                     String user = entry.getKey();
                     Double amnt = entry.getValue();
-                    
-                    int i = 0;
-                    insstmt.setString(++i, user);
-                    insstmt.setDouble(++i, amnt);
-                    insstmt.setDouble(++i, amnt);
-                    insstmt.executeUpdate();
-                    
-                    i = 0;
-                    tstmt.setString(++i, user);
-                    tstmt.setDouble(++i, amnt);
-                    tstmt.setString(++i, fromuser);
-                    tstmt.executeUpdate();
-                    
+
+                    sql = inssql.replaceAll("%user1", user);
+                    sql = sql.replaceAll("%amnt", amnt.toString());
+                    stmt.executeUpdate(sql);
+
+                    sql = tsql.replaceAll("%user1", user);
+                    sql = sql.replaceAll("%user2", fromuser);
+                    sql = sql.replaceAll("%amnt", amnt.toString());
+                    stmt.executeUpdate(sql);
                     conn.commit();
                 }
             }
@@ -2157,11 +2150,8 @@ public final class DB {
             throw ex;
         } finally {
             try {
-                if (tstmt != null) {
-                    tstmt.close();
-                }
-                if (insstmt != null) {
-                    insstmt.close();
+                if (stmt != null) {
+                    stmt.close();
                 }
                 if (conn != null) {
                     conn.close();
@@ -2170,7 +2160,6 @@ public final class DB {
                 throw e;
             }
         }
-
     }
     
     /**
