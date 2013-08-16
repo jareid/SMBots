@@ -279,14 +279,19 @@ public class Referrals extends Event {
      */
     public Referrals(final String[] mgrchans, final String[] rnkchans) {
         managerValidChans = new ArrayList<String>();
+        rankValidChans = new ArrayList<String>();
+        
         for (String chan: mgrchans) {
             managerValidChans.add(chan.toLowerCase());
+            rankValidChans.add(chan.toLowerCase());
+            // add mgr channels as valid rank channels so that rank commands work in mgr chans too
         }
         
 
-        rankValidChans = new ArrayList<String>();
+        
         for (String chan: rnkchans) {
             rankValidChans.add(chan.toLowerCase());
+            
         }
     }
     
