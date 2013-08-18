@@ -481,7 +481,7 @@ public final class XMLLoader {
                 }
                 if (nick != null && botname != null && pass != null 
                         && server != null && port != 0) {
-                    basebot.initialise(nick, pass, botname, true, false, false);
+                    basebot.initialise(nick, pass, botname, true, true,  false);
                     basebot.addServer(server, server, port, ip, autoident);
                 } else {
                     EventLog.fatal(null, "XMLLoader", "initBaseBot");
