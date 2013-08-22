@@ -8,6 +8,8 @@
  */
 package org.smokinmils.cashier.commands;
 
+import java.io.IOException;
+
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.bot.CheckIdentified;
@@ -19,6 +21,7 @@ import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
+import org.smokinmils.external.HTTPPoster;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -141,6 +144,16 @@ public class Coins extends Event {
                             User usr = bot.getUserChannelDao().getUser(user);
                             bot.sendIRCNotice(usr, out);
                             
+                            try {
+                                if (!profile.equals(ProfileType.PLAY)) {
+                                    HTTPPoster h = new HTTPPoster();
+                                    h.sendGoldChange(sender.getNick(), amount, profile);
+                                }
+                            } catch (IOException e) {
+                                EventLog.log(e, "Coins", "giveChips");
+                                
+                            }
+                            
                         } else {
                             EventLog.log(sender.getNick() + " attempted to give someone coins and "
                                          + "the database failed", "GiveChips", "message");
@@ -230,6 +243,17 @@ public class Coins extends Event {
 
                             User usr = bot.getUserChannelDao().getUser(user);
                             bot.sendIRCNotice(usr, out);
+                            
+                           
+                            try {
+                                if (!profile.equals(ProfileType.PLAY)) {
+                                    HTTPPoster h = new HTTPPoster();
+                                    h.sendGoldChange(sender, -amount, profile);
+                                }
+                            } catch (IOException e) {
+                                EventLog.log(e, "Coins", "payoutChips");
+                                
+                            }
                         } else {
                             EventLog.log(sender + "database failed", "Payout", "message");
                         }

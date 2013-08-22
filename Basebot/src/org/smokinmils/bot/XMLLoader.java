@@ -125,16 +125,17 @@ public final class XMLLoader {
 
                 Thread.sleep(CONNECT_SLEEP_TIME); // wait for some time to allow bot to connect.
 
-                joinChannels(serveraddr);
-
+                
                 loadListeners(serveraddr, bot);
 
                 loadTimers(serveraddr, bot);  
-
+                
+                joinChannels(serveraddr);
+                
                 initSpamEncorcer();
                 
                 initLottery(serveraddr);
-                
+
             } catch (Exception e) {
                 e.printStackTrace();  
             }
@@ -589,6 +590,39 @@ public final class XMLLoader {
                 EventLog.log(e, "XMLLoader", "getBotNick");
             }
             return nick;
+        }
+
+        /**
+         * Gets a http setting for posting data.
+         * @param setting the setting we want
+         * @return the value of the setting
+         */
+        public String getHTTPSetting(final String setting) {
+            String ret = "";
+            try {
+
+                XPath xPath =  XPathFactory.newInstance().newXPath();
+ 
+                String expression = "/bot/*";
+                //read a nodelist using xpath
+                NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                            XPathConstants.NODESET);
+                  
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    String n = nodeList.item(i).getNodeName();
+                    Element el = (Element) nodeList.item(i); 
+                    if (n.equals("http")) {
+                        if (el.getAttribute("type").equals(setting)) {
+                            ret = el.getTextContent();
+                            break;
+                        }
+                    }
+                }
+                
+            } catch (Exception e) {
+                EventLog.log(e, "XMLLoader", "joinChannels");
+            }
+            return ret;
         }
     }
 
