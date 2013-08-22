@@ -350,7 +350,6 @@ public final class DB {
                     String user = rs.getString(UsersTable.COL_USERNAME);
                     double amount = rs.getDouble(AuctionsTable.COL_AMOUNT);
                     String itemname = rs.getString(AuctionsTable.COL_ITEMNAME);
-                    System.out.println(">>>>>> " + itemname);
                     String profstr = rs.getString(ProfileTypeTable.COL_NAME);
                     
                     ProfileType prof = ProfileType.fromString(profstr);
