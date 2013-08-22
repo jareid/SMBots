@@ -2,6 +2,7 @@ package org.smokinmils.games.rpg;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -118,7 +119,10 @@ public class Duel extends Event {
     private static final int    HEALTH = 100;
     
     /** All the open bets. */
-    private final ArrayList<Bet> openBets;
+    private final List<Bet> openBets;
+    
+    /** pending bets. */
+    private final List<String> pendingBets;
     
     /** The fast channel for the game. */
     private static final String FAST_CHAN = "#SM_Express";
@@ -130,6 +134,7 @@ public class Duel extends Event {
      */
     public Duel(final IrcBot bot, final String channel) {
         openBets = new ArrayList<Bet>();
+        pendingBets = new ArrayList<String>();
 
         Timer announce = new Timer(true);
         announce.scheduleAtFixedRate(new Announce(bot, channel),
@@ -150,8 +155,7 @@ public class Duel extends Event {
         Channel chan = event.getChannel();
         SpamEnforcer se = SpamEnforcer.getInstance();
         
-        if (isValidChannel(chan.getName())
-                && bot.userIsIdentified(sender)) {
+        if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)) {
             try {
                 if (Utils.startsWith(message, DM_CMD)) {
                     if (se.check(event, FAST_CHAN)) { newDM(event); }
@@ -206,7 +210,7 @@ public class Duel extends Event {
                 }
             }
 
-            if (!found) {
+            if (!found && !pendingBets.contains(user)) {
                 // attempt to parse the amount
                 Double amount = Utils.tryParseDbl(msg[1]);
                 double betsize = Utils.checkCredits(user, amount, bot, channel);
@@ -264,99 +268,107 @@ public class Duel extends Event {
         } else if (better != null) {
             Bet found = null;
             boolean foundb = false;
-            for (Bet bet : openBets) {
-                if (bet.getUser().getNick().equalsIgnoreCase(better)) {
-                    found = bet;
-                    foundb = true;
-                    ProfileType cprof = db.getActiveProfile(caller);
-
-                    // quick hax to check if play chips vs non-play chips!
-                    if (cprof != ProfileType.PLAY && bet.getProfile() == ProfileType.PLAY) {
-                        bot.sendIRCMessage(channel, PLAY_VS.replaceAll("%username", username));
-                        found = null;
-                    } else if (cprof == ProfileType.PLAY && bet.getProfile() != ProfileType.PLAY) {
-                        bot.sendIRCMessage(channel, REAL_VS.replaceAll("%username", username));
-                        found = null;
-                    } else if (db.checkCredits(caller) < bet.getAmount()) {
-                        bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
-                        found = null;
-                    } else {
-                        // play this wager
-                        bet.call(caller, cprof);
-                        
-                        String player1 = better;
-                        String player2 = caller;
-                        int active = Random.nextInt(2);
-
-                        int h1 = HEALTH;
-                        int h2 = HEALTH;
-                        while (h1 > 0 && h2 > 0) {
-                            int attack = Random.nextInt(ATTACK) + 1 + ATTACK;
-                            int defense = Random.nextInt(DEFENSE) + 1;
-                            int total = attack - defense;
-
-                            String attacker, defender;
-                            int dfndh = 0;
-                            if (active == 0) {
-                                h2 -= total;
-                                dfndh = h2;
-                                attacker = player1;
-                                defender = player2;
-                            } else {
-                                h1 -= total;
-                                dfndh = h1;
-                                attacker = player2;
-                                defender = player1;
+            if (pendingBets.contains(better)) {
+                bot.sendIRCMessage(channel, NO_WAGER.replaceAll("%username", username));
+            } else {
+                for (Bet bet : openBets) {
+                    if (bet.getUser().getNick().equalsIgnoreCase(better)) {
+                        found = bet;
+                        foundb = true;
+                        ProfileType cprof = db.getActiveProfile(caller);
+                        pendingBets.add(better);
+    
+                        // quick hax to check if play chips vs non-play chips!
+                        if (cprof != ProfileType.PLAY && bet.getProfile() == ProfileType.PLAY) {
+                            bot.sendIRCMessage(channel, PLAY_VS.replaceAll("%username", username));
+                            found = null;
+                        } else if (cprof == ProfileType.PLAY 
+                                && bet.getProfile() != ProfileType.PLAY) {
+                            bot.sendIRCMessage(channel, REAL_VS.replaceAll("%username", username));
+                            found = null;
+                        } else if (db.checkCredits(caller) < bet.getAmount()) {
+                            bot.sendIRCMessage(channel, NO_CHIPS.replaceAll("%username", username));
+                            found = null;
+                        } else {
+                            // play this wager
+                            bet.call(caller, cprof);
+                            
+                            String player1 = better;
+                            String player2 = caller;
+                            int active = Random.nextInt(2);
+    
+                            int h1 = HEALTH;
+                            int h2 = HEALTH;
+                            while (h1 > 0 && h2 > 0) {
+                                int attack = Random.nextInt(ATTACK) + 1 + ATTACK;
+                                int defense = Random.nextInt(DEFENSE) + 1;
+                                int total = attack - defense;
+    
+                                String attacker, defender;
+                                int dfndh = 0;
+                                if (active == 0) {
+                                    h2 -= total;
+                                    dfndh = h2;
+                                    attacker = player1;
+                                    defender = player2;
+                                } else {
+                                    h1 -= total;
+                                    dfndh = h1;
+                                    attacker = player2;
+                                    defender = player1;
+                                }
+                                
+                                if (dfndh < 0) {
+                                    dfndh = 0;
+                                }
+                                
+                                String out = HIT.replaceAll("%attacker", attacker);
+                                out = out.replaceAll("%defender", defender);
+                                out = out.replaceAll("%atkpoints", Integer.toString(attack));
+                                out = out.replaceAll("%dfndpoints", Integer.toString(defense));
+                                out = out.replaceAll("%health", Integer.toString(dfndh));
+                                bot.sendIRCNotice(user, out);
+                                bot.sendIRCNotice(bet.getUser(), out);
+                                
+                                active = (active + 1) % 2;
                             }
+    
+                            // Calculate rake.
+                            double rake = Rake.getRake(caller, bet.getAmount(), cprof)
+                                        + bet.getRake();
+                            double win = (bet.getAmount() * 2) - rake;
                             
-                            if (dfndh < 0) {
-                                dfndh = 0;
+                            String winner, loser;
+                            int winh;
+                            if (h1 <= 0) { // caller wins
+                                winner = caller;
+                                loser = better;
+                                winh = h2;
+                                bet.lose(caller, cprof, win);
+                            } else { // better wins
+                                winner = better;
+                                loser = caller;
+                                winh = h1;
+                                bet.win(win);
                             }
-                            
-                            String out = HIT.replaceAll("%attacker", attacker);
-                            out = out.replaceAll("%defender", defender);
-                            out = out.replaceAll("%atkpoints", Integer.toString(attack));
-                            out = out.replaceAll("%dfndpoints", Integer.toString(defense));
-                            out = out.replaceAll("%health", Integer.toString(dfndh));
-                            bot.sendIRCNotice(user, out);
-                            bot.sendIRCNotice(bet.getUser(), out);
-                            
-                            active = (active + 1) % 2;
+    
+                            // jack pot stuff
+                            bet.checkJackpot(bot);
+                            if (Rake.checkJackpot(bet.getAmount())) {
+                                ArrayList<String> players = new ArrayList<String>();
+                                players.add(caller);
+                                Rake.jackpotWon(cprof, GamesType.DM, players, bot, null);
+                            }
+    
+                            String out = WIN.replaceAll("%winner", winner);
+                            out = out.replaceAll("%loser", loser);
+                            out = out.replaceAll("%amount", Utils.chipsToString(win));
+                            out = out.replaceAll("%health", Integer.toString(winh));
+                            bot.sendIRCMessage(channel, out);
+                            pendingBets.remove(better);
                         }
-
-                        // Calculate rake.
-                        double rake = Rake.getRake(caller, bet.getAmount(), cprof) + bet.getRake();
-                        double win = (bet.getAmount() * 2) - rake;
-                        
-                        String winner, loser;
-                        int winh;
-                        if (h1 <= 0) { // caller wins
-                            winner = caller;
-                            loser = better;
-                            winh = h2;
-                            bet.lose(caller, cprof, win);
-                        } else { // better wins
-                            winner = better;
-                            loser = caller;
-                            winh = h1;
-                            bet.win(win);
-                        }
-
-                        // jack pot stuff
-                        bet.checkJackpot(bot);
-                        if (Rake.checkJackpot(bet.getAmount())) {
-                            ArrayList<String> players = new ArrayList<String>();
-                            players.add(caller);
-                            Rake.jackpotWon(cprof, GamesType.DM, players, bot, null);
-                        }
-
-                        String out = WIN.replaceAll("%winner", winner);
-                        out = out.replaceAll("%loser", loser);
-                        out = out.replaceAll("%amount", Utils.chipsToString(win));
-                        out = out.replaceAll("%health", Integer.toString(winh));
-                        bot.sendIRCMessage(channel, out);
+                        break;
                     }
-                    break;
                 }
             }
 

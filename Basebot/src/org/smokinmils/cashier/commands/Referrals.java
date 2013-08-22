@@ -1024,14 +1024,16 @@ public class Referrals extends Event {
                 Map<String, Integer> groupusers = new HashMap<String, Integer>();            
                 Map<String, Integer> allpoints = db.getPoints();
                 for (Entry<String, Integer> ent: allpoints.entrySet()) {
-                    // note how many points the group have.
-                    String grp = db.getRankGroup(ent.getKey()).toLowerCase();
-                    if (!grouppoints.containsKey(grp)) {
-                        grouppoints.put(grp, ent.getValue());
-                        groupusers.put(grp, 1);
-                    } else {
-                        grouppoints.put(grp, grouppoints.get(group) + ent.getValue());
-                        groupusers.put(grp, groupusers.get(group) + 1);
+                    if (ent.getValue() != null) {
+                        // note how many points the group have.
+                        String grp = db.getRankGroup(ent.getKey()).toLowerCase();
+                        if (!grouppoints.containsKey(grp)) {
+                            grouppoints.put(grp, ent.getValue());
+                            groupusers.put(grp, 1);
+                        } else {
+                            grouppoints.put(grp, grouppoints.get(group) + ent.getValue());
+                            groupusers.put(grp, groupusers.get(group) + 1);
+                        }
                     }
                 }
                 

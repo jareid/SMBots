@@ -350,7 +350,6 @@ public final class DB {
                     String user = rs.getString(UsersTable.COL_USERNAME);
                     double amount = rs.getDouble(AuctionsTable.COL_AMOUNT);
                     String itemname = rs.getString(AuctionsTable.COL_ITEMNAME);
-                    System.out.println(">>>>>> " + itemname);
                     String profstr = rs.getString(ProfileTypeTable.COL_NAME);
                     
                     ProfileType prof = ProfileType.fromString(profstr);
@@ -2100,7 +2099,7 @@ public final class DB {
         
         String usersql = "SELECT uu." + UsersTable.COL_ID + " FROM "
                        + UsersTable.NAME + " uu" + " WHERE uu."
-                       + UsersTable.COL_USERNAME + " LIKE %user1 LIMIT 1";
+                       + UsersTable.COL_USERNAME + " LIKE '%user1' LIMIT 1";
         
         String tsql = "INSERT INTO " + RefsTransactionsTable.NAME + "("
                 + RefsTransactionsTable.COL_TYPEID + ", "
@@ -2111,7 +2110,7 @@ public final class DB {
                 + RefsTransactionsTable.COL_PROFILETYPE + ") VALUES(("
                 + getTzxTypeIDSQL(TransactionType.REFERRAL) + "), ("
                 + getGameIDSQL(GamesType.ADMIN) + "), ("
-                + usersql + "), ?, (" + usersql.replaceAll("%user1", "%user2")
+                + usersql + "), '%amnt', (" + usersql.replaceAll("%user1", "%user2")
                 + "), (" + getProfileIDSQL(profile) + "))";
         
         String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
@@ -2143,7 +2142,7 @@ public final class DB {
                     sql = sql.replaceAll("%user2", fromuser);
                     sql = sql.replaceAll("%amnt", amnt.toString());
                     stmt.executeUpdate(sql);
-                    conn.commit();
+                    //conn.commit();
                 }
             }
         } catch (SQLException ex) {
