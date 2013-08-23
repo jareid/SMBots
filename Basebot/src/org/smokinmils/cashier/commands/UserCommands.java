@@ -567,23 +567,24 @@ public class UserCommands extends Event {
         SpamEnforcer se = SpamEnforcer.getInstance();
         
         if (msg.length == 2 || msg.length == POS_CMD_LEN) {
-            bot.bePatient(event.getUser());
-            String who;
-            if (msg.length == 2) {
-                who = sender;
-            } else {
-                who = msg[2];
-            }
-
-            ProfileType profile = ProfileType.fromString(msg[1]);
-            if (profile == null) {
-                bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
-            } else if (!profile.hasComps()) {
-                String out = NOCOMPETITION.replaceAll("%sender", sender);
-                out = out.replaceAll("%profile", profile.toString());
-                bot.sendIRCMessage(chan, out);
-            } else {
-                if (se.checkPosition(event)) {
+            if (se.checkPosition(event)) {
+                bot.bePatient(event.getUser());
+                String who;
+                if (msg.length == 2) {
+                    who = sender;
+                } else {
+                    who = msg[2];
+                }
+    
+                ProfileType profile = ProfileType.fromString(msg[1]);
+                if (profile == null) {
+                    bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
+                } else if (!profile.hasComps()) {
+                    String out = NOCOMPETITION.replaceAll("%sender", sender);
+                    out = out.replaceAll("%profile", profile.toString());
+                    bot.sendIRCMessage(chan, out);
+                } else {
+                    
                     BetterInfo better = null;
                     try {
                         better = DB.getInstance().competitionPosition(profile, who);
@@ -635,8 +636,9 @@ public class UserCommands extends Event {
                                 EventLog.log(e, "BetDetails", "run");
                             }
                         }
-                    }
-                }  
+                        
+                    }  
+                }
             }
         } else {
             bot.invalidArguments(senderu, POSFMT);
