@@ -174,7 +174,7 @@ public final class XMLLoader {
                 }
                 
             } catch (Exception e) {
-                EventLog.log(e, "XMLLoader", "joinChannels");
+                EventLog.log(e, "XMLLoader", "getDBChannels");
             }
             return ret;
         }
@@ -279,7 +279,6 @@ public final class XMLLoader {
                        
                         String[] chanarr = channels.toArray(new String[channels.size()]);
                         String type = el.getAttribute("type");
-                        System.out.println(type);
                         if (type.equals("blackjack")) {
                             basebot.addListener(server, new BJGame(bot), chanarr);
                         } else if (type.equals("help")) {
@@ -620,7 +619,7 @@ public final class XMLLoader {
                 }
                 
             } catch (Exception e) {
-                EventLog.log(e, "XMLLoader", "joinChannels");
+                EventLog.log(e, "XMLLoader", "getHTTPSetting");
             }
             return ret;
         }
