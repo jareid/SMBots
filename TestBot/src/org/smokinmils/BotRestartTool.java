@@ -39,7 +39,7 @@ public class BotRestartTool {
         while (true) {
             try {
                 if (checkRestart()) {
-                    System.out.println("Restart table was true. Restarting the test bot...");
+                    System.out.println("Restart table was true. Restarting the bot...");
                     restartBot();
                 }
                 Thread.sleep(30000);
@@ -81,7 +81,7 @@ public class BotRestartTool {
     
     private static void restartBot() throws Exception {
         // Read PID
-        File file = new File("TESTSM_BOT.pid");
+        File file = new File("SM_BOT.pid");
         if (file.exists()) {
             Scanner scanner = new Scanner(file);
             
@@ -99,8 +99,8 @@ public class BotRestartTool {
         Thread.sleep(2000);
         
         // Start
-        System.out.println("Starting SMGamerTest.exe");
-        Runtime.getRuntime().exec("cmd /c start SMGamerTest.exe");
+        System.out.println("Starting SMGamer.exe");
+        Runtime.getRuntime().exec("cmd /c start SMGamer.exe settings\\livesettings.xml");
         
         Connection connect = null;
         Statement statement = null;

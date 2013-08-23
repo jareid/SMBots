@@ -32,6 +32,7 @@ import org.smokinmils.bot.events.Part;
 import org.smokinmils.bot.events.PrivateMessage;
 import org.smokinmils.bot.events.Quit;
 import org.smokinmils.bot.events.UserList;
+import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
@@ -67,8 +68,16 @@ public class CheckIdentified extends Event {
     public static final String WELCOME_MSG = "%b%c01Hello %c04%user%c01, "
             + "welcome to our channel! For information on our games and "
             + "systems please type %c04!info%c01 and use further commands "
-            + "for specific topics listed. If you need any help just ask in "
-            + "the channel. We hope that you enjoy your stay!";
+            + "for specific topics listed. %b%c04[INFO]%c01 The current manager online is "
+            + "%c04%manager%c01. To buy coins or ask questions please %c04/query %manager";
+    
+    /**
+     * This string is output when the user has just been created.
+     */
+    public static final String WELCOME_MSG2 = "%b%c04[INFO]%c01 Beware of IRC imposters. Always "
+                                            + "confirm trades in this channel if unsure. "
+                                            + "%c04[IMPORTANT]%c01 We will NEVER query you to sell "
+                                            + "you coins. %c04[IMPORTANT]%c01";
     
     /** Contains a separate thread to process identification checks. */
     private final CheckUserQueue checkThread;
@@ -306,8 +315,9 @@ public class CheckIdentified extends Event {
                     } else {
                         bot.addIdentifiedUser(user);
                         if (res == UserCheck.CREATED) {
-                            String out = WELCOME_MSG.replaceAll("%user",
-                                                                user.getNick());
+                            String out = WELCOME_MSG.replaceAll("%user", user.getNick())
+                                                    .replaceAll("%manager",
+                                                                ManagerSystem.getLoggedInUser());
                             bot.sendIRCNotice(user, out);
                         }
                     }
