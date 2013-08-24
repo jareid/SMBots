@@ -31,13 +31,13 @@ import org.smokinmils.logging.EventLog;
  */
 public final class Referal {
     /** The percentage of the rake provided that goes to jackpot. */
-    private static final double  JACKPOT_PERCENT = 0.20;
+    private static final double  JACKPOT_PERCENT = 0.10;
 
     /** The percentage of the rake provided that goes to group referral fees. */
     private static final double  GROUP_PERCENT   = 0.20;
     
     /** The percentage of the rake provided that goes to group user referral fees. */
-    private static final double  GUSER_PERCENT    = 0.2;
+    private static final double  GUSER_PERCENT    = 0.14;
     
     /** The percentage of the group provided that goes to point referral fees. */
     private static final double  POINTS_PERCENT   = 0.33;

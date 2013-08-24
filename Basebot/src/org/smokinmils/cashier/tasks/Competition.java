@@ -54,7 +54,7 @@ public class Competition extends TimerTask {
     private static final int    NUMBERWINNERS        = 5;
 
     /** The amount of minutes between announcements. */
-    private static final int    ANNOUNCEMINS         = 45;
+    private static final int    ANNOUNCEMINS         = 30;
 
     /** The irc bot used to announce. */
     private final IrcBot        bot;

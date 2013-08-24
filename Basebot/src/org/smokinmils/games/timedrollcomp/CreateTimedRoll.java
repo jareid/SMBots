@@ -101,10 +101,8 @@ public class CreateTimedRoll extends Event {
     @Override
     public final void message(final Message event) {
         String message = event.getMessage().toLowerCase();
-        User sender = event.getUser();
 
-        if (isValidChannel(event.getChannel().getName())
-                && event.getBot().userIsIdentified(sender)) {
+        if (isValidChannel(event.getChannel().getName())) {
             if (Utils.startsWith(message, CRE_CMD)) {
                 createGame(event);
             } else if (Utils.startsWith(message, ENDCMD)) {

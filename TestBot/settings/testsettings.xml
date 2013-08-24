@@ -7,7 +7,7 @@
 	<ip>127.0.0.1</ip>
 	<rake>#testeroo2</rake>
 	
-	<db type="server">199.101.50.187</db>
+	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
 	<db type="dbname">test</db>
 	<db type="dbuser">smbot</db>

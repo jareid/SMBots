@@ -46,7 +46,7 @@ public final class Rake {
     private static String       jackpotChannel;
     
     /** The 1 in X chance of winning the jack pot.*/
-    private static final int    JACKPOTCHANCE  = 1000000;
+    private static final int    JACKPOTCHANCE  = 500000;
     
     /** Amount of rake taken/generated from bets. */
     private static final double RAKE           = 0.05;

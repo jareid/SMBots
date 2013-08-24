@@ -47,9 +47,9 @@ public class JackpotAnnounce extends TimerTask {
     @Override
     public final void run() {
         String out = "%b%c01The jackpot raises by %c041%c01 chip for every "
-                   + "%c04200%c01 chips bet on all games. You have a "
-                   + "%c040.0001%%c01 chance to win per chip that you bet (so "
-                   + "%c040.1%%c01 chance per 1000%c01 chips). To see the current"
+                   + "%c04100%c01 chips bet on all games. You have a "
+                   + "%c040.0002%%c01 chance to win per chip that you bet (so "
+                   + "%c040.2%%c01 chance per 1000%c01 chips). To see the current"
                    + " jackpot sizes use %c04!jackpots%c01.";
         if (Rake.JACKPOTENABLED) {
             Channel chan = bot.getUserChannelDao().getChannel(channel);
