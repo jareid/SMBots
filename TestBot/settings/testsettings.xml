@@ -13,6 +13,9 @@
 	<db type="dbuser">smbot</db>
 	<db type="dbpass">SM_bot_2013$</db>
 	
+	<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
+    <http type="url">http://smokin-goldshop.appspot.com/stockREMOVEME</http>
+	
 	<listener type="invite">
 		<channel>testeroo2</channel>
 	</listener>
@@ -67,7 +70,7 @@
 		<channel>testeroo2</channel>
 		<option type="announce">testeroo2</option>
 	</listener>
-	<listener type="poker">
+	<listener type="pokerDISABLED">
 		<channel>testeroo2</channel>
 	</listener>
 	<listener type="auctions">

@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.entity.ContentType;
 import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
@@ -27,6 +27,9 @@ public class HTTPPoster {
     /** Conversion between coins and 07. */
     private static final int COIN_2_07 = 10000;
     
+    /** Amount in a million. */
+    private static final int ONEMILLION = 1000000;
+    
     /** The TOKEN for submitting data. */
     private static final String TOKEN = XMLLoader.getInstance().getHTTPSetting("token");
     //"9c8fcb2a-0bc2-4288-8880-0e2f3f42598d";
@@ -38,7 +41,7 @@ public class HTTPPoster {
     
     /** JSON to send a gold transaction. */
     private static final String SUBMIT_GOLD = "{\"token\": \"%token\", \"agent\": \"%agent\", "
-                                    + "\"amount\": %amount, \"comment\": \"\", "
+                                    + "\"amount\": \"%amountm\", \"comment\": \"\", "
                                     + "\"goldtype\": \"%goldtype\"}";
     
     /**
@@ -51,43 +54,27 @@ public class HTTPPoster {
     public final void sendGoldChange(final String agent,
                                final double amount,
                                final ProfileType prof) throws IOException {
-        
         HttpClient c = new DefaultHttpClient();
         HttpPost p = new HttpPost(URL);
         
         String out = SUBMIT_GOLD.replaceAll("%token", TOKEN);
         out = out.replaceAll("%agent", agent);
         out = out.replaceAll("%goldtype", prof.getText());
-        int sendamount = 0;
+        
+        // convert to millions
+        double sendamount = 0.0;
         if (prof.equals(ProfileType.EOC)) {
-            sendamount = (int) (amount * COIN2_EOC);
+            sendamount = (amount * COIN2_EOC) / ONEMILLION;
         } else {
-            sendamount = (int) (amount * COIN_2_07);
+            sendamount = (amount * COIN_2_07) / ONEMILLION;
         }
-        out = out.replaceAll("%amount", String.valueOf(sendamount));
+        out = out.replaceAll("%amount", Double.toString(sendamount));
         
         p.setEntity(new StringEntity(out, ContentType.create(JSONMIME)));
-        
-        //HttpResponse r = 
-                c.execute(p);
-        /*
-        BufferedReader rd = new BufferedReader(new InputStreamReader(r.getEntity().getContent()));
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-            System.out.println(line);
-        
-        }*/
+
+        c.execute(p);
+
         EventLog.log("Posted to internets", "HTTPPost", "sendGoldChange");
         
     }
-    /* for testing 
-    public static void main(String[] args) {
-        HTTPPoster h = new HTTPPoster();
-        try {
-            h.sendGoldChange("Harold", 10, ProfileType.EOC);
-            System.out.println("DUN");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
 }

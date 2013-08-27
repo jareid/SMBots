@@ -287,11 +287,8 @@ public class Referrals extends Event {
             // add mgr channels as valid rank channels so that rank commands work in mgr chans too
         }
         
-
-        
         for (String chan: rnkchans) {
             rankValidChans.add(chan.toLowerCase());
-            
         }
     }
     

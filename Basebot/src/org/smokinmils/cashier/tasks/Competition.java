@@ -253,13 +253,10 @@ public class Competition extends TimerTask {
                     readFile.close();
                 } catch (IOException e) {
                     EventLog.log(e, "Competition", "end");
-                    EventLog.log(
-                            "No data for " + profile.toString(), "Competition",
-                            "end");
-                    bot.sendIRCMessage(chan,
-                                       "%b%c04No competition prizes set for + "
-                                    + profile.toString()
-                                    + " please talk to an admin");
+                    EventLog.log("No data for " + profile.toString(), "Competition", "end");
+                    bot.sendIRCMessage(chan, "%b%c04No competition prizes set for " 
+                                             + profile.toString()
+                                             + " please talk to an admin");
                     continue;
                 }
                 results.put(profile, prizes);

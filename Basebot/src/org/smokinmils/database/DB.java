@@ -1191,7 +1191,6 @@ public final class DB {
                 + "'";
 
         return new BetterInfo(user, runGetIntQuery(sql), runGetLongQuery(csql));
-
     }
 
     /**

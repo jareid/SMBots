@@ -27,11 +27,11 @@ public final class SpamEnforcer {
     private final HashMap<String, HashMap<User, Long>> spamMap;
     
     /** how long between position commands. */
-    private static final long POSITION_DELAY = 30 * Utils.MS_IN_MIN;
+    private static final long POSITION_DELAY = 10;
     
     /** Message informing of them about the limits on !position. */
     private static final String POSITION_MESSAGE = "You can only use the !position command every "
-            + "30 minutes";
+                                                + "10 seconds";
     
     /** the map of user->time for profile restricting. */
     private final HashMap<User, Long> positionMap;
