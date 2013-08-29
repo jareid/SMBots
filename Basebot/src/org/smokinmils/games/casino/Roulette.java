@@ -182,12 +182,6 @@ public class Roulette extends Event {
     /** Number of rolls to keep. */
     private static final int HISTORY_LENGTH = 12;
     
-    /** The timer used to announce history. */
-    private final Timer         historyTimer;  
-    
-    /** Delay to announce history of roulette. */
-    private static final int HISTORY_DELAY = 20;
-    
     /**
      * Constructor.
      * 
@@ -208,10 +202,6 @@ public class Roulette extends Event {
         gameTimer = new Timer(true);
         gameTimer.schedule(new AnnounceEnd(bot, channel),
                            delay * Utils.MS_IN_MIN);
-        
-        historyTimer = new Timer(true);
-        //historyTimer.schedule(new HistoryAnnounce(irc, channel),
-        //                    HISTORY_DELAY * Utils.MS_IN_SEC);
     }
 
     /**
@@ -529,6 +519,9 @@ public class Roulette extends Event {
         // clear the bets
         allBets.clear();
 
+        // show the history of the last x winning numbers
+        showHistory(ib);
+        
         this.state = OPEN;
     }
     
@@ -549,8 +542,9 @@ public class Roulette extends Event {
                 } else {
                     results += "%c00,03 ";
                 }
-                results += String.valueOf(i) + " %c04,00 "; // FIXME colours!
+                results += String.valueOf(i) + " ";
             }
+            System.out.println(this.channel + ">> " + results); // DEM PRINTLNS
             String out = HISTORY_ANNOUNCE.replaceAll("%results", results);
             irc.sendIRCMessage(channel, out);
         }
@@ -620,39 +614,6 @@ public class Roulette extends Event {
             }
             gameTimer.schedule(new AnnounceEnd(irc, channel),
                             delay * Utils.MS_IN_MIN);
-        }
-    }
-    
-    /**
-     * Handles the announcing the History.
-     */
-    class HistoryAnnounce extends TimerTask {
-        /** The IRC bot. */
-        private final IrcBot irc;
-        
-        /** The IRC channel. */
-        private final String channel;
-
-        /**
-         * Constructor.
-         * @param ib   The irc bot/server.
-         * @param chan The channel.
-         */
-        public HistoryAnnounce(final IrcBot ib,
-                   final String chan) {
-            irc = bot;
-            channel = chan;
-        }
-
-        @Override
-        public void run() {
-            try {
-                showHistory(irc);
-            } catch (Exception e) {
-                EventLog.log(e, "Roulette", "HistoryAnnounce.run");
-            }
-            historyTimer.schedule(new HistoryAnnounce(irc, channel),
-                            HISTORY_DELAY * Utils.MS_IN_SEC);
         }
     }
 
