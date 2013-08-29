@@ -46,8 +46,8 @@ public class Auctioneer extends Event {
     public static final String  ADDCMD     = "!additem";
 
     /** The add command format. */
-    public static final String  ADDFMT    = "%b%c12" + ADDCMD + " <item/coins> <length in minutes> "
-            + "<start_price> <profile> <item name/amount of coins> ";
+    public static final String  ADDFMT    = "%b%c12" + ADDCMD + " <item/chips> <length in minutes> "
+            + "<start_price> <profile> <item name/amount of chips> ";
 
     /** The add command length. */
     public static final int     ADD_CMD_LEN     = 6;
@@ -68,7 +68,7 @@ public class Auctioneer extends Event {
     /** String informing the user bid has been accepted. */
     private static final String AUC_BID = "%b%c12Bid Accepted, %c04%who%c12 is now the highest"
                             + " bidder for the item %c04%itemname%c12 with the id %c04%id%c12 at"
-                            + " %c04%newamount%c12 coins. Type %c04!bid %id%c12 to bid!";
+                            + " %c04%newamount%c12 chips. Type %c04!bid %id%c12 to bid!";
 
     /** String informing users of the active auctions. */
     private static final String ACTIVE_AUCTIONS = "%b%c12The following auctions are active, to bid "
@@ -76,7 +76,7 @@ public class Auctioneer extends Event {
     
     /** String for each individual auction to be added to above. */
     private static final String SINGLE_AUCTION = " %b%c04%name %c12(id: %c04%id%c12, "
-                                  + "Time left: %c04%time%c12,  Current bid: %c04%bid%c12 coins, "
+                                  + "Time left: %c04%time%c12,  Current bid: %c04%bid%c12 chips, "
                                   + "Profile: %c04%profile%c12)";
     
     /** String announcing auction that is in the final minute. */
@@ -95,7 +95,7 @@ public class Auctioneer extends Event {
     		+ "id:%c04%id";
 
     /** String to check for when adding a chips auction. */
-    private static final String ADD_CHIPS_VAR = "coins";
+    private static final String ADD_CHIPS_VAR = "chips";
     
     /** The list of auctions that are active. */
     private final ArrayList<Auction> auctions;

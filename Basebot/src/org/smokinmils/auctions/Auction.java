@@ -25,7 +25,7 @@ public class Auction {
     
     /** String letting the user know to pay, pay now! */
     private static final String WINNER = "%b%c04%who%c12: You have won the auction for %c04%name"
-    		+ " %c12if the auction was for coins these have been added to your account, if an item "
+    		+ " %c12if the auction was for chips these have been added to your account, if an item "
     		+ ", please query a member of staff! ";
    
     /** String for the final minute. */
@@ -37,7 +37,7 @@ public class Auction {
 
     /** String to announce auction winnor. */
     private static final String AUCTION_WON = "%b%c04%who%c12 has won %c04%item%c12 for"
-    		+ " %c04%price%c12 coins ";
+    		+ " %c04%price%c12 chips ";
 
     /** The cost to bid. */
     public static final int BID_PRICE = 20;

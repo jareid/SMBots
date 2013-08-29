@@ -29,7 +29,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie
  */
-public class Coins extends Event {
+public class Chips extends Event {
     /** The payout command. */
     public static final String  PAYCMD       = "!payout";
 
@@ -40,7 +40,7 @@ public class Coins extends Event {
     public static final int     PAY_CMD_LEN     = 4;
     
     /** The give command. */
-    public static final String  GIVECMD     = "!coins";
+    public static final String  GIVECMD     = "!chips";
 
     /** The give command format. */
     public static final String  GIVEFMT      = "%b%c12" + GIVECMD + " <user> <amount> <profile>";

@@ -17,7 +17,7 @@ import javax.xml.xpath.XPathFactory;
 import org.smokinmils.BaseBot;
 import org.smokinmils.auctions.Auctioneer;
 import org.smokinmils.cashier.ManagerSystem;
-import org.smokinmils.cashier.commands.Coins;
+import org.smokinmils.cashier.commands.Chips;
 import org.smokinmils.cashier.commands.Lottery;
 import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
@@ -285,7 +285,7 @@ public final class XMLLoader {
                         } else if (type.equals("help")) {
                             basebot.addListener(server, new Help(), chanarr);
                         } else if (type.equals("coins")) {
-                            basebot.addListener(server, new Coins(), chanarr);
+                            basebot.addListener(server, new Chips(), chanarr);
                         } else if (type.equals("usercommands")) {
                             basebot.addListener(server, new UserCommands(), chanarr);
                         } else if (type.equals("roulette")) {

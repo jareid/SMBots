@@ -52,7 +52,7 @@ public class Roulette extends Event {
     
     /** The no chips message. */
     private static final String  NO_CHIPS        = "%b%c12You do not have "
-                                                 + "enough coins for that!";
+                                                 + "enough chips for that!";
     
     /** The invalid bet choice message. */
     private static final String  INVALID_BET     = "%b%c12\"%c04!bet <amount> "
@@ -88,7 +88,8 @@ public class Roulette extends Event {
                                                  + " %c04%names";
     
     /** The message announcing the history. */
-    private static final String HISTORY_ANNOUNCE = "%b%c12Roulette result history: %c04%results";
+    private static final String HIST_ANNOUNCE = "%b%c12Roulette result history, newest on the left:"
+                                                + " %c04%results";
 
     /** OPEN state - bets are allowed. */
     private static final int     OPEN            = 0;
@@ -180,7 +181,7 @@ public class Roulette extends Event {
     private ArrayList<Integer> history;
     
     /** Number of rolls to keep. */
-    private static final int HISTORY_LENGTH = 12;
+    private static final int HISTORY_LENGTH = 20;
     
     /**
      * Constructor.
@@ -544,8 +545,7 @@ public class Roulette extends Event {
                 }
                 results += String.valueOf(i) + " ";
             }
-            System.out.println(this.channel + ">> " + results); // DEM PRINTLNS
-            String out = HISTORY_ANNOUNCE.replaceAll("%results", results);
+            String out = HIST_ANNOUNCE.replaceAll("%results", results);
             irc.sendIRCMessage(channel, out);
         }
     }

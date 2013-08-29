@@ -88,16 +88,16 @@ public class RPSGame extends Event {
 
     /** Message to say you opened a new bet. */
     private static final String OPENEDWAGER    = "%b%c04%who%c12: has opened a "
-                   + "new RPS wager of %c04%amount%c12 %profile coins! To call "
+                   + "new RPS wager of %c04%amount%c12 %profile chips! To call "
                    + "this wager type %c04" + CALL_CMD + " %who";
     
     /** Message when user hasn't got enough coins. */
     private static final String NOCOINS        = "%b%c12Sorry, you do not have "
-           + "%c04%coins%c12 coins available for the %c04%profile%c12 profile.";
+           + "%c04%coins%c12 chips available for the %c04%profile%c12 profile.";
     
     /** Message for mixed profile bets. */
     private static final String REALCOINSONLY  = "%b%c04%who%c12: : you need "
-        + "to use %c04%profile%c12 coins to call a %c04%profile%c12 coins rps!";
+        + "to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
     
     /** Message when someone wins. */
     private static final String WIN            = "%b%c12%winstring. " 
@@ -110,7 +110,7 @@ public class RPSGame extends Event {
     /** Message when a replay failed. */
     private static final String REPLAYFAIL     = "%b%c12Replay between "
            + "%c04%better%c12 and %c04%caller%c12 failed as %c04%who%c12 didn't"
-              + " respond. Both users have been refunded %c04%coins%c12 coins!";
+              + " respond. Both users have been refunded %c04%coins%c12 chips!";
     
     /** Output of valid choices. */
     private static final String VALIDCHOICES   = "%b%c04%who%c12: Please "
