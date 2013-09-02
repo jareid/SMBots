@@ -126,12 +126,13 @@ public final class XMLLoader {
 
                 Thread.sleep(CONNECT_SLEEP_TIME); // wait for some time to allow bot to connect.
 
+                joinChannels(serveraddr);
                 
                 loadListeners(serveraddr, bot);
 
                 loadTimers(serveraddr, bot);  
                 
-                joinChannels(serveraddr);
+               
                 
                 initSpamEncorcer();
                 

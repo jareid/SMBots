@@ -248,7 +248,7 @@ public class Referrals extends Event {
     
     /** Message when the points are checked. */
     private static final String POINTS_STATS  = "%b%c04%sender%c12: "
-                                              + "%c04%profile%c12 has %c04%coins%c12 coins so far"
+                                              + "%c04%profile%c12 has %c04%coins%c12 chips so far"
                                               + ". That is %c04%chippoint%c12 per point and "
                                               + "%c04%user%c12 will get %c04%usercoins%c12.";
     

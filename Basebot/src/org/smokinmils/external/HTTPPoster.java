@@ -22,7 +22,7 @@ public class HTTPPoster {
     private static final String JSONMIME = "application/json";
     
     /** Conversion between coins and EOC. */
-    private static final int COIN2_EOC = 100000;
+    private static final int COIN_2_EOC = 100000;
     
     /** Conversion between coins and 07. */
     private static final int COIN_2_07 = 10000;
@@ -64,12 +64,12 @@ public class HTTPPoster {
         // convert to millions
         double sendamount = 0.0;
         if (prof.equals(ProfileType.EOC)) {
-            sendamount = (amount * COIN2_EOC) / ONEMILLION;
+            sendamount = (amount * COIN_2_EOC) / ONEMILLION;
         } else {
             sendamount = (amount * COIN_2_07) / ONEMILLION;
         }
         out = out.replaceAll("%amount", Double.toString(sendamount));
-        
+        System.out.println(out);
         p.setEntity(new StringEntity(out, ContentType.create(JSONMIME)));
 
         c.execute(p);

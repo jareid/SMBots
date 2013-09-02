@@ -152,7 +152,7 @@ public class BJGame extends Event {
     private static final String STATE = "%b%c04%who%c12: You have %c04%hand %c12%pscore";
     
     /** String to notify on winnings / amount returned for a draw. */
-    private static final String WINNINGS = "%b%c04%who%c12: You receive %coins coins";
+    private static final String WINNINGS = "%b%c04%who%c12: You receive %coins chips";
 
     /** String for points when they have Blackjack! */
     private static final String BLACKJACK_STRING = "BlackJack!";
@@ -161,7 +161,7 @@ public class BJGame extends Event {
     private static final String DOUBLE_NOT_ENOUGH = "%b%c04%who%c12: Not enough chips to double";
 
     /** String to tell them they can't double.*/
-    private static final String DOUBLE_NOT_VALID = "%b%c04%who%c12: Game not valid for doubleing";
+    private static final String DOUBLE_NOT_VALID = "%b%c04%who%c12: Game not valid for doubling";
 
     /** String to tell them they can't insure.*/
     private static final String INSURE_NOT_VALID = "%b%c04%who%c12: You can't insure this game";
@@ -172,7 +172,7 @@ public class BJGame extends Event {
 
     /** String to tell the user they have taken out insurance! */
     private static final String INSURE_TAKEN = "%b%c04%who%c12: You have taken insurance out" 
-            + " against the dealer having BlackJack for %c04%coins%c12 coins!";
+            + " against the dealer having BlackJack for %c04%coins%c12 chips!";
     
     /** String letting the user know they have got insurance cash dollar back. */
     private static final String INSURANCE_PAID = "%b%c04%who%c12: Your insurance has paid";

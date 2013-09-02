@@ -87,17 +87,17 @@ public class UserCommands extends Event {
 
     /** The transfer message for the channel. */
     private static final String TRANSFERRERD    = "%b%c04%sender%c12 has transfered %c04%amount%c12"
-                                                + " coins to the %c04%profile%c12 account of "
+                                                + " chips to the %c04%profile%c12 account of "
                                                 + "%c04%who%c12";
 
     /** The transfer message for the receiver. */
-    private static final String TRANSFERCHIPSUSER   = "%b%c12You have had %c04%amount%c12 coins "
+    private static final String TRANSFERCHIPSUSER   = "%b%c12You have had %c04%amount%c12 chips "
                                                     + "transfered into your %c04%profile%c12"
                                                     + " account by %c04%sender%c12";
             
     /** The transfer message for the sender. */
     private static final String TRANSFERCHIPSSENDER = "%b%c12You have transferred %c04%amount%c12 "
-                                                    + "coins from your %c04%profile%c12"
+                                                    + "chips from your %c04%profile%c12"
                                                     + " account to %c04%who%c12";
     /** The public stats message. */
     private static final String PUBLIC_STATS   = "%b%c04%sender%c12: You have made your stats"
@@ -123,14 +123,14 @@ public class UserCommands extends Event {
     
 	/** Used to specify the Check message on another user. */
 	public static final String CHECKCREDITSMSG     =  "%b%c04%sender%c12: %c04%user %c12currently "
-	                           + "has %c04%creds%c12 coins on the active profile (%c04%active%c12)";
+	                           + "has %c04%creds%c12 chips on the active profile (%c04%active%c12)";
 	
 	/** Used to specify the other profiles in the check message. */
 	public static final String OTHERPROFILES       = " | %c04%name%c12 (%c04%amount%c12)";
 	
 	/** Used to specify the user has no credits. */
 	public static final String NOCREDITS           = "%b%c04%sender: %c04%user%c12 %c12currently "
-	                                               + "has %c04no%c12 available coins.";
+	                                               + "has %c04no%c12 available chips.";
 
     /** Profile changed message. */
     public static final String PROFILE_CHANGED     = "%b%c04%user %c12is now " 
@@ -150,7 +150,7 @@ public class UserCommands extends Event {
     /** Message for a user's position in the competition. */
     private static final String       POSITION          = "%b%c04%sender:%c12 "
            + "%c04%who%c12 is currently in position %c04%position%c12 for the "
-           + "%c04%profile%c12 competition with %c04%coins%c12 coins bet";
+           + "%c04%profile%c12 competition with %c04%coins%c12 chips bet";
     
     /** Message when a user is not ranked for the competition. */
     private static final String       NOTRANKED         = "%b%c04%sender:%c12 "

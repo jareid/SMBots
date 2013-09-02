@@ -3,6 +3,7 @@ package org.smokinmils.games.casino;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+//import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,7 +52,7 @@ public class Roulette extends Event {
     
     /** The no chips message. */
     private static final String  NO_CHIPS        = "%b%c12You do not have "
-                                                 + "enough coins for that!";
+                                                 + "enough chips for that!";
     
     /** The invalid bet choice message. */
     private static final String  INVALID_BET     = "%b%c12\"%c04!bet <amount> "
@@ -85,6 +86,10 @@ public class Roulette extends Event {
     /** The winners' message. */
     private static final String  CONGRATULATIONS = "%b%c12Congratulations to"
                                                  + " %c04%names";
+    
+    /** The message announcing the history. */
+    private static final String HIST_ANNOUNCE = "%b%c12Roulette result history, newest on the left:"
+                                                + " %c04%results";
 
     /** OPEN state - bets are allowed. */
     private static final int     OPEN            = 0;
@@ -172,6 +177,12 @@ public class Roulette extends Event {
     /** The fast channel for the game. */
     private static final String FAST_CHAN = "#SM_roulette";
     
+    /** Arraylist containing the winning history. */
+    private ArrayList<Integer> history;
+    
+    /** Number of rolls to keep. */
+    private static final int HISTORY_LENGTH = 20;
+    
     /**
      * Constructor.
      * 
@@ -186,6 +197,8 @@ public class Roulette extends Event {
         state = OPEN;
         delay = dly;
         bot = irc;
+        
+        history = new ArrayList<Integer>();
 
         gameTimer = new Timer(true);
         gameTimer.schedule(new AnnounceEnd(bot, channel),
@@ -242,11 +255,29 @@ public class Roulette extends Event {
             double betsize = Utils.checkCredits(user, amount, bot, event.getChannel());
             String choice = msg[2].toLowerCase();
             Integer choicenum = Utils.tryParse(msg[2]);
+            ArrayList<Integer> splitChoice = splitBet(msg[2]);
+            
             ProfileType profile = db.getActiveProfile(username);
             if (amount == null) {
                 bot.sendIRCNotice(user, INVALID_BET);
             } else if (amount <= 0) {
                 bot.sendIRCNotice(user, INVALID_BETSIZE);
+            } else if (splitChoice != null) { 
+                double totalCost = splitChoice.size() * betsize;
+                if (totalCost > db.checkCredits(username, profile)) {
+                    bot.sendIRCNotice(user, NO_CHIPS);
+                } else {
+                    // user has enough chips, and all choices in the CSV are valid
+                    for (int value : splitChoice) {
+                        Bet bet = new Bet(user, profile, GamesType.ROULETTE, betsize, 
+                                                                String.valueOf(value));
+                        allBets.add(bet);
+                    }
+                    String out = BET_MADE.replaceAll("%username", username);
+                    out = out.replaceAll("%choice", Utils.listToString(splitChoice));
+                    out = out.replaceAll("%amount", Utils.chipsToString(betsize));
+                    bot.sendIRCMessage(event.getChannel(), out);
+                }
             } else if (!((choice.equalsIgnoreCase("red")
                     || choice.equalsIgnoreCase("black")
                     || choice.equalsIgnoreCase("1st")
@@ -254,13 +285,13 @@ public class Roulette extends Event {
                     || choice.equalsIgnoreCase("3rd")
                     || choice.equalsIgnoreCase("even") || choice
                         .equalsIgnoreCase("odd")) || (choicenum != null
-                    && choicenum >= 0 && choicenum <= NUMBER))) {
+                    && choicenum >= 0 && choicenum <= NUMBER))) { // text bet
                 bot.sendIRCNotice(user, INVALID_BET);
             } else if ((choicenum != null
-                        && choicenum >= 0 && choicenum <= NUMBER)
+                        && choicenum >= 0 && choicenum <= NUMBER) // num bet
                     && amount > Variables.MAXBET_ROUL_NUM) {
                 bot.maxBet(user, event.getChannel(), Variables.MAXBET_ROUL_NUM);
-            } else if (amount > Variables.MAXBET) {
+            } else if (amount > Variables.MAXBET) { // too much bet
                 bot.maxBet(user, event.getChannel(), Variables.MAXBET);
             } else if (betsize <= 0.0) {
                 bot.sendIRCNotice(user, NO_CHIPS);
@@ -276,6 +307,39 @@ public class Roulette extends Event {
         }
     }
     
+    
+    /**
+     * Checks to see if the user is betting on a bunch of comma seperated values, and returns
+     * them. Checks if they are numbers and of a valid range
+     * @param choice the choices in string format
+     * @return yay or nay
+     */
+    private ArrayList<Integer> splitBet(final String choice) {
+        boolean valid = true;
+        String[] choices = choice.split(",");
+        ArrayList<Integer> bets = new ArrayList<Integer>();
+        for (String c : choices) {
+            Integer bet = Utils.tryParse(c);
+            if (bet != null) {
+                if (bet <= NUMBER && bet >= 0) {
+                    // valid
+                    bets.add(bet);
+                } else {
+                    valid = false;
+                    break;
+                }
+            } else {
+                // one of them isn't valid, so nope
+                valid = false;
+                break;
+            }
+        }
+        if (!valid) {
+            bets = null;
+        }
+        return bets;
+    }
+
     /**
      * This method handles the cancel command.
      * 
@@ -365,6 +429,14 @@ public class Roulette extends Event {
         if (winner > NUMBER) {
             winner = 0;
         }
+        
+        // add the winning number to the history and prune if too long
+        history.add(0, winner);
+        if (history.size() > HISTORY_LENGTH) {
+            history.remove(HISTORY_LENGTH);
+        }
+        
+        
         boolean isEven = false;
         if (winner % 2 == 0 && winner != 0) {
             isEven = true;
@@ -448,9 +520,36 @@ public class Roulette extends Event {
         // clear the bets
         allBets.clear();
 
+        // show the history of the last x winning numbers
+        showHistory(ib);
+        
         this.state = OPEN;
     }
-
+    
+    
+    /**
+     * Method to show the history of the past X bets (as defined above).
+     * @param irc the irc bot used to announce it all.
+     */
+    @SuppressWarnings("deprecation")
+    public final void showHistory(final IrcBot irc) {
+        if (history.size() > 0) {
+            String results = "";
+            for (int i : history) {
+                if (getColour(i).equalsIgnoreCase("red")) {
+                    results += "%c00,04 ";
+                } else if (getColour(i).equalsIgnoreCase("black")) {
+                    results += "%c00,01 ";
+                } else {
+                    results += "%c00,03 ";
+                }
+                results += String.valueOf(i) + " ";
+            }
+            String out = HIST_ANNOUNCE.replaceAll("%results", results);
+            irc.sendIRCMessage(channel, out);
+        }
+    }
+    
     /**
      * Announces the end of the game (i.e no more bets).
      * @author Jamie
@@ -517,4 +616,5 @@ public class Roulette extends Event {
                             delay * Utils.MS_IN_MIN);
         }
     }
+
 }

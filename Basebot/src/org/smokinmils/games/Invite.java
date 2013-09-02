@@ -61,6 +61,15 @@ public class Invite extends Event {
     /** length of the normal command (ie not roulette). */
     private static final int CMD_LENGTH = 3;
 
+    /** String to let the user know the game has been placed in the channel. */
+    private static final String INVITE_DONE = "%b%c04%who%c12: %game has been started in %chan";
+    
+    /** String to let the user know that the game is already present in the channel. */
+    private static final String INVITE_NOPE = "%b%c04%who%c12: %game is already in %chan";
+    
+    /** String to let the user know that the bot has left #chan. */
+    private static final String UNINVITE_DONE = "%b%c04%who%c12: All games removed from %chan";
+    
     /** Instructions for roulette. */
     private static final String INVALID_COMMAND_ROULETTE = "%b%c04%who%c12: To invite a roulette " 
     + "game you must use !invite #chan roulette x, where x is the delay for the roulette rounds";
@@ -75,12 +84,18 @@ public class Invite extends Event {
      */
     private final HashMap<String, ArrayList<Event>> tempListeners;
     
+    /** Keep track of the games that have been invited for dupe checking. 
+     * TODO Neater with single map?
+    */
+    private final HashMap<String, ArrayList<String>> tempGames;
+    
     
     /**
      * Constructor.
      */
     public Invite() {
         tempListeners = new HashMap<String, ArrayList<Event>>();
+        tempGames = new HashMap<String, ArrayList<String>>();
     }
     
     /* (non-Javadoc)
@@ -115,93 +130,124 @@ public class Invite extends Event {
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
         
-        String newchannel = msg[1];
         // TODO: no need to use base bot here, use IrcBot.getListener()
+        String newchannel = msg[1].toLowerCase();
         BaseBot bb = BaseBot.getInstance();
-        String game = msg[2];
+        String game = msg[2].toLowerCase();
         
-        if (game.equals(ROULETTE)) {
-            if (msg.length < ROULETTE_CMD_LENGTH) {
-                bot.sendIRCMessage(chan,
-                                   INVALID_COMMAND_ROULETTE.replaceAll("%who", sender.getNick()));
-            } else {
-                // start roulette in that channel
-                
-                int rdelay = Utils.tryParse(msg[1 + 1 + 1]);
-                
-                if (rdelay > 0) {
-                    bb.addChannel(bot.getServer(), newchannel);
-                    Roulette roulette = new Roulette(rdelay, newchannel, bot);
-                    roulette.addValidChan(newchannel);
-                    bb.addListener(bot.getServer(), roulette);
-                } else {
-                    String out = INVALID_COMMAND_ROULETTE.replaceAll("%who", 
-                                                                    sender.getNick());
-                    bot.sendIRCMessage(chan, out); 
-                }
+
+        // assuming adding
+        boolean adding = true;
+        
+        // check if said game is already in the channel
+        if (tempGames.containsKey(newchannel)) {
+            ArrayList<String> channels = tempGames.get(newchannel);
+            if (channels.contains(game)) {
+                adding = false;
             }
-        } else {
-           if (msg.length < CMD_LENGTH) {
-               String out = INVALID_COMMAND.replaceAll("%who", sender.getNick());
-               bot.sendIRCMessage(chan, out);
-           } else {
-               // valid length 
-               Event listener = null;
-               if (game.equals(DD)) {
-                   listener = new DiceDuel(bot, newchannel);
-                   listener.addValidChan(newchannel);
-                   bb.addListener(bot.getServer(), listener);
-               } else if (game.equals(DUEL)) {
-                   listener = new Duel(bot, newchannel);
-                   listener.addValidChan(newchannel);
-                   bb.addListener(bot.getServer(), listener);
-               } else if (game.equals(OU)) {
-                   listener = new OverUnder();
-                   listener.addValidChan(newchannel);
-                   bb.addListener(bot.getServer(), listener);
-               } else if (game.equals(RPS)) {
-                   listener = new RPSGame();
-                   listener.addValidChan(newchannel);
-                   ((RPSGame) listener).addAnnounce(newchannel, bot);
-                   bb.addListener(bot.getServer(), listener);
-               } else if (game.equals(BJ)) {
-                   listener = new BJGame(bot);
-                   listener.addValidChan(newchannel);
-                   bb.addListener(bot.getServer(), listener);
-               } else {
+        }
+
+        if (adding) { 
+               if (msg.length < CMD_LENGTH) {
                    String out = INVALID_COMMAND.replaceAll("%who", sender.getNick());
-                   bot.sendIRCMessage(chan, out); 
-               }
-               
-               // add user commands if we are adding and we are not already in that channel
-               if (listener != null && !bot.getValidChannels().contains(newchannel.toLowerCase())) {
-                   bb.addChannel(bot.getServer(), newchannel); 
-                   //add in harmless commands for basic stuffs.
-                   UserCommands uc = new UserCommands();
-                   uc.addValidChan(newchannel);
-                   bb.addListener(bot.getServer(), uc);
-                   if (tempListeners.containsKey(newchannel)) {
-                       ArrayList<Event> listeners = tempListeners.get(newchannel);
-                       listeners.add(uc);
+                   bot.sendIRCMessage(chan, out);
+               } else {
+                   // valid length 
+                   Event listener = null;
+                   if (game.equals(ROULETTE)) { // roulette is different due to delay arg
+                       if (msg.length < ROULETTE_CMD_LENGTH) {
+                           String out = INVALID_COMMAND_ROULETTE.replaceAll("%who", 
+                                   sender.getNick());
+                           bot.sendIRCMessage(chan, out); 
+                       } else {
+                           int rdelay = Utils.tryParse(msg[1 + 1 + 1]);
+                           
+                           if (rdelay > 0) {
+                               listener = new Roulette(rdelay, newchannel, bot);
+                               listener.addValidChan(newchannel);
+                               bb.addListener(bot.getServer(), listener);
+                           } else {
+                               String out = INVALID_COMMAND_ROULETTE.replaceAll("%who", 
+                                       sender.getNick());
+                               bot.sendIRCMessage(chan, out);   
+                           }
+                       }
+                   } else if (game.equals(DD)) {
+                       listener = new DiceDuel(bot, newchannel);
+                       listener.addValidChan(newchannel);
+                       bb.addListener(bot.getServer(), listener);
+                   } else if (game.equals(DUEL)) {
+                       listener = new Duel(bot, newchannel);
+                       listener.addValidChan(newchannel);
+                       bb.addListener(bot.getServer(), listener);
+                   } else if (game.equals(OU)) {
+                       listener = new OverUnder();
+                       listener.addValidChan(newchannel);
+                       bb.addListener(bot.getServer(), listener);
+                   } else if (game.equals(RPS)) {
+                       listener = new RPSGame();
+                       listener.addValidChan(newchannel);
+                       ((RPSGame) listener).addAnnounce(newchannel, bot);
+                       bb.addListener(bot.getServer(), listener);
+                   } else if (game.equals(BJ)) {
+                       listener = new BJGame(bot);
+                       listener.addValidChan(newchannel);
+                       bb.addListener(bot.getServer(), listener);
                    } else {
-                       ArrayList<Event> listeners = new ArrayList<Event>();
-                       listeners.add(uc);
-                       tempListeners.put(newchannel, listeners);
+                       String out = INVALID_COMMAND.replaceAll("%who", sender.getNick());
+                       bot.sendIRCMessage(chan, out); 
+                   }
+                   
+                   // add user commands if we are adding and we are not already in that channel
+                   if (listener != null && !bot.getValidChannels().contains(newchannel)) {
+                       bb.addChannel(bot.getServer(), newchannel); 
+                       //add in harmless commands for basic stuffs.
+                       UserCommands uc = new UserCommands();
+                       uc.addValidChan(newchannel);
+                       bb.addListener(bot.getServer(), uc);
+                       if (tempListeners.containsKey(newchannel)) {
+                           ArrayList<Event> listeners = tempListeners.get(newchannel);
+                           listeners.add(uc);
+                       } else {
+                           ArrayList<Event> listeners = new ArrayList<Event>();
+                           listeners.add(uc);
+                           tempListeners.put(newchannel, listeners);
+                       }
+                   }
+                   
+                   // keep track of the listeners for uninviting
+                   if (listener != null) {
+                      if (tempListeners.containsKey(newchannel)) {
+                          ArrayList<Event> listeners = tempListeners.get(newchannel);
+                          listeners.add(listener);
+                      } else {
+                          ArrayList<Event> listeners = new ArrayList<Event>();
+                          listeners.add(listener);
+                          tempListeners.put(newchannel, listeners);
+                      }
+                      // add to gameListeners to easily check for dupes
+                      if (tempGames.containsKey(newchannel)) {
+                          ArrayList<String> channels = tempGames.get(newchannel);
+                          channels.add(game);
+                      } else {
+                          ArrayList<String> channels = new ArrayList<String>();
+                          channels.add(game);
+                          tempGames.put(newchannel, channels);
+                      }
+                      
+                      // all done in the hood
+                      String out = INVITE_DONE.replaceAll("%who", sender.getNick());
+                      out = out.replaceAll("%game", game);
+                      out = out.replaceAll("%chan", newchannel);
+                      bot.sendIRCMessage(chan, out);
                    }
                }
-               
-               // keep track of the listeners for uninviting
-               if (listener != null) {
-                  if (tempListeners.containsKey(newchannel)) {
-                      ArrayList<Event> listeners = tempListeners.get(newchannel);
-                      listeners.add(listener);
-                  } else {
-                      ArrayList<Event> listeners = new ArrayList<Event>();
-                      listeners.add(listener);
-                      tempListeners.put(newchannel, listeners);
-                  }
-               }
-           }
+            //}
+        } else { // game already in chan
+            String out = INVITE_NOPE.replaceAll("%who", sender.getNick());
+            out = out.replaceAll("%game", game);
+            out = out.replaceAll("%chan", newchannel);
+            bot.sendIRCMessage(chan, out);
         }
     }
     
@@ -225,8 +271,15 @@ public class Invite extends Event {
             }
             Channel chan = bot.getUserChannelDao().getChannel(channel);
             chan.send().part();
+            
+            // clean up
             bot.delValidChannel(channel);
             tempListeners.remove(channel);
+            tempGames.remove(channel);
+            
+            String out = UNINVITE_DONE.replaceAll("%who", sender.getNick());
+            out = out.replaceAll("%chan", channel);
+            bot.sendIRCMessage(event.getChannel(), out);
             
         } 
     }
