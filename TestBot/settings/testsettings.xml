@@ -15,10 +15,16 @@
 	
 	<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
     <http type="url">http://smokin-goldshop.appspot.com/stockREMOVEME</http>
+
+    <trade type="percent">0.05</trade>
+    <trade type="minimum">5.0</trade>
 	
 	<listener type="invite">
 		<channel>testeroo2</channel>
 	</listener>
+	<listener type="trade">
+        <channel>testeroo2</channel>
+    </listener>
 	<listener type="referrals">
 		<channel>testeroo2</channel>
         <option type="managementchan">testeroo2</option>

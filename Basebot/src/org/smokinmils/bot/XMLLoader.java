@@ -17,7 +17,8 @@ import javax.xml.xpath.XPathFactory;
 import org.smokinmils.BaseBot;
 import org.smokinmils.auctions.Auctioneer;
 import org.smokinmils.cashier.ManagerSystem;
-import org.smokinmils.cashier.commands.Coins;
+import org.smokinmils.cashier.commands.Admin;
+import org.smokinmils.cashier.commands.Escrow;
 import org.smokinmils.cashier.commands.Lottery;
 import org.smokinmils.cashier.commands.Referrals;
 import org.smokinmils.cashier.commands.UserCommands;
@@ -284,7 +285,7 @@ public final class XMLLoader {
                         } else if (type.equals("help")) {
                             basebot.addListener(server, new Help(), chanarr);
                         } else if (type.equals("coins")) {
-                            basebot.addListener(server, new Coins(), chanarr);
+                            basebot.addListener(server, new Admin(), chanarr);
                         } else if (type.equals("usercommands")) {
                             basebot.addListener(server, new UserCommands(), chanarr);
                         } else if (type.equals("roulette")) {
@@ -294,6 +295,8 @@ public final class XMLLoader {
                             basebot.addListener(server, new OverUnder(), chanarr);
                         } else if (type.equals("createtimedroll")) {
                             basebot.addListener(server, new CreateTimedRoll(), chanarr);
+                        } else if (type.equals("trade")) {
+                            basebot.addListener(server, new Escrow(), chanarr);
                         } else if (type.equals("diceduel")) {
                           basebot.addListener(server, new DiceDuel(bot, chanarr[0]),
                                    chanarr);
@@ -620,6 +623,43 @@ public final class XMLLoader {
                 
             } catch (Exception e) {
                 EventLog.log(e, "XMLLoader", "getHTTPSetting");
+            }
+            return ret;
+        }
+        
+        /**
+         * Gets a trade setting.
+         * @param setting the setting we want
+         * @return the value of the setting
+         */
+        public double getTradeSetting(final String setting) {
+            Double ret = 0.0;
+            try {
+
+                XPath xPath =  XPathFactory.newInstance().newXPath();
+ 
+                String expression = "/bot/*";
+                //read a nodelist using xpath
+                NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                            XPathConstants.NODESET);
+                  
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    String n = nodeList.item(i).getNodeName();
+                    Element el = (Element) nodeList.item(i); 
+                    if (n.equals("trade")) {
+                        if (el.getAttribute("type").equals(setting)) {
+                            ret = Double.parseDouble(el.getTextContent());
+                            break;
+                        }
+                    }
+                }
+                
+            } catch (Exception e) {
+                EventLog.log(e, "XMLLoader", "getHTTPSetting");
+            }
+            if (ret == null) {
+                ret = 0.0;
+                EventLog.log("Error in XML, trade setting empty", "XMLLoader", "getTradeSetting");
             }
             return ret;
         }

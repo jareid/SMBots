@@ -70,7 +70,7 @@ public final class BaseBot {
 	private static final String FINGER_MSG = "Leave me alone, kthx!";
 
 	/** The socket timeout value. */
-    private static final int SOCKET_TIMEOUT = 5000;
+    private static final int SOCKET_TIMEOUT = 1000;
 	
 	/** The default IRC port. */
 	private static final int DEFAULT_PORT = 6667;

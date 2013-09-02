@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
+import org.pircbotx.hooks.Listener;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
@@ -22,6 +23,12 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.external.HTTPPoster;
+import org.smokinmils.games.casino.DiceDuel;
+import org.smokinmils.games.casino.OverUnder;
+import org.smokinmils.games.casino.Roulette;
+import org.smokinmils.games.casino.blackjack.BJGame;
+import org.smokinmils.games.rockpaperscissors.RPSGame;
+import org.smokinmils.games.rpg.Duel;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -29,7 +36,7 @@ import org.smokinmils.logging.EventLog;
  * 
  * @author Jamie
  */
-public class Coins extends Event {
+public class Admin extends Event {
     /** The payout command. */
     public static final String  PAYCMD       = "!payout";
 
@@ -47,6 +54,9 @@ public class Coins extends Event {
 
     /** The give command length. */
     public static final int     GIVE_CMD_LEN     = 4;
+    
+    /** The disable command. */
+    public static final String  DISCMD       = "!disable";
 
     /** The message to the channel on success. */
     private static final String PAYOUTCHIPS   = "%b%c04%sender:%c12 Paid out %c04%amount%c12 coins "
@@ -55,11 +65,6 @@ public class Coins extends Event {
     /** The message to the user. */
     private static final String PAYOUTCHIPSPM = "%b%c12You have had %c04%amount%c12 coins " 
                                               + "paid out from your account by %c04%sender%c12";
-    
-    /** Message when the user doesn't have enough chips. */
-    public static final String  NOCHIPSMSG    = "%b%c12Sorry, %c04%user%c12 does not have "
-                                              + "%c04%coins%c12 coins available for the "
-                                              + "%c04%profile%c12 profile.";
 
     /** The message sent to the channel on success. */
     private static final String GIVECHIPS   = "%b%c04%sender:%c12 Added "
@@ -68,6 +73,41 @@ public class Coins extends Event {
     /** Message sent to the user on success. */
     private static final String GIVECHIPSPM = "%b%c12You have had "
       + "%c04%amount%c12 coins deposited into your account by %c04%sender%c12";
+    
+    /** Message when the user doesn't have enough chips. */
+    public static final String  NOCHIPSMSG    = "%b%c12Sorry, %c04%user%c12 does not have "
+                                              + "%c04%coins%c12 coins available for the "
+                                              + "%c04%profile%c12 profile.";
+    
+    /** Message when a command is disabled. */
+    public static final String  DISABLED     = "%b%c04%who%c12: The %c04%game%c12 has now been " 
+                                             + "disabled.";
+    
+    /** Message when a command is disabled. */
+    public static final String  DISABLEDALL  = "%b%c01The %c04%game%c01 has now been disabled. " 
+                                             + "Please speak to a manager if you have any issues.";
+
+    /** string representation for roulette . */
+    private static final String ROULETTE = "roulette";
+    
+    /** string representation for dice duel. */
+    private static final String DD = "dd";
+    
+    /** string representation for dice duel. */
+    private static final String DUEL = "duel";
+    
+    /** string representation for overunder. */
+    private static final String OU = "ou";
+    
+    /** string representation for rockpaperscissors. */
+    private static final String RPS = "rps";
+    
+    /** string representation for blackjack. */
+    private static final String BJ = "bj";
+    
+    /** Instructions for other games. */
+    private static final String INVALID_COMMAND = "%b%c04%who%c12: To disable a " 
+                                                + "game you must use !disable <game>";
 
     /**
      * This method handles the chips commands.
@@ -86,6 +126,8 @@ public class Coins extends Event {
                 giveChips(event);
             } else if (Utils.startsWith(message, PAYCMD)) {
                 payoutChips(event);
+            } else if (Utils.startsWith(message, DISCMD)) {
+                disable(event);
             }
         }
     }
@@ -190,8 +232,7 @@ public class Coins extends Event {
             if (msg.length == PAY_CMD_LEN) {
                 String user = msg[1];
                 Double amount = Utils.tryParseDbl(msg[2]);
-                ProfileType profile = ProfileType
-                        .fromString(msg[PAY_CMD_LEN - 1]);
+                ProfileType profile = ProfileType.fromString(msg[PAY_CMD_LEN - 1]);
 
                 if (amount != null && amount > 0) {
                     double chips = 0;
@@ -266,6 +307,64 @@ public class Coins extends Event {
             }
         } else {
             EventLog.info(sender + " attempted to pay out someone coins", "Payout", "message");
+        }
+    }
+    
+    /**
+     * This method handles the payout command.
+     * 
+     * @param event the message event.
+     */
+    public final void disable(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        User senderu = event.getUser();
+        String sender = senderu.getNick();
+        Channel chan = event.getChannel();
+
+        String[] msg = message.split(" ");
+
+        if (msg.length != 2) {
+            String out = INVALID_COMMAND.replaceAll("%who", sender);
+            bot.sendIRCMessage(chan, out); 
+        } else if (bot.userIsOp(event.getUser(), chan.getName())) {
+            String game = msg[1];
+            // Supressed as we need to store the type of class here.
+            @SuppressWarnings("rawtypes")
+            Class type = null;
+            if (game.equals(DD)) {
+                type = DiceDuel.class;
+            } else if (game.equals(DUEL)) {
+                type = Duel.class;
+            } else if (game.equals(OU)) {
+                type = OverUnder.class;
+            } else if (game.equals(RPS)) {
+                type = RPSGame.class;
+            } else if (game.equals(BJ)) {
+                type = BJGame.class;
+            } else if (game.equals(ROULETTE)) {
+                type = Roulette.class;
+            } else {
+                String out = INVALID_COMMAND.replaceAll("%who", sender);
+                bot.sendIRCMessage(chan, out); 
+            }
+            
+            // Valid game, so lets get rid of those buggy listeners
+            if (type != null) {
+                for (Listener<IrcBot> listenr: bot.getListenerManager().getListeners()) {
+                    if (type.isInstance(listenr)) {
+                        bot.getListenerManager().removeListener(listenr);
+                    }
+                }
+                String out = DISABLED.replaceAll("%who", sender);
+                out = out.replaceAll("%game", game);
+                bot.sendIRCMessage(chan, out); 
+
+                out = DISABLEDALL.replaceAll("%game", game);
+                for (Channel channel: bot.getUserChannelDao().getAllChannels()) {
+                    bot.sendIRCMessage(channel, out);
+                }                
+            }
         }
     }
 }

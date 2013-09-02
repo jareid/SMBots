@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.smgamer</groupId>
+  <groupId>SMGamer</groupId>
   <artifactId>Basebot</artifactId>
   <version>1.0.1-SNAPSHOT</version>
   <build>
@@ -45,6 +45,11 @@
   	<dependency>
   		<groupId>mysql</groupId>
   		<artifactId>mysql-connector-java</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.mchange</groupId>
+  		<artifactId>c3p0</artifactId>
+  		<version>0.9.2.1</version>
   	</dependency>
   </dependencies>
   

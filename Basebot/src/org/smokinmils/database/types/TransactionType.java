@@ -25,6 +25,12 @@ public enum TransactionType {
 	
 	/** pay for auction. */
 	AUCTION_PAY("auctionpay"),
+
+    /** escrow transaction.*/
+    COMMISSION("commission"),
+
+    /** escrow transaction.*/
+    ESCROW("escrow"),
 	
     /** cancel transactions. */
 	CANCEL("cancel"),

@@ -156,8 +156,7 @@ public class ManagerSystem extends Event {
         }
 
         nextMin = new Timer(true);
-        nextMin.scheduleAtFixedRate(
-                new IncreaseTime(), Utils.MS_IN_MIN, Utils.MS_IN_MIN);
+        nextMin.scheduleAtFixedRate(new IncreaseTime(), Utils.MS_IN_MIN, Utils.MS_IN_MIN);
 
         if (getLoggedInUser() != null) {
             inactive = new Timer(true);
@@ -306,7 +305,11 @@ public class ManagerSystem extends Event {
             File inifile = new File(dir, FILENAME);
             Wini ini = new Wini(inifile);
 
-            ini.put("loggedin", "who", getLoggedInUser());
+            String liu = getLoggedInUser();
+            if (liu == null || liu.equals("")) {
+                liu = "NOBODY";
+            }
+            ini.put("loggedin", "who", liu);
             ini.put("inactive", "maxtime", inactiveTime);
             for (Entry<String, Double> entry : managerTimes.entrySet()) {
                 ini.put("times", entry.getKey(), entry.getValue());

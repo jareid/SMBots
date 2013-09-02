@@ -82,6 +82,7 @@ public class Invite extends Event {
     public Invite() {
         tempListeners = new HashMap<String, ArrayList<Event>>();
     }
+    
     /* (non-Javadoc)
      * @see org.smokinmils.bot.Event#message(org.smokinmils.bot.events.Message)
      */
@@ -115,12 +116,14 @@ public class Invite extends Event {
         String[] msg = message.split(" ");
         
         String newchannel = msg[1];
+        // TODO: no need to use base bot here, use IrcBot.getListener()
         BaseBot bb = BaseBot.getInstance();
         String game = msg[2];
         
         if (game.equals(ROULETTE)) {
             if (msg.length < ROULETTE_CMD_LENGTH) {
-                bot.sendIRCMessage(chan, INVALID_COMMAND_ROULETTE);
+                bot.sendIRCMessage(chan,
+                                   INVALID_COMMAND_ROULETTE.replaceAll("%who", sender.getNick()));
             } else {
                 // start roulette in that channel
                 

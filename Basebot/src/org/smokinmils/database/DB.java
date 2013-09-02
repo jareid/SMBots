@@ -27,6 +27,7 @@ import org.smokinmils.database.tables.BetsTable;
 import org.smokinmils.database.tables.ChipsTransactionsTable;
 import org.smokinmils.database.tables.CompetitionIDTable;
 import org.smokinmils.database.tables.CompetitionView;
+import org.smokinmils.database.tables.EscrowTable;
 import org.smokinmils.database.tables.FullReferersTextView;
 import org.smokinmils.database.tables.GamesTable;
 import org.smokinmils.database.tables.HostGroupUsersTable;
@@ -50,6 +51,7 @@ import org.smokinmils.database.tables.UserProfilesView;
 import org.smokinmils.database.tables.UsersTable;
 import org.smokinmils.database.tables.UsersView;
 import org.smokinmils.database.types.BetterInfo;
+import org.smokinmils.database.types.EscrowResult;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.ReferalUser;
@@ -522,6 +524,8 @@ public final class DB {
             } else if (amount <= chips) {
                 if (chipdiff <= CHIPS_OTHER) {
                     ret = chips;
+                } else if (chips < CHIPS_LTONE) {
+                    ret = CHIPS_LTONE;
                 } else {
                     ret = amount;
                 }
@@ -2590,6 +2594,135 @@ public final class DB {
         boolean res = false;
         if (num > 0) { res = true; }
         return res;
+    }
+    
+    /**
+     * Checks if a trade exists.
+     * 
+     * @param rank Rank performing the trade.
+     * @param user User being trade.
+     * 
+     * @return True if one exists.
+     * @throws SQLException 
+     */
+    public boolean hasEscrow(final String rank,
+                                        final String user) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM " + EscrowTable.NAME + " e"
+                   + " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(user)
+                   + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(rank) + ")";
+        
+        int count = runGetIntQuery(sql);
+       
+        boolean res = false;
+        if (count > 0) {
+            res = true;
+        }
+        
+        return res;
+    }
+    
+    
+    /**
+     * Confirms a trade and gives the coins to the user.
+     * 
+     * @param fromuser Rank performing the trade.
+     * @param touser User being trade.
+     * @param percentage The percentage given to the rank
+     * @param minimum   The minimum number of chips to take.
+     * @param givecomm   Whether or not to give commission
+     * 
+     * @return The amount and profile.
+     * @throws SQLException 
+     */
+    public EscrowResult escrowConfirmed(final String fromuser,
+                                        final String touser,
+                                        final double percentage,
+                                        final double minimum,
+                                        final boolean givecomm) throws SQLException {
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        double amount = 0.0;
+        ProfileType prof = null;
+        String sql = "SELECT " + EscrowTable.COL_AMOUNT + ", p." + ProfileTypeTable.COL_NAME
+                   + " FROM " + EscrowTable.NAME + " e"
+                   + " JOIN " + ProfileTypeTable.NAME + " p ON p."
+                   + ProfileTypeTable.COL_ID + " = e." + EscrowTable.COL_PROFILE
+                   + " WHERE e." + EscrowTable.COL_USER + " = (" + getUserIDSQL(touser)
+                   + ") AND e." + EscrowTable.COL_RANK + " = (" + getUserIDSQL(fromuser) + ")";
+        
+        String del = "DELETE FROM " + EscrowTable.NAME 
+                + " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(touser)
+                + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(fromuser) + ")";
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                amount = rs.getDouble(EscrowTable.COL_AMOUNT);
+                prof = ProfileType.fromString(rs.getString("p." + ProfileTypeTable.COL_NAME));
+                
+                double comm = 0;
+                // if commission is given, the person 
+                if (givecomm) {
+                    comm = amount * percentage;
+                    if (comm < minimum) {
+                        comm = minimum;
+                    }
+                
+                    adjustChips(touser, comm, prof, GamesType.ADMIN, TransactionType.COMMISSION);
+                    addChipTransaction(touser, DB.HOUSE_USER, comm, 
+                                        TransactionType.COMMISSION, prof);
+                }
+                
+                adjustChips(touser, amount - comm, prof, GamesType.ADMIN, TransactionType.ESCROW);
+                addChipTransaction(touser, fromuser, amount - comm, TransactionType.ESCROW, prof);
+                runBasicQuery(del);
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+       
+        return new EscrowResult(amount, prof);
+    }
+
+    /**
+     * Adds a trade to the escrow system.
+     * 
+     * @param fromuser User performing the trade.
+     * @param touser User being traded.
+     * @param amount Amount of trade.
+     * @param profile Profile for trade.
+     * @throws SQLException 
+     */
+    public void addEscrow(final String fromuser,
+                          final String touser,
+                          final Double amount,
+                          final ProfileType profile) throws SQLException {
+        String sql = "INSERT INTO " + EscrowTable.NAME
+                   + "(" + EscrowTable.COL_USER + ", " + EscrowTable.COL_RANK
+                   + ", " + EscrowTable.COL_AMOUNT + ", " + EscrowTable.COL_PROFILE + ") "
+                   + "VALUES((" 
+                   + getUserIDSQL(touser) + "), (" + getUserIDSQL(fromuser) + "), '"
+                   + amount.toString() + "', (" +  getProfileIDSQL(profile) + "))";
+        
+        runBasicQuery(sql);
     }
     
     /**
