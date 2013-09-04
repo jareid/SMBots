@@ -25,21 +25,20 @@ import org.smokinmils.logging.EventLog;
  *
  */
 public class BJBet extends Bet {
-
     /** Starting hand size. */
     public static final int START_HAND_SIZE = 2;
     
     /** The deck used for this game. */
-    private Shoe deck;
+    private final Shoe deck;
     
     /** The channel we are playing in. */
-    private Channel channel;
+    private final Channel channel;
     
     /** The player's Cards. */
-    private ArrayList<Card> playerHand;
+    private final ArrayList<Card> playerHand;
     
     /** the Dealer's Cards. */
-    private ArrayList<Card> dealerHand;
+    private final ArrayList<Card> dealerHand;
     
     /** is this a double game? */
     private boolean doubled = false;
@@ -65,7 +64,7 @@ public class BJBet extends Bet {
                 final double betamount,
                 final ProfileType prof,
                 final Channel chan) throws SQLException {
-        super(user, prof, GamesType.BLACKJACK, betamount, null);
+        super(user.getNick(), prof, GamesType.BLACKJACK, betamount, null);
         
         channel = chan;
         // init stuff
@@ -128,7 +127,7 @@ public class BJBet extends Bet {
             //manually adjust since this isn't standard.
             doubled = true;
             doubleAmount = amount;
-            db.adjustChips(getUser().getNick(), -doubleAmount, 
+            db.adjustChips(getUser(), -doubleAmount, 
                     getProfile(), GamesType.BLACKJACK, TransactionType.BET);
         } catch (SQLException e) {
             
@@ -155,7 +154,7 @@ public class BJBet extends Bet {
         insureAmount = amount;
         try {
             //manually adjust since this isn't standard.
-            db.adjustChips(getUser().getNick(), -amount, 
+            db.adjustChips(getUser(), -amount, 
                     getProfile(), GamesType.BLACKJACK, TransactionType.BJ_INSURE);
         } catch (SQLException e) { 
             EventLog.log(e, "BJBet", "insure");
@@ -180,7 +179,7 @@ public class BJBet extends Bet {
            
             try {
                 //manually adjust since this isn't standard.
-                db.adjustChips(getUser().getNick(), insureAmount * 2, 
+                db.adjustChips(getUser(), insureAmount * 2, 
                         getProfile(), GamesType.BLACKJACK, TransactionType.WIN);
             } catch (SQLException e) {
                 

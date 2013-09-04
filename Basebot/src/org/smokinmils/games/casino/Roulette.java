@@ -3,7 +3,6 @@ package org.smokinmils.games.casino;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-//import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,6 +22,7 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
+//import java.util.Collections;
 
 /**
  * Class the provide a roulette game.
@@ -178,7 +178,7 @@ public class Roulette extends Event {
     private static final String FAST_CHAN = "#SM_roulette";
     
     /** Arraylist containing the winning history. */
-    private ArrayList<Integer> history;
+    private final ArrayList<Integer> history;
     
     /** Number of rolls to keep. */
     private static final int HISTORY_LENGTH = 20;
@@ -269,8 +269,8 @@ public class Roulette extends Event {
                 } else {
                     // user has enough chips, and all choices in the CSV are valid
                     for (int value : splitChoice) {
-                        Bet bet = new Bet(user, profile, GamesType.ROULETTE, betsize, 
-                                                                String.valueOf(value));
+                        Bet bet = new Bet(user.getNick(), profile, GamesType.ROULETTE, betsize, 
+                                          String.valueOf(value));
                         allBets.add(bet);
                     }
                     String out = BET_MADE.replaceAll("%username", username);
@@ -296,7 +296,7 @@ public class Roulette extends Event {
             } else if (betsize <= 0.0) {
                 bot.sendIRCNotice(user, NO_CHIPS);
             } else {
-                Bet bet = new Bet(user, profile, GamesType.ROULETTE, betsize, choice);
+                Bet bet = new Bet(user.getNick(), profile, GamesType.ROULETTE, betsize, choice);
                 allBets.add(bet);
 
                 String out = BET_MADE.replaceAll("%username", username);
@@ -356,7 +356,7 @@ public class Roulette extends Event {
             User user = event.getUser();
             List<Bet> found = new ArrayList<Bet>();
             for (Bet bet : allBets) {
-                if (bet.getUser().compareTo(user) == 0) {
+                if (bet.getUser().equalsIgnoreCase(user.getNick())) {
                     found.add(bet);
                 }
             }
@@ -447,8 +447,7 @@ public class Roulette extends Event {
         for (Bet bet : allBets) {
             String choice = bet.getChoice();
             Integer choicenum = Utils.tryParse(choice);
-            User user = bet.getUser();
-            String username = user.getNick();
+            String username = bet.getUser();
             
             int winamount = 0;
             boolean win = false;

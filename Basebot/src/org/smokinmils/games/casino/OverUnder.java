@@ -164,7 +164,7 @@ public class OverUnder extends Event {
         } else {
             boolean found = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().compareTo(user) == 0) {
+                if (bet.getUser().compareTo(user.getNick()) == 0) {
                     // They already have a bet open, and as such, tell them to
                     // roll instead
                     found = true;
@@ -197,7 +197,7 @@ public class OverUnder extends Event {
                         channel, NO_CHIPS.replaceAll("%username", username));
             } else {
                 ProfileType prof = db.getActiveProfile(username);
-                Bet bet = new Bet(user, prof, GamesType.OVER_UNDER, betsize, choice);
+                Bet bet = new Bet(user.getNick(), prof, GamesType.OVER_UNDER, betsize, choice);
                 openBets.add(bet);
 
                 String out = NEW_WAGER.replaceAll("%username", username);
@@ -223,7 +223,7 @@ public class OverUnder extends Event {
 
         Bet found = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().compareTo(user) == 0) {
+            if (bet.getUser().equalsIgnoreCase(user.getNick())) {
                 found = bet;
                 // generate some die rolls
                 int total = (Random.nextInt(RANDOM) + 1) + (Random.nextInt(RANDOM) + 1);
@@ -318,7 +318,7 @@ public class OverUnder extends Event {
         // try to locate and cancel the bet else ignore
         Bet found = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().compareTo(user) == 0) {
+            if (bet.getUser().equalsIgnoreCase(user.getNick())) {
                 found = bet;
                 break;
             }

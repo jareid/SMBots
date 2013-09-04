@@ -11,7 +11,6 @@ package org.smokinmils.bot;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import org.pircbotx.User;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -25,7 +24,7 @@ import org.smokinmils.database.types.TransactionType;
  */
 public class Bet {
     /** The user who placed this bet. */
-	private final User user;
+	private final String user;
 	
 	/** The decimal amount for this bet. */
 	private final double amount;
@@ -66,7 +65,7 @@ public class Bet {
 	 * 
      * @throws SQLException when the database failed.
 	 */
-	public Bet(final User usr,
+	public Bet(final String usr,
 	           final ProfileType prof,
 	           final GamesType gme,
 	           final double amnt,
@@ -80,8 +79,8 @@ public class Bet {
 		this.time = System.currentTimeMillis();
 
         DB db = DB.getInstance();
-        db.adjustChips(user.getNick(), -amount, profile, game, TransactionType.BET);
-        db.addBet(user.getNick(), "", amount, profile, game);
+        db.adjustChips(user, -amount, profile, game, TransactionType.BET);
+        db.addBet(user, "", amount, profile, game);
 	}
 	
 	/**
@@ -111,7 +110,7 @@ public class Bet {
 	 * 
 	 * @return The user.
 	 */
-	public final User getUser() { return user; }
+	public final String getUser() { return user; }
 	
 	/**
      * Returns this bet's amount.
@@ -178,8 +177,8 @@ public class Bet {
 	 */
     public final void cancel() throws SQLException {
         DB db = DB.getInstance();
-        db.adjustChips(user.getNick(), amount, profile, game, TransactionType.CANCEL);
-        db.deleteBet(user.getNick(), game);        
+        db.adjustChips(user, amount, profile, game, TransactionType.CANCEL);
+        db.deleteBet(user, game);        
     }
 
     /**
@@ -191,7 +190,7 @@ public class Bet {
      */ 
     public final void win(final double win) throws SQLException {
         DB db = DB.getInstance();
-        db.adjustChips(user.getNick(), win, profile, game, TransactionType.WIN);
+        db.adjustChips(user, win, profile, game, TransactionType.WIN);
     }
 
     /** 
@@ -216,14 +215,14 @@ public class Bet {
      */
     public final void close() throws SQLException {
         DB db = DB.getInstance();
-        db.deleteBet(user.getNick(), game);
+        db.deleteBet(user, game);
     }
 
     /**
      * @return The amount of rake from this bet.
      */
     public final double getRake() {
-        return Rake.getRake(user.getNick(), amount, profile);
+        return Rake.getRake(user, amount, profile);
     }
     
     /**
@@ -234,7 +233,7 @@ public class Bet {
     public final void checkJackpot(final IrcBot bot) {
         if (Rake.checkJackpot(amount)) { 
             ArrayList<String> players = new ArrayList<String>();
-            players.add(user.getNick());
+            players.add(user);
             Rake.jackpotWon(profile, game, players, bot, null);
         }
     }

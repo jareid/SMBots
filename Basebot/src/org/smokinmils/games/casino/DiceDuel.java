@@ -185,7 +185,7 @@ public class DiceDuel extends Event {
             // check if they already have an open bet
             boolean found = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().compareTo(user) == 0) {
+                if (bet.getUser().equalsIgnoreCase(user.getNick())) {
                     bot.sendIRCMessage(channel, OPEN_WAGER.replaceAll("%username", username));
                     found = true;
                 }
@@ -203,7 +203,7 @@ public class DiceDuel extends Event {
                     bot.maxBet(user, channel, Variables.MAXBET);
                 } else if (betsize > 0.0) { // add bet, remove chips,notify channel
                     ProfileType profile = db.getActiveProfile(username);
-                    Bet bet = new Bet(user, profile, GamesType.DICE_DUEL, betsize, "");
+                    Bet bet = new Bet(user.getNick(), profile, GamesType.DICE_DUEL, betsize, "");
                     openBets.add(bet);
 
                     String out = NEW_WAGER.replaceAll("%username", username);
@@ -237,7 +237,7 @@ public class DiceDuel extends Event {
         Bet found = null;
         boolean foundb = false;
         for (Bet bet : openBets) {
-            if (bet.getUser().getNick().equalsIgnoreCase(username)) {
+            if (bet.getUser().equalsIgnoreCase(username)) {
                 foundb = true;
                 // Check Bet Time
                 long now = System.currentTimeMillis();
@@ -330,7 +330,7 @@ public class DiceDuel extends Event {
             Bet found = null;
             boolean foundb = false;
             for (Bet bet : openBets) {
-                if (bet.getUser().getNick().equalsIgnoreCase(better)) {
+                if (bet.getUser().equalsIgnoreCase(better)) {
                     found = bet;
                     foundb = true;
                     ProfileType cprof = db.getActiveProfile(caller);
@@ -426,7 +426,7 @@ public class DiceDuel extends Event {
         // try to locate and cancel the bet else ignore
         Bet found = null;
         for (Bet bet : openBets) {
-            if (bet.getUser().compareTo(user) == 0) {
+            if (bet.getUser().equalsIgnoreCase(user.getNick())) {
                 found = bet;
                 break;
             }
@@ -472,15 +472,14 @@ public class DiceDuel extends Event {
                     }
 
                     wagers += WAGER.replaceAll("%proftype", prof);
-                    wagers = wagers.replaceAll("%username",
-                                               bet.getUser().getNick());
+                    wagers = wagers.replaceAll("%username", bet.getUser());
                     wagers = wagers.replaceAll("%amount",
                                         Utils.chipsToString(bet.getAmount()));
                     
                     long now = System.currentTimeMillis();
                     long diff = now - bet.getTime();
                     if (diff >= HOUSECALLTIME) {
-                        housecalls.add(bet.getUser().getNick());
+                        housecalls.add(bet.getUser());
                     }
                 }             
                 
