@@ -27,6 +27,7 @@ import org.smokinmils.settings.Variables;
  * 
  * @author cjc
  */
+@SuppressWarnings("deprecation")
 public class BJGame extends Event {
     
     /** The stand command. */
@@ -207,6 +208,7 @@ public class BJGame extends Event {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
         User sender = event.getUser();
+        String player = sender.getNick();
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
                 
@@ -217,9 +219,9 @@ public class BJGame extends Event {
             if (Utils.startsWith(message, BJ_CMD)) {
                 if (se.check(event, FAST_CHAN)) { newGame(event); }
             } else if (Utils.startsWith(message, HIT_CMD)) {
-               hit(sender, bot, chan);
+               hit(player, bot, chan);
             } else if (Utils.startsWith(message, STAND_CMD)) {
-                stand(sender, bot, chan); 
+                stand(player, bot, chan); 
             } else if (Utils.startsWith(message, DOUBLE_CMD)) {
                 doubleDown(sender, bot, chan, msg);
             } else if (Utils.startsWith(message, INSURE_CMD)) {
@@ -244,7 +246,7 @@ public class BJGame extends Event {
         BJBet usergame = null;
         synchronized (BaseBot.getLockObject()) {
             for (BJBet game : openGames) {
-                if (game.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                if (game.getUser().compareTo(sender.getNick()) == 0) {
                     usergame = game;
                     break;
                 }
@@ -287,7 +289,7 @@ public class BJGame extends Event {
         synchronized (BaseBot.getLockObject()) {
             BJBet usergame = null;
             for (BJBet game : openGames) {
-                if (game.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                if (game.getUser().compareTo(sender.getNick()) == 0) {
                     usergame  = game;
                     break;
                 }
@@ -342,11 +344,11 @@ public class BJGame extends Event {
                           final IrcBot bot,
                           final Channel chan,
                           final String[] msg) {
-        
+        String player = sender.getNick();
         BJBet usergame = null;
         synchronized (BaseBot.getLockObject()) {
             for (BJBet game : openGames) {
-                if (game.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                if (game.getUser().compareTo(sender.getNick()) == 0) {
                     usergame = game;
                     break;
                 }
@@ -354,7 +356,7 @@ public class BJGame extends Event {
             if (usergame != null) {
                 // if the game isn't valid, or is already doubleDowned
                 if (!canDouble(usergame.getPlayerHand()) || usergame.isDoubleGame()) {
-                    String out = DOUBLE_NOT_VALID.replaceAll("%who", sender.getNick());
+                    String out = DOUBLE_NOT_VALID.replaceAll("%who", player);
                     bot.sendIRCNotice(sender, out);
                 } else {
                     Double amount = Utils.tryParseDbl(msg[1]);
@@ -363,7 +365,7 @@ public class BJGame extends Event {
                     } else {
                         double userTotalCoins = 0.0;
                         try {
-                            userTotalCoins = DB.getInstance().checkCredits(sender.getNick(), 
+                            userTotalCoins = DB.getInstance().checkCredits(player, 
                                                                 usergame.getProfile());
                         } catch (SQLException e) {
                             EventLog.log(e, "BJGame", "doubleDown");
@@ -371,15 +373,15 @@ public class BJGame extends Event {
                         if (userTotalCoins >= amount) {
                             usergame.doubleDown(amount);
                             usergame.dealPlayerCard();
-                            dealerPlay(sender, bot, chan, usergame);
+                            dealerPlay(player, bot, chan, usergame);
                         } else {
-                            String out = DOUBLE_NOT_ENOUGH.replaceAll("%who", sender.getNick());
+                            String out = DOUBLE_NOT_ENOUGH.replaceAll("%who", player);
                             bot.sendIRCNotice(sender, out);
                         } 
                     }
                 }
             } else {
-                String out = NO_OPEN_GAME.replaceAll("%who", sender.getNick());
+                String out = NO_OPEN_GAME.replaceAll("%who", player);
                 bot.sendIRCNotice(sender, out); 
             }
             
@@ -393,13 +395,13 @@ public class BJGame extends Event {
      * @param bot the irc bot so we can reply etc
      * @param chan the channel where this is all taking place
      */
-    private void stand(final User sender, 
+    private void stand(final String sender, 
                        final IrcBot bot,
                        final Channel chan) {
         BJBet usergame = null;
         synchronized (BaseBot.getLockObject()) {
             for (BJBet game : openGames) {
-                if (game.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                if (game.getUser().compareTo(sender) == 0) {
                     usergame = game;
                     break;
                 }
@@ -408,7 +410,7 @@ public class BJGame extends Event {
             if (usergame != null) {
                 dealerPlay(sender, bot, chan, usergame);
             } else {
-                String out = NO_OPEN_GAME.replaceAll("%who", sender.getNick());
+                String out = NO_OPEN_GAME.replaceAll("%who", sender);
                 bot.sendIRCNotice(sender, out);
             }
         }
@@ -420,7 +422,7 @@ public class BJGame extends Event {
      * @param bot the bot that we can reply with
      * @param chan the channel where this is happening
      */
-    private void hit(final User sender, 
+    private void hit(final String sender, 
                      final IrcBot bot,
                      final Channel chan) {
         // find game, add card, if bust gameover, if 21 send to dealer, else let them carry on
@@ -428,7 +430,7 @@ public class BJGame extends Event {
         BJBet usergame = null;
         synchronized (BaseBot.getLockObject()) {
             for (BJBet game : openGames) {
-                if (game.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                if (game.getUser().compareTo(sender) == 0) {
                     usergame = game;
                     break;
                 }
@@ -450,19 +452,19 @@ public class BJGame extends Event {
                     doLose(sender, bot, chan, usergame); 
                 } else {
                     // they are < 21, can still play, inform them of such.
-                    String out = STATE.replaceAll("%who", sender.getNick());
+                    String out = STATE.replaceAll("%who", sender);
                     
                     out = out.replaceAll("%hand", handToString(phand, false));
                     out = out.replace("%pscore", scorelist);
                     bot.sendIRCNotice(sender, out);
                     bot.sendIRCMessage(sender, out);
-                    out = BJ_OPTIONS.replaceAll("%who", sender.getNick());
+                    out = BJ_OPTIONS.replaceAll("%who", sender);
                     out += CAN_HIT;
                     out += CAN_STAND;
                     bot.sendIRCNotice(sender, out);
                 }
             }  else {
-                String out = NO_OPEN_GAME.replaceAll("%who", sender.getNick());
+                String out = NO_OPEN_GAME.replaceAll("%who", sender);
                 bot.sendIRCNotice(sender, out);
             }
         }   
@@ -475,7 +477,7 @@ public class BJGame extends Event {
      * @param chan the channel
      * @param usergame the game we are letting the dealer play
      */
-    private void dealerPlay(final User sender, 
+    private void dealerPlay(final String sender, 
                             final IrcBot bot,
                             final Channel chan, 
                             final BJBet usergame) {
@@ -508,10 +510,10 @@ public class BJGame extends Event {
      * Removes a game from the opengames.
      * @param user the username who is playing the game.
      */
-    private void removeGame(final User user) {
+    private void removeGame(final String user) {
         BJBet endgame = null;
         for (BJBet game : openGames) {
-            if (game.getUser().getNick().compareTo(user.getNick()) == 0) {
+            if (game.getUser().compareTo(user) == 0) {
                 endgame = game;
                 break;
             }
@@ -533,7 +535,7 @@ public class BJGame extends Event {
      * @param chan the channel to which we say stuff
      * @param usergame the game we are dealing with
      */
-    private void doDraw(final User player, 
+    private void doDraw(final String player, 
                         final IrcBot bot,
                         final Channel chan, 
                         final BJBet usergame) {
@@ -545,7 +547,7 @@ public class BJGame extends Event {
         } else {
             win = amount * PUSH_WIN;
         }
-        Rake.getRake(player.getNick(), amount, usergame.getProfile());
+        Rake.getRake(player, amount, usergame.getProfile());
         
         try { 
             usergame.win(win);
@@ -556,7 +558,7 @@ public class BJGame extends Event {
             ArrayList<Card> dhand = usergame.getDealerHand();
             
             // Announce winner and give chips
-            String out = OUTCOME.replaceAll("%who", player.getNick());
+            String out = OUTCOME.replaceAll("%who", player);
             
             out = out.replaceAll("%outcome", PLAYER_DRAW);
             
@@ -578,7 +580,7 @@ public class BJGame extends Event {
             bot.sendIRCMessage(chan, out);
             
             out = WINNINGS.replaceAll("%coins", Utils.chipsToString(win));
-            out = out.replaceAll("%who", player.getNick());
+            out = out.replaceAll("%who", player);
             bot.sendIRCNotice(player, out);
             
         } catch (Exception e) {
@@ -588,7 +590,7 @@ public class BJGame extends Event {
         // jackpot stuff only one person, so no need for losers!
        if (Rake.checkJackpot(amount)) {
             ArrayList<String> players = new ArrayList<String>();
-            players.add(player.getNick());
+            players.add(player);
             Rake.jackpotWon(usergame.getProfile(), GamesType.BLACKJACK, players, bot,
                             chan);
         }
@@ -603,7 +605,7 @@ public class BJGame extends Event {
      * @param usergame the game we are winning
      * @param multiplier the multiplier for winning
      */
-    private void doWin(final User winner, 
+    private void doWin(final String winner, 
                        final IrcBot bot,
                        final Channel chan, 
                        final BJBet usergame,
@@ -619,7 +621,7 @@ public class BJGame extends Event {
         }
         
        
-        Rake.getRake(winner.getNick(), amount, wprof);
+        Rake.getRake(winner, amount, wprof);
 
         try {
             usergame.win(win);
@@ -630,7 +632,7 @@ public class BJGame extends Event {
             ArrayList<Card> dhand = usergame.getDealerHand();
             
             // Announce winner and give chips
-            String out = OUTCOME.replaceAll("%who", winner.getNick());
+            String out = OUTCOME.replaceAll("%who", winner);
             
             if (natural(usergame.getPlayerHand())) {
                 out = out.replaceAll("%pscore", BLACKJACK_STRING);
@@ -651,7 +653,7 @@ public class BJGame extends Event {
             bot.sendIRCMessage(chan, out);
            
             out = WINNINGS.replaceAll("%coins", Utils.chipsToString(win));
-            out = out.replaceAll("%who", winner.getNick());
+            out = out.replaceAll("%who", winner);
             bot.sendIRCNotice(winner, out);
             
         } catch (Exception e) {
@@ -662,7 +664,7 @@ public class BJGame extends Event {
         // jackpot stuff only one person, so no need for losers!
        if (Rake.checkJackpot(amount)) {
             ArrayList<String> players = new ArrayList<String>();
-            players.add(winner.getNick());
+            players.add(winner);
             Rake.jackpotWon(wprof, GamesType.BLACKJACK, players, bot,
                             chan);
         }
@@ -674,7 +676,7 @@ public class BJGame extends Event {
      * @param chan the channel we are sending messages to
      * @param usergame the game that we are losing :(
      */
-    private void doLose(final User sender, 
+    private void doLose(final String sender, 
                         final IrcBot bot,
                         final Channel chan, 
                         final BJBet usergame) {
@@ -686,9 +688,9 @@ public class BJGame extends Event {
         ArrayList<Card> phand = usergame.getPlayerHand();
         ArrayList<Card> dhand = usergame.getDealerHand();
         
-        Rake.getRake(sender.getNick(), usergame.getAmount(), usergame.getProfile());
+        Rake.getRake(sender, usergame.getAmount(), usergame.getProfile());
         
-        String out = OUTCOME.replaceAll("%who", sender.getNick());
+        String out = OUTCOME.replaceAll("%who", sender);
         
         if (natural(usergame.getPlayerHand())) {
             out = out.replaceAll("%pscore", BLACKJACK_STRING);
@@ -713,7 +715,7 @@ public class BJGame extends Event {
             // check insurance.
             if (usergame.isInsured()) {
                 usergame.payInsurance();
-                out = INSURANCE_PAID.replaceAll("%who", sender.getNick());
+                out = INSURANCE_PAID.replaceAll("%who", sender);
                 bot.sendIRCMessage(chan, out);   
             } 
             
@@ -721,7 +723,7 @@ public class BJGame extends Event {
         // jackpot stuff only one person, so no need for losers!
        if (Rake.checkJackpot(usergame.getAmount())) {
             ArrayList<String> players = new ArrayList<String>();
-            players.add(sender.getNick());
+            players.add(sender);
             Rake.jackpotWon(usergame.getProfile(), GamesType.BLACKJACK, players, bot,
                             chan);
         } 
@@ -736,7 +738,8 @@ public class BJGame extends Event {
     private void newGame(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
-        User sender = event.getUser();
+        String sender = event.getUser().getNick();
+        User senderu = event.getUser();
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
         BJBet game = null;
@@ -747,7 +750,7 @@ public class BJGame extends Event {
             Double betsize = 0.0;
             synchronized (BaseBot.getLockObject()) {
                 for (BJBet g : openGames) {
-                    if (g.getUser().getNick().compareTo(sender.getNick()) == 0) {
+                    if (g.getUser().compareTo(sender) == 0) {
                         hasopen = true;
                         break;
                     }
@@ -755,24 +758,24 @@ public class BJGame extends Event {
                 
                 if (hasopen) {
                     String out = OPENGAME.replaceAll("%who",
-                            sender.getNick());
+                            sender);
                     bot.sendIRCNotice(sender, out);
                 } else {
                     Double amount = Utils.tryParseDbl(msg[1]);
                     if (amount == null || amount == 0) {
-                        bot.invalidArguments(sender, BJ_FORMAT);
+                        bot.invalidArguments(senderu, BJ_FORMAT);
                     } else if (amount > Variables.MAXBET) {
-                        bot.maxBet(sender, chan, Variables.MAXBET);
+                        bot.maxBet(senderu, chan, Variables.MAXBET);
                     } else {
                         DB db = DB.getInstance();
                         try {
-                            profile = db.getActiveProfile(sender.getNick());
-                            betsize = Utils.checkCredits(sender, amount, bot, chan);
+                            profile = db.getActiveProfile(sender);
+                            betsize = Utils.checkCredits(senderu, amount, bot, chan);
                             if (amount < 0.0) {
-                                bot.invalidArguments(sender, BJ_FORMAT);
+                                bot.invalidArguments(senderu, BJ_FORMAT);
                             } else if (betsize > 0.0) {
                                 playbet = true;
-                                game = new BJBet(sender, betsize, profile, chan);
+                                game = new BJBet(senderu, betsize, profile, chan);
                                 openGames.add(game);
                             } else {
                                 String out = NOCHIPS.replaceAll("%chips",
@@ -794,7 +797,7 @@ public class BJGame extends Event {
                     ArrayList<Card> dhand = game.getDealerHand();
                     
                     //print to channel the hands
-                    String out = DEALT_HANDS.replaceAll("%who", sender.getNick());
+                    String out = DEALT_HANDS.replaceAll("%who", sender);
                     
                     out = out.replaceAll("%phand", handToString(phand, false));
                     out = out.replaceAll("%dhand", handToString(dhand, true)); 
@@ -813,7 +816,7 @@ public class BJGame extends Event {
                         // player auto win
                         doWin(sender, bot, chan, game, BJ_WIN);
                     } else  {
-                        out = BJ_OPTIONS.replaceAll("%who", sender.getNick());
+                        out = BJ_OPTIONS.replaceAll("%who", sender);
                         out += CAN_HIT;
                         out += CAN_STAND;
                         if (canInsure(dhand)) {
@@ -990,7 +993,7 @@ public class BJGame extends Event {
                         if (diff > AUTO_STAND_TIME) {
                             stand(bet.getUser(), irc, bet.getChannel()); 
                         } else if (diff > WARNING_TIME) {
-                            String out = TIMEOUT_WARNING.replace("%who", bet.getUser().getNick());
+                            String out = TIMEOUT_WARNING.replace("%who", bet.getUser());
                             irc.sendIRCNotice(bet.getUser(), out);
                         }
                     }
