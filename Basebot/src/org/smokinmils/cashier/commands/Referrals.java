@@ -1028,8 +1028,8 @@ public class Referrals extends Event {
                             grouppoints.put(grp, ent.getValue());
                             groupusers.put(grp, 1);
                         } else {
-                            grouppoints.put(grp, grouppoints.get(group) + ent.getValue());
-                            groupusers.put(grp, groupusers.get(group) + 1);
+                            grouppoints.put(grp, grouppoints.get(grp) + ent.getValue());
+                            groupusers.put(grp, groupusers.get(grp) + 1);
                         }
                     }
                 }

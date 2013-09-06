@@ -9,7 +9,7 @@
 	
 	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
-	<db type="dbname">live</db>
+	<db type="dbname">test</db>
 	<db type="dbuser">smbot</db>
 	<db type="dbpass">SM_bot_2013$</db>
 	
