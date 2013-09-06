@@ -522,10 +522,14 @@ public final class DB {
                     ret = 0.0;
                 }
             } else if (amount <= chips) {
-                if (chipdiff <= CHIPS_OTHER) {
-                    ret = chips;
-                } else if (chips < CHIPS_LTONE) {
-                    ret = CHIPS_LTONE;
+                if (amount < CHIPS_LTONE) {
+                    if (chips < CHIPS_LTONE) {
+                        ret = chips;
+                    } else {
+                        ret = CHIPS_LTONE;
+                    }
+                } else if (chipdiff <= CHIPS_OTHER) {
+                        ret = chips;
                 } else {
                     ret = amount;
                 }

@@ -21,6 +21,7 @@ import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
+import org.smokinmils.cashier.tasks.Competition;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.BetterInfo;
 import org.smokinmils.database.types.ProfileType;
@@ -77,6 +78,12 @@ public class UserCommands extends Event {
     
     /** The stats command. */
     public static final String SHOWSTATCMD = "!showstats";
+    
+    /** The competition command. */
+    public static final String COMPCMD = "!competitions";
+    
+    /** The competition command. */
+    public static final String COMPCMD2 = "!competition";    
     
     /** The position command length. */
     public static final int     POS_CMD_LEN     = 3;
@@ -202,6 +209,8 @@ public class UserCommands extends Event {
                 changeProfile(event);
             } else if (Utils.startsWith(message, POSCMD)) {
                 compPosition(event);
+            } else if (Utils.startsWith(message, COMPCMD) || Utils.startsWith(message, COMPCMD2)) {
+                competitions(event);
             }
         }
     }
@@ -559,8 +568,7 @@ public class UserCommands extends Event {
         String message = event.getMessage();
         User senderu = event.getUser();
         String sender = senderu.getNick();
-        Channel chan = event.getChannel();
-        
+        Channel chan = event.getChannel();       
 
         String[] msg = message.split(" ");
         
@@ -594,15 +602,11 @@ public class UserCommands extends Event {
     
                     String out = "";
                     if (better.getPosition() == -1) {
-                        out = NOTRANKED.replaceAll("%profile",
-                                profile.toString());
+                        out = NOTRANKED.replaceAll("%profile", profile.toString());
                     } else {
-                        out = POSITION.replaceAll("%profile",
-                                profile.toString());
-                        out = out.replaceAll("%position",
-                                Integer.toString(better.getPosition()));
-                        out = out.replaceAll("%coins",
-                                Long.toString(better.getAmount()));
+                        out = POSITION.replaceAll("%profile", profile.toString());
+                        out = out.replaceAll("%position", Integer.toString(better.getPosition()));
+                        out = out.replaceAll("%coins", Long.toString(better.getAmount()));
                     }
     
                     out = out.replaceAll("%sender", sender);
@@ -643,6 +647,18 @@ public class UserCommands extends Event {
         } else {
             bot.invalidArguments(senderu, POSFMT);
         }
+    }
+    
+    /**
+     * This method handles the competition command.
+     * 
+     * @param event The message event
+     */
+    public final void competitions(final Message event) {
+        IrcBot bot = event.getBot();
+        String chan = event.getChannel().getName();     
+        
+        Competition.announce(bot, chan);
     }
 }
 

@@ -95,15 +95,18 @@ public class Competition extends TimerTask {
         if (over) {
             end();
         } else if (runs == ANNOUNCEMINS) {
-            announce();
+            announce(bot, channel);
             runs = 0;
         }
     }
 
     /**
      * Announce the current leaders.
+     * 
+     * @param bot the bot used to announce.
+     * @param chan the channel to announce to.
      */
-    private void announce() {
+    public static void announce(final IrcBot bot, final String chan) {
         DB db = DB.getInstance();
 
         String duration = "";
@@ -118,29 +121,27 @@ public class Competition extends TimerTask {
         for (ProfileType profile : ProfileType.values()) {
             try {
                 // Announce the current lottery
-                Lottery.announceLottery(bot, profile, channel);
+                Lottery.announceLottery(bot, profile, chan);
             } catch (Exception e) {
                 EventLog.log(e, "Competition", "run");
             }
         }
 
-        Channel chan = bot.getUserChannelDao().getChannel(channel);
+        Channel anochan = bot.getUserChannelDao().getChannel(chan);
         
-        Map<ProfileType, List<Integer>> allprizes = readPrizes();
+        Map<ProfileType, List<Integer>> allprizes = readPrizes(bot, chan);
         for (ProfileType profile : ProfileType.values()) {
             if (profile.hasComps()) {
                 try {
-                    List<BetterInfo> betters = db.getCompetition(
-                            profile, NUMBERWINNERS);
+                    List<BetterInfo> betters = db.getCompetition(profile, NUMBERWINNERS);
 
                     List<Integer> prizes = allprizes.get(profile);
                     // check there are enough prizes
                     if (prizes == null || prizes.size() < betters.size()) {
                         EventLog.log("Not enough prizes for " + profile.toString(),
-                                "Competition", "end");
-                        bot.sendIRCMessage(chan,
-                                "%b%c04No competition prizes set for + " + profile.toString()
-                                        + ", please talk to an admin");
+                                     "Competition", "end");
+                        bot.sendIRCMessage(anochan, "%b%c04No competition prizes set for + "
+                                            + profile.toString() + ", please talk to an admin");
                         continue;
                     }
 
@@ -152,7 +153,7 @@ public class Competition extends TimerTask {
                     out = out.replaceAll("%prizes", prizestr);
                     out = out.replaceAll("%players", allwins);
 
-                    bot.sendIRCMessage(chan, out);
+                    bot.sendIRCMessage(anochan, out);
                 } catch (Exception e) {
                     EventLog.log(e, "Competition", "run");
                 }
@@ -170,7 +171,7 @@ public class Competition extends TimerTask {
 
         // End the competition
         DB db = DB.getInstance();
-        Map<ProfileType, List<Integer>> allprizes = readPrizes();
+        Map<ProfileType, List<Integer>> allprizes = readPrizes(bot, channel);
         for (ProfileType profile : ProfileType.values()) {
             if (profile.hasComps()) {
                 try {
@@ -233,12 +234,16 @@ public class Competition extends TimerTask {
     /**
      * Read the prizes from a file.
      * 
+     * @param bot the bot used to announce.
+     * @param channame the channel to announce to.
+     *
      * @return The map of prizes.
      */
-    private Map<ProfileType, List<Integer>> readPrizes() {
+    private static Map<ProfileType, List<Integer>> readPrizes(final IrcBot bot,
+                                                              final String channame) {
         Map<ProfileType, List<Integer>> results =
                 new HashMap<ProfileType, List<Integer>>();
-        Channel chan = bot.getUserChannelDao().getChannel(channel);
+        Channel chan = bot.getUserChannelDao().getChannel(channame);
         for (ProfileType profile : ProfileType.values()) {
             if (profile.hasComps()) {
                 List<Integer> prizes = new ArrayList<Integer>();

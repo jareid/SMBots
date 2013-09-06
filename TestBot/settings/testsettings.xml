@@ -9,12 +9,12 @@
 	
 	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
-	<db type="dbname">test</db>
+	<db type="dbname">live</db>
 	<db type="dbuser">smbot</db>
 	<db type="dbpass">SM_bot_2013$</db>
 	
 	<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
-    <http type="url">http://smokin-goldshop.appspot.com/stockREMOVEME</http>
+    <http type="url">http://smokin-goldshop.appspot.co/stock</http>
 
     <trade type="percent">0.05</trade>
     <trade type="minimum">5.0</trade>

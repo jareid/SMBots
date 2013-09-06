@@ -28,7 +28,6 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
-import org.smokinmils.games.rpg.Duel;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -334,8 +333,8 @@ public class Admin extends Event {
             Class type = null;
             if (game.equals(DD)) {
                 type = DiceDuel.class;
-            } else if (game.equals(DUEL)) {
-                type = Duel.class;
+/*            } else if (game.equals(DUEL)) {
+                type = Duel.class;*/
             } else if (game.equals(OU)) {
                 type = OverUnder.class;
             } else if (game.equals(RPS)) {
