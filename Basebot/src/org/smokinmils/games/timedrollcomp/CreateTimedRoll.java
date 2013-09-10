@@ -20,7 +20,9 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
+import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -35,6 +37,19 @@ public class CreateTimedRoll extends Event {
     /** The Create format. */
     public static final String               CRE_FORMAT     = "%b%c12"
                   + CRE_CMD + " <channel> <minutes> <prize> <profile> <rounds>";
+
+    /** The create command length. */
+    public static final int                  CRE_CMD_LEN    = 6;
+    
+    /** The Create command. */
+    public static final String               SPN_CMD        = "!startroll";
+
+    /** The Create format. */
+    public static final String               SPN_FORMAT     = "%b%c12"
+                  + SPN_CMD + " <channel> <minutes> <prize> <profile> <rounds>";
+
+    /** The create command length. */
+    public static final int                  SPN_CMD_LEN    = 6;
     
     /** The Ban command. */
     public static final String               BAN_CMD        = "!rollban";
@@ -44,9 +59,6 @@ public class CreateTimedRoll extends Event {
     
     /** The Unban command. */
     public static final String               UBAN_CMD        = "!rollunban";
-
-    /** The create command length. */
-    public static final int                  CRE_CMD_LEN    = 6;
 
     /** The End command. */
     public static final String               ENDCMD     = "!end";
@@ -85,12 +97,18 @@ public class CreateTimedRoll extends Event {
 
     /** The map of games. */
     private final Map<String, TimedRollComp> games;
+    
+    /** The channel where sponsor can be used. */
+    private final String sponserChan;
 
     /**
      * Constructor.
+     * 
+     * @param sponserchan Channel used for sponser
      */
-    public CreateTimedRoll() {
+    public CreateTimedRoll(final String sponserchan) {
         games = new HashMap<String, TimedRollComp>();
+        sponserChan = sponserchan;
     }
 
     /**
@@ -102,7 +120,8 @@ public class CreateTimedRoll extends Event {
     public final void message(final Message event) {
         String message = event.getMessage().toLowerCase();
 
-        if (isValidChannel(event.getChannel().getName())) {
+        if (isValidChannel(event.getChannel().getName())
+            && !sponserChan.equalsIgnoreCase(event.getChannel().getName())) {
             if (Utils.startsWith(message, CRE_CMD)) {
                 createGame(event);
             } else if (Utils.startsWith(message, ENDCMD)) {
@@ -112,6 +131,9 @@ public class CreateTimedRoll extends Event {
             } else if (Utils.startsWith(message, UBAN_CMD)) {
                 unban(event);
             }
+        } else if (sponserChan.equalsIgnoreCase(event.getChannel().getName()) 
+                   && Utils.startsWith(message, SPN_CMD)) {
+            sponserGame(event);
         }
     }
 
@@ -160,8 +182,7 @@ public class CreateTimedRoll extends Event {
 
                             games.put(channel.toLowerCase(), trc);
                         } catch (IllegalArgumentException e) {
-                            bot.sendIRCNotice(senderu,
-                                    "%b%c12Received the following error: %c04"
+                            bot.sendIRCNotice(senderu, "%b%c12Received the following error: %c04"
                                             + e.getMessage());
                         }
                     }
@@ -173,6 +194,72 @@ public class CreateTimedRoll extends Event {
             }
         } else {
             bot.invalidArguments(senderu, CRE_FORMAT);
+        }
+    }
+    
+    /**
+     * Handles the create command.
+     * 
+     * @param event the message event.
+     */
+    private void sponserGame(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        Channel chan = event.getChannel();
+        User senderu = event.getUser();
+        String[] msg = message.split(" ");
+
+        if (msg.length == SPN_CMD_LEN) {
+            int i = 1;
+            String channel = msg[i];
+            i++;
+            Integer mins = Utils.tryParse(msg[i]);
+            i++;
+            Integer prize = Utils.tryParse(msg[i]);
+            i++;
+            ProfileType profile = ProfileType.fromString(msg[i]);
+            i++;
+            Integer rounds = Utils.tryParse(msg[i]);
+
+            if (!channel.isEmpty() && mins != null && prize != null
+                    && rounds != null && rounds > 0) {
+                // Check valid profile
+                if (profile != null) {
+                    TimedRollComp trc = games.get(channel.toLowerCase());
+                    int betsize = Utils.checkCreditsAsInt(senderu, rounds * prize,
+                                                             bot, chan, profile);
+                    if (trc != null) {
+                        bot.sendIRCMessage(chan, EXIST.replaceAll("%chan", channel));
+                    } else if (betsize > 0) { // check they had enough chips.
+                        try {
+                            DB.getInstance().adjustChips(senderu.getNick(), -(rounds * prize),
+                                                profile, GamesType.TIMEDROLL, TransactionType.BET);
+                            trc = new TimedRollComp(bot, channel, profile,
+                                    prize, mins, rounds, this, false);
+
+                            String out = CREATED.replaceAll("%chan", channel);
+                            out = out.replaceAll("%prize", Integer.toString(prize));
+                            out = out.replaceAll("%mins", Integer.toString(mins));
+                            out = out.replaceAll("%profile", profile.toString());
+                            out = out.replaceAll("%rounds", Integer.toString(rounds));
+                            bot.sendIRCMessage(chan, out);
+
+                            games.put(channel.toLowerCase(), trc);
+                        } catch (IllegalArgumentException e) {
+                            bot.sendIRCNotice(senderu, "%b%c12Received the following error: %c04"
+                                            + e.getMessage());
+                        } catch (SQLException e) {
+                            EventLog.log(e, "CreateTimedRoll", "sponserGame");
+                        }
+                    }
+                } else {
+                    bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
+                }
+            } else {
+                bot.invalidArguments(senderu, SPN_FORMAT);
+            }
+        } else {
+            bot.invalidArguments(senderu, SPN_FORMAT);
         }
     }
 

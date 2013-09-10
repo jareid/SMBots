@@ -15,6 +15,7 @@ import java.util.List;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.database.DB;
+import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -51,6 +52,11 @@ public final class Utils {
     /** Message for denying bets if they bet less than 1 coin with more than 1 on account. */
     private static final String MINIMUM_BET = "%b%c04%who%c12: If you have more than 1 coin "
                                                             + "you must bet more than 1 coin";
+    
+    /** Not enough coins message. */
+    private static final String  NO_CHIPS        = "%b%c04%username%c12: "
+                                     + "You do not have enough chips for that!";
+    
 
     /**
      * A method that will handle parsing of integers without throwing an
@@ -169,10 +175,12 @@ public final class Utils {
      * Wrapper for DB.checkCredits that prevents &lt; 1 chips bet when the
      * user  has more than 1. Also makes the user bet their total if
      * within current bet is within 0.05 of total on account.
+     * 
      * @param user  The user who is betting
      * @param amount the amount being bet
      * @param bot the bot so we can send errrrr messages
      * @param chan the channel to send messages
+     * 
      * @return the credits 
      */
     public static double checkCredits(final User user, 
@@ -192,6 +200,45 @@ public final class Utils {
                 bot.sendIRCMessage(chan, out);
             } else {
                 ret = total;
+            }
+        } catch (SQLException e) {
+            EventLog.log(e, "Utils", "checkCredits");
+        }
+        return ret;
+    }
+    
+    /**
+     * Wrapper for DB.checkCredits that prevents &lt; 1 chips bet when the
+     * user  has more than 1.
+     * 
+     * @param user  The user who is betting
+     * @param amount the amount being bet
+     * @param bot the bot so we can send errrrr messages
+     * @param chan the channel to send messages
+     * @param profile the profile type to check.
+     * 
+     * @return the credits 
+     */
+    public static int checkCreditsAsInt(final User user, 
+                                      final int amount,
+                                      final IrcBot bot,
+                                      final Channel chan,
+                                      final ProfileType profile) {
+        int ret = 0;
+        DB db = DB.getInstance();
+        String username = user.getNick();
+        
+        try {
+            int total = db.checkCreditsAsInt(username, profile);
+            // check if betting lt one and having gt 1
+            if (amount < ONE_CHIP) {
+                // tell them they need to bet at least one coinchip
+                String out = MINIMUM_BET.replaceAll("%who", username);
+                bot.sendIRCMessage(chan, out);
+            } else if (total < amount) {
+                bot.sendIRCMessage(chan, NO_CHIPS.replaceAll("%username", username));
+            } else {
+                ret = amount;
             }
         } catch (SQLException e) {
             EventLog.log(e, "Utils", "checkCredits");

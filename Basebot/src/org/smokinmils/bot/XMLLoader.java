@@ -185,8 +185,7 @@ public final class XMLLoader {
          * @param serveraddr    the server we are doing this on
          */
         private void joinChannels(final String serveraddr) {
-            try {
-                
+            try {                
                 BaseBot basebot = BaseBot.getInstance();
                 XPath xPath =  XPathFactory.newInstance().newXPath();
  
@@ -199,8 +198,7 @@ public final class XMLLoader {
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     String n = nodeList.item(i).getNodeName();
                 
-                    if (n.equals(CHANNEL)) {
-                        
+                    if (n.equals(CHANNEL)) {                        
                         channels.add("#" + nodeList.item(i).getTextContent());
                     }
                 }
@@ -294,7 +292,8 @@ public final class XMLLoader {
                         } else if (type.equals("overunder")) {
                             basebot.addListener(server, new OverUnder(), chanarr);
                         } else if (type.equals("createtimedroll")) {
-                            basebot.addListener(server, new CreateTimedRoll(), chanarr);
+                            basebot.addListener(server,
+                                    new CreateTimedRoll("#" + options.get("sponserchan")), chanarr);
                         } else if (type.equals("trade")) {
                             basebot.addListener(server, new Escrow(), chanarr);
                         } else if (type.equals("diceduel")) {

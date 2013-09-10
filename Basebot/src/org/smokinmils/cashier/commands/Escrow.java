@@ -243,8 +243,7 @@ public class Escrow extends Event {
                         EventLog.log(e, "Escrow", "sellChips");
                     }
 
-                    //TODO: fix before launch
-                    if (false == true/*bot.manualStatusRequest(user)*/) {
+                    if (bot.manualStatusRequest(user)) {
                         String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
                         
                         bot.sendIRCMessage(senderu, out);

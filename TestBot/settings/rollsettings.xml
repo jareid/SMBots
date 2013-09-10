@@ -15,11 +15,12 @@
 	<db type="dbpass">SM_bot_2013$</db>
 
 	<listener type="createtimedroll">
-		<channel>testeroo</channel>
+		<channel>testeroo2</channel>
+        <option type="sponserchan">testeroo2</option>
 	</listener>
 
 	<timer type="trc">
-		<channel>testeroo</channel>
+		<channel>testeroo2</channel>
 		<option type="profile">EOC</option>
 		<option type="prize">2</option>
 		<option type="mins">5</option>
