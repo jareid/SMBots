@@ -45,6 +45,7 @@ import org.smokinmils.database.tables.RefsTransactionsTable;
 import org.smokinmils.database.tables.RollBansTable;
 import org.smokinmils.database.tables.TotalBetsView;
 import org.smokinmils.database.tables.TransactionTypesTable;
+import org.smokinmils.database.tables.TransactionsSummaryTable;
 import org.smokinmils.database.tables.TransactionsTable;
 import org.smokinmils.database.tables.UserProfilesTable;
 import org.smokinmils.database.tables.UserProfilesView;
@@ -107,7 +108,7 @@ public final class DB {
     private final String        url         = "jdbc:mysql://"
                                             + DBSettings.SERVER + ":"
                                             + DBSettings.PORT + "/"
-                                            + DBSettings.DB_NAME;
+                                            + DBSettings.DB_NAME + "?autoReconnect=true";
 
     /** This is used to adjust bets when they are approaching zero. */
     private static final double CHIPS_LTONE = 1.0;
@@ -131,6 +132,7 @@ public final class DB {
         props.put("numHelperThreads", "12");
         props.put("aquireIncrement", "5");
         props.put("autoReconnect", "true");
+        props.put("testConnectionOnCheckout", "true");
         props.put("maxIdleTime", new Integer(MAX_IDLE_MINS * Utils.MS_IN_MIN));
         
         unpooled = DataSources.unpooledDataSource(url,
@@ -2259,6 +2261,59 @@ public final class DB {
                 
                 res.put(ProfileType.fromString(rs.getString(UserProfilesView.COL_PROFILE)),
                         userstat);
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+        return res;
+    }
+    
+    /** 
+     * Gets a users stats for each profile.
+     * 
+     * @param user the user to get the stats for
+     * 
+     * @return a map of profile and stats objects.
+     * 
+     * @throws SQLException 
+     */
+    public double getAllTimeTotal(final String user) throws SQLException {
+        double res = 0.0;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT SUM(" + TransactionsSummaryTable.COL_AMOUNT + ") FROM "
+                   + TransactionsSummaryTable.NAME + " WHERE "
+                   + TransactionsSummaryTable.COL_USERID + " LIKE (" + getUserIDSQL(user)
+                   + ") AND (" + TransactionsSummaryTable.COL_TYPEID + " LIKE ("
+                               + getTzxTypeIDSQL(TransactionType.BET)
+                   + ") OR " + TransactionsSummaryTable.COL_TYPEID + " LIKE ("
+                             + getTzxTypeIDSQL(TransactionType.CANCEL)
+                   + ") OR " + TransactionsSummaryTable.COL_TYPEID + " LIKE ("
+                             + getTzxTypeIDSQL(TransactionType.POKER_BUYIN)
+                   + ")";
+
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                res = rs.getDouble(1);
             }
         } catch (SQLException e) {
             throw new DBException(e, sql);

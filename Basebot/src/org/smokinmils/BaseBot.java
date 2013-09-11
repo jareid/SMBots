@@ -148,10 +148,12 @@ public final class BaseBot {
     * @param addr   The address for the server.
     * @param local  The local address the bot will use.
     * @param autoident Turns the auto ident check on or off
+    * @param channel The main channel for this server
     */
    public void addServer(final String name, final String addr,
-                         final InetAddress local, final boolean autoident) {
-       addServer(name, addr, DEFAULT_PORT, local, autoident);
+                         final InetAddress local, final boolean autoident,
+                         final String channel) {
+       addServer(name, addr, DEFAULT_PORT, local, autoident, channel);
    }
    
    /**
@@ -162,10 +164,11 @@ public final class BaseBot {
     * @param port	The port for this server.
     * @param local  The local address the bot will use.
     * @param autoident Turns the auto ident check on or off
+    * @param channel The main channel for this server
     */
    public void addServer(final String name, final String addr,
                          final int port, final InetAddress local,
-                         final boolean autoident) {
+                         final boolean autoident, final String channel) {
        IrcBot newbot = null;
        
        ThreadedListenerManager<IrcBot> lm  = new ThreadedListenerManager<IrcBot>();
@@ -191,7 +194,7 @@ public final class BaseBot {
        
 	   newbot = new IrcBot(configuration);
 	   
-       CheckIdentified cithread = new CheckIdentified(newbot, autoident);
+       CheckIdentified cithread = new CheckIdentified(newbot, autoident, channel);
        lm.addListener(cithread);
        newbot.setIdentCheck(cithread);
        

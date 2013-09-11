@@ -79,24 +79,62 @@ public class CheckIdentified extends Event {
                                             + "%c04[IMPORTANT]%c01 We will NEVER query you to sell "
                                             + "you coins. %c04[IMPORTANT]%c01";
     
+    /**
+     * This string is output when the user has just been created.
+     */
+    public static final String JOIN_MSG = "%b%c04[%c01INFO%c04]%c01 %c04%user%c01 is a "
+                                        + "%c04%level%c01 user";
+    
     /** Contains a separate thread to process identification checks. */
     private final CheckUserQueue checkThread;
     
     /** Tells us whether to enable automatic checks or not. */
     private final boolean isEnabled;
+
+    /** Channel to announce in. */
+    private final String channel;
+    
+    /** The string for a new user. */
+    public static final String OTHERSTR = "Noob";
+    
+    /** The amount of chips required for bronze. */
+    public static final int BRONZE = XMLLoader.getInstance().getTierSetting("bronze");
+    
+    /** The string for a bronze user. */
+    public static final String BRONZESTR = "Bronze";
+    
+    /** The amount of chips required for silver. */
+    public static final int SILVER = XMLLoader.getInstance().getTierSetting("silver");
+    
+    /** The string for a silver user. */
+    public static final String SILVERSTR = "Silver";
+    
+    /** The amount of chips required for gold. */
+    public static final int GOLD = XMLLoader.getInstance().getTierSetting("gold");
+    
+    /** The string for a gold user. */
+    public static final String GOLDSTR = "Gold";
+    
+    /** The amount of chips required for platinum. */
+    public static final int PLATINUM = XMLLoader.getInstance().getTierSetting("platinum");
+    
+    /** The string for a platinum user. */
+    public static final String PLATINUMSTR = "Platinum";
     
     /**
      * Constructor.
      * 
      * @param bot The irc bot for this server's ident checks
      * @param enabled If auto checks are on or not.
+     * @param chan The channel used for announce.
      * 
      * @see Event
      */
-    public CheckIdentified(final IrcBot bot, final boolean enabled) {
+    public CheckIdentified(final IrcBot bot, final boolean enabled, final String chan) {
         super();
         checkThread = new CheckUserQueue(bot);
         isEnabled = enabled;
+        channel = chan;
     }
     
     @Override
@@ -319,6 +357,23 @@ public class CheckIdentified extends Event {
                                                     .replaceAll("%manager",
                                                                 ManagerSystem.getLoggedInUser());
                             bot.sendIRCNotice(user, out);
+                        } else {
+                            // Existing user, announce better tier
+                            double bet = DB.getInstance().getAllTimeTotal(user.getNick());
+                            String tier = OTHERSTR;
+                            if (bet >= PLATINUM) {
+                                tier = PLATINUMSTR;
+                            } else if (bet >= GOLD) {
+                                tier = GOLDSTR;
+                            } else if (bet >= SILVER) {
+                                tier = SILVERSTR;
+                            } else if (bet >= BRONZE) {
+                                tier = BRONZESTR;
+                            }
+                            
+                            String out = JOIN_MSG.replaceAll("%user", user.getNick())
+                                                 .replaceAll("%tier", tier);
+                            bot.sendIRCMessage(bot.getUserChannelDao().getChannel(channel), out);
                         }
                     }
                 } catch (Exception e) {
