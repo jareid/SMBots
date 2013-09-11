@@ -5,7 +5,8 @@
 	<server>irc.SwiftIRC.net</server>
 	<port>6667</port>
 	<ip>127.0.0.1</ip>
-	<rake>#testeroo2</rake>
+	<rake>testeroo2</rake>
+    <mainchan>testeroo2</mainchan>
 	
 	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
@@ -18,6 +19,11 @@
 
     <trade type="percent">0.05</trade>
     <trade type="minimum">5.0</trade>
+    
+    <tier type="bronze">1000</tier>
+    <tier type="silver">5000</tier>
+    <tier type="gold">15000</tier>
+    <tier type="platinum">40000</tier>
 	
 	<listener type="invite">
 		<channel>testeroo2</channel>
