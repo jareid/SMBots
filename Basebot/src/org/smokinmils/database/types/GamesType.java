@@ -32,6 +32,9 @@ public enum GamesType {
     /** Blackjack game. */
     DM("iDM"),
     
+    /** The duel game. */
+    DUEL("duel"),
+    
     /** Lottery game. */
     LOTTERY("Lottery"),
     

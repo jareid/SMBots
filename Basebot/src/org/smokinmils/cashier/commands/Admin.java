@@ -28,6 +28,7 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
+import org.smokinmils.games.rpg.duelling.NewDuel;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -343,6 +344,8 @@ public class Admin extends Event {
                 type = BJGame.class;
             } else if (game.equals(ROULETTE)) {
                 type = Roulette.class;
+            } else if (game.equals(DUEL)) {
+                type = NewDuel.class;
             } else {
                 String out = INVALID_COMMAND.replaceAll("%who", sender);
                 bot.sendIRCMessage(chan, out); 

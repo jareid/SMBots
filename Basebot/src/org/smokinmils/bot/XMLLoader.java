@@ -35,6 +35,7 @@ import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.casino.poker.Client;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
+import org.smokinmils.games.rpg.duelling.NewDuel;
 import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.help.Help;
@@ -309,7 +310,13 @@ public final class XMLLoader {
                         rpsevent.addValidChan(chanarr);
                         rpsevent.addAnnounce("#" + options.get("announce"), bot);
                         basebot.addListener(server, rpsevent);
-                    } else if (type.equals("poker")) {
+                    } else if (type.equals("duel")) {
+                        NewDuel nd = new NewDuel();
+                        nd.addValidChan(chanarr);
+                        nd.addAnnounce("#" + options.get("announce"), bot);
+                        basebot.addListener(server, nd);
+                    }  else if (type.equals("poker")) {
+                    
                         Client poker = new Client(server, chanarr[0]);
                         poker.initialise();
                         basebot.addListener(server, poker);

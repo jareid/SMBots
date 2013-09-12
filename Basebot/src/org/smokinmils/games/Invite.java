@@ -16,6 +16,7 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
+import org.smokinmils.games.rpg.duelling.NewDuel;
 
 /**
  * Allows managers to invite the bot into a channel with a certain game.
@@ -187,6 +188,11 @@ public class Invite extends Event {
                    } else if (game.equals(BJ)) {
                        listener = new BJGame(bot);
                        listener.addValidChan(newchannel);
+                       bb.addListener(bot.getServer(), listener);
+                   } else if (game.equalsIgnoreCase(DUEL)) {
+                       listener = new NewDuel();
+                       listener.addValidChan(newchannel);
+                       ((NewDuel) listener).addAnnounce(newchannel, bot);
                        bb.addListener(bot.getServer(), listener);
                    } else {
                        String out = INVALID_COMMAND.replaceAll("%who", sender.getNick());
