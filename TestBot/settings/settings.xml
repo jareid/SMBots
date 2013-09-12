@@ -17,7 +17,7 @@
 		<channel>testerroo3</channel>
 	</lottery>
 	
-	<db type="server">199.101.50.187</db>
+	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
 	<db type="dbname">test</db>
 	<db type="dbuser">smbot</db>
@@ -33,13 +33,13 @@
 	</listener>
 	<listener type="roulette" id="1">
 		<channel>testerroo3</channel>
-		<option type="time">1</option>
+		<option type="time">2</option>
 	</listener>
-	<listener type="roulette" id="2">
+	<listener type="rouletteDISABLED" id="2">
 		<channel>testerroo3too</channel>
 		<option type="time">2</option>
 	</listener>
-	<listener type="blackjack">
+	<listener type="blackjackDISABLED">
 		<channel>testerroo3</channel>
 	</listener>
 	<listener type="overunder">
@@ -48,7 +48,7 @@
 	<listener type="diceduel">
 		<channel>testerroo3</channel>
 	</listener>
-    <listener type="dm">
+    <listener type="dmDISABLED">
         <channel>testerroo3</channel>
         <channel>testerroo3too</channel>
     </listener>
@@ -71,14 +71,18 @@
 	<listener type="createtimedroll">
 		<channel>testerroo3</channel>
 	</listener>
-	<listener type="rps">
+	<listener type="rpsDISABLED">
+		<channel>testerroo3</channel>
+		<option type="announce">testerroo3</option>
+	</listener>
+	<listener type="duel">
 		<channel>testerroo3</channel>
 		<option type="announce">testerroo3</option>
 	</listener>
 	<listener type="pokerDISABLED">
 		<channel>testerroo3</channel>
 	</listener>
-	<listener type="auctions">
+	<listener type="auctionsDISABLED">
 		<channel>testerroo3</channel>
 	</listener>
 	 

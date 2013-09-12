@@ -255,7 +255,7 @@ public class Roulette extends Event {
             double betsize = Utils.checkCredits(user, amount, bot, event.getChannel());
             String choice = msg[2].toLowerCase();
             Integer choicenum = Utils.tryParse(msg[2]);
-            ArrayList<Integer> splitChoice = splitBet(msg[2]);
+            ArrayList<String> splitChoice = splitBet(msg[2]);
             
             ProfileType profile = db.getActiveProfile(username);
             if (amount == null) {
@@ -268,9 +268,10 @@ public class Roulette extends Event {
                     bot.sendIRCNotice(user, NO_CHIPS);
                 } else {
                     // user has enough chips, and all choices in the CSV are valid
-                    for (int value : splitChoice) {
-                        Bet bet = new Bet(user.getNick(), profile, GamesType.ROULETTE, betsize, 
-                                          String.valueOf(value));
+                    for (String value : splitChoice) {
+                        
+                            Bet bet = new Bet(user.getNick(), profile, GamesType.ROULETTE, betsize, 
+                                    value);
                         allBets.add(bet);
                     }
                     String out = BET_MADE.replaceAll("%username", username);
@@ -314,20 +315,24 @@ public class Roulette extends Event {
      * @param choice the choices in string format
      * @return yay or nay
      */
-    private ArrayList<Integer> splitBet(final String choice) {
+    private ArrayList<String> splitBet(final String choice) {
         boolean valid = true;
         String[] choices = choice.split(",");
-        ArrayList<Integer> bets = new ArrayList<Integer>();
+        ArrayList<String> bets = new ArrayList<String>();
         for (String c : choices) {
             Integer bet = Utils.tryParse(c);
             if (bet != null) {
                 if (bet <= NUMBER && bet >= 0) {
                     // valid
-                    bets.add(bet);
+                    bets.add(c);
                 } else {
                     valid = false;
                     break;
                 }
+            } else if (c.equalsIgnoreCase("1st") || c.equalsIgnoreCase("2nd") ||
+                    c.equalsIgnoreCase("3rd") || c.equalsIgnoreCase("red") || 
+                    c.equalsIgnoreCase("black")) {
+                bets.add(c);
             } else {
                 // one of them isn't valid, so nope
                 valid = false;
