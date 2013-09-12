@@ -329,9 +329,9 @@ public class Roulette extends Event {
                     valid = false;
                     break;
                 }
-            } else if (c.equalsIgnoreCase("1st") || c.equalsIgnoreCase("2nd") ||
-                    c.equalsIgnoreCase("3rd") || c.equalsIgnoreCase("red") || 
-                    c.equalsIgnoreCase("black")) {
+            } else if (c.equalsIgnoreCase("1st") || c.equalsIgnoreCase("2nd")
+                    || c.equalsIgnoreCase("3rd") || c.equalsIgnoreCase("red") 
+                    || c.equalsIgnoreCase("black")) {
                 bets.add(c);
             } else {
                 // one of them isn't valid, so nope

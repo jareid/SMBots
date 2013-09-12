@@ -1,7 +1,5 @@
 package org.smokinmils.games.rpg.duelling;
 
-import java.util.Comparator;
-
 /**
  * Provides an enumerate for the NewDuel game that represents choices and decides
  * the winner.
@@ -19,13 +17,13 @@ public enum GameLogic {
     /** The text. */
     private final String text;
 
-    private 
+
     /**
      * Constructor.
      * 
      * @param txt textual representation.
      */
-    GameLogic(final String txt) {
+    private GameLogic(final String txt) {
         text = txt;
     }
 
