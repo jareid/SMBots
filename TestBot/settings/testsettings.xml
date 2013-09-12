@@ -51,8 +51,9 @@
 		<channel>testeroo2</channel>
 		<channel>testeroo2too</channel>
 	</listener>	
-    <listener type="dm">
+     <listener type="duel">
         <channel>testeroo2</channel>
+        <option type="announce">testeroo2</option>
     </listener>
 	<listener type="diceduel">
 		<channel>testeroo2</channel>
