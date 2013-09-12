@@ -20,6 +20,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.NoticeEvent;
@@ -373,7 +374,8 @@ public class CheckIdentified extends Event {
                             
                             String out = JOIN_MSG.replaceAll("%user", user.getNick())
                                                  .replaceAll("%tier", tier);
-                            bot.sendIRCMessage(bot.getUserChannelDao().getChannel(channel), out);
+                            Channel achan = bot.getUserChannelDao().getChannel(channel);
+                            bot.sendIRCMessage(channel, out);
                         }
                     }
                 } catch (Exception e) {

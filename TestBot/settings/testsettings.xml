@@ -10,7 +10,7 @@
 	
 	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
-	<db type="dbname">test</db>
+	<db type="dbname">live</db>
 	<db type="dbuser">smbot</db>
 	<db type="dbpass">SM_bot_2013$</db>
 	
@@ -77,6 +77,7 @@
 	</listener>
 	<listener type="createtimedroll">
 		<channel>testeroo2</channel>
+        <option type="sponserchan">testeroo2</option>
 	</listener>
 	<listener type="rps">
 		<channel>testeroo2</channel>

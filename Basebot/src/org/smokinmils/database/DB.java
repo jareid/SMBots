@@ -403,7 +403,7 @@ public final class DB {
     public ProfileType getActiveProfile(final String username) throws SQLException {
         String sql = "SELECT " + UsersView.COL_ACTIVEPROFILE + " FROM "
                 + UsersView.NAME + " WHERE " + UsersView.COL_USERNAME
-                + " LIKE '" + username + "'";
+                + " = '" + username + "'";
         return ProfileType.fromString(runGetStringQuery(sql));
     }
 
@@ -420,11 +420,11 @@ public final class DB {
     public UserCheck checkUserExists(final String username,
                                      final String hostmask) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + UsersTable.NAME + " WHERE "
-                + UsersTable.COL_USERNAME + " LIKE " + "'" + username + "'";
+                + UsersTable.COL_USERNAME + " = " + "'" + username + "'";
 
         String hostsql = "SELECT COUNT(" + HostmasksTable.COL_USERID
                 + ") FROM " + HostmasksTable.NAME + " WHERE "
-                + HostmasksTable.COL_HOST + " LIKE " + "'" + hostmask + "'";
+                + HostmasksTable.COL_HOST + " = " + "'" + hostmask + "'";
 
         String insusersql = "INSERT INTO " + UsersTable.NAME + "("
                 + UsersTable.COL_USERNAME + ") VALUES('" + username + "')";
@@ -461,7 +461,7 @@ public final class DB {
      */
     public boolean checkUserExists(final String username) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + UsersTable.NAME + " WHERE "
-                + UsersTable.COL_USERNAME + " LIKE " + "'" + username + "'";
+                + UsersTable.COL_USERNAME + " = " + "'" + username + "'";
 
         return runGetIntQuery(sql) == 1;
     }
@@ -604,7 +604,7 @@ public final class DB {
         String sql = "SELECT " + UserProfilesView.COL_PROFILE + ","
                 + UserProfilesView.COL_AMOUNT + " FROM "
                 + UserProfilesView.NAME + " WHERE "
-                + UserProfilesView.COL_USERNAME + " LIKE '" + username + "'";
+                + UserProfilesView.COL_USERNAME + " = '" + username + "'";
 
         try {
             conn = getConnection();
@@ -653,7 +653,7 @@ public final class DB {
         String sql = "UPDATE " + UsersTable.NAME + " SET "
                 + UsersTable.COL_ACTIVEPROFILE + " = " + "("
                 + getProfileIDSQL(profile) + ")" + " WHERE "
-                + UsersTable.COL_USERNAME + " LIKE '" + username + "'";
+                + UsersTable.COL_USERNAME + " = '" + username + "'";
 
         return runBasicQuery(sql) == 1;
     }
@@ -856,16 +856,16 @@ public final class DB {
     public void transferChips(final String sender, final String user,
                               final int amount, final ProfileType profile) throws SQLException {
         String chipssql = "SELECT COUNT(*) FROM " + UserProfilesView.NAME
-                + " WHERE " + UserProfilesView.COL_PROFILE + " LIKE " + "'"
+                + " WHERE " + UserProfilesView.COL_PROFILE + " = " + "'"
                 + profile.toString() + "'" + " AND "
-                + UserProfilesView.COL_USERNAME + " LIKE " + "'" + user + "'";
+                + UserProfilesView.COL_USERNAME + " = " + "'" + user + "'";
 
         String updminussql = "UPDATE " + UserProfilesTable.NAME + " SET "
                 + UserProfilesTable.COL_AMOUNT + "= ("
                 + UserProfilesTable.COL_AMOUNT + " - " + amount + ")"
-                + " WHERE " + UserProfilesTable.COL_TYPEID + " LIKE ("
+                + " WHERE " + UserProfilesTable.COL_TYPEID + " = ("
                 + getProfileIDSQL(profile) + ") AND "
-                + UserProfilesTable.COL_USERID + " LIKE ("
+                + UserProfilesTable.COL_USERID + " = ("
                 + getUserIDSQL(sender) + ")";
 
         // TODO: use insert or update as in adjustChips (or use adjust chips)
@@ -879,9 +879,9 @@ public final class DB {
         String updaddsql = "UPDATE " + UserProfilesTable.NAME + " SET "
                 + UserProfilesTable.COL_AMOUNT + "= ("
                 + UserProfilesTable.COL_AMOUNT + " + " + amount + ")"
-                + " WHERE " + UserProfilesTable.COL_TYPEID + " LIKE ("
+                + " WHERE " + UserProfilesTable.COL_TYPEID + " = ("
                 + getProfileIDSQL(profile) + ") AND "
-                + UserProfilesTable.COL_USERID + " LIKE (" + getUserIDSQL(user)
+                + UserProfilesTable.COL_USERID + " = (" + getUserIDSQL(user)
                 + ")";
 
         if (runGetIntQuery(chipssql) < 1) {
@@ -1191,13 +1191,13 @@ public final class DB {
         String sql = "SELECT t.position FROM "
                 + "(SELECT c.*,(@position:=@position+1) AS position" + " FROM "
                 + CompetitionView.NAME + " c, (SELECT @position:=0) p WHERE "
-                + CompetitionView.COL_PROFILE + " LIKE '" + profile.toString()
-                + "') t" + " WHERE " + CompetitionView.COL_USERNAME + " LIKE '"
+                + CompetitionView.COL_PROFILE + " = '" + profile.toString()
+                + "') t" + " WHERE " + CompetitionView.COL_USERNAME + " = '"
                 + user + "'";
         String csql = "SELECT " + CompetitionView.COL_TOTAL + " FROM "
                 + CompetitionView.NAME + " WHERE "
-                + CompetitionView.COL_PROFILE + " LIKE '" + profile.toString()
-                + "' AND " + CompetitionView.COL_USERNAME + " LIKE '" + user
+                + CompetitionView.COL_PROFILE + " = '" + profile.toString()
+                + "' AND " + CompetitionView.COL_USERNAME + " = '" + user
                 + "'";
 
         return new BetterInfo(user, runGetIntQuery(sql), runGetLongQuery(csql));
@@ -1268,7 +1268,7 @@ public final class DB {
         throws SQLException {
         String sql = "SELECT " + CompetitionView.COL_USERNAME + ","
                 + CompetitionView.COL_TOTAL + " FROM " + CompetitionView.NAME
-                + " WHERE " + CompetitionView.COL_PROFILE + " LIKE '"
+                + " WHERE " + CompetitionView.COL_PROFILE + " = '"
                 + profile.toString() + "'" + " ORDER BY "
                 + CompetitionView.COL_TOTAL + " DESC " + " LIMIT 0, "
                 + Integer.toString(number);
@@ -1344,11 +1344,11 @@ public final class DB {
         throws SQLException {
         String sql = "SELECT " + TotalBetsView.COL_USERNAME + ","
                 + TotalBetsView.COL_TOTAL + " FROM " + TotalBetsView.NAME
-                + " WHERE " + TotalBetsView.COL_PROFILE + " LIKE '"
+                + " WHERE " + TotalBetsView.COL_PROFILE + " = '"
                 + profile.toString() + "'";
 
         if (who != null) {
-            sql += " AND " + TotalBetsView.COL_USERNAME + " LIKE '" + who + "'";
+            sql += " AND " + TotalBetsView.COL_USERNAME + " = '" + who + "'";
         }
 
         sql += " ORDER BY " + TotalBetsView.COL_TOTAL + " DESC LIMIT 1";
@@ -1423,11 +1423,11 @@ public final class DB {
         String sql = "SELECT " + OrderedBetsView.COL_USERNAME + ","
                 + OrderedBetsView.COL_GAME + "," + OrderedBetsView.COL_TOTAL
                 + " FROM " + OrderedBetsView.NAME + " WHERE "
-                + OrderedBetsView.COL_PROFILE + " LIKE '" + profile.toString()
+                + OrderedBetsView.COL_PROFILE + " = '" + profile.toString()
                 + "'";
 
         if (who != null) {
-            sql += " AND " + OrderedBetsView.COL_USERNAME + " LIKE '" + who
+            sql += " AND " + OrderedBetsView.COL_USERNAME + " = '" + who
                     + "'";
         }
 
@@ -1667,7 +1667,7 @@ public final class DB {
     public boolean isRankGroup(final String group)
         throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + HostGroupsTable.NAME + " WHERE "
-                + HostGroupsTable.COL_NAME + " LIKE '" + group + "'";
+                + HostGroupsTable.COL_NAME + " = '" + group + "'";
 
         return (runGetIntQuery(sql) > 0);
     }
@@ -1682,7 +1682,7 @@ public final class DB {
     public void deleteRankGroup(final String group)
         throws SQLException {
         String sql = "DELETE FROM " + HostGroupsTable.NAME + " WHERE "
-                + HostGroupsTable.COL_NAME + " LIKE '" + group + "'";
+                + HostGroupsTable.COL_NAME + " = '" + group + "'";
         runBasicQuery(sql);
     }
 
@@ -1717,13 +1717,13 @@ public final class DB {
         throws SQLException {
         String sql = "UPDATE " + HostGroupsTable.NAME + " SET "
                 + HostGroupsTable.COL_NAME + " = '" + newgroup + "'"
-                + " WHERE " + HostGroupsTable.COL_NAME + " LIKE '" + oldgroup
+                + " WHERE " + HostGroupsTable.COL_NAME + " = '" + oldgroup
                 + "'";
         runBasicQuery(sql);
 
         sql = "UPDATE " + UsersTable.NAME + " SET " + UsersTable.COL_USERNAME
                 + " = '" + newgroup + "'" + " WHERE " + UsersTable.COL_USERNAME
-                + " LIKE '" + oldgroup + "'";
+                + " = '" + oldgroup + "'";
         runBasicQuery(sql);
     }
 
@@ -2010,11 +2010,11 @@ public final class DB {
     public ReferrerType getRefererType(final String username)
         throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + FullReferersTextView.NAME
-                + " WHERE " + FullReferersTextView.COL_USERNAME + " LIKE '"
+                + " WHERE " + FullReferersTextView.COL_USERNAME + " = '"
                 + username + "'";
 
         String grpsql = "SELECT COUNT(*) FROM " + FullReferersTextView.NAME
-                + " WHERE " + FullReferersTextView.COL_USERNAME + " LIKE '"
+                + " WHERE " + FullReferersTextView.COL_USERNAME + " = '"
                 + username + "'" + " AND " + FullReferersTextView.COL_GROUP
                 + " IS NOT NULL";
 
@@ -2046,7 +2046,7 @@ public final class DB {
         String sql = "SELECT " + "t." + FullReferersTextView.COL_REFERRER + ","
                 + "t." + FullReferersTextView.COL_GROUP + " FROM "
                 + FullReferersTextView.NAME + " t" + " WHERE "
-                + FullReferersTextView.COL_USERNAME + " LIKE '" + user + "'";
+                + FullReferersTextView.COL_USERNAME + " = '" + user + "'";
 
         Connection conn = null;
         Statement stmt = null;
@@ -2108,7 +2108,7 @@ public final class DB {
         
         String usersql = "SELECT uu." + UsersTable.COL_ID + " FROM "
                        + UsersTable.NAME + " uu" + " WHERE uu."
-                       + UsersTable.COL_USERNAME + " LIKE '%user1' LIMIT 1";
+                       + UsersTable.COL_USERNAME + " = '%user1' LIMIT 1";
         
         String tsql = "INSERT INTO " + RefsTransactionsTable.NAME + "("
                 + RefsTransactionsTable.COL_TYPEID + ", "
@@ -2184,7 +2184,7 @@ public final class DB {
                    + " FROM " + HostGroupsTable.NAME + " hgu"
                    + " JOIN " + UsersTable.NAME + " uu ON uu."
                               + UsersTable.COL_ID + " = hgu." + HostGroupsTable.COL_OWNER
-                   + " WHERE " + HostGroupsTable.COL_NAME + " LIKE '" + group + "'";
+                   + " WHERE " + HostGroupsTable.COL_NAME + " = '" + group + "'";
         return runGetStringQuery(sql);
     }
     
@@ -2198,7 +2198,7 @@ public final class DB {
      */
     public boolean hasPublicStats(final String user) throws SQLException {
         String sql = "SELECT " + UsersTable.COL_STATS + " FROM " + UsersTable.NAME
-                   + " WHERE " + UsersTable.COL_USERNAME + " LIKE '" + user + "'";
+                   + " WHERE " + UsersTable.COL_USERNAME + " = '" + user + "'";
         int col = runGetIntQuery(sql);
         boolean res = true;
         if (col == 0) {
@@ -2223,7 +2223,7 @@ public final class DB {
         }
         String sql = "UPDATE " + UsersTable.NAME
                    + " SET " + UsersTable.COL_STATS + " = " + Integer.toString(col)
-                   + " WHERE " + UsersTable.COL_USERNAME + " LIKE '" + user + "'";
+                   + " WHERE " + UsersTable.COL_USERNAME + " = '" + user + "'";
         runBasicQuery(sql);
     }
     
@@ -2243,7 +2243,7 @@ public final class DB {
         Statement stmt = null;
         ResultSet rs = null;
         String sql = "SELECT * FROM " + UserProfilesView.NAME + " WHERE "
-                + UserProfilesView.COL_USERNAME + " LIKE '" + user + "'";
+                + UserProfilesView.COL_USERNAME + " = '" + user + "'";
 
         try {
             conn = getConnection();
@@ -2298,14 +2298,14 @@ public final class DB {
         ResultSet rs = null;
         String sql = "SELECT SUM(" + TransactionsSummaryTable.COL_AMOUNT + ") FROM "
                    + TransactionsSummaryTable.NAME + " WHERE "
-                   + TransactionsSummaryTable.COL_USERID + " LIKE (" + getUserIDSQL(user)
-                   + ") AND (" + TransactionsSummaryTable.COL_TYPEID + " LIKE ("
+                   + TransactionsSummaryTable.COL_USERID + " = (" + getUserIDSQL(user)
+                   + ") AND (" + TransactionsSummaryTable.COL_TYPEID + " = ("
                                + getTzxTypeIDSQL(TransactionType.BET)
-                   + ") OR " + TransactionsSummaryTable.COL_TYPEID + " LIKE ("
+                   + ") OR " + TransactionsSummaryTable.COL_TYPEID + " = ("
                              + getTzxTypeIDSQL(TransactionType.CANCEL)
-                   + ") OR " + TransactionsSummaryTable.COL_TYPEID + " LIKE ("
+                   + ") OR " + TransactionsSummaryTable.COL_TYPEID + " = ("
                              + getTzxTypeIDSQL(TransactionType.POKER_BUYIN)
-                   + ")";
+                   + "))";
 
         try {
             conn = getConnection();
@@ -2332,7 +2332,7 @@ public final class DB {
                 throw e;
             }
         }
-        return res;
+        return -res;
     }
     
     /**
@@ -2630,7 +2630,7 @@ public final class DB {
                    + RollBansTable.COL_USERID + " IN ("
                    + "SELECT " + UsersTable.COL_ID 
                    + " FROM " + UsersTable.NAME
-                   + " WHERE " + UsersTable.COL_USERNAME + " LIKE '" + user + "')";
+                   + " WHERE " + UsersTable.COL_USERNAME + " = '" + user + "')";
         runBasicQuery(sql);
     }
     
@@ -2648,7 +2648,7 @@ public final class DB {
                    + ") FROM " + RollBansTable.NAME + " rb"
                    + " JOIN " + UsersTable.NAME + " u"
                    + " ON u." + UsersTable.COL_ID  + " = rb." + RollBansTable.COL_USERID
-                   + " WHERE u." + UsersTable.COL_USERNAME + " LIKE '" + user + "'";
+                   + " WHERE u." + UsersTable.COL_USERNAME + " = '" + user + "'";
         int num = runGetIntQuery(sql);
         boolean res = false;
         if (num > 0) { res = true; }
@@ -3184,7 +3184,7 @@ public final class DB {
     private static String getUserIDSQL(final String username) {
         String out = "SELECT uu." + UsersTable.COL_ID + " FROM "
                 + UsersTable.NAME + " uu" + " WHERE uu."
-                + UsersTable.COL_USERNAME + " LIKE '" + username + "' LIMIT 1";
+                + UsersTable.COL_USERNAME + " = '" + username + "' LIMIT 1";
         return out;
     }
 
@@ -3198,7 +3198,7 @@ public final class DB {
     private static String getGameIDSQL(final GamesType game) {
         String out = "SELECT gg." + GamesTable.COL_ID + " FROM "
                 + GamesTable.NAME + " gg" + " WHERE gg." + GamesTable.COL_NAME
-                + " LIKE '" + game.toString() + "' LIMIT 1";
+                + " = '" + game.toString() + "' LIMIT 1";
         return out;
     }
 
@@ -3212,7 +3212,7 @@ public final class DB {
     private static String getProfileIDSQL(final ProfileType profile) {
         String out = "SELECT pt." + ProfileTypeTable.COL_ID + " FROM "
                 + ProfileTypeTable.NAME + " pt" + " WHERE pt."
-                + ProfileTypeTable.COL_NAME + " LIKE " + "'"
+                + ProfileTypeTable.COL_NAME + " = " + "'"
                 + profile.toString() + "'";
         return out;
     }
@@ -3227,7 +3227,7 @@ public final class DB {
     private static String getTzxTypeIDSQL(final TransactionType tzxtype) {
         String out = "SELECT tt." + TransactionTypesTable.COL_ID + " FROM "
                 + TransactionTypesTable.NAME + " tt" + " WHERE tt."
-                + TransactionTypesTable.COL_TYPE + " LIKE '"
+                + TransactionTypesTable.COL_TYPE + " = '"
                 + tzxtype.toString() + "'";
         return out;
     }
@@ -3242,7 +3242,7 @@ public final class DB {
     private static String getRankGroupIDSQL(final String group) {
         String out = "(SELECT hg." + HostGroupsTable.COL_ID + " FROM "
                 + HostGroupsTable.NAME + " hg" + " WHERE hg."
-                + HostGroupsTable.COL_NAME + " LIKE '" + group + "')";
+                + HostGroupsTable.COL_NAME + " = '" + group + "')";
         return out;
     }
 }
