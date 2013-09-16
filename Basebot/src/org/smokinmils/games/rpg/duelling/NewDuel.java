@@ -34,11 +34,9 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
-import org.smokinmils.cashier.rake.Rake;
+//import org.smokinmils.cashier.rake.Rake; TODO Rake
 import org.smokinmils.database.DB;
-import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
-import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 
@@ -293,8 +291,6 @@ public class NewDuel extends Event {
                 }
             }
             try {
-                ProfileType profile = db.getActiveProfile(p2.getNick());
-                Double betsize = Utils.checkCredits(p2, theGame.getAmount(), bot, chan);
                 // check to see if someone is playing themselves...
                 if (p2.getNick().equalsIgnoreCase(p1nick)) {
                    bot.sendIRCMessage(chan, SELFBET.replaceAll("%who", p2.getNick()));
