@@ -418,8 +418,9 @@ public class RPSGame extends Event {
                 new GetChoice(bot, user));
         executor.execute(choicetask);
         try {
+            User usrobj = bot.getUserChannelDao().getUser(user);
             choice = choicetask.get(CHOICE_SECS, TimeUnit.SECONDS);
-            bot.sendIRCMessage(user, VALIDCHOICE.replaceAll("%choice", choice.toString()));
+            bot.sendIRCMessage(usrobj, VALIDCHOICE.replaceAll("%choice", choice.toString()));
         } catch (TimeoutException e) {
             // Do nothing, we expect this.
             choice = null;
@@ -638,10 +639,11 @@ public class RPSGame extends Event {
             boolean received = false;
             String choices = Arrays.asList(GameLogic.values()).toString();
             choices = choices.substring(1, choices.length() - 1);
-
-            irc.sendIRCMessage(user, VALIDCHOICES.replaceAll("%choices", choices)
+            User usrobj = irc.getUserChannelDao().getUser(user);
+            
+            irc.sendIRCMessage(usrobj, VALIDCHOICES.replaceAll("%choices", choices)
                             .replaceAll("%who", user));
-            irc.sendIRCNotice(user, PLEASECHOOSE);
+            irc.sendIRCNotice(usrobj, PLEASECHOOSE);
 
             // Loop until we receive the correct message
             while (!received) {
@@ -666,7 +668,7 @@ public class RPSGame extends Event {
                         out = out.replaceAll(
                                 "%choices", Arrays.asList(GameLogic.values())
                                         .toString());
-                        irc.sendIRCMessage(user, out);
+                        irc.sendIRCMessage(usrobj, out);
                     } else {
                         queue.close();
                         received = true;

@@ -375,7 +375,7 @@ public class CheckIdentified extends Event {
                             String out = JOIN_MSG.replaceAll("%user", user.getNick())
                                                  .replaceAll("%tier", tier);
                             Channel achan = bot.getUserChannelDao().getChannel(channel);
-                            bot.sendIRCMessage(channel, out);
+                            bot.sendIRCMessage(achan, out);
                         }
                     }
                 } catch (Exception e) {

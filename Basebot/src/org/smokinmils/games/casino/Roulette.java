@@ -330,7 +330,7 @@ public class Roulette extends Event {
                     break;
                 }
             } else if (c.equalsIgnoreCase("1st") || c.equalsIgnoreCase("2nd")
-                    || c.equalsIgnoreCase("3rd") || c.equalsIgnoreCase("red") 
+                    || c.equalsIgnoreCase("3rd") || c.equalsIgnoreCase("red")
                     || c.equalsIgnoreCase("black")) {
                 bets.add(c);
             } else {

@@ -220,6 +220,7 @@ public class DiceDuel extends Event {
             }
         }
     }
+    
     /**
      * This method handles the house call command.
      * 
