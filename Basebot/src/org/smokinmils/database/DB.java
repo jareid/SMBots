@@ -44,6 +44,7 @@ import org.smokinmils.database.tables.ReferersTable;
 import org.smokinmils.database.tables.RefsTransactionsTable;
 import org.smokinmils.database.tables.RollBansTable;
 import org.smokinmils.database.tables.TotalBetsView;
+import org.smokinmils.database.tables.TradeTable;
 import org.smokinmils.database.tables.TransactionTypesTable;
 import org.smokinmils.database.tables.TransactionsSummaryTable;
 import org.smokinmils.database.tables.TransactionsTable;
@@ -57,6 +58,7 @@ import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.database.types.ReferrerType;
+import org.smokinmils.database.types.Trade;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.database.types.UserStats;
@@ -2244,6 +2246,24 @@ public final class DB {
         ResultSet rs = null;
         String sql = "SELECT * FROM " + UserProfilesView.NAME + " WHERE "
                 + UserProfilesView.COL_USERNAME + " = '" + user + "'";
+        // TODO: use the below code.
+/* SELECT
+        (SELECT SUM(amount) FROM transactions_summary
+         WHERE (type_id = 'lotterywin' OR type_id = 'win' OR type_id = 'pokercash')
+                AND  user_id = '1'),
+        (SELECT COUNT(*) FROM transactions_summary
+         WHERE (type_id = 'lotterywin' OR type_id = 'win' OR type_id = 'pokercash')
+                AND  user_id = '1'),
+        (SELECT SUM(amount) FROM transactions_summary 
+         WHERE (type_id = 'cancel') AND  user_id = '1'),
+        (SELECT COUNT(*) FROM transactions_summary WHERE (type_id = 'cancel') AND  user_id = '1'),
+        (SELECT SUM(amount) FROM transactions_summary
+         WHERE (type_id = 'bet' OR type_id = 'cancel' OR type_id = 'pokerbuy') AND  user_id = '1'),
+        (SELECT COUNT(*) FROM referral_transactions WHERE user_id = '1',
+        (SELECT SUM(amount) FROM referral_transactions_summary WHERE user_id = '1',
+        (SELECT COUNT(*) FROM transactions_summary
+         WHERE (type_id = 'bet' OR type_id = 'pokerbuy') AND  user_id = '1')
+*/
 
         try {
             conn = getConnection();
@@ -2680,7 +2700,6 @@ public final class DB {
         return res;
     }
     
-    
     /**
      * Confirms a trade and gives the coins to the user.
      * 
@@ -2761,6 +2780,192 @@ public final class DB {
         return new EscrowResult(amount, prof);
     }
 
+
+    /**
+     * Adds a swap to the table ready for confirmation.
+     * 
+     * @param sender    The person starting the swap.
+     * @param amount    The amount of the swap.
+     * @param profile   The profile of the swap.
+     * @param wamount   The rquested amount.
+     * @param wprofile  The requested profile.
+     * 
+     * @return  The ID of the new swap.
+     * 
+     * @throws SQLException if a db error occurs.
+     */
+    public int addSwap(final String sender,
+                        final Double amount,
+                        final ProfileType profile,
+                        final Double wamount,
+                        final ProfileType wprofile) throws SQLException {
+        String sql = "INSERT INTO " + TradeTable.NAME + "(" + TradeTable.COL_USER + ", "
+                                                            + TradeTable.COL_AMOUNT + ", "
+                                                            + TradeTable.COL_PROFILE + ", "
+                                                            + TradeTable.COL_WANTED + ", "
+                                                            + TradeTable.COL_WANTEDPROF + ")"
+                                    + "VALUES(" + "'" + sender + "',"
+                                                + "'" + amount.toString() + "',"
+                                                + "(" + getProfileIDSQL(wprofile) + "),"
+                                                + "'" + wamount.toString() + "',"
+                                                + "(" + getProfileIDSQL(wprofile) + "))";
+        return runGetIDQuery(sql);
+    }
+
+    /**
+     * Retrieves the details about a swap.
+     * 
+     * @param id The trade number.
+     * 
+     * @return  The swap details. Null if none exists.
+     * 
+     * @throws SQLException if a db error occurs.
+     */
+    public Trade getSwap(final Integer id) throws SQLException {
+        Trade res = null;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        String sql = "SELECT *, p1." + ProfileTypeTable.NAME + " AS outprofile,"
+                             + "p2." + ProfileTypeTable.NAME + " AS inprofile "
+                   + " FROM " + TradeTable.NAME + " WHERE " + TradeTable.COL_ID
+                   + "= '" + Integer.toString(id) + "'"
+                   + " JOIN " + ProfileTypeTable.NAME + " p1 ON "
+                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_PROFILE
+                   + " JOIN " + ProfileTypeTable.NAME + " p2 ON "
+                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_WANTEDPROF;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                res = new Trade(rs.getInt(TradeTable.COL_ID),
+                                rs.getString(TradeTable.COL_USER),
+                                rs.getDouble(TradeTable.COL_AMOUNT),
+                                ProfileType.fromString(rs.getString("outprofile")),
+                                rs.getDouble(TradeTable.COL_WANTED),
+                                ProfileType.fromString(rs.getString("inprofile")));
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+       
+        return res;
+    }
+
+    /**
+     * Completes a swap between two users.
+     * Takes the chips from the accepting user and switches them between users.
+     * 
+     * @param trade The swap details
+     * @param user  The user accepting the swap.
+     *
+     * @throws SQLException if a db error occurs.
+     */
+    public void completeSwap(final Trade trade,
+                             final String user) throws SQLException {
+        String sql = "DELETE FROM " + TradeTable.NAME + " WHERE " + TradeTable.COL_ID + " = '"
+                                                                + trade.getId() + "'";
+
+        adjustChips(user, -trade.getWantedAmount(), trade.getWantedProfile(),
+                    GamesType.ADMIN, TransactionType.SWAP);
+        
+        adjustChips(trade.getUser(), trade.getWantedAmount(), trade.getWantedProfile(),
+                    GamesType.ADMIN, TransactionType.SWAP);        
+
+        adjustChips(user, trade.getAmount(), trade.getProfile(),
+                    GamesType.ADMIN, TransactionType.SWAP);
+        
+        adjustChips(DB.HOUSE_USER, -trade.getAmount(), trade.getProfile(),
+                    GamesType.ADMIN, TransactionType.SWAP);
+        
+        addChipTransaction(user, trade.getUser(), -trade.getWantedAmount(), TransactionType.SWAP,
+                            trade.getWantedProfile());
+        
+        addChipTransaction(trade.getUser(), user, trade.getWantedAmount(), TransactionType.SWAP,
+                            trade.getWantedProfile());
+        
+        addChipTransaction(DB.HOUSE_USER, trade.getUser(), -trade.getAmount(), TransactionType.SWAP,
+                           trade.getProfile());
+        
+        addChipTransaction(trade.getUser(), DB.HOUSE_USER, trade.getAmount(), TransactionType.SWAP,
+                           trade.getProfile());
+        
+        runBasicQuery(sql);
+    }
+
+    /**
+     * Returns a list of all current swaps in the system.
+     * 
+     * @return the list of swaps
+     * 
+     * @throws SQLException if a db error occurs.
+     */
+    public List<Trade> getAllSwaps() throws SQLException {
+        List<Trade> res = new ArrayList<Trade>();
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        
+        String sql = "SELECT *, p1." + ProfileTypeTable.NAME + " AS outprofile,"
+                             + "p2." + ProfileTypeTable.NAME + " AS inprofile "
+                   + " FROM " + TradeTable.NAME
+                   + " JOIN " + ProfileTypeTable.NAME + " p1 ON "
+                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_PROFILE
+                   + " JOIN " + ProfileTypeTable.NAME + " p2 ON "
+                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_WANTEDPROF;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                res.add(new Trade(rs.getInt(TradeTable.COL_ID),
+                                rs.getString(TradeTable.COL_USER),
+                                rs.getDouble(TradeTable.COL_AMOUNT),
+                                ProfileType.fromString(rs.getString("outprofile")),
+                                rs.getDouble(TradeTable.COL_WANTED),
+                                ProfileType.fromString(rs.getString("inprofile"))));
+            }
+        } catch (SQLException e) {
+            throw new DBException(e, sql);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+       
+        return res;
+    }
+    
     /**
      * Adds a trade to the escrow system.
      * 

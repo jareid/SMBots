@@ -41,14 +41,14 @@ public class CreateTimedRoll extends Event {
     /** The create command length. */
     public static final int                  CRE_CMD_LEN    = 6;
     
-    /** The Create command. */
-    public static final String               SPN_CMD        = "!startroll";
+    /** The Sponser command. */
+    public static final String               SPN_CMD        = "!sponserroll";
 
-    /** The Create format. */
+    /** The Sponser format. */
     public static final String               SPN_FORMAT     = "%b%c12"
                   + SPN_CMD + " <channel> <minutes> <prize> <profile> <rounds>";
 
-    /** The create command length. */
+    /** The sponser command length. */
     public static final int                  SPN_CMD_LEN    = 6;
     
     /** The Ban command. */

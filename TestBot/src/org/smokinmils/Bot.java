@@ -157,11 +157,27 @@ public class Bot {
             scanner.close();
         }
         
+        file = new File("SM_RollBot.pid");
+        if (file.exists()) {
+            Scanner scanner = new Scanner(file);
+            
+            if(scanner.hasNextInt()) {
+                int pid = scanner.nextInt();
+                
+                // Kill
+                System.out.println("Killing PID: " + Integer.toString(pid));
+                Runtime.getRuntime().exec("taskkill /F /PID " + Integer.toString(pid));
+    
+            }
+            scanner.close();
+        }
+        
         Thread.sleep(2000);
         
         // Start
         System.out.println("Starting SMGamer.exe");
         Runtime.getRuntime().exec("cmd /c start SMGamer.exe bot settings\\livesettings.xml");
+        Runtime.getRuntime().exec("cmd /c start SMGamer.exe bot settings\\rollsettings.xml");
         
         Connection connect = null;
         Statement statement = null;

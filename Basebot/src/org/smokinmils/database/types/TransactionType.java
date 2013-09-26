@@ -68,6 +68,9 @@ public enum TransactionType {
     /** reset transactions. */
 	RESET("reset"),
 	
+    /** swap transactions. */
+    SWAP("swap"),
+	
     /** transfer transactions. */
 	TRANSFER("transfer"),
 	
