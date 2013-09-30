@@ -39,6 +39,8 @@ import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
 import org.smokinmils.logging.EventLog;
 
+import com.google.common.collect.ImmutableSortedSet;
+
 /**
  * Provides the functionality to automatically verify users.
  * Also, gives a player play chips if they don't exist
@@ -208,8 +210,8 @@ public class CheckIdentified extends Event {
     @Override
     public final void userList(final UserList event) {
         IrcBot bot = event.getBot();
-        // TODO: fix concurrency issue here
-        for (User usr: event.getUsers()) {
+        ImmutableSortedSet<User> users = event.getUsers();
+        for (User usr: users) {
             String nick = usr.getNick();
             if (!nick.equalsIgnoreCase(bot.getNick()) 
                     && !nick.equalsIgnoreCase("X")

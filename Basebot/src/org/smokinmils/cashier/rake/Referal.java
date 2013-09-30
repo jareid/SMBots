@@ -201,7 +201,6 @@ public final class Referal {
                 fees.put(db.getOwner(group.getKey()), eachownfee);
             }
         } else {
-            // TODO: if nobody is in the group, is this correct?
             fees.put(DB.HOUSE_USER, grpfee);
         }
         

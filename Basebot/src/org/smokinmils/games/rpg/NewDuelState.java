@@ -1,4 +1,4 @@
-package org.smokinmils.games.rpg.duelling;
+package org.smokinmils.games.rpg;
 
 import java.sql.SQLException;
 

@@ -8,6 +8,8 @@
  */ 
 package org.smokinmils.database.types;
 
+import java.util.HashMap;
+
 /**
 * A class used to return values about a transaction for a better.
 * 
@@ -34,6 +36,12 @@ public class UserStats {
     
     /** The total number of bets. */
     private final int betcount;
+    
+    /** The map of all stats. */
+    private final HashMap<ProfileType, HashMap<TransactionType, Double>> stats;
+    
+    /** The map of all counts. */
+    private final HashMap<ProfileType, HashMap<TransactionType, Integer>> counts;
 
     /**
      * Consturctor.
@@ -52,7 +60,7 @@ public class UserStats {
                     final int cxlno,
                     final double refer,
                     final double bet,
-                      final int betno) {
+                    final int betno) {
         wintotal = win;
         wincount = winno;
         canceltotal = cxl;
@@ -60,6 +68,25 @@ public class UserStats {
         refertotal = refer;
         bettotal = bet;
         betcount = betno;
+        
+        stats = new HashMap<ProfileType, HashMap<TransactionType, Double>>();
+        counts = new HashMap<ProfileType, HashMap<TransactionType, Integer>>();
+    }
+    
+    /**
+     * Constructor.
+     */
+    public UserStats() {
+        wintotal = 0.0;
+        wincount = 0;
+        canceltotal = 0.0;
+        cancelcount = 0;
+        refertotal = 0.0;
+        bettotal = 0.0;
+        betcount = 0;
+        
+        stats = new HashMap<ProfileType, HashMap<TransactionType, Double>>();
+        counts = new HashMap<ProfileType, HashMap<TransactionType, Integer>>();
     }
     
     /**
@@ -109,4 +136,51 @@ public class UserStats {
     public final double getWintotal() {
         return wintotal;
     }
+
+    /**
+     * Retrieves a stat value.
+     * 
+     * @param prof The profile we want stats for
+     * @param tzx  The transaction type we want stats for.
+     * 
+     * @return the value of the stats
+     */
+    public final double getStat(final ProfileType prof, final TransactionType tzx) {
+        HashMap<TransactionType, Double> profstats = stats.get(prof);
+        double ret = 0.0;
+        if (profstats != null) {
+            Double statval = profstats.get(tzx);
+            if (statval != null) {
+                ret = statval;
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Sets a specifc stat for a specifc profile.
+     * 
+     * @param prof  The profile to set the stat for
+     * @param tzx   The type of stat
+     * @param value The actual stat.
+     * @param count The number of times used.
+     */
+    public final void setStat(final ProfileType prof, final TransactionType tzx,
+                              final double value, final int count) {
+        HashMap<TransactionType, Double> profstats = stats.get(prof);
+        if (profstats == null) {
+            profstats = new HashMap<TransactionType, Double>();
+        }
+        profstats.put(tzx, value);
+        stats.put(prof, profstats);
+        
+        HashMap<TransactionType, Integer> profcounts = counts.get(prof);
+        if (profcounts == null) {
+            profcounts = new HashMap<TransactionType, Integer>();
+        }
+        profcounts.put(tzx, count);
+        counts.put(prof, profcounts);
+    }
+    
 }

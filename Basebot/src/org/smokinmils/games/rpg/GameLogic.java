@@ -1,4 +1,4 @@
-package org.smokinmils.games.rpg.duelling;
+package org.smokinmils.games.rpg;
 
 /**
  * Provides an enumerate for the NewDuel game that represents choices and decides

@@ -144,8 +144,9 @@ public class BJBet extends Bet {
     }
 
     /**
-     * insures a game Assumes user has chips and the amount is valid.
-     * TODO make this boolean for integration.
+     * Insures a game.
+     * Assumes user has chips and the amount is valid.
+     * 
      * @param amount the amount we are insuring for
      */
     public final void insure(final double amount) {

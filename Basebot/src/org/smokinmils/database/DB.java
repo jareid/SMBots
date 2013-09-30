@@ -24,6 +24,7 @@ import org.smokinmils.auctions.Auction;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.database.tables.AuctionsTable;
 import org.smokinmils.database.tables.BetsTable;
+import org.smokinmils.database.tables.ChipsTransactionsSummaryTable;
 import org.smokinmils.database.tables.ChipsTransactionsTable;
 import org.smokinmils.database.tables.CompetitionIDTable;
 import org.smokinmils.database.tables.CompetitionView;
@@ -40,6 +41,7 @@ import org.smokinmils.database.tables.OrderedBetsView;
 import org.smokinmils.database.tables.PokerBetsTable;
 import org.smokinmils.database.tables.PokerHandsTable;
 import org.smokinmils.database.tables.ProfileTypeTable;
+import org.smokinmils.database.tables.RefTransactionsSummaryTable;
 import org.smokinmils.database.tables.ReferersTable;
 import org.smokinmils.database.tables.RefsTransactionsTable;
 import org.smokinmils.database.tables.RollBansTable;
@@ -123,7 +125,6 @@ public final class DB {
      * 
      * @throws Exception when we fail to retrieve a connection
      * 
-     * TODO: clean up datasources with a close method.
      *  see http://www.mchange.com/projects/c3p0/
      */
     private DB() throws Exception {
@@ -256,7 +257,7 @@ public final class DB {
                 + getProfileIDSQL(pr.get(0)) + "));";
          
         int newID = runGetIDQuery(sql);
-        /* Multi profile support not yet implmented fully :( TODO ?
+        /* TODO(cjc) Multi profile support not yet implmented fully
          * for (ProfileType p : pr) {
             sql = "INSERT INTO " + AuctionProfilesTable.NAME + "("
                     + AuctionProfilesTable.COL_AUCTIONID + ", " + AuctionProfilesTable.COL_PROFILEID
@@ -2246,24 +2247,43 @@ public final class DB {
         ResultSet rs = null;
         String sql = "SELECT * FROM " + UserProfilesView.NAME + " WHERE "
                 + UserProfilesView.COL_USERNAME + " = '" + user + "'";
-        // TODO: use the below code.
-/* SELECT
-        (SELECT SUM(amount) FROM transactions_summary
-         WHERE (type_id = 'lotterywin' OR type_id = 'win' OR type_id = 'pokercash')
-                AND  user_id = '1'),
-        (SELECT COUNT(*) FROM transactions_summary
-         WHERE (type_id = 'lotterywin' OR type_id = 'win' OR type_id = 'pokercash')
-                AND  user_id = '1'),
-        (SELECT SUM(amount) FROM transactions_summary 
-         WHERE (type_id = 'cancel') AND  user_id = '1'),
-        (SELECT COUNT(*) FROM transactions_summary WHERE (type_id = 'cancel') AND  user_id = '1'),
-        (SELECT SUM(amount) FROM transactions_summary
-         WHERE (type_id = 'bet' OR type_id = 'cancel' OR type_id = 'pokerbuy') AND  user_id = '1'),
-        (SELECT COUNT(*) FROM referral_transactions WHERE user_id = '1',
-        (SELECT SUM(amount) FROM referral_transactions_summary WHERE user_id = '1',
-        (SELECT COUNT(*) FROM transactions_summary
-         WHERE (type_id = 'bet' OR type_id = 'pokerbuy') AND  user_id = '1')
-*/
+        
+        String joinsql = " JOIN " + ProfileTypeTable.NAME + " pt ON " + ProfileTypeTable.COL_ID 
+                                  + " = " + TransactionsSummaryTable.COL_PROFILETYPE
+                       + " JOIN " + TransactionTypesTable.NAME + " tt ON "
+                                  + TransactionTypesTable.COL_ID + " = " 
+                                  + TransactionsSummaryTable.COL_TYPEID
+                       + " JOIN " + UsersTable.NAME + " u ON " + UsersTable.COL_ID + " = " 
+                                  + TransactionsSummaryTable.COL_USERID;
+        
+        String whereclause = " WHERE u." + UsersTable.COL_USERNAME + " = '" + user + "'";
+        
+        String tzxsql = "SELECT pt." + ProfileTypeTable.COL_NAME
+                           + ", tt." + TransactionTypesTable.COL_TYPE
+                           + ", COUNT(*)"
+                           + ", SUM(ts. + " + TransactionsSummaryTable.COL_AMOUNT + ")"
+                      + " FROM " + TransactionsSummaryTable.NAME + " ts "
+                      + joinsql + whereclause
+                      + "GROUP BY " + TransactionsSummaryTable.COL_PROFILETYPE + ","
+                                    + TransactionsSummaryTable.COL_TYPEID;
+
+        String refsql = "SELECT pt." + ProfileTypeTable.COL_NAME
+                            + ", COUNT(*)"
+                            + ", SUM(ts. + " + RefTransactionsSummaryTable.COL_AMOUNT + ")"
+                      + " FROM " + RefTransactionsSummaryTable.NAME + " rs "
+                      + joinsql + whereclause
+                      + "GROUP BY " + RefTransactionsSummaryTable.COL_PROFILETYPE;
+        
+        String chpsql = "SELECT pt." + ProfileTypeTable.COL_NAME
+                                   + ", tt." + TransactionTypesTable.COL_TYPE
+                                   + ", COUNT(*)"
+                                   + ", SUM(ts. + " + ChipsTransactionsSummaryTable.COL_AMOUNT + ")"
+                      + " FROM " + TransactionsSummaryTable.NAME + " cs "
+                      + joinsql + whereclause
+                      + "GROUP BY " + TransactionsSummaryTable.COL_PROFILETYPE + ","
+                                    + TransactionsSummaryTable.COL_TYPEID;
+        
+        UserStats statsobj = new UserStats();
 
         try {
             conn = getConnection();
@@ -2281,6 +2301,35 @@ public final class DB {
                 
                 res.put(ProfileType.fromString(rs.getString(UserProfilesView.COL_PROFILE)),
                         userstat);
+            }
+
+            rs = stmt.executeQuery(tzxsql);
+            while (rs.next()) {
+                int i = 1;
+                ProfileType prof = ProfileType.fromString(rs.getString(i)); i++;
+                TransactionType tzx = TransactionType.fromString(rs.getString(i)); i++;
+                Integer count = rs.getInt(i); i++;
+                Double value = rs.getDouble(i);
+                statsobj.setStat(prof, tzx, value, count);
+            }
+            
+            rs = stmt.executeQuery(chpsql);
+            while (rs.next()) {
+                int i = 1;
+                ProfileType prof = ProfileType.fromString(rs.getString(i)); i++;
+                TransactionType tzx = TransactionType.fromString(rs.getString(i)); i++;
+                Integer count = rs.getInt(i); i++;
+                Double value = rs.getDouble(i);
+                statsobj.setStat(prof, tzx, value, count);
+            }
+            
+            rs = stmt.executeQuery(refsql);
+            while (rs.next()) {
+                int i = 1;
+                ProfileType prof = ProfileType.fromString(rs.getString(i)); i++;
+                Integer count = rs.getInt(i); i++;
+                Double value = rs.getDouble(i);
+                statsobj.setStat(prof, TransactionType.REFERRAL, value, count);
             }
         } catch (SQLException e) {
             throw new DBException(e, sql);

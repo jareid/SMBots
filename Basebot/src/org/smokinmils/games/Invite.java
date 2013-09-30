@@ -16,7 +16,7 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
-import org.smokinmils.games.rpg.duelling.NewDuel;
+import org.smokinmils.games.rpg.NewDuel;
 
 /**
  * Allows managers to invite the bot into a channel with a certain game.
@@ -84,9 +84,7 @@ public class Invite extends Event {
      */
     private final HashMap<String, ArrayList<Event>> tempListeners;
     
-    /** Keep track of the games that have been invited for dupe checking. 
-     * TODO Neater with single map?
-    */
+    /** Keep track of the games that have been invited for dupe checking. */
     private final HashMap<String, ArrayList<String>> tempGames;
     
     
@@ -98,7 +96,11 @@ public class Invite extends Event {
         tempGames = new HashMap<String, ArrayList<String>>();
     }
     
-    /* (non-Javadoc)
+    /** 
+     * On message handler.
+     * (non-Javadoc)
+     * 
+     * @param event The event.
      * @see org.smokinmils.bot.Event#message(org.smokinmils.bot.events.Message)
      */
     @Override
@@ -130,7 +132,6 @@ public class Invite extends Event {
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
         
-        // TODO: no need to use base bot here, use IrcBot.getListener()
         String newchannel = msg[1].toLowerCase();
         BaseBot bb = BaseBot.getInstance();
         String game = msg[2].toLowerCase();

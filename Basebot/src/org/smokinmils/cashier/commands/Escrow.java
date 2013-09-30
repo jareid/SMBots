@@ -544,7 +544,7 @@ public class Escrow extends Event {
     /**
      * Simple extension to time task to deal with game triggers.
      * 
-     * @author cjc
+     * @author jamie
      */
     class Announce extends TimerTask {
         /** The IRC bot. */

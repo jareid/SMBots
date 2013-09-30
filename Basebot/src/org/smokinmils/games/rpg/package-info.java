@@ -1,6 +1,8 @@
 /**
- * Provides the RPG functionality.
  * 
- * @author Jamie
+ */
+/**
+ * @author cjc
+ * 
  */
 package org.smokinmils.games.rpg;

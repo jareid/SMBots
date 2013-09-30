@@ -28,7 +28,7 @@ import org.smokinmils.games.casino.OverUnder;
 import org.smokinmils.games.casino.Roulette;
 import org.smokinmils.games.casino.blackjack.BJGame;
 import org.smokinmils.games.rockpaperscissors.RPSGame;
-import org.smokinmils.games.rpg.duelling.NewDuel;
+import org.smokinmils.games.rpg.NewDuel;
 import org.smokinmils.logging.EventLog;
 
 /**

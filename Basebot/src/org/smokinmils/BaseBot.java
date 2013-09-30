@@ -248,8 +248,6 @@ public final class BaseBot {
 	   boolean ret;
 	   IrcBot bot = bots.get(server);
 	   if (bot != null) {
-	       // TODO: check this new way works
-           //bot.getConfiguration().getListenerManager().addListener(listener);
            bot.getListenerManager().addListener(listener);
            
 		   EventLog.debug("Added new listener " + listener.toString()

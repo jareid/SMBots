@@ -1,4 +1,4 @@
-package org.smokinmils.games.rpg.duelling;
+package org.smokinmils.games.rpg;
 
 /**
  * This file is part of a commercial IRC bot that allows users to play online
@@ -34,11 +34,11 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
-//import org.smokinmils.cashier.rake.Rake; TODO Rake
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
+//import org.smokinmils.cashier.rake.Rake; TODO Rake
 
 /**
  * Provides the functionality to give a user some coins.
@@ -167,10 +167,10 @@ public class NewDuel extends Event {
     private static final double BLK_DEF = 0.2;
     
     /** Mapping of GameLogic to damage. */
-    private EnumMap<GameLogic, Double> damage;
+    private final EnumMap<GameLogic, Double> damage;
     
     /** Mapping of Gamelogic to defence. */
-    private EnumMap<GameLogic, Double> defence;
+    private final EnumMap<GameLogic, Double> defence;
 
     /** the default choice for when they don't make one! :( */
     private static GameLogic DEFAULTCHOICE = GameLogic.JAB;
@@ -371,7 +371,6 @@ public class NewDuel extends Event {
         User sender = event.getUser();
         Channel chan = event.getChannel();
         String[] msg = message.split(" ");
-
         
         if (msg.length == 2) {
             boolean hasopen = false;
@@ -481,7 +480,7 @@ public class NewDuel extends Event {
         /** The user to get the choice from. */
         private final User user;
         /** The game state to get HP info. */
-        private NewDuelState nds;
+        private final NewDuelState nds;
         
         /**
          * Constructor.
