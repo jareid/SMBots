@@ -14,7 +14,7 @@
     <db type="dbuser">smbot</db>
     <db type="dbpass">SM_bot_2013$</db>
     
-<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
+	<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
     <http type="url">http://smokin-goldshop.appspot.com/stock</http>
 
     <spam>
@@ -62,6 +62,10 @@
         <channel>sm_vip</channel>
         <channel>sm_express</channel>
     </listener>
+    <listener type="createtournament">
+		<channel>managers</channel>
+		<channel>SM_ranks</channel>
+	</listener>
     <listener type="dm">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>

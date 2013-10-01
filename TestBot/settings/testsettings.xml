@@ -80,6 +80,9 @@
 		<channel>testeroo2</channel>
         <option type="sponserchan">testeroo2</option>
 	</listener>
+	<listener type="createtournament">
+		<channel>testerroo2</channel>
+	</listener>
 	<listener type="rps">
 		<channel>testeroo2</channel>
 		<option type="announce">testeroo2</option>
