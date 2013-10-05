@@ -5,114 +5,118 @@
 	<server>irc.SwiftIRC.net</server>
 	<port>6667</port>
 	<ip>127.0.0.1</ip>
-	<rake>testeroo2</rake>
-    <mainchan>testeroo2</mainchan>
+	<rake>testeroo3</rake>
+    <mainchan>testeroo3</mainchan>
 	
 	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
-	<db type="dbname">live</db>
+	<db type="dbname">test</db>
 	<db type="dbuser">smbot</db>
 	<db type="dbpass">SM_bot_2013$</db>
 	
 	<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
     <http type="url">http://smokin-goldshop.appspot.co/stock</http>
 
-    <trade type="percent">0.05</trade>
-    <trade type="minimum">5.0</trade>
+    <trade type="joinmsg">%b%c04-| PLEASE READ THIS IMPORTANT INFO BEFORE YOU CONTINUE! THIS INFO WILL SOMETIMES BE UPDATED |-
+    %b%c01Welcome to SMExchange! This channel is used for buying and selling chips with ranks, or to swap eoc/07 chips with any other users.
+    %b%c041)%c01 Chips can only be bought and sold with ranks in this channel
+    %b%c042)%c01 Before you ever trade in-game a trade will be set up here and the chips will be locked until confirmation is received
+    %b%c043)%c01 BEWARE OF IMPOSTERS - ranks will NEVER contact you first; you must always contact them first
+    %b%c01To swap one type of chips for another type %c04%swpformat%c01 (for example !swap 100 eoc 100 07). Someone else can then accept your offer and the trade will be complete.
+    </trade>
     
-    <tier type="bronze">1000</tier>
+    <tier type="bronze">500</tier>
     <tier type="silver">5000</tier>
-    <tier type="gold">15000</tier>
-    <tier type="platinum">40000</tier>
+    <tier type="gold">50000</tier>
+    <tier type="platinum">500000</tier>
+    <tier type="elite">5000000</tier>
 	
 	<listener type="invite">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 	</listener>
 	<listener type="trade">
-        <channel>testeroo2</channel>
+        <option type="delay">3</option>
+        <channel>testeroo3</channel>
     </listener>
 	<listener type="referrals">
-		<channel>testeroo2</channel>
-        <option type="managementchan">testeroo2</option>
-        <option type="hostchan">testeroo2</option>
-	</listener>
-	<listener type="roulette" id="1">
-		<channel>testeroo2</channel>
-		<option type="time">1</option>
-	</listener>
-	<listener type="roulette" id="2">
-		<channel>testeroo2too</channel>
-		<option type="time">2</option>
+		<channel>testeroo3</channel>
+        <option type="managementchan">testeroo3</option>
+        <option type="hostchan">testeroo3</option>
 	</listener>
 	<listener type="blackjack">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 	</listener>
 	<listener type="overunder">
-		<channel>testeroo2</channel>
-		<channel>testeroo2too</channel>
+		<channel>testeroo3</channel>
+		<channel>testeroo3too</channel>
 	</listener>	
      <listener type="duel">
-        <channel>testeroo2</channel>
-        <option type="announce">testeroo2</option>
+        <channel>testeroo3</channel>
+        <option type="announce">testeroo3</option>
     </listener>
 	<listener type="diceduel">
-		<channel>testeroo2</channel>
-		<channel>testeroo2too</channel>
+		<channel>testeroo3</channel>
+		<channel>testeroo3too</channel>
 	</listener>
 	<listener type="usercommands">
-		<channel>testeroo2</channel>
-		<channel>testeroo2too</channel>
+		<channel>testeroo3</channel>
+		<channel>testeroo3too</channel>
 	</listener>
 	<listener type="help">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 	</listener>
 	<listener type="managersystem">
-		<channel>testeroo2</channel>
-		<option type="managementchan">testeroo2</option>
-		<option type="activechan">testeroo2</option>
-		<option type="hostchan">testeroo2</option>
+		<channel>testeroo3</channel>
+		<option type="managementchan">testeroo3</option>
+		<option type="activechan">testeroo3</option>
+		<option type="hostchan">testeroo3</option>
 	</listener>
 	<listener type="coins">
-		<channel>testeroo2</channel>
-		<channel>testeroo2too</channel>
+		<channel>testeroo3</channel>
+		<channel>testeroo3too</channel>
 	</listener>
 	<listener type="createtimedroll">
-		<channel>testeroo2</channel>
-        <option type="sponserchan">testeroo2</option>
+		<channel>testeroo3</channel>
+        <option type="sponserchan">testeroo3</option>
 	</listener>
 	<listener type="rps">
-		<channel>testeroo2</channel>
-		<option type="announce">testeroo2</option>
+		<channel>testeroo3</channel>
+		<option type="announce">testeroo3</option>
 	</listener>
 	<listener type="pokerDISABLED">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 	</listener>
 	<listener type="auctions">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 	</listener>
 	
 	<timer type="trc">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 		<option type="profile">EOC</option>
 		<option type="prize">2</option>
 		<option type="mins">5</option>
 		<option type="rounds">-1</option>			
 	</timer>
 	<timer type="managerannounce">
-		<channel>testeroo2</channel>
+	    <file>messages.ini</file>
+		<channel>testeroo3</channel>
 	</timer>
+    <timer type="managerannounce">
+        <file>trademsgs.ini</file>
+        <channel>testeroo3</channel>
+    </timer>
 	<timer type="bettimer">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 		<option type="delay">5</option>
 		<option type="period">60</option>
 	</timer>
 	<timer type="comptimer">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 		<option type="delay">1</option>
 		<option type="period">1</option>
 	</timer>
 	<timer type="jackpottimer">
-		<channel>testeroo2</channel>
+		<channel>testeroo3</channel>
 		<option type="delay">2</option>
 		<option type="period">60</option>
 	</timer>

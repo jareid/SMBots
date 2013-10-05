@@ -14,8 +14,21 @@
     <db type="dbuser">smbot</db>
     <db type="dbpass">SM_bot_2013$</db>
     
-<http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
+    <http type="token">9c8fcb2a-0bc2-4288-8880-0e2f3f42598d</http>
     <http type="url">http://smokin-goldshop.appspot.com/stock</http>
+    
+    <trade type="joinmsg">%b%c04-| PLEASE READ THIS IMPORTANT INFO BEFORE YOU CONTINUE! THIS INFO WILL SOMETIMES BE UPDATED |-\n
+    %b%c01Welcome to SMExchange! This channel is used for buying and selling chips with ranks, or to swap eoc/07 chips with any other users.\n
+    %b%c041)%c01 Chips can only be bought and sold with ranks in this channel\n
+    %b%c042)%c01 Before you ever trade in-game a trade will be set up here and the chips will be locked until confirmation is received\n
+    %b%c043)%c01 BEWARE OF IMPOSTERS - ranks will NEVER contact you first; you must always contact them first\n
+    %b%c01To swap one type of chips for another type %c04%swpformat%c01 (for example !swap 100 eoc 100 07). Someone else can then accept your offer and the trade will be complete.
+    </trade>
+    <tier type="bronze">500</tier>
+    <tier type="silver">5000</tier>
+    <tier type="gold">50000</tier>
+    <tier type="platinum">500000</tier>
+    <tier type="elite">5000000</tier>
 
     <spam>
         <channel>SMGamer</channel>
@@ -24,7 +37,10 @@
     <listener type="invite">
         <channel>managers</channel>
     </listener>
-    
+    <listener type="trade">
+        <option type="delay">3</option>
+        <channel>SMExchange</channel>
+    </listener>
     <listener type="referrals">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
@@ -131,7 +147,12 @@
         <option type="rounds">-1</option>           
     </timer>
     <timer type="managerannounce">
+        <option type="file">messages.ini</option>
         <channel>SMGamer</channel>
+    </timer>
+    <timer type="managerannounce">
+        <option type="file">trademsgs.ini</option>
+        <channel>SMExchange</channel>
     </timer>
     <timer type="bettimer">
         <channel>SMGamer</channel>

@@ -38,6 +38,7 @@ import org.smokinmils.games.rockpaperscissors.RPSGame;
 import org.smokinmils.games.rpg.NewDuel;
 import org.smokinmils.games.timedrollcomp.CreateTimedRoll;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
+import org.smokinmils.games.tournaments.CreateTournament;
 import org.smokinmils.help.Help;
 import org.smokinmils.logging.EventLog;
 import org.w3c.dom.Document;
@@ -61,6 +62,7 @@ public final class XMLLoader {
     
     /** the parsed document we can navigate. */
     private Document xmlDocument;
+   
     /** 
      * Get's the instance. 
      * @return the instance...*/
@@ -294,6 +296,11 @@ public final class XMLLoader {
                     } else if (type.equals("createtimedroll")) {
                         basebot.addListener(server,
                                 new CreateTimedRoll("#" + options.get("sponserchan")), chanarr);
+                    } else if (type.equals("createtournament")) {
+                        CreateTournament ct = new CreateTournament();
+                        ct.addValidChan(chanarr);
+                        basebot.addListener(server,
+                                ct, chanarr);
                     } else if (type.equals("trade")) {
                         String d = options.get("delay");
                         int delay = Integer.parseInt(d);
