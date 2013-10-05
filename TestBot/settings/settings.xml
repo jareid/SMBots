@@ -71,6 +71,9 @@
 	<listener type="createtimedroll">
 		<channel>testerroo3</channel>
 	</listener>
+	<listener type="createtournament">
+		<channel>testerroo2</channel>
+	</listener>
 	<listener type="rpsDISABLED">
 		<channel>testerroo3</channel>
 		<option type="announce">testerroo3</option>

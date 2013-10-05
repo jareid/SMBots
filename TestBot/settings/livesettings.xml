@@ -78,6 +78,10 @@
         <channel>sm_vip</channel>
         <channel>sm_express</channel>
     </listener>
+    <listener type="createtournament">
+		<channel>managers</channel>
+		<channel>SM_ranks</channel>
+	</listener>
     <listener type="dm">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>

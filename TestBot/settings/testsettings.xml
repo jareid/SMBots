@@ -79,6 +79,9 @@
 		<channel>testeroo3</channel>
         <option type="sponserchan">testeroo3</option>
 	</listener>
+	<listener type="createtournament">
+		<channel>testerroo2</channel>
+	</listener>
 	<listener type="rps">
 		<channel>testeroo3</channel>
 		<option type="announce">testeroo3</option>
