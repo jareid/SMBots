@@ -3,10 +3,10 @@ package org.smokinmils.games.rpg;
 import java.sql.SQLException;
 
 import org.pircbotx.User;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.logging.EventLog;
 
 /**

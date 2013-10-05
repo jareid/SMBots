@@ -55,12 +55,13 @@ import org.smokinmils.database.tables.UserProfilesView;
 import org.smokinmils.database.tables.UsersTable;
 import org.smokinmils.database.tables.UsersView;
 import org.smokinmils.database.types.BetterInfo;
-import org.smokinmils.database.types.EscrowResult;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.ReferalUser;
 import org.smokinmils.database.types.ReferrerType;
+import org.smokinmils.database.types.Swap;
 import org.smokinmils.database.types.Trade;
+import org.smokinmils.database.types.TradeResult;
 import org.smokinmils.database.types.TransactionType;
 import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.database.types.UserStats;
@@ -871,7 +872,6 @@ public final class DB {
                 + UserProfilesTable.COL_USERID + " = ("
                 + getUserIDSQL(sender) + ")";
 
-        // TODO: use insert or update as in adjustChips (or use adjust chips)
         String inssql = "INSERT INTO " + UserProfilesTable.NAME + "("
                 + UserProfilesTable.COL_USERID + ", "
                 + UserProfilesTable.COL_TYPEID + ", "
@@ -967,7 +967,6 @@ public final class DB {
             }
             
             if (numrows == 1) {
-                //TODO: find out why this adjusts 2 rows
                 result = (runBasicQuery(inssql) >= 1);
             }
         }
@@ -2725,88 +2724,70 @@ public final class DB {
     }
     
     /**
+     * Adds a trade to the escrow system.
+     * 
+     * @param rank Rank performing the trade.
+     * @param user User being traded.
+     * @param amount Amount of trade.
+     * @param profile Profile for trade.
+     * @throws SQLException 
+     */
+    public void addTrade(final String rank,
+                          final String user,
+                          final Double amount,
+                          final ProfileType profile) throws SQLException {
+        String sql = "INSERT INTO " + EscrowTable.NAME
+                   + "(" + EscrowTable.COL_USER + ", " + EscrowTable.COL_RANK
+                   + ", " + EscrowTable.COL_AMOUNT + ", " + EscrowTable.COL_PROFILE + ") "
+                   + "VALUES((" 
+                   + getUserIDSQL(user) + "), (" + getUserIDSQL(rank) + "), '"
+                   + amount.toString() + "', (" +  getProfileIDSQL(profile) + "))";
+        
+        runBasicQuery(sql);
+    }
+    
+    /**
      * Checks if a trade exists.
      * 
      * @param rank Rank performing the trade.
      * @param user User being trade.
      * 
-     * @return True if one exists.
+     * @return The escrow details if it exists
+     * .
      * @throws SQLException 
      */
-    public boolean hasEscrow(final String rank,
-                                        final String user) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM " + EscrowTable.NAME + " e"
-                   + " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(user)
-                   + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(rank) + ")";
+    public Trade getTrade(final String rank,
+                           final String user) throws SQLException {
+        String sql = "SELECT e.amount,"
+                   + " p." + ProfileTypeTable.COL_NAME + " AS profname,"
+                   + " u." + UsersTable.COL_USERNAME + " AS theuser,"
+                   + " u2." + UsersTable.COL_USERNAME + " AS therank"
+                   + " FROM " + EscrowTable.NAME + " e"
+                   + " JOIN " + ProfileTypeTable.NAME + " p ON p."
+                              + ProfileTypeTable.COL_ID + " = e." + EscrowTable.COL_PROFILE
+                   + " JOIN " + UsersTable.NAME + " u ON u."
+                              + UsersTable.COL_ID + " = e." + EscrowTable.COL_USER
+                   + " JOIN " + UsersTable.NAME + " u2 ON u2."
+                              + UsersTable.COL_ID + " = e." + EscrowTable.COL_RANK;
         
-        int count = runGetIntQuery(sql);
+       String cond1 = " WHERE e." + EscrowTable.COL_USER + " = (" + getUserIDSQL(user)
+                   + ") AND e." + EscrowTable.COL_RANK + " = (" + getUserIDSQL(rank) + ")";
        
-        boolean res = false;
-        if (count > 0) {
-            res = true;
-        }
-        
-        return res;
-    }
-    
-    /**
-     * Confirms a trade and gives the coins to the user.
-     * 
-     * @param fromuser Rank performing the trade.
-     * @param touser User being trade.
-     * @param percentage The percentage given to the rank
-     * @param minimum   The minimum number of chips to take.
-     * @param givecomm   Whether or not to give commission
-     * 
-     * @return The amount and profile.
-     * @throws SQLException 
-     */
-    public EscrowResult escrowConfirmed(final String fromuser,
-                                        final String touser,
-                                        final double percentage,
-                                        final double minimum,
-                                        final boolean givecomm) throws SQLException {
+        Trade res = null;
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
-        double amount = 0.0;
-        ProfileType prof = null;
-        String sql = "SELECT " + EscrowTable.COL_AMOUNT + ", p." + ProfileTypeTable.COL_NAME
-                   + " FROM " + EscrowTable.NAME + " e"
-                   + " JOIN " + ProfileTypeTable.NAME + " p ON p."
-                   + ProfileTypeTable.COL_ID + " = e." + EscrowTable.COL_PROFILE
-                   + " WHERE e." + EscrowTable.COL_USER + " = (" + getUserIDSQL(touser)
-                   + ") AND e." + EscrowTable.COL_RANK + " = (" + getUserIDSQL(fromuser) + ")";
-        
-        String del = "DELETE FROM " + EscrowTable.NAME 
-                + " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(touser)
-                + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(fromuser) + ")";
         
         try {
             conn = getConnection();
             stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql + cond1);
 
             if (rs.next()) {
-                amount = rs.getDouble(EscrowTable.COL_AMOUNT);
-                prof = ProfileType.fromString(rs.getString("p." + ProfileTypeTable.COL_NAME));
-                
-                double comm = 0;
-                // if commission is given, the person 
-                if (givecomm) {
-                    comm = amount * percentage;
-                    if (comm < minimum) {
-                        comm = minimum;
-                    }
-                
-                    adjustChips(touser, comm, prof, GamesType.ADMIN, TransactionType.COMMISSION);
-                    addChipTransaction(touser, DB.HOUSE_USER, comm, 
-                                        TransactionType.COMMISSION, prof);
-                }
-                
-                adjustChips(touser, amount - comm, prof, GamesType.ADMIN, TransactionType.ESCROW);
-                addChipTransaction(touser, fromuser, amount - comm, TransactionType.ESCROW, prof);
-                runBasicQuery(del);
+                res = new Trade(rs.getString("theuser"),
+                                rs.getString("therank"),
+                                ProfileType.fromString(rs.getString("profname")),
+                                rs.getDouble("e." + EscrowTable.COL_AMOUNT));
             }
         } catch (SQLException e) {
             throw new DBException(e, sql);
@@ -2826,10 +2807,71 @@ public final class DB {
             }
         }
        
-        return new EscrowResult(amount, prof);
+        return res;
+    }
+    
+    /**
+     * Confirms a trade and gives the coins to the user.
+     * 
+     * @param exists The escrow details.
+     * 
+     * @return The amount and profile.
+     * @throws SQLException 
+     */
+    public TradeResult tradeConfirmed(final Trade exists) throws SQLException {   
+        String del = "DELETE FROM " + EscrowTable.NAME;
+        String cond1 = " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(exists.getUser())
+                + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(exists.getRank()) + ")";
+        
+        String cond2 = " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(exists.getRank())
+                + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(exists.getUser()) + ")";
+        
+        String touser = exists.getUser();
+        String fromuser = exists.getRank();
+        double amount = exists.getAmount();
+        if (amount < 0) {
+            touser = exists.getRank();
+            fromuser = exists.getUser();
+            amount = -amount;
+        }
+        
+        adjustChips(touser, amount, exists.getProfile(), GamesType.ADMIN, TransactionType.ESCROW);
+        addChipTransaction(touser, fromuser, amount, TransactionType.ESCROW, exists.getProfile());
+        runBasicQuery(del + cond1);
+        runBasicQuery(del + cond2);
+       
+        return new TradeResult(amount, exists.getProfile());
     }
 
-
+    /**
+     * Confirms a trade and gives the coins to the user.
+     * 
+     * @param exists The escrow details.
+     * 
+     * @throws SQLException 
+     */
+    public void tradeCancel(final Trade exists) throws SQLException {
+        String del = "DELETE FROM " + EscrowTable.NAME;
+        String cond1 = " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(exists.getUser())
+                + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(exists.getRank()) + ")";
+        
+        String cond2 = " WHERE " + EscrowTable.COL_USER + " = (" + getUserIDSQL(exists.getRank())
+                + ") AND " + EscrowTable.COL_RANK + " = (" + getUserIDSQL(exists.getUser()) + ")";
+        
+        String fromuser = exists.getRank();
+        double amount = exists.getAmount();
+        if (amount < 0) {
+            fromuser = exists.getUser();
+            amount = -amount;
+        }
+        
+        adjustChips(fromuser, amount, exists.getProfile(), GamesType.ADMIN, TransactionType.CANCEL);
+        addChipTransaction(fromuser, DB.HOUSE_USER, amount,
+                           TransactionType.CANCEL, exists.getProfile());
+        runBasicQuery(del + cond1);
+        runBasicQuery(del + cond2);
+    }
+    
     /**
      * Adds a swap to the table ready for confirmation.
      * 
@@ -2853,7 +2895,7 @@ public final class DB {
                                                             + TradeTable.COL_PROFILE + ", "
                                                             + TradeTable.COL_WANTED + ", "
                                                             + TradeTable.COL_WANTEDPROF + ")"
-                                    + "VALUES(" + "'" + sender + "',"
+                                    + "VALUES(" + "(" + getUserIDSQL(sender) + "),"
                                                 + "'" + amount.toString() + "',"
                                                 + "(" + getProfileIDSQL(wprofile) + "),"
                                                 + "'" + wamount.toString() + "',"
@@ -2870,20 +2912,23 @@ public final class DB {
      * 
      * @throws SQLException if a db error occurs.
      */
-    public Trade getSwap(final Integer id) throws SQLException {
-        Trade res = null;
+    public Swap getSwap(final Integer id) throws SQLException {
+        Swap res = null;
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         
-        String sql = "SELECT *, p1." + ProfileTypeTable.NAME + " AS outprofile,"
-                             + "p2." + ProfileTypeTable.NAME + " AS inprofile "
-                   + " FROM " + TradeTable.NAME + " WHERE " + TradeTable.COL_ID
-                   + "= '" + Integer.toString(id) + "'"
-                   + " JOIN " + ProfileTypeTable.NAME + " p1 ON "
-                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_PROFILE
-                   + " JOIN " + ProfileTypeTable.NAME + " p2 ON "
-                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_WANTEDPROF;
+        String sql = "SELECT *, p1." + ProfileTypeTable.COL_NAME + " AS outprofile, "
+                             + "p2." + ProfileTypeTable.COL_NAME + " AS inprofile, "
+                             + "u." + UsersTable.COL_USERNAME + " AS theuser "
+                   + " FROM " + TradeTable.NAME + " tt "
+                   + " JOIN " + ProfileTypeTable.NAME + " p1 ON p1."
+                              + ProfileTypeTable.COL_ID + " = tt." + TradeTable.COL_PROFILE
+                   + " JOIN " + ProfileTypeTable.NAME + " p2 ON p2."
+                              + ProfileTypeTable.COL_ID + " = tt." + TradeTable.COL_WANTEDPROF
+                   + " JOIN " + UsersTable.NAME + " u ON u."
+                              + UsersTable.COL_ID + " = tt." + TradeTable.COL_USER
+                   + " WHERE tt." + TradeTable.COL_ID + " = '" + Integer.toString(id) + "'";
         
         try {
             conn = getConnection();
@@ -2891,8 +2936,8 @@ public final class DB {
             rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
-                res = new Trade(rs.getInt(TradeTable.COL_ID),
-                                rs.getString(TradeTable.COL_USER),
+                res = new Swap(rs.getInt(TradeTable.COL_ID),
+                                rs.getString("theuser"),
                                 rs.getDouble(TradeTable.COL_AMOUNT),
                                 ProfileType.fromString(rs.getString("outprofile")),
                                 rs.getDouble(TradeTable.COL_WANTED),
@@ -2928,7 +2973,7 @@ public final class DB {
      *
      * @throws SQLException if a db error occurs.
      */
-    public void completeSwap(final Trade trade,
+    public void completeSwap(final Swap trade,
                              final String user) throws SQLException {
         String sql = "DELETE FROM " + TradeTable.NAME + " WHERE " + TradeTable.COL_ID + " = '"
                                                                 + trade.getId() + "'";
@@ -2959,6 +3004,29 @@ public final class DB {
         
         runBasicQuery(sql);
     }
+    
+    /**
+     * Completes a swap between two users.
+     * Takes the chips from the accepting user and switches them between users.
+     * 
+     * @param trade The swap details
+     * @param user  The user accepting the swap.
+     *
+     * @throws SQLException if a db error occurs.
+     */
+    public void cancelSwap(final Swap trade,
+                           final String user) throws SQLException {
+        String sql = "DELETE FROM " + TradeTable.NAME + " WHERE " + TradeTable.COL_ID + " = '"
+                                                                + trade.getId() + "'";
+        
+        adjustChips(trade.getUser(), trade.getAmount(), trade.getProfile(),
+                    GamesType.ADMIN, TransactionType.CANCEL);    
+        
+        addChipTransaction(user, trade.getUser(), trade.getAmount(), TransactionType.CANCEL,
+                            trade.getProfile());
+        
+        runBasicQuery(sql);
+    }
 
     /**
      * Returns a list of all current swaps in the system.
@@ -2967,19 +3035,22 @@ public final class DB {
      * 
      * @throws SQLException if a db error occurs.
      */
-    public List<Trade> getAllSwaps() throws SQLException {
-        List<Trade> res = new ArrayList<Trade>();
+    public List<Swap> getAllSwaps() throws SQLException {
+        List<Swap> res = new ArrayList<Swap>();
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         
-        String sql = "SELECT *, p1." + ProfileTypeTable.NAME + " AS outprofile,"
-                             + "p2." + ProfileTypeTable.NAME + " AS inprofile "
-                   + " FROM " + TradeTable.NAME
-                   + " JOIN " + ProfileTypeTable.NAME + " p1 ON "
-                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_PROFILE
-                   + " JOIN " + ProfileTypeTable.NAME + " p2 ON "
-                              + ProfileTypeTable.COL_ID + " = " + TradeTable.COL_WANTEDPROF;
+        String sql = "SELECT *, p1." + ProfileTypeTable.COL_NAME + " AS outprofile,"
+                             + "p2." + ProfileTypeTable.COL_NAME + " AS inprofile, "
+                             + "u." + UsersTable.COL_USERNAME + " AS theuser "
+                   + " FROM " + TradeTable.NAME + " tt"
+                   + " JOIN " + ProfileTypeTable.NAME + " p1 ON p1."
+                              + ProfileTypeTable.COL_ID + " = tt." + TradeTable.COL_PROFILE
+                   + " JOIN " + ProfileTypeTable.NAME + " p2 ON p2."
+                              + ProfileTypeTable.COL_ID + " = tt." + TradeTable.COL_WANTEDPROF
+                   + " JOIN " + UsersTable.NAME + " u ON u."
+                              + UsersTable.COL_ID + " = tt." + TradeTable.COL_USER;
         
         try {
             conn = getConnection();
@@ -2987,8 +3058,8 @@ public final class DB {
             rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                res.add(new Trade(rs.getInt(TradeTable.COL_ID),
-                                rs.getString(TradeTable.COL_USER),
+                res.add(new Swap(rs.getInt(TradeTable.COL_ID),
+                                rs.getString("theuser"),
                                 rs.getDouble(TradeTable.COL_AMOUNT),
                                 ProfileType.fromString(rs.getString("outprofile")),
                                 rs.getDouble(TradeTable.COL_WANTED),
@@ -3013,29 +3084,6 @@ public final class DB {
         }
        
         return res;
-    }
-    
-    /**
-     * Adds a trade to the escrow system.
-     * 
-     * @param fromuser User performing the trade.
-     * @param touser User being traded.
-     * @param amount Amount of trade.
-     * @param profile Profile for trade.
-     * @throws SQLException 
-     */
-    public void addEscrow(final String fromuser,
-                          final String touser,
-                          final Double amount,
-                          final ProfileType profile) throws SQLException {
-        String sql = "INSERT INTO " + EscrowTable.NAME
-                   + "(" + EscrowTable.COL_USER + ", " + EscrowTable.COL_RANK
-                   + ", " + EscrowTable.COL_AMOUNT + ", " + EscrowTable.COL_PROFILE + ") "
-                   + "VALUES((" 
-                   + getUserIDSQL(touser) + "), (" + getUserIDSQL(fromuser) + "), '"
-                   + amount.toString() + "', (" +  getProfileIDSQL(profile) + "))";
-        
-        runBasicQuery(sql);
     }
     
     /**

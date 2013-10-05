@@ -27,7 +27,6 @@ import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.smokinmils.BaseBot;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.SpamEnforcer;
@@ -38,6 +37,7 @@ import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 

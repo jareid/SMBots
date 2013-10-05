@@ -153,7 +153,7 @@ public class Admin extends Event {
 
                 if (amount != null && amount > 0.0) {
                     // Check valid profile
-                    if (bot.manualStatusRequest(user)) {
+                    if (!bot.manualStatusRequest(user)) {
                         String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
                         bot.sendIRCMessage(sender, out);
                     } else if (profile != null) {
@@ -242,7 +242,7 @@ public class Admin extends Event {
                         EventLog.log(e, "Payout", "message");
                     }
 
-                    if (bot.manualStatusRequest(user)) {
+                    if (!bot.manualStatusRequest(user)) {
                         String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
                         
                         bot.sendIRCMessage(senderu, out);

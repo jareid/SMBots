@@ -85,8 +85,8 @@ public class CheckIdentified extends Event {
     /**
      * This string is output when the user has just been created.
      */
-    public static final String JOIN_MSG = "%b%c04[%c01INFO%c04]%c01 %c04%user%c01 is a "
-                                        + "%c04%level%c01 user";
+    public static final String JOIN_MSG = "%b%c04[%c01INFO%c04]%c01 A %c04%tier%c01 "
+                                        + "bettor has entered the channel!  Welcome %c04%user%c01";
     
     /** Contains a separate thread to process identification checks. */
     private final CheckUserQueue checkThread;
@@ -98,7 +98,7 @@ public class CheckIdentified extends Event {
     private final String channel;
     
     /** The string for a new user. */
-    public static final String OTHERSTR = "Noob";
+    public static final String OTHERSTR = "New";
     
     /** The amount of chips required for bronze. */
     public static final int BRONZE = XMLLoader.getInstance().getTierSetting("bronze");
@@ -123,6 +123,12 @@ public class CheckIdentified extends Event {
     
     /** The string for a platinum user. */
     public static final String PLATINUMSTR = "Platinum";
+    
+    /** The amount of chips required for platinum. */
+    public static final int ELITE = XMLLoader.getInstance().getTierSetting("elite");
+    
+    /** The string for a platinum user. */
+    public static final String ELITESTR = "Elite";
     
     /**
      * Constructor.
@@ -340,6 +346,7 @@ public class CheckIdentified extends Event {
          * @return true if successful, false if not identified, null if failed.
          */
         private Boolean sendStatusRequest(final User user) {
+            Channel achan = bot.getUserChannelDao().getChannel(channel);
             Boolean identd = checkIdentified(user);
             // Only add users with the correct levels
             if (identd == null) {
@@ -364,7 +371,10 @@ public class CheckIdentified extends Event {
                             // Existing user, announce better tier
                             double bet = DB.getInstance().getAllTimeTotal(user.getNick());
                             String tier = OTHERSTR;
-                            if (bet >= PLATINUM) {
+
+                            if (bet >= ELITE) {
+                                tier = ELITESTR;
+                            } else if (bet >= PLATINUM) {
                                 tier = PLATINUMSTR;
                             } else if (bet >= GOLD) {
                                 tier = GOLDSTR;
@@ -376,8 +386,7 @@ public class CheckIdentified extends Event {
                             
                             String out = JOIN_MSG.replaceAll("%user", user.getNick())
                                                  .replaceAll("%tier", tier);
-                            Channel achan = bot.getUserChannelDao().getChannel(channel);
-                            bot.sendIRCMessage(achan, out);
+                            bot.addJoinMsg(new Pair(achan, out));
                         }
                     }
                 } catch (Exception e) {

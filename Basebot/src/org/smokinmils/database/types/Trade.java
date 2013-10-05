@@ -13,57 +13,47 @@ package org.smokinmils.database.types;
 * 
 * @author Jamie Reid
 */
-public class Trade {
-    /** The trade ID. */
-	private int id;
+public class Trade {	
+	/** The trade rank. */
+	private String rank;
 	
-	/** The trade user. */
-	private String user;
+    /** The trade user. */
+    private String user;
 
     /** The amount. */
     private double amount;
     
     /** The profile. */
     private ProfileType profile;
-    
-    /** The amount. */
-    private double wantedAmount;
-    
-    /** The profile. */
-    private ProfileType wantedProfile;
 	
     /**
      * Constructor.
-     * @param num The id number.
-     * @param usr The user who set the trade.
-     * @param amnt The amount he is trading.
-     * @param prof The profile traded.
-     * @param wamnt The amount requested.
-     * @param wprof The profile requested.
+     * 
+     * @param usr The user of the trade
+     * @param rnk The rank of the trade
+     * @param prof The profile of the trade
+     * @param amnt The trade amount
      */
-    public Trade(final int num, final String usr,
-                 final double amnt, final ProfileType prof,
-                 final double wamnt, final ProfileType wprof) {
-        setId(num);
+    public Trade(final String usr, final String rnk, final ProfileType prof,
+                 final double amnt) {
         setUser(usr);
+        setRank(rnk);
         setAmount(amnt);
         setProfile(prof);
-        setWantedAmount(wamnt);
-        setWantedProfile(wprof);
     }
 
     /**
-     * @return the id
+     * @return the rank
      */
-    public final int getId() {
-        return id;
+    public final String getRank() {
+        return rank;
     }
 
     /**
-     * @param num the id to set
+     * @param rnk the rank to set
      */
-    private void setId(final int num) {
-        this.id = num;
+    private void setRank(final String rnk) {
+        rank = rnk;
     }
 
     /**
@@ -77,7 +67,7 @@ public class Trade {
      * @param usr the user to set
      */
     private void setUser(final String usr) {
-        this.user = usr;
+        user = usr;
     }
 
     /**
@@ -91,7 +81,7 @@ public class Trade {
      * @param amnt the amount to set
      */
     private void setAmount(final double amnt) {
-        this.amount = amnt;
+        amount = amnt;
     }
 
     /**
@@ -105,34 +95,6 @@ public class Trade {
      * @param prof the profile to set
      */
     private void setProfile(final ProfileType prof) {
-        this.profile = prof;
-    }
-
-    /**
-     * @return the wanted_amount
-     */
-    public final double getWantedAmount() {
-        return wantedAmount;
-    }
-
-    /**
-     * @param wamount the wanted_amount to set
-     */
-    private void setWantedAmount(final double wamount) {
-        this.wantedAmount = wamount;
-    }
-
-    /**
-     * @return the wanted_profile
-     */
-    public final ProfileType getWantedProfile() {
-        return wantedProfile;
-    }
-
-    /**
-     * @param wprofile the wanted_profile to set
-     */
-    private void setWantedProfile(final ProfileType wprofile) {
-        this.wantedProfile = wprofile;
+        profile = prof;
     }
 }

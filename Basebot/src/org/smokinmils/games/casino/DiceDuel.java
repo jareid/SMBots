@@ -9,7 +9,6 @@ import java.util.TimerTask;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.BaseBot;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
@@ -20,6 +19,7 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 
@@ -47,7 +47,7 @@ public class DiceDuel extends Event {
     
     /** The invalid bet size message. */
     private static final String  INVALID_BETSIZE = "%b%c12You have to bet more"
-                                                 + "than %c040%c12!";
+                                                 + " than %c040%c12!";
     
     /** The bet cancelled message. */
     private static final String  BET_CANCELLED   = "%b%c04%username%c12: "

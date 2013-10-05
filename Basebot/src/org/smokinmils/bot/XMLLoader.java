@@ -295,10 +295,11 @@ public final class XMLLoader {
                         basebot.addListener(server,
                                 new CreateTimedRoll("#" + options.get("sponserchan")), chanarr);
                     } else if (type.equals("trade")) {
-                        basebot.addListener(server, new Escrow(), chanarr);
+                        String d = options.get("delay");
+                        int delay = Integer.parseInt(d);
+                        basebot.addListener(server, new Escrow(bot, chanarr[0], delay), chanarr);
                     } else if (type.equals("diceduel")) {
-                      basebot.addListener(server, new DiceDuel(bot, chanarr[0]),
-                               chanarr);
+                      basebot.addListener(server, new DiceDuel(bot, chanarr[0]), chanarr);
                     } else if (type.equals("managersystem")) {
                       basebot.addListener(server,
                                 new ManagerSystem("#" + options.get("activechan"),
@@ -407,7 +408,7 @@ public final class XMLLoader {
                                 null, true);
                     } else if (type.equals("managerannounce")) {
                         ManagerAnnounce mgrano = new ManagerAnnounce(
-                                basebot.getBot(server), chanarr[0]);
+                                basebot.getBot(server), chanarr[0], options.get("file"));
                         mgrano.begin(0);
                     } else if (type.equals("bettimer")) {
                         Timer bettimer = new Timer(true);
@@ -635,8 +636,8 @@ public final class XMLLoader {
      * @param setting the setting we want
      * @return the value of the setting
      */
-     public double getTradeSetting(final String setting) {
-         Double ret = 0.0;
+     public String getTradeSetting(final String setting) {
+         String ret = "";
          try {
              XPath xPath =  XPathFactory.newInstance().newXPath();
  
@@ -651,7 +652,7 @@ public final class XMLLoader {
                 Element el = (Element) nodeList.item(i); 
                 if (n.equals("trade")) {
                     if (el.getAttribute("type").equals(setting)) {
-                        ret = Double.parseDouble(el.getTextContent());
+                        ret = el.getTextContent();
                         break;
                     }
                 }
@@ -660,7 +661,7 @@ public final class XMLLoader {
             EventLog.log(e, "XMLLoader", "getTierSetting");
         }
         if (ret == null) {
-            ret = 0.0;
+            ret = "";
             EventLog.log("Error in XML, trade setting empty", "XMLLoader", "getTradeSetting");
         }
         return ret;

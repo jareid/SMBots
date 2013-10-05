@@ -278,12 +278,13 @@ public final class Rake {
             if (users != null) {
                 int min = users * minpoints;
                 if (minpoints > entry.getValue()) {
+                    int fail = min - entry.getValue();
                     String out = GROUP_FAIL.replaceAll("%group", entry.getKey());
                     out = out.replaceAll("%min", Integer.toString(min));
-                    out = out.replaceAll("%points", entry.getValue().toString());
+                    out = out.replaceAll("%points", Integer.toString(fail));
                     
-                    Channel chan = bot.getUserChannelDao().getChannel(
-                                                                    ManagerSystem.getManagerChan());
+                    Channel chan = bot.getUserChannelDao()
+                                                .getChannel(ManagerSystem.getManagerChan());
                     bot.sendIRCMessage(chan, out);
                 }
             }

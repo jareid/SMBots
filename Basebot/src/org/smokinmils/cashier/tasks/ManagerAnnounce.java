@@ -48,7 +48,7 @@ public class ManagerAnnounce extends TimerTask {
     private static final String DIRNAME         = "settings";
     
     /** The file name the messages are stored in. */
-    private static final String FILENAME         = "messages.ini";
+    private final String filename;
 
     /** The default interval. */
     private static final int    DEFAULT_INTERVAL = 1;
@@ -60,11 +60,13 @@ public class ManagerAnnounce extends TimerTask {
      * Constructor.
      * 
      * @param irc The irc bot for this manager system.
-     * @param chan The channel for announcements
+     * @param chan The channel for announcements.
+     * @param fname The string of the filename.
      */
-    public ManagerAnnounce(final IrcBot irc, final String chan) {
+    public ManagerAnnounce(final IrcBot irc, final String chan, final String fname) {
         bot = irc;
         channel = chan;
+        filename = fname;
         intervals = new ArrayList<Integer>();
         messages = new ArrayList<String>();
         readData();
@@ -78,14 +80,16 @@ public class ManagerAnnounce extends TimerTask {
      * @param intervls The intervals between announcements
      * @param msgs The messages to announce.
      * @param next The interval to the next announcement.
+     * @param fname The string of the filename.
      */
     public ManagerAnnounce(final IrcBot irc, final String chan,
             final List<Integer> intervls, final List<String> msgs,
-            final int next) {
+            final int next, final String fname) {
         bot = irc;
         channel = chan;
         intervals = intervls;
         messages = msgs;
+        filename = fname;
         begin(next);
     }
 
@@ -127,7 +131,7 @@ public class ManagerAnnounce extends TimerTask {
         if (announceTimer != null) {
             announceTimer.cancel();
         }
-        new ManagerAnnounce(bot, channel, intervals, messages, interval);
+        new ManagerAnnounce(bot, channel, intervals, messages, interval, filename);
     }
 
     /**
@@ -136,7 +140,7 @@ public class ManagerAnnounce extends TimerTask {
     private void readData() {
         try {
             File dir = new File(DIRNAME);
-            File file = new File(dir, FILENAME);
+            File file = new File(dir, filename);
             Ini ini = new Ini(new FileReader(file));
 
             for (String name : ini.keySet()) {

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.smokinmils.BaseBot;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
@@ -17,6 +16,7 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 

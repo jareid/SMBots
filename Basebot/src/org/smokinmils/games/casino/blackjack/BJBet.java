@@ -5,11 +5,11 @@ import java.util.ArrayList;
 
 import org.pircbotx.Channel;
 import org.pircbotx.User;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.TransactionType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.games.casino.cards.Shoe;
 import org.smokinmils.logging.EventLog;

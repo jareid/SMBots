@@ -8,8 +8,10 @@
  */ 
 package org.smokinmils.bot;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 
 import org.pircbotx.Channel;
@@ -60,7 +62,10 @@ public class IrcBot extends PircBotX {
 	private CheckIdentified identCheck;
 	
 	/** The listener manager used for this bot. */
-	private ListenerManager<IrcBot> listenerManager;
+	private ListenerManager<IrcBot> listenerManager;	
+
+    /** A queue of events this room needs to process. */
+    private static Deque<Pair>  msgQueue;
 	
 	/**
 	 * Constructor.
@@ -74,6 +79,10 @@ public class IrcBot extends PircBotX {
     	identifiedUsers = new ArrayList<String>();
     	validChannels = new ArrayList<String>();
     	identCheck = null;
+    	
+        msgQueue = new ArrayDeque<Pair>();
+    	JoinMsgQueue refq = new JoinMsgQueue();
+        refq.start();
 	}
 	
 	/**
@@ -237,7 +246,7 @@ public class IrcBot extends PircBotX {
         boolean ret = false;
         User usr = this.getUserChannelDao().getUser(user);
         if (identCheck != null && user != null) {
-            identCheck.manualStatusRequest(usr);
+            ret = identCheck.manualStatusRequest(usr);
         }
         return ret;
     }
@@ -453,5 +462,69 @@ public class IrcBot extends PircBotX {
      */
     public final void setListenerManager(final ListenerManager<IrcBot> listman) {
         listenerManager = listman;
+    }
+    
+    /**
+     * Adds an event to be handled by this thread.
+     * 
+     * @param msg the pair of objects of who to msg and what.
+     */
+    public final void addJoinMsg(final Pair msg) {
+        synchronized (msgQueue) {
+            msgQueue.addLast(msg);
+        }
+    }
+    
+    /**
+     * Reads an pair to be handled by this thread.
+     * 
+     * @return The pair or null if there is nothing to process.
+     */
+    public final Pair readJoinMessage() {
+        Pair msg = null;
+        synchronized (msgQueue) {
+            if (!msgQueue.isEmpty()) {
+                msg = msgQueue.removeFirst();
+            }
+        }
+        return msg;
+    }
+    
+    /**
+     * The thread object that processes the events.
+     */
+    private class JoinMsgQueue extends Thread {
+        /**
+         * (non-Javadoc).
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
+            boolean interuptted = false;
+            while (!(Thread.interrupted() || interuptted)) {
+                Pair msg = readJoinMessage();
+                if (msg != null) {
+                    if (msg.getValue() instanceof String) {
+                        String what = (String) msg.getValue();
+                        Object who = msg.getKey();
+                        if (who instanceof User) {
+                            sendIRCMessage((User) who, what);
+                            sendIRCNotice((User) who, what);
+                        } else if (who instanceof Channel) {
+                            sendIRCMessage((Channel) who, what);
+                        } else if (who instanceof String) {
+                            sendIRCMessage((String) who, what);
+                        }                            
+                    }
+                }
+
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    interuptted = true;
+                }
+            }
+            return;
+        }
     }
  }

@@ -28,8 +28,7 @@ public class Help extends Event {
 	public static final String COMMAND = "!info";
 	
     /** A description of the info command. */
-	public static final String DESCRIPTION = "%b%c12Lists the available info "
-	                                       + "topics";
+	public static final String DESCRIPTION = "%b%c12Lists the available info topics";
 	
 	/** The format used for the info command. */
 	public static final String FORMAT = "%b%c12" + COMMAND + " ?topic?";

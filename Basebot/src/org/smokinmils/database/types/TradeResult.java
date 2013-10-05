@@ -13,7 +13,7 @@ package org.smokinmils.database.types;
 * 
 * @author Jamie Reid
 */
-public class EscrowResult {
+public class TradeResult {
     /** The amount. */
 	private double amount;
 
@@ -25,7 +25,7 @@ public class EscrowResult {
      * @param amnt The amount
      * @param prof The profile
      */
-	public EscrowResult(final double amnt, final ProfileType prof) {
+	public TradeResult(final double amnt, final ProfileType prof) {
 	    setAmount(amnt);
 	    setProfile(prof);
 	}

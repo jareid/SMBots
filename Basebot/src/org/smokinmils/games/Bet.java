@@ -6,11 +6,12 @@
  *
  * Copyright (C) 2013 Jamie Reid
  */
-package org.smokinmils.bot;
+package org.smokinmils.games;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.smokinmils.bot.IrcBot;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
