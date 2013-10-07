@@ -42,7 +42,7 @@ public class CreateTimedRoll extends Event {
     public static final int                  CRE_CMD_LEN    = 6;
     
     /** The Sponser command. */
-    public static final String               SPN_CMD        = "!sponserroll";
+    public static final String               SPN_CMD        = "!sponsorroll";
 
     /** The Sponser format. */
     public static final String               SPN_FORMAT     = "%b%c12"

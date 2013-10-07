@@ -248,9 +248,9 @@ public class Referrals extends Event {
     
     /** Message when the points are checked. */
     private static final String POINTS_STATS  = "%b%c04%sender%c12: "
-                                              + "%c04%profile%c12 has %c04%coins%c12 chips so far"
+                                              + "%c04%profile%c12 has %c04%chips%c12 chips so far"
                                               + ". That is %c04%chippoint%c12 per point and "
-                                              + "%c04%user%c12 will get %c04%usercoins%c12.";
+                                              + "%c04%user%c12 will get %c04%userchips%c12.";
     
     /** Message when the points are given. */
     private static final String GIVEPOINTS    = "%b%c04%sender%c12: "
@@ -909,13 +909,13 @@ public class Referrals extends Event {
                     chippoint = 0.0;
                 }
                 
-                double usercoins = chippoint * rankpoints;
+                double userchips = chippoint * rankpoints;
                 
                 out = POINTS_STATS;
                 out = out.replaceAll("%profile", entry.getKey().toString());
                 out = out.replaceAll("%chippoint", Utils.chipsToString(chippoint));
-                out = out.replaceAll("%usercoins", Utils.chipsToString(usercoins));
-                out = out.replaceAll("%coins", Utils.chipsToString(coin));
+                out = out.replaceAll("%userchips", Utils.chipsToString(userchips));
+                out = out.replaceAll("%chips", Utils.chipsToString(coin));
                 out = out.replaceAll("%user", who);
                 out = out.replaceAll("%sender", sender);
                 bot.sendIRCNotice(user, out);

@@ -61,7 +61,7 @@ public class DiceDuel extends Event {
     private static final String  NO_WAGER        = "%b%c04%username%c12: "
                                         + "I can't find a record of that wager";
     
-    /** Not enough coins message. */
+    /** Not enough chips message. */
     private static final String  NO_CHIPS        = "%b%c04%username%c12: "
                                      + "You do not have enough chips for that!";
     

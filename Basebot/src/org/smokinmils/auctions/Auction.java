@@ -113,7 +113,7 @@ public class Auction {
         chips = true;
         chipsWin = c;
         price = p;
-        name = Utils.chipsToString(c) + " " + pr.get(0) + " coins";
+        name = Utils.chipsToString(c) + " " + pr.get(0) + " chips";
         time = t * Utils.MIN_IN_HOUR;
         profiles = pr;
         
@@ -167,7 +167,7 @@ public class Auction {
         chipsWin = c;
         
         price = p;
-        name = Utils.chipsToString(c) + " " + pr.get(0) + " coins";
+        name = Utils.chipsToString(c) + " " + pr.get(0) + " chips";
         time = t * Utils.MIN_IN_HOUR;
         profiles = pr;
         winner = w;

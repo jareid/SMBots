@@ -9,7 +9,6 @@ import java.util.TimerTask;
 
 import org.pircbotx.Channel;
 import org.smokinmils.BaseBot;
-import org.smokinmils.bot.Bet;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -18,6 +17,7 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.logging.EventLog;
 
 
@@ -108,7 +108,7 @@ public class Tournament extends Event {
     private List<String> players;
     
     /** The bets active. */
-    private List<Bet> bets;
+    private final List<Bet> bets;
     
     /** The current round. */
     private Round currentRound = null;
@@ -120,16 +120,16 @@ public class Tournament extends Event {
     private int timePerRound = 0;
     
     /** The profile type for the tournament. */
-    private ProfileType profile;
+    private final ProfileType profile;
     
     /** The registration cost. */
-    private double amount;
+    private final double amount;
     
     /** The prize cash dollar coin chips. */
     private double prizeMoney;
     
     /** Timer for tasks. */
-    private Timer announce;
+    private final Timer announce;
     
     /**
      * Constructor.

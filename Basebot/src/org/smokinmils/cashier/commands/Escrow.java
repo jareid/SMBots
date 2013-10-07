@@ -9,6 +9,9 @@
 package org.smokinmils.cashier.commands;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -91,10 +94,14 @@ public class Escrow extends Event {
                                         + AGREECMD + " %id";
     
     /** The message to the channel on trade start. */
-    private static final String OPEN_SWAP = "%b%c04[%c12OPEN SWAPS%c04]%c12 %c04%user%c12 - "
-                                          + "Change: %c04%amount %profile%c12 - To: "
-                                          + "%c04%wamount %wprofile%c1 - " 
-                                          + "Please type %c04 " + AGREECMD + " %id";
+    private static final String OPEN_SWAPS = "%b%c04[%c12OPEN SWAPS%c04]%c12 To swap ";
+    
+   /** The message to the channel on trade start. */
+   private static final String OPEN_SWAP = "%c04%amount %profile%c12 for %c04%wamount %wprofile%c12"
+                                         + " type %c04 " + AGREECMD + " %id %c12|";
+   
+   /** number of swaps per line. */
+   private static final int SWAP_PER_LINE = 5;
     
     /** The message to the channel on trade start. */
     private static final String SWAPCOMP   = "%b%c04[SWAP]%c12 Swap ID %c04%id%c12 has been "
@@ -157,6 +164,18 @@ public class Escrow extends Event {
                                               + "%c04%profile%c12 profile.";
     
     /** Message when the user doesn't have enough chips. */
+    public static final String  NOPLAYMSG    = "%b%c04%user%c12: Sorry, %c04play%c12 chips are not"
+                                              + " valid in a swap or trade.";
+    
+    /** Message when the user trys to open too many swaps. */
+    public static final String  TOOMANYSWAPS    = "%b%c04%user%c12: Sorry, You can only have"
+                                              + " %c04two%c12 open swaps at a time.";
+
+    /** Message when the user tries a negative swap. */
+    public static final String  NONEGATIVES    = "%b%c04%user%c12: Sorry, You can't have"
+                                                 + " %c04negative%c12 swaps.";
+    
+    /** Message when the user doesn't have enough chips. */
     public static final String  JOINMSG    = XMLLoader.getInstance().getTradeSetting("joinmsg");
     
     /** Minutes between announcements. */
@@ -186,9 +205,10 @@ public class Escrow extends Event {
     public final void join(final Join event) {
         User user = event.getUser();
         IrcBot bot = event.getBot();
-        if (!user.getNick().equalsIgnoreCase(bot.getNick())) {
+        if (!user.getNick().equalsIgnoreCase(bot.getNick())
+                && isValidChannel(event.getChannel().getName())) {
             String out = JOINMSG.replaceAll("%swpformat", SWAPFMT.replaceAll("%b%c12", ""));
-            bot.addJoinMsg(new Pair(user.getNick(), out));
+            bot.addJoinMsg(new Pair(user, out));
         }
     }
     
@@ -205,7 +225,7 @@ public class Escrow extends Event {
         Channel chan = event.getChannel();
         
         if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)) {
-            if (Utils.startsWith(message, TRADECMD)) {
+            if (Utils.startsWith(message, TRADECMD) && bot.userIsHost(sender, chan.getName())) {
                 sellChips(event);
             } else if (Utils.startsWith(message, CONFIRMCMD)) {
                 confirm(event);
@@ -241,16 +261,27 @@ public class Escrow extends Event {
             Double actamnt = amount;
             ProfileType profile = ProfileType.fromString(msg[TRADE_CMD_LEN - 1]);
             
+            double chips = 0;
             Trade exists = null;
             try {
                 exists = DB.getInstance().getTrade(sender, user);
+                chips = DB.getInstance().checkCredits(sender, profile);
             } catch (Exception e) {
                 EventLog.log(e, "Escrow", "sellChips");
-            }
+            }                
             
             if (exists != null) {
                 String out = TRADE_EXIST.replaceAll("%user", user)
                                         .replaceAll("%rank", sender);
+                bot.sendIRCMessage(chan, out);
+            } else if (amount != null && chips < amount) {
+                String out = NOCHIPSMSG.replaceAll("%chips", Utils.chipsToString(amount));
+                out = out.replaceAll("%profile", profile.toString());
+                out = out.replaceAll("%user", sender);
+                
+                bot.sendIRCMessage(chan, out);
+            } else if (profile == ProfileType.PLAY) {
+                String out = NOPLAYMSG.replaceAll("%user", sender);
                 bot.sendIRCMessage(chan, out);
             } else if (amount != null) {
                 DB db = DB.getInstance();
@@ -480,7 +511,7 @@ public class Escrow extends Event {
                 }
             }
             
-            if (bot.manualStatusRequest(sender)) {
+            if (!bot.manualStatusRequest(sender)) {
                 String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", sender);
                 bot.sendIRCMessage(senderu, out);
             } else if (exists == null) {
@@ -488,7 +519,7 @@ public class Escrow extends Event {
                 bot.sendIRCMessage(chan, out);
 
             } else if (exists.getUser().equalsIgnoreCase(sender)) {
-                String out = SELFTRADE.replaceAll("%user", sender);
+                String out = SELFTRADE.replaceAll("%who", sender);
                 bot.sendIRCMessage(chan, out);
             } else if (chips < exists.getWantedAmount()) {
                 String out = NOCHIPSMSG.replaceAll("%chips",
@@ -543,16 +574,27 @@ public class Escrow extends Event {
             ProfileType wprofile = ProfileType.fromString(msg[SWAP_CMD_LEN - 1]);
             
             if (amount != null && wamount != null) {
-                DB db = DB.getInstance();
-                // positive means we are selling chips, negative buying them                
-                double chips = 0;
+                // positive means we are selling chips, negative buying them        
+                DB db = DB.getInstance();        
+                double chips = 0;                
+                int swapcount = 0;
+                List<Swap> openSwaps = null;
                 try {
+                    openSwaps = DB.getInstance().getAllSwaps();
+                    for (Swap item: openSwaps) {
+                        if (item.getUser().equalsIgnoreCase(sender)) {
+                            swapcount++;
+                        }
+                    }
                     chips = db.checkCredits(sender, profile);
+                    
                 } catch (Exception e) {
                     EventLog.log(e, "Escrow", "swapChips");
                 }
-
-                if (bot.manualStatusRequest(sender)) {
+                
+                if (swapcount == 2) {
+                    bot.sendIRCMessage(chan, TOOMANYSWAPS.replaceAll("%user", sender));
+                } else if (!bot.manualStatusRequest(sender)) {
                     String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", sender);
                     
                     bot.sendIRCMessage(senderu, out);
@@ -563,6 +605,18 @@ public class Escrow extends Event {
                     out = out.replaceAll("%profile", profile.toString());
                     out = out.replaceAll("%user", sender);
                     
+                    bot.sendIRCMessage(chan, out);
+                } else if (profile == ProfileType.PLAY) {
+                    String out = NOPLAYMSG.replaceAll("%user", sender);
+                    bot.sendIRCMessage(chan, out);
+                } else if (wprofile == ProfileType.PLAY) {
+                    String out = NOPLAYMSG.replaceAll("%user", sender);
+                    bot.sendIRCMessage(chan, out);
+                } else if (amount < 0) {
+                    String out = NONEGATIVES.replaceAll("%user", sender);
+                    bot.sendIRCMessage(chan, out);
+                } else if (wamount < 0) {
+                    String out = NONEGATIVES.replaceAll("%user", sender);
                     bot.sendIRCMessage(chan, out);
                 } else {
                     boolean success = false;
@@ -632,7 +686,7 @@ public class Escrow extends Event {
                 EventLog.log(e, "Escrow", "agree");
             }
             
-            if (bot.manualStatusRequest(sender)) {
+            if (!bot.manualStatusRequest(sender)) {
                 String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", sender);
                 bot.sendIRCMessage(senderu, out);
             } else if (exists == null) {
@@ -683,6 +737,7 @@ public class Escrow extends Event {
         @Override
         public void run() {
             List<Swap> openSwaps = null;
+            List<Swap> cxlSwaps = new ArrayList<Swap>();
             try {
                 openSwaps = DB.getInstance().getAllSwaps();
             } catch (SQLException e) {
@@ -691,15 +746,56 @@ public class Escrow extends Event {
             
             if (openSwaps != null && openSwaps.size() > 0) {
                 Channel chan = irc.getUserChannelDao().getChannel(channel);
+                String swapstr = "";
+                int swapcount = 0;
+
+                for (Swap swp: openSwaps) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(swp.getTimestamp());
+                    cal.add(Calendar.DATE, 1);
+                    Date date = cal.getTime();
+                    if (date.before(new Date())) {
+                        cxlSwaps.add(swp);
+                    }
+                }
+                
+                for (Swap swp: cxlSwaps) {
+                    openSwaps.remove(swp);
+                }
                 
                 for (Swap swp: openSwaps) {
-                    String swap = OPEN_SWAP.replaceAll("%id", Integer.toString(swp.getId()));
-                    swap = swap.replaceAll("%user", swp.getUser());
-                    swap = swap.replaceAll("%amount", Utils.chipsToString(swp.getAmount()));
-                    swap = swap.replaceAll("%profile", swp.getProfile().toString());
-                    swap = swap.replaceAll("%wamount", Utils.chipsToString(swp.getWantedAmount()));
-                    swap = swap.replaceAll("%wprofile", swp.getProfile().toString());
-                    irc.sendIRCMessage(chan, swap);
+                    if (swapcount == 0) {
+                        swapstr += OPEN_SWAPS;
+                    } else if (swapcount < SWAP_PER_LINE) {
+                        swapstr += OPEN_SWAP;
+                    }
+                    
+                    swapstr = swapstr.replaceAll("%id", Integer.toString(swp.getId()));
+                    swapstr = swapstr.replaceAll("%user", swp.getUser());
+                    swapstr = swapstr.replaceAll("%amount", Utils.chipsToString(swp.getAmount()));
+                    swapstr = swapstr.replaceAll("%profile", swp.getProfile().toString());
+                    swapstr = swapstr.replaceAll("%wamount",
+                                                 Utils.chipsToString(swp.getWantedAmount()));
+                    swapstr = swapstr.replaceAll("%wprofile", swp.getWantedProfile().toString());
+
+                    swapcount++;
+                    if (swapcount == SWAP_PER_LINE) {
+                        swapstr += "\n";
+                        swapcount = 0;
+                    }
+                }
+                irc.sendIRCMessage(chan, swapstr);
+                
+                for (Swap swp: cxlSwaps) {
+                    try {
+                        DB.getInstance().cancelSwap(swp, swp.getUser());
+                    } catch (SQLException e) {
+                        EventLog.log(e, "Escrow", "Announce->run");                
+                    }
+                    
+                    String out = CXL_SWAP.replaceAll("%id", Integer.toString(swp.getId()));
+                    
+                    irc.sendIRCMessage(chan, out);
                 }
             }
         }

@@ -41,7 +41,7 @@ import org.smokinmils.settings.Variables;
 //import org.smokinmils.cashier.rake.Rake; TODO Rake
 
 /**
- * Provides the functionality to give a user some coins.
+ * Provides the functionality to give a user some chips.
  * 
  * @author cjc
  */
@@ -90,9 +90,9 @@ public class NewDuel extends Event {
                    + "new Duel wager of %c04%amount%c12 %profile chips! To call "
                    + "this wager type %c04" + CALL_CMD + " %who";
     
-    /** Message when user hasn't got enough coins. */
-    private static final String NOCOINS        = "%b%c12Sorry, you do not have "
-           + "%c04%coins%c12 chips available for the %c04%profile%c12 profile.";
+    /** Message when user hasn't got enough chips. */
+    private static final String NOchips        = "%b%c12Sorry, you do not have "
+           + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
     
     /** Message for mixed profile bets. */
     private static final String WRONGPROFILE  = "%b%c04%who%c12: : This duel is "
@@ -304,8 +304,8 @@ public class NewDuel extends Event {
                     out = out.replaceAll("%profile", theGame.getProfile().toString());
                     bot.sendIRCMessage(chan, out);
                 } else if (db.checkCredits(p2.getNick()) < theGame.getAmount()) {
-                    String out = NOCOINS.replaceAll("%who", p2.getNick());
-                    out = out.replaceAll("%coins", Utils.chipsToString(theGame.getAmount()));
+                    String out = NOchips.replaceAll("%who", p2.getNick());
+                    out = out.replaceAll("%chips", Utils.chipsToString(theGame.getAmount()));
                     out = out.replaceAll("%profile", theGame.getProfile().toString());
                 } else {
                 
@@ -407,7 +407,7 @@ public class NewDuel extends Event {
                                         Utils.chipsToString(nds.getAmount()));
                                 bot.sendIRCMessage(chan, out);
                             } else {
-                                String out = NOCOINS.replaceAll("%coins", 
+                                String out = NOchips.replaceAll("%chips", 
                                                                 Utils.chipsToString(amount));
                                 out = out.replaceAll("%profile", profile.toString());
                                 bot.sendIRCMessage(chan, out);

@@ -414,8 +414,14 @@ public final class XMLLoader {
                                 Integer.parseInt(options.get("rounds")), 
                                 null, true);
                     } else if (type.equals("managerannounce")) {
+                        String file = options.get("file");
                         ManagerAnnounce mgrano = new ManagerAnnounce(
-                                basebot.getBot(server), chanarr[0], options.get("file"));
+                                basebot.getBot(server), chanarr[0], file);
+                        mgrano.begin(0);
+                    } else if (type.equals("tradeannounce")) {
+                        String file = options.get("file");
+                        ManagerAnnounce mgrano = new ManagerAnnounce(
+                                basebot.getBot(server), chanarr[0], file);
                         mgrano.begin(0);
                     } else if (type.equals("bettimer")) {
                         Timer bettimer = new Timer(true);
@@ -436,7 +442,6 @@ public final class XMLLoader {
                                 Utils.tryParse(options.get("delay")) * Utils.MS_IN_MIN, 
                                 Utils.tryParse(options.get("period")) * Utils.MS_IN_MIN);
                     }
-                   
                 }
             }
         } catch (Exception e) {
@@ -583,8 +588,6 @@ public final class XMLLoader {
     public String getBotNick() {
         String nick = "";
         try {
-            
-        
             XPath xPath =  XPathFactory.newInstance().newXPath();
             String expression = "/bot/*";
             //read a nodelist using xpath

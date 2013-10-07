@@ -101,12 +101,12 @@
 		<option type="rounds">-1</option>			
 	</timer>
 	<timer type="managerannounce">
-	    <file>messages.ini</file>
+	    <option type="file">messages.ini</option>
 		<channel>testeroo3</channel>
 	</timer>
-    <timer type="managerannounce">
-        <file>trademsgs.ini</file>
-        <channel>testeroo3</channel>
+    <timer type="tradeannounce">
+        <option type="file">trademsgs.ini</option>
+        <channel>testeroo2</channel>
     </timer>
 	<timer type="bettimer">
 		<channel>testeroo3</channel>

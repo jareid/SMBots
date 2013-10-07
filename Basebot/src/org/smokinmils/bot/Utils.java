@@ -53,7 +53,7 @@ public final class Utils {
     private static final String MINIMUM_BET = "%b%c04%who%c12: If you have more than 1 coin "
                                                             + "you must bet more than 1 coin";
     
-    /** Not enough coins message. */
+    /** Not enough chips message. */
     private static final String  NO_CHIPS        = "%b%c04%username%c12: "
                                      + "You do not have enough chips for that!";
     

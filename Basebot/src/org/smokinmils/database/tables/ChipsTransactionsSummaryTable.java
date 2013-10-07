@@ -20,7 +20,7 @@ public final class ChipsTransactionsSummaryTable {
     private ChipsTransactionsSummaryTable() { }
 
 	/** Table name. */
-	public static final String NAME = "chipstransactions_summary";
+	public static final String NAME = "chiptransactions_summary";
 	
 	/** Column for the userid. */
 	public static final String COL_USERID = "user_id";
