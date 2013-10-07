@@ -20,7 +20,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.hooks.WaitForQueue;
 import org.pircbotx.hooks.events.NoticeEvent;
@@ -33,7 +32,6 @@ import org.smokinmils.bot.events.Part;
 import org.smokinmils.bot.events.PrivateMessage;
 import org.smokinmils.bot.events.Quit;
 import org.smokinmils.bot.events.UserList;
-import org.smokinmils.cashier.ManagerSystem;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.UserCheck;
 import org.smokinmils.games.timedrollcomp.TimedRollComp;
@@ -71,8 +69,11 @@ public class CheckIdentified extends Event {
     public static final String WELCOME_MSG = "%b%c01Hello %c04%user%c01, "
             + "welcome to our channel! For information on our games and "
             + "systems please type %c04!info%c01 and use further commands "
-            + "for specific topics listed. %b%c04[INFO]%c01 The current manager online is "
-            + "%c04%manager%c01. To buy coins or ask questions please %c04/query %manager";
+            + "for specific topics listed. %c04[INFO]%c01 The current manager online is "
+            + "%c04%manager%c01. To buy chips or ask questions please %c04/query %manager\n"
+            + "%b%c04[IMPORTANT]%c01 Beware of IRC imposters. All chips trading happens in "
+            + "#SMExchange and ranks will NEVER contact you to check if you need to buy or sell "
+            + "chips. %c04[IMPORTANT]";
     
     /**
      * This string is output when the user has just been created.
@@ -80,7 +81,7 @@ public class CheckIdentified extends Event {
     public static final String WELCOME_MSG2 = "%b%c04[INFO]%c01 Beware of IRC imposters. Always "
                                             + "confirm trades in this channel if unsure. "
                                             + "%c04[IMPORTANT]%c01 We will NEVER query you to sell "
-                                            + "you coins. %c04[IMPORTANT]%c01";
+                                            + "you chips. %c04[IMPORTANT]%c01";
     
     /**
      * This string is output when the user has just been created.
@@ -151,7 +152,7 @@ public class CheckIdentified extends Event {
         IrcBot bot = event.getBot();
         User user = event.getUser();
         if (!bot.userIsIdentified(user)) {
-            checkThread.addUser(user);
+            checkThread.addUser(user, false);
         }
     }
     
@@ -162,7 +163,7 @@ public class CheckIdentified extends Event {
         if (!bot.userIsIdentified(user)
                 && event.getMessage().startsWith("!")
                 && !event.getMessage().startsWith(TimedRollComp.CMD)) {
-            checkThread.addUser(user);
+            checkThread.addUser(user, false);
             // If we already told this user, don't tell them again
             if (!sentNoIdent.contains(user.getNick())) {
                 bot.sendIRCNotice(user, NOT_IDENTIFIED_MSG);
@@ -176,7 +177,7 @@ public class CheckIdentified extends Event {
         IrcBot bot = event.getBot();
         User user = event.getUser();
         if (!bot.userIsIdentified(user)) {
-            checkThread.addUser(user);
+            checkThread.addUser(user, false);
         }
     }
     
@@ -188,14 +189,14 @@ public class CheckIdentified extends Event {
         if (!nick.equalsIgnoreCase(event.getBot().getNick())
                 && !nick.equalsIgnoreCase("X")) {
             event.getBot().removeIdentifiedUser(user.getNick());
-            checkThread.addUser(user);
+            checkThread.addUser(user, false);
         }
     }
     
     @Override
     public final void nickChange(final NickChange event) {
         event.getBot().removeIdentifiedUser(event.getOldNick());
-        checkThread.addUser(event.getUser());
+        checkThread.addUser(event.getUser(), false);
     }
     
     @Override
@@ -223,9 +224,10 @@ public class CheckIdentified extends Event {
                     && !nick.equalsIgnoreCase("X")
                     && !bot.userIsIdentified(usr)) {
                 bot.removeIdentifiedUser(usr.getNick());
-                checkThread.addUser(usr);
+                checkThread.addUser(usr, true);
             }
         }
+        
     }
     
     /**
@@ -246,6 +248,13 @@ public class CheckIdentified extends Event {
     }
     
     /**
+     * @return the channel
+     */
+    public final String getChannel() {
+        return channel;
+    }
+
+    /**
      * A separate class that is used to process identification checks
      * 
      * This is a thread safe class that processes events using a queue system.
@@ -255,6 +264,9 @@ public class CheckIdentified extends Event {
     final class CheckUserQueue extends Thread {
         /** A queue of events users to be checked. */
         private final Deque<User> users;
+        
+        /** A queue of events users to be checked. */
+        private final Deque<Boolean> startup;
         
         /** The IRC bot used to check. */
         private final IrcBot bot;
@@ -281,6 +293,7 @@ public class CheckIdentified extends Event {
          */
         private CheckUserQueue(final IrcBot irc) {
             users = new ArrayDeque<User>();
+            startup = new ArrayDeque<Boolean>();
             //userMap = new HashMap<User, Long>();
             bot = irc;
             this.start();
@@ -298,7 +311,8 @@ public class CheckIdentified extends Event {
             while (!(Thread.interrupted() || interuptted)) { 
                 if (!users.isEmpty()) {
                     User user = users.removeFirst();
-                    sendStatusRequest(user);
+                    boolean start = startup.removeFirst();
+                    sendStatusRequest(user, start);
                 }
                 
                 try {
@@ -342,11 +356,11 @@ public class CheckIdentified extends Event {
          * and waits for the response.
          * 
          * @param user     The user
+         * @param starting True if this is bots first start event.
          * 
          * @return true if successful, false if not identified, null if failed.
          */
-        private Boolean sendStatusRequest(final User user) {
-            Channel achan = bot.getUserChannelDao().getChannel(channel);
+        private Boolean sendStatusRequest(final User user, final boolean starting) {
             Boolean identd = checkIdentified(user);
             // Only add users with the correct levels
             if (identd == null) {
@@ -360,34 +374,8 @@ public class CheckIdentified extends Event {
                                                                      user.getHostmask());
                     if (res == UserCheck.FAILED) {
                         bot.sendIRCNotice(user, TOO_MANY_ACCS);
-                    } else {
+                    } else if (!starting) {
                         bot.addIdentifiedUser(user);
-                        if (res == UserCheck.CREATED) {
-                            String out = WELCOME_MSG.replaceAll("%user", user.getNick())
-                                                    .replaceAll("%manager",
-                                                                ManagerSystem.getLoggedInUser());
-                            bot.sendIRCNotice(user, out);
-                        } else {
-                            // Existing user, announce better tier
-                            double bet = DB.getInstance().getAllTimeTotal(user.getNick());
-                            String tier = OTHERSTR;
-
-                            if (bet >= ELITE) {
-                                tier = ELITESTR;
-                            } else if (bet >= PLATINUM) {
-                                tier = PLATINUMSTR;
-                            } else if (bet >= GOLD) {
-                                tier = GOLDSTR;
-                            } else if (bet >= SILVER) {
-                                tier = SILVERSTR;
-                            } else if (bet >= BRONZE) {
-                                tier = BRONZESTR;
-                            }
-                            
-                            String out = JOIN_MSG.replaceAll("%user", user.getNick())
-                                                 .replaceAll("%tier", tier);
-                            bot.addJoinMsg(new Pair(achan, out));
-                        }
                     }
                 } catch (Exception e) {
                     EventLog.log(e, "CheckIdentified", "sendStatusRequest");
@@ -400,10 +388,11 @@ public class CheckIdentified extends Event {
          * Add a user to the queue for identification checks.
          * 
          * @param user The user to add
+         * @param isstartup The boolean denoting whether to send msgs.
          * 
          * @see org.pircbotx.User
          */
-        public void addUser(final User user) {
+        public void addUser(final User user, final boolean isstartup) {
             if (isEnabled) {
                 //Long time = UserMap.get(user);
                 //Long now = System.currentTimeMillis();
@@ -415,6 +404,7 @@ public class CheckIdentified extends Event {
                 restrict.add("POINTS");
                 if (!restrict.contains(user.getNick().toUpperCase()) && !users.contains(user)) {
                     users.addLast(user);
+                    startup.addLast(isstartup);
                     //userMap.put(user, now);
                 }
             }

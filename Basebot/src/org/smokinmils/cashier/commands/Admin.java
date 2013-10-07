@@ -13,7 +13,6 @@ import java.io.IOException;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Listener;
-import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Utils;
@@ -47,7 +46,10 @@ public class Admin extends Event {
     public static final int     PAY_CMD_LEN     = 4;
     
     /** The give command. */
-    public static final String  GIVECMD     = "!coins";
+    public static final String  GIVECMD     = "!chips";
+    
+    /** The give command. */
+    public static final String  GIVECMD2     = "!chips";
 
     /** The give command format. */
     public static final String  GIVEFMT      = "%b%c12" + GIVECMD + " <user> <amount> <profile>";
@@ -59,24 +61,24 @@ public class Admin extends Event {
     public static final String  DISCMD       = "!disable";
 
     /** The message to the channel on success. */
-    private static final String PAYOUTCHIPS   = "%b%c04%sender:%c12 Paid out %c04%amount%c12 coins "
+    private static final String PAYOUTCHIPS   = "%b%c04%sender:%c12 Paid out %c04%amount%c12 chips "
                                               + "from the %c04%profile%c12 account of %c04%who%c12";
     
     /** The message to the user. */
-    private static final String PAYOUTCHIPSPM = "%b%c12You have had %c04%amount%c12 coins " 
+    private static final String PAYOUTCHIPSPM = "%b%c12You have had %c04%amount%c12 chips " 
                                               + "paid out from your account by %c04%sender%c12";
 
     /** The message sent to the channel on success. */
     private static final String GIVECHIPS   = "%b%c04%sender:%c12 Added "
-      + "%c04%amount%c12 coins to the %c04%profile%c12 account of %c04%who%c12";
+      + "%c04%amount%c12 chips to the %c04%profile%c12 account of %c04%who%c12";
     
     /** Message sent to the user on success. */
     private static final String GIVECHIPSPM = "%b%c12You have had "
-      + "%c04%amount%c12 coins deposited into your account by %c04%sender%c12";
+      + "%c04%amount%c12 chips deposited into your account by %c04%sender%c12";
     
     /** Message when the user doesn't have enough chips. */
     public static final String  NOCHIPSMSG    = "%b%c12Sorry, %c04%user%c12 does not have "
-                                              + "%c04%coins%c12 coins available for the "
+                                              + "%c04%chips%c12 chips available for the "
                                               + "%c04%profile%c12 profile.";
     
     /** Message when a command is disabled. */
@@ -122,7 +124,7 @@ public class Admin extends Event {
         Channel chan = event.getChannel();
         
         if (isValidChannel(chan.getName()) && bot.userIsIdentified(sender)) {
-            if (Utils.startsWith(message, GIVECMD)) {
+            if (Utils.startsWith(message, GIVECMD) || Utils.startsWith(message, GIVECMD2)) {
                 giveChips(event);
             } else if (Utils.startsWith(message, PAYCMD)) {
                 payoutChips(event);
@@ -153,10 +155,7 @@ public class Admin extends Event {
 
                 if (amount != null && amount > 0.0) {
                     // Check valid profile
-                    if (!bot.manualStatusRequest(user)) {
-                        String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
-                        bot.sendIRCMessage(sender, out);
-                    } else if (profile != null) {
+                    if (profile != null) {
                         boolean success = false;
                         try {
                             DB db = DB.getInstance();
@@ -192,12 +191,12 @@ public class Admin extends Event {
                                     h.sendGoldChange(sender.getNick(), amount, profile);
                                 }
                             } catch (IOException e) {
-                                EventLog.log(e, "Coins", "giveChips");
+                                EventLog.log(e, "chips", "giveChips");
                                 
                             }
                             
                         } else {
-                            EventLog.log(sender.getNick() + " attempted to give someone coins and "
+                            EventLog.log(sender.getNick() + " attempted to give someone chips and "
                                          + "the database failed", "GiveChips", "message");
                         }
                     } else {
@@ -210,7 +209,7 @@ public class Admin extends Event {
                 bot.invalidArguments(sender, GIVEFMT);
             }
         } else {
-            EventLog.info(sender + " attempted to give someone coins",  "GiveChips", "message");
+            EventLog.info(sender + " attempted to give someone chips",  "GiveChips", "message");
         }
     }
 
@@ -242,14 +241,10 @@ public class Admin extends Event {
                         EventLog.log(e, "Payout", "message");
                     }
 
-                    if (!bot.manualStatusRequest(user)) {
-                        String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", user);
-                        
-                        bot.sendIRCMessage(senderu, out);
-                    } else if (profile == null) {
+                    if (profile == null) {
                         bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                     } else if (chips < amount) {
-                        String out = NOCHIPSMSG.replaceAll("%coins", Utils.chipsToString(amount));
+                        String out = NOCHIPSMSG.replaceAll("%chips", Utils.chipsToString(amount));
                         out = out.replaceAll("%profile", profile.toString());
                         out = out.replaceAll("%user", user);
                         
@@ -292,7 +287,7 @@ public class Admin extends Event {
                                     h.sendGoldChange(sender, -amount, profile);
                                 }
                             } catch (IOException e) {
-                                EventLog.log(e, "Coins", "payoutChips");
+                                EventLog.log(e, "chips", "payoutChips");
                                 
                             }
                         } else {
@@ -306,7 +301,7 @@ public class Admin extends Event {
                 bot.invalidArguments(senderu, PAYFMT);
             }
         } else {
-            EventLog.info(sender + " attempted to pay out someone coins", "Payout", "message");
+            EventLog.info(sender + " attempted to pay out someone chips", "Payout", "message");
         }
     }
     

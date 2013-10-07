@@ -31,4 +31,7 @@ public final class TradeTable {
     
     /** Column for the amount of the trade. */
     public static final String COL_WANTEDPROF = "wanted_profile";
+    
+    /** Column for the timestamp of the trade. */
+    public static final String COL_TIMESTAMP = "timestamp";
 }

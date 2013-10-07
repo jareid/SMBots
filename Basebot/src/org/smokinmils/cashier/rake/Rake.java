@@ -80,7 +80,7 @@ public final class Rake {
      * @param chan The jackpot channel.
      */
     public static void init(final String chan) {
-        jackpotChannel = chan;
+        setJackpotChannel(chan);
     }
 
     /**
@@ -168,13 +168,13 @@ public final class Rake {
                     out = out.replaceAll("%game", game.toString());
 
                     if (channel != null
-                       && !channel.getName().equalsIgnoreCase(jackpotChannel)) {
+                       && !channel.getName().equalsIgnoreCase(getJackpotChannel())) {
                         bot.sendIRCMessage(channel, out);
                         bot.sendIRCMessage(channel, out);
                         bot.sendIRCMessage(channel, out);
                     }
                     
-                    Channel jpchan = bot.getUserChannelDao().getChannel(jackpotChannel);
+                    Channel jpchan = bot.getUserChannelDao().getChannel(getJackpotChannel());
 
                     bot.sendIRCMessage(jpchan, out);
                     bot.sendIRCMessage(jpchan, out);
@@ -292,5 +292,19 @@ public final class Rake {
         
         // reset points
         db.resetPoints();
+    }
+
+    /**
+     * @return the jackpotChannel
+     */
+    public static String getJackpotChannel() {
+        return jackpotChannel;
+    }
+
+    /**
+     * @param chan the jackpotChannel to set
+     */
+    private static void setJackpotChannel(final String chan) {
+        Rake.jackpotChannel = chan;
     }
 }

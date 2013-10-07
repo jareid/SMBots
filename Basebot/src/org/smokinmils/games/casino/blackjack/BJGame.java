@@ -153,7 +153,7 @@ public class BJGame extends Event {
     private static final String STATE = "%b%c04%who%c12: You have %c04%hand %c12%pscore";
     
     /** String to notify on winnings / amount returned for a draw. */
-    private static final String WINNINGS = "%b%c04%who%c12: You receive %coins chips";
+    private static final String WINNINGS = "%b%c04%who%c12: You receive %chips chips";
 
     /** String for points when they have Blackjack! */
     private static final String BLACKJACK_STRING = "BlackJack!";
@@ -167,13 +167,13 @@ public class BJGame extends Event {
     /** String to tell them they can't insure.*/
     private static final String INSURE_NOT_VALID = "%b%c04%who%c12: You can't insure this game";
 
-    /** String to tell them they don't have the chipcoins to insure.*/
+    /** String to tell them they don't have the chipchips to insure.*/
     private static final String INSURE_NOT_ENOUGH = "%b%c04%who%c12: You don't have the chips "
     		                                                + "to insure";
 
     /** String to tell the user they have taken out insurance! */
     private static final String INSURE_TAKEN = "%b%c04%who%c12: You have taken insurance out" 
-            + " against the dealer having BlackJack for %c04%coins%c12 chips!";
+            + " against the dealer having BlackJack for %c04%chips%c12 chips!";
     
     /** String letting the user know they have got insurance cash dollar back. */
     private static final String INSURANCE_PAID = "%b%c04%who%c12: Your insurance has paid";
@@ -300,9 +300,9 @@ public class BJGame extends Event {
                     String out = INSURE_NOT_VALID.replaceAll("%who", sender.getNick());
                     bot.sendIRCNotice(sender, out);
                 } else {
-                    double userTotalCoins = 0.0;
+                    double userTotalchips = 0.0;
                     try {
-                        userTotalCoins = DB.getInstance().checkCredits(sender.getNick(), 
+                        userTotalchips = DB.getInstance().checkCredits(sender.getNick(), 
                                         usergame.getProfile());
                     } catch (SQLException e) {
                        EventLog.log(e, "BJGame", "insure");
@@ -312,10 +312,10 @@ public class BJGame extends Event {
                     if (amount == null || amount == 0 || amount > usergame.getAmount() / 2) {
                         bot.invalidArguments(sender, CAN_INSURE); 
                     } else {
-                        if (userTotalCoins >= amount) {
+                        if (userTotalchips >= amount) {
                             usergame.insure(amount);
                             String out = INSURE_TAKEN.replaceAll("%who", sender.getNick());
-                            out = out.replaceAll("%coins", Utils.chipsToString(amount));
+                            out = out.replaceAll("%chips", Utils.chipsToString(amount));
                             bot.sendIRCNotice(sender, out);
                         
                         } else {
@@ -363,14 +363,14 @@ public class BJGame extends Event {
                     if (amount == null || amount == 0 || amount > usergame.getAmount()) {
                         bot.invalidArguments(sender, CAN_DOUBLE); 
                     } else {
-                        double userTotalCoins = 0.0;
+                        double userTotalchips = 0.0;
                         try {
-                            userTotalCoins = DB.getInstance().checkCredits(player, 
+                            userTotalchips = DB.getInstance().checkCredits(player, 
                                                                 usergame.getProfile());
                         } catch (SQLException e) {
                             EventLog.log(e, "BJGame", "doubleDown");
                         }
-                        if (userTotalCoins >= amount) {
+                        if (userTotalchips >= amount) {
                             usergame.doubleDown(amount);
                             usergame.dealPlayerCard();
                             dealerPlay(player, bot, chan, usergame);
@@ -579,7 +579,7 @@ public class BJGame extends Event {
             
             bot.sendIRCMessage(chan, out);
             
-            out = WINNINGS.replaceAll("%coins", Utils.chipsToString(win));
+            out = WINNINGS.replaceAll("%chips", Utils.chipsToString(win));
             out = out.replaceAll("%who", player);
             bot.sendIRCNotice(player, out);
             
@@ -652,7 +652,7 @@ public class BJGame extends Event {
             
             bot.sendIRCMessage(chan, out);
            
-            out = WINNINGS.replaceAll("%coins", Utils.chipsToString(win));
+            out = WINNINGS.replaceAll("%chips", Utils.chipsToString(win));
             out = out.replaceAll("%who", winner);
             bot.sendIRCNotice(winner, out);
             

@@ -8,6 +8,8 @@
  */ 
 package org.smokinmils.database.types;
 
+import java.util.Date;
+
 /**
 * A class used to return values about a transaction for a referral user.
 * 
@@ -31,6 +33,9 @@ public class Swap {
     
     /** The profile. */
     private ProfileType wantedProfile;
+    
+    /** The timestamp. */
+    private Date timestamp;
 	
     /**
      * Constructor.
@@ -40,16 +45,19 @@ public class Swap {
      * @param prof The profile traded.
      * @param wamnt The amount requested.
      * @param wprof The profile requested.
+     * @param ts the timestamp.
      */
     public Swap(final int num, final String usr,
                  final double amnt, final ProfileType prof,
-                 final double wamnt, final ProfileType wprof) {
+                 final double wamnt, final ProfileType wprof,
+                 final Date ts) {
         setId(num);
         setUser(usr);
         setAmount(amnt);
         setProfile(prof);
         setWantedAmount(wamnt);
         setWantedProfile(wprof);
+        setTimestamp(ts);
     }
 
     /**
@@ -134,5 +142,19 @@ public class Swap {
      */
     private void setWantedProfile(final ProfileType wprofile) {
         this.wantedProfile = wprofile;
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public final Date getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * @param ts the timestamp to set
+     */
+    public final void setTimestamp(final Date ts) {
+        this.timestamp = ts;
     }
 }

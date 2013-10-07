@@ -8,6 +8,7 @@
  */
 package org.smokinmils.cashier.commands;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,8 +18,10 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.Pair;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.events.Join;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.cashier.tasks.Competition;
@@ -157,7 +160,7 @@ public class UserCommands extends Event {
     /** Message for a user's position in the competition. */
     private static final String       POSITION          = "%b%c04%sender:%c12 "
            + "%c04%who%c12 is currently in position %c04%position%c12 for the "
-           + "%c04%profile%c12 competition with %c04%coins%c12 chips bet";
+           + "%c04%profile%c12 competition with %c04%chips%c12 chips bet";
     
     /** Message when a user is not ranked for the competition. */
     private static final String       NOTRANKED         = "%b%c04%sender:%c12 "
@@ -167,8 +170,8 @@ public class UserCommands extends Event {
     /** Last 30 days message. */
     private static final String       LAST30DAYS        =
            "%b%c04(%c12Last 30 days on the %c04%profile%c12 profile%c04)%c12 "
-       + "%c04%who%c12 highest bet was %c04%hb_coins%c12 on %c04%hb_game%c12 | "
-       + "%c04%who%c12 bet total is %c04%hbt_coins%c12";
+       + "%c04%who%c12 highest bet was %c04%hb_chips%c12 on %c04%hb_game%c12 | "
+       + "%c04%who%c12 bet total is %c04%hbt_chips%c12";
     
     
     /** No data for the last 30 days message. */
@@ -180,6 +183,38 @@ public class UserCommands extends Event {
     private static final String       NOCOMPETITION     = "%b%c04%sender:%c12 "
            + "There is no competition running for the %c04%profile%c12 profile";
 
+    @Override
+    public final void join(final Join event) {
+        String nick = event.getUser().getNick();
+        if (!nick.equalsIgnoreCase(event.getBot().getNick())
+                && event.getChannel().getName().equalsIgnoreCase(Rake.getJackpotChannel())) {
+            // Existing user, announce better tier
+            double bet = 0.0;
+            try {
+                bet = DB.getInstance().getAllTimeTotal(nick);
+            } catch (SQLException e) {
+                EventLog.log(e, "CheckIdentified", "join");
+            }
+            String tier = CheckIdentified.OTHERSTR;
+        
+            if (bet >= CheckIdentified.ELITE) {
+                tier = CheckIdentified.ELITESTR;
+            } else if (bet >= CheckIdentified.PLATINUM) {
+                tier = CheckIdentified.PLATINUMSTR;
+            } else if (bet >= CheckIdentified.GOLD) {
+                tier = CheckIdentified.GOLDSTR;
+            } else if (bet >= CheckIdentified.SILVER) {
+                tier = CheckIdentified.SILVERSTR;
+            } else if (bet >= CheckIdentified.BRONZE) {
+                tier = CheckIdentified.BRONZESTR;
+            }
+            
+            String out = CheckIdentified.JOIN_MSG.replaceAll("%user", event.getUser().getNick())
+                                                 .replaceAll("%tier", tier);
+            event.getBot().addJoinMsg(new Pair(event.getChannel(), out));
+        }
+    }
+    
     /**
      * This method handles the chips commands.
      * 
@@ -606,7 +641,7 @@ public class UserCommands extends Event {
                     } else {
                         out = POSITION.replaceAll("%profile", profile.toString());
                         out = out.replaceAll("%position", Integer.toString(better.getPosition()));
-                        out = out.replaceAll("%coins", Long.toString(better.getAmount()));
+                        out = out.replaceAll("%chips", Long.toString(better.getAmount()));
                     }
     
                     out = out.replaceAll("%sender", sender);
@@ -627,9 +662,9 @@ public class UserCommands extends Event {
                                 } else {
                                     out = LAST30DAYS.replaceAll("%hb_game",
                                             highbet.getGame().toString());
-                                    out = out.replaceAll("%hb_coins",
+                                    out = out.replaceAll("%hb_chips",
                                             Long.toString(highbet.getAmount()));
-                                    out = out.replaceAll("%hbt_coins",
+                                    out = out.replaceAll("%hbt_chips",
                                             Long.toString(topbet.getAmount()));
                                     out = out.replaceAll("%who", highbet.getUser());
                                 }

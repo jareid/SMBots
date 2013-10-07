@@ -154,7 +154,7 @@
         <option type="file">messages.ini</option>
         <channel>SMGamer</channel>
     </timer>
-    <timer type="managerannounce">
+    <timer type="tradeannounce">
         <option type="file">trademsgs.ini</option>
         <channel>SMExchange</channel>
     </timer>

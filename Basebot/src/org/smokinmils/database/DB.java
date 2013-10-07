@@ -1190,12 +1190,14 @@ public final class DB {
     public BetterInfo competitionPosition(final ProfileType profile,
                                           final String user)
         throws SQLException {
-        String sql = "SELECT t.position FROM "
-                + "(SELECT c.*,(@position:=@position+1) AS position" + " FROM "
-                + CompetitionView.NAME + " c, (SELECT @position:=0) p WHERE "
+        String sql = "SELECT t.position FROM ("
+                + "SELECT c.*,(@rownum:=@rownum+1) AS position" + " FROM "
+                + CompetitionView.NAME + " c, (SELECT @rownum:=0) r WHERE "
                 + CompetitionView.COL_PROFILE + " = '" + profile.toString()
-                + "') t" + " WHERE " + CompetitionView.COL_USERNAME + " = '"
+                + "' ORDER BY " + CompetitionView.COL_TOTAL + " DESC) as t"
+                + " WHERE " + CompetitionView.COL_USERNAME + " = '"
                 + user + "'";
+        
         String csql = "SELECT " + CompetitionView.COL_TOTAL + " FROM "
                 + CompetitionView.NAME + " WHERE "
                 + CompetitionView.COL_PROFILE + " = '" + profile.toString()
@@ -2247,40 +2249,41 @@ public final class DB {
         String sql = "SELECT * FROM " + UserProfilesView.NAME + " WHERE "
                 + UserProfilesView.COL_USERNAME + " = '" + user + "'";
         
-        String joinsql = " JOIN " + ProfileTypeTable.NAME + " pt ON " + ProfileTypeTable.COL_ID 
-                                  + " = " + TransactionsSummaryTable.COL_PROFILETYPE
-                       + " JOIN " + TransactionTypesTable.NAME + " tt ON "
-                                  + TransactionTypesTable.COL_ID + " = " 
-                                  + TransactionsSummaryTable.COL_TYPEID
-                       + " JOIN " + UsersTable.NAME + " u ON " + UsersTable.COL_ID + " = " 
+        String joinsql = " JOIN " + ProfileTypeTable.NAME + " pt ON pt." + ProfileTypeTable.COL_ID 
+                                  + " = ts." + TransactionsSummaryTable.COL_PROFILETYPE
+                       + " JOIN " + UsersTable.NAME + " u ON u." + UsersTable.COL_ID + " = ts." 
                                   + TransactionsSummaryTable.COL_USERID;
+        
+        String joinsql2 = " JOIN " + TransactionTypesTable.NAME + " tt ON tt."
+                        + TransactionTypesTable.COL_ID + " = ts." 
+                        + TransactionsSummaryTable.COL_TYPEID;
         
         String whereclause = " WHERE u." + UsersTable.COL_USERNAME + " = '" + user + "'";
         
         String tzxsql = "SELECT pt." + ProfileTypeTable.COL_NAME
                            + ", tt." + TransactionTypesTable.COL_TYPE
                            + ", COUNT(*)"
-                           + ", SUM(ts. + " + TransactionsSummaryTable.COL_AMOUNT + ")"
+                           + ", SUM(ts." + TransactionsSummaryTable.COL_AMOUNT + ")"
                       + " FROM " + TransactionsSummaryTable.NAME + " ts "
-                      + joinsql + whereclause
-                      + "GROUP BY " + TransactionsSummaryTable.COL_PROFILETYPE + ","
+                      + joinsql + joinsql2 + whereclause
+                      + " GROUP BY " + TransactionsSummaryTable.COL_PROFILETYPE + ","
                                     + TransactionsSummaryTable.COL_TYPEID;
 
         String refsql = "SELECT pt." + ProfileTypeTable.COL_NAME
                             + ", COUNT(*)"
-                            + ", SUM(ts. + " + RefTransactionsSummaryTable.COL_AMOUNT + ")"
-                      + " FROM " + RefTransactionsSummaryTable.NAME + " rs "
+                            + ", SUM(ts." + RefTransactionsSummaryTable.COL_AMOUNT + ")"
+                      + " FROM " + RefTransactionsSummaryTable.NAME + " ts "
                       + joinsql + whereclause
-                      + "GROUP BY " + RefTransactionsSummaryTable.COL_PROFILETYPE;
+                      + " GROUP BY " + RefTransactionsSummaryTable.COL_PROFILETYPE;
         
         String chpsql = "SELECT pt." + ProfileTypeTable.COL_NAME
                                    + ", tt." + TransactionTypesTable.COL_TYPE
                                    + ", COUNT(*)"
-                                   + ", SUM(ts. + " + ChipsTransactionsSummaryTable.COL_AMOUNT + ")"
-                      + " FROM " + TransactionsSummaryTable.NAME + " cs "
-                      + joinsql + whereclause
-                      + "GROUP BY " + TransactionsSummaryTable.COL_PROFILETYPE + ","
-                                    + TransactionsSummaryTable.COL_TYPEID;
+                                   + ", SUM(ts." + ChipsTransactionsSummaryTable.COL_AMOUNT + ")"
+                      + " FROM " + ChipsTransactionsSummaryTable.NAME + " ts "
+                      + joinsql + joinsql2 + whereclause
+                      + " GROUP BY " + ChipsTransactionsSummaryTable.COL_PROFILETYPE + ","
+                                    + ChipsTransactionsSummaryTable.COL_TYPEID;
         
         UserStats statsobj = new UserStats();
 
@@ -2373,7 +2376,8 @@ public final class DB {
                              + getTzxTypeIDSQL(TransactionType.CANCEL)
                    + ") OR " + TransactionsSummaryTable.COL_TYPEID + " = ("
                              + getTzxTypeIDSQL(TransactionType.POKER_BUYIN)
-                   + "))";
+                   + ")) AND " + TransactionsSummaryTable.COL_PROFILETYPE + " = ("
+                               + getProfileIDSQL(ProfileType.PLAY) + ")";
 
         try {
             conn = getConnection();
@@ -2811,7 +2815,7 @@ public final class DB {
     }
     
     /**
-     * Confirms a trade and gives the coins to the user.
+     * Confirms a trade and gives the chips to the user.
      * 
      * @param exists The escrow details.
      * 
@@ -2844,7 +2848,7 @@ public final class DB {
     }
 
     /**
-     * Confirms a trade and gives the coins to the user.
+     * Confirms a trade and gives the chips to the user.
      * 
      * @param exists The escrow details.
      * 
@@ -2897,7 +2901,7 @@ public final class DB {
                                                             + TradeTable.COL_WANTEDPROF + ")"
                                     + "VALUES(" + "(" + getUserIDSQL(sender) + "),"
                                                 + "'" + amount.toString() + "',"
-                                                + "(" + getProfileIDSQL(wprofile) + "),"
+                                                + "(" + getProfileIDSQL(profile) + "),"
                                                 + "'" + wamount.toString() + "',"
                                                 + "(" + getProfileIDSQL(wprofile) + "))";
         return runGetIDQuery(sql);
@@ -2941,7 +2945,8 @@ public final class DB {
                                 rs.getDouble(TradeTable.COL_AMOUNT),
                                 ProfileType.fromString(rs.getString("outprofile")),
                                 rs.getDouble(TradeTable.COL_WANTED),
-                                ProfileType.fromString(rs.getString("inprofile")));
+                                ProfileType.fromString(rs.getString("inprofile")),
+                                rs.getTimestamp(TradeTable.COL_TIMESTAMP));
             }
         } catch (SQLException e) {
             throw new DBException(e, sql);
@@ -3063,7 +3068,8 @@ public final class DB {
                                 rs.getDouble(TradeTable.COL_AMOUNT),
                                 ProfileType.fromString(rs.getString("outprofile")),
                                 rs.getDouble(TradeTable.COL_WANTED),
-                                ProfileType.fromString(rs.getString("inprofile"))));
+                                ProfileType.fromString(rs.getString("inprofile")),
+                                rs.getTimestamp(TradeTable.COL_TIMESTAMP)));
             }
         } catch (SQLException e) {
             throw new DBException(e, sql);

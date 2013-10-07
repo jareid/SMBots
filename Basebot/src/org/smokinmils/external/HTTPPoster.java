@@ -21,10 +21,10 @@ public class HTTPPoster {
     /** JSON Mime type. */
     private static final String JSONMIME = "application/json";
     
-    /** Conversion between coins and EOC. */
+    /** Conversion between chips and EOC. */
     private static final int COIN_2_EOC = 100000;
     
-    /** Conversion between coins and 07. */
+    /** Conversion between chips and 07. */
     private static final int COIN_2_07 = 10000;
     
     /** Amount in a million. */
@@ -47,7 +47,7 @@ public class HTTPPoster {
     /**
      * Sends the amount of gold sold / bought to the stock page.
      * @param agent the agent who initiated the change
-     * @param amount the amount that has changed in coins
+     * @param amount the amount that has changed in chips
      * @param prof the profile that has been sold/bought
      * @throws IOException 
      */
