@@ -8,6 +8,7 @@ package org.smokinmils.games.timedrollcomp;
  * 
  * Copyright (C) 2013 Jamie Reid
  */
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class TimedRollComp extends Event {
     
     /** The message when someone rolls. */
     public static final String               ROLLED          = "%b%c04%who%c12 "
-                           + "has used his free roll and rolled a... %c04%roll%c12.";
+                           + "has used his %c04%type%c12 roll and rolled a... %c04%roll%c12.";
 
     /** The message when someone rolls. */
     public static final String               NEWLEADER       = "%b%c04%winner"
@@ -50,7 +51,7 @@ public class TimedRollComp extends Event {
     
     /** The message when there is one winner. */
     public static final String               SINGLEWINNER    = "%b%c04%winner"
-          + "%c01 has won this round with a roll of %c04%roll%c01 and has been "
+          + "%c01 has won this round with a %super roll of %c04%roll%c01 and has been "
           + "awarded %c04%chips %profile%c01 chips.";
     
     /** The message when there is one winner. */
@@ -84,9 +85,15 @@ public class TimedRollComp extends Event {
     
     /** List of users who have rolled. */
     private Map<String, String>            userlist;
+
+    /** List of users who have super-rolled. */
+    private List<String>                    superlist;
     
     /** The prize for each round. */
     private int                              prize;
+    
+    /** The super prize for each round. */
+    private int                              superprize;
     
     /** The profile this game awards prizes for. */
     private ProfileType                      profile;
@@ -102,6 +109,9 @@ public class TimedRollComp extends Event {
     
     /** If this game uses bans. */
     private boolean                          banEnabled;
+    
+    /** If this game uses bans. */
+    private boolean                          superEnabled;
 
     /**
      * Constructor.
@@ -110,14 +120,17 @@ public class TimedRollComp extends Event {
      * @param channel   The irc channel to run on.
      * @param prof      The profile prizes are for.
      * @param prze      The prize in chips.
+     * @param supprze   The super prize in chips.
      * @param mins      The number of mins for each round.
      * @param rnds      The number of rounds to play.
      * @param ctr       The parent object.
      * @param bans      If bans are turned on for this game.
+     * @param supers    If super rolls are enabled for this game.
      */
     public TimedRollComp(final IrcBot bot, final String channel,
-            final ProfileType prof, final int prze, final int mins,
-            final int rnds, final CreateTimedRoll ctr, final boolean bans) {
+            final ProfileType prof, final int prze, final int supprze, final int mins,
+            final int rnds, final CreateTimedRoll ctr, final boolean bans,
+            final boolean supers) {
         // check the channel is a valid IRC Channel name
         if (!channel.matches("([#&][^\\x07\\x2C\\s]{1,200})")) {
             throw new IllegalArgumentException(channel
@@ -133,14 +146,17 @@ public class TimedRollComp extends Event {
         } else {
             validChan = channel;
             prize = prze;
+            superprize = supprze;
             rolls = new TreeMap<Integer, List<String>>();
             userlist = new HashMap<String, String>();
+            superlist = new ArrayList<String>();
             irc = bot;
             profile = prof;
             rounds = rnds;
             roundsRun = 0;
             parent = ctr;
             banEnabled = bans;
+            superEnabled = supers;
 
             irc.sendIRC().joinChannel(validChan);
 
@@ -191,8 +207,7 @@ public class TimedRollComp extends Event {
         String host = event.getUser().getHostmask();
 
         synchronized (this) {
-            if (Utils.startsWith(message, CMD)
-                    && validChan.equalsIgnoreCase(chan.getName())) {
+            if (Utils.startsWith(message, CMD) && validChan.equalsIgnoreCase(chan.getName())) {
                 boolean banned = false;
                 if (banEnabled) {
                     try {
@@ -203,20 +218,36 @@ public class TimedRollComp extends Event {
                 }
                 if (!banned 
                     && (!userlist.containsKey(sender) && !userlist.containsValue(host))) {
+                    
                     int userroll = Random.nextInt(MAXROLL);
 
+                    // add to the map
+                    String type = "free";
+                    if (superEnabled) {
+                        try {
+                            boolean hassuper = false;
+                            hassuper = DB.getInstance().hasSuperRolls(sender);
+                            if (hassuper && bot.manualStatusRequest(sender)) {
+                                superlist.add(sender);
+                                type = "super";
+                                DB.getInstance().giveSuperRolls(sender, -1);
+                            }
+                        } catch (SQLException e) {
+                            EventLog.log(e, "TimedRollComp", "message");
+                        }
+                    }
+                    
                     String out = ROLLED.replaceAll("%who", sender);
                     out = out.replaceAll("%roll", Integer.toString(userroll));
+                    out = out.replaceAll("%type", type);
                     bot.sendIRCMessage(chan, out);
 
                     if (rolls.isEmpty() || rolls.lastKey() < userroll) {
                         out = NEWLEADER.replaceAll("%winner", sender);
-                        out = out.replaceAll(
-                                "%roll", Integer.toString(userroll));
+                        out = out.replaceAll("%roll", Integer.toString(userroll));
                         irc.sendIRCMessage(chan, out);
                     }
-
-                    // add to the map
+                    
                     List<String> users = rolls.get(userroll);
                     if (users == null) {
                         users = new ArrayList<String>();
@@ -246,6 +277,9 @@ public class TimedRollComp extends Event {
                 // Single winner
                 out = SINGLEWINNER;
                 winstr = winners.get(0);
+                if (superlist.contains(winners.get(0))) {
+                    win = superprize;
+                }
             } else {
                 // Split winnings
                 win = prize / winners.size();
@@ -278,10 +312,12 @@ public class TimedRollComp extends Event {
                 }
             }
         }
+        
         // Clear the rolls for the next round
         rolls.clear();
         userlist.clear();
-
+        superlist.clear();
+        
         roundsRun++;
         if (parent != null && rounds != -1 && roundsRun == rounds) {
             parent.endRollGame(validChan, irc);

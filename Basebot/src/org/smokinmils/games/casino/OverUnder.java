@@ -267,14 +267,12 @@ public class OverUnder extends Event {
 
                             out = ROLL_WIN.replaceAll("%bonus", BONUS_ROLL);
                             out = out.replaceAll("%username", username);
-                            out = out.replaceAll(
-                                    "%total", Integer.toString(total));
+                            out = out.replaceAll("%total", Integer.toString(total));
                             bot.sendIRCMessage(channel, out);
                         } else {
                             out = ROLL_LOSE.replaceAll("%bonus", BONUS_ROLL);
                             out = out.replaceAll("%username", username);
-                            out = out.replaceAll(
-                                    "%total", Integer.toString(total));
+                            out = out.replaceAll("%total", Integer.toString(total));
                             bot.sendIRCMessage(channel, out);
                         }
                     }
@@ -282,14 +280,14 @@ public class OverUnder extends Event {
 
                 // Generate "rake"
                 bet.getRake();
+                
+                Bet.awardSuperRolls(username, "", bet.getAmount(), bot, channel);
 
                 // check if jackpot won
                 if (Rake.checkJackpot(bet.getAmount())) {
                     ArrayList<String> winners = new ArrayList<String>();
                     winners.add(username);
-                    Rake.jackpotWon(
-                            bet.getProfile(), GamesType.OVER_UNDER, winners,
-                            bot, null);
+                    Rake.jackpotWon(bet.getProfile(), GamesType.OVER_UNDER, winners, bot, null);
                 }
                 break;
             }

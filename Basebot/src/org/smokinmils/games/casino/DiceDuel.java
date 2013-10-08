@@ -366,7 +366,7 @@ public class DiceDuel extends Event {
                         if (d1 > d2) { // caller wins
                             winner = caller;
                             loser = better;
-                            bet.lose(caller, cprof, win);
+                            bet.lose(caller, cprof, win, bot, channel);
                         } else { // better wins, use his profile
                             winner = better;
                             loser = caller;

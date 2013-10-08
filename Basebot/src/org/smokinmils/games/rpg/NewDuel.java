@@ -36,6 +36,7 @@ import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 //import org.smokinmils.cashier.rake.Rake; TODO Rake
@@ -91,7 +92,7 @@ public class NewDuel extends Event {
                    + "this wager type %c04" + CALL_CMD + " %who";
     
     /** Message when user hasn't got enough chips. */
-    private static final String NOchips        = "%b%c12Sorry, you do not have "
+    private static final String NOCHIPS        = "%b%c12Sorry, you do not have "
            + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
     
     /** Message for mixed profile bets. */
@@ -304,7 +305,7 @@ public class NewDuel extends Event {
                     out = out.replaceAll("%profile", theGame.getProfile().toString());
                     bot.sendIRCMessage(chan, out);
                 } else if (db.checkCredits(p2.getNick()) < theGame.getAmount()) {
-                    String out = NOchips.replaceAll("%who", p2.getNick());
+                    String out = NOCHIPS.replaceAll("%who", p2.getNick());
                     out = out.replaceAll("%chips", Utils.chipsToString(theGame.getAmount()));
                     out = out.replaceAll("%profile", theGame.getProfile().toString());
                 } else {
@@ -350,6 +351,8 @@ public class NewDuel extends Event {
                        out = out.replaceAll("%loser", theGame.getP1().getNick());
                    }
                    bot.sendIRCMessage(chan, out);
+                   Bet.awardSuperRolls(theGame.getP1().getNick(), theGame.getP2().getNick(),
+                                       theGame.getAmount(), bot, chan);
                    games.remove(theGame);
                 }   
             } catch (Exception e) {
@@ -407,7 +410,7 @@ public class NewDuel extends Event {
                                         Utils.chipsToString(nds.getAmount()));
                                 bot.sendIRCMessage(chan, out);
                             } else {
-                                String out = NOchips.replaceAll("%chips", 
+                                String out = NOCHIPS.replaceAll("%chips", 
                                                                 Utils.chipsToString(amount));
                                 out = out.replaceAll("%profile", profile.toString());
                                 bot.sendIRCMessage(chan, out);

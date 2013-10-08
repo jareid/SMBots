@@ -171,7 +171,7 @@ public class CreateTimedRoll extends Event {
                     } else {
                         try {
                             trc = new TimedRollComp(bot, channel, profile,
-                                    prize, mins, rounds, this, false);
+                                    prize, 0, mins, rounds, this, false, false);
 
                             String out = CREATED.replaceAll("%chan", channel);
                             out = out.replaceAll("%prize", Integer.toString(prize));
@@ -235,7 +235,7 @@ public class CreateTimedRoll extends Event {
                             DB.getInstance().adjustChips(senderu.getNick(), -(rounds * prize),
                                                 profile, GamesType.TIMEDROLL, TransactionType.BET);
                             trc = new TimedRollComp(bot, channel, profile,
-                                    prize, mins, rounds, this, false);
+                                    prize, 0, mins, rounds, this, false, false);
 
                             String out = CREATED.replaceAll("%chan", channel);
                             out = out.replaceAll("%prize", Integer.toString(prize));

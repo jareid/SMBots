@@ -9,6 +9,7 @@
 package org.smokinmils.cashier.commands;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -182,36 +183,44 @@ public class UserCommands extends Event {
     /** No competition running message. */
     private static final String       NOCOMPETITION     = "%b%c04%sender:%c12 "
            + "There is no competition running for the %c04%profile%c12 profile";
+    
+    /** Map holding timings for various user checks. */
+    private static Map<String, Long> timeMap = new HashMap<String, Long>();
 
     @Override
     public final void join(final Join event) {
         String nick = event.getUser().getNick();
         if (!nick.equalsIgnoreCase(event.getBot().getNick())
                 && event.getChannel().getName().equalsIgnoreCase(Rake.getJackpotChannel())) {
-            // Existing user, announce better tier
-            double bet = 0.0;
-            try {
-                bet = DB.getInstance().getAllTimeTotal(nick);
-            } catch (SQLException e) {
-                EventLog.log(e, "CheckIdentified", "join");
-            }
-            String tier = CheckIdentified.OTHERSTR;
-        
-            if (bet >= CheckIdentified.ELITE) {
-                tier = CheckIdentified.ELITESTR;
-            } else if (bet >= CheckIdentified.PLATINUM) {
-                tier = CheckIdentified.PLATINUMSTR;
-            } else if (bet >= CheckIdentified.GOLD) {
-                tier = CheckIdentified.GOLDSTR;
-            } else if (bet >= CheckIdentified.SILVER) {
-                tier = CheckIdentified.SILVERSTR;
-            } else if (bet >= CheckIdentified.BRONZE) {
-                tier = CheckIdentified.BRONZESTR;
-            }
+            Long time = timeMap.get(nick);
+            Long now = System.currentTimeMillis();
+            Long diff = now - time;
+            if (diff < Utils.MS_IN_MIN) {
+                // Existing user, announce better tier
+                double bet = 0.0;
+                try {
+                    bet = DB.getInstance().getAllTimeTotal(nick);
+                } catch (SQLException e) {
+                    EventLog.log(e, "CheckIdentified", "join");
+                }
+                String tier = CheckIdentified.OTHERSTR;
             
-            String out = CheckIdentified.JOIN_MSG.replaceAll("%user", event.getUser().getNick())
-                                                 .replaceAll("%tier", tier);
-            event.getBot().addJoinMsg(new Pair(event.getChannel(), out));
+                if (bet >= CheckIdentified.ELITE) {
+                    tier = CheckIdentified.ELITESTR;
+                } else if (bet >= CheckIdentified.PLATINUM) {
+                    tier = CheckIdentified.PLATINUMSTR;
+                } else if (bet >= CheckIdentified.GOLD) {
+                    tier = CheckIdentified.GOLDSTR;
+                } else if (bet >= CheckIdentified.SILVER) {
+                    tier = CheckIdentified.SILVERSTR;
+                } else if (bet >= CheckIdentified.BRONZE) {
+                    tier = CheckIdentified.BRONZESTR;
+                }
+                
+                String out = CheckIdentified.JOIN_MSG.replaceAll("%user", event.getUser().getNick())
+                                                     .replaceAll("%tier", tier);
+                event.getBot().addJoinMsg(new Pair(event.getChannel(), out));
+            }
         }
     }
     

@@ -48,13 +48,16 @@ public class Escrow extends Event {
     public static final String  TRADEFMT      = "%b%c12" + TRADECMD + " <user> <amount> <profile>";
     
     /** The trade command. */
-    public static final String  TRADECXLCMD       = "!tradecancel";
+    public static final String  TRADECXLCMD    = "!tradecancel";
 
     /** The trade command format. */
-    public static final String  TRADECXLFMT      = "%b%c12" + TRADECXLCMD + " <user>";
+    public static final String  TRADECXLFMT    = "%b%c12" + TRADECXLCMD + " <user>";
+    
+    /** The trade command format. */
+    public static final String  MGRTRADECXLFMT = "%b%c12" + TRADECXLCMD + " <rank> <user>";
     
     /** The trade command length. */
-    public static final int     TRADE_CMD_LEN     = 4;
+    public static final int     TRADE_CMD_LEN  = 4;
     
     /** The trade + swap command length. */
     public static final String     SWAPCMD     = "!swap";
@@ -97,7 +100,7 @@ public class Escrow extends Event {
     private static final String OPEN_SWAPS = "%b%c04[%c12OPEN SWAPS%c04]%c12 To swap ";
     
    /** The message to the channel on trade start. */
-   private static final String OPEN_SWAP = "%c04%amount %profile%c12 for %c04%wamount %wprofile%c12"
+   private static final String OPEN_SWAP = "%c04%wamount %wprofile%c12 for %c04%amount %profile%c12"
                                          + " type %c04 " + AGREECMD + " %id %c12|";
    
    /** number of swaps per line. */
@@ -157,6 +160,11 @@ public class Escrow extends Event {
     private static final String TRADENOCNF = "%b%c04[TRADE]%c12 A %c04%user%c12 is the only person"
                                            + " that can confirm this trade!";
     
+    /** The message to the channel on trade cancel failure. */
+    private static final String TRADEDENY  = "%b%c04[TRADE]%c12 %c04%user%c12: This trade is denied"
+                                           + " as the conversion rate is unreasonable! Please "
+                                           + "choose a better conversion rate!";
+    
     
     /** Message when the user doesn't have enough chips. */
     public static final String  NOCHIPSMSG    = "%b%c12Sorry, %c04%user%c12 does not have "
@@ -178,18 +186,33 @@ public class Escrow extends Event {
     /** Message when the user doesn't have enough chips. */
     public static final String  JOINMSG    = XMLLoader.getInstance().getTradeSetting("joinmsg");
     
+    /** Used to limit the maximum conversion. */
+    public static final Double  MAXCONV = Double.parseDouble(XMLLoader.getInstance()
+                                                                      .getTradeSetting("maxconv"));
+    /** Used to limit the maximum conversion default. */
+    public static final Double  MAXCONVDEFAULT = 0.3;
+    
+    /** Used to convert to percent. */
+    public static final int PERCENT = 100;
+            
     /** Minutes between announcements. */
     private final int     announceDelay;
+    
+    /** The channel used for manager cancels. */
+    private final String  managerChan;
     
     /**
      * Constructor.
      * 
      * @param bot    The irc bot.
      * @param channel The channel the game will run on
+     * @param mgrchan The channel the managers can cancel in
      * @param delay the number of minutes between announcements.
      */
-    public Escrow(final IrcBot bot, final String channel, final int delay) {
+    public Escrow(final IrcBot bot, final String channel, 
+                  final String mgrchan, final int delay) {
        announceDelay = delay;
+       managerChan = mgrchan;
        Timer announce = new Timer(true);
        announce.scheduleAtFixedRate(new Announce(bot, channel),
                                     announceDelay * Utils.MS_IN_MIN,
@@ -235,6 +258,12 @@ public class Escrow extends Event {
                 swapChips(event);
             } else if (Utils.startsWith(message, AGREECMD)) {
                 agree(event);
+            } else if (Utils.startsWith(message, SWAPCXLCMD)) {
+                cancelSwap(event);
+            }
+        } else if (chan.getName().equalsIgnoreCase(managerChan)) {
+            if (Utils.startsWith(message, TRADECXLCMD)) {
+                mgrCancelTrade(event);
             } else if (Utils.startsWith(message, SWAPCXLCMD)) {
                 cancelSwap(event);
             }
@@ -485,6 +514,64 @@ public class Escrow extends Event {
      * 
      * @param event the Message event
      */
+    public final void mgrCancelTrade(final Message event) {
+        IrcBot bot = event.getBot();
+        String message = event.getMessage();
+        User sender = event.getUser();
+        Channel chan = event.getChannel();
+
+        String[] msg = message.split(" ");
+        
+        if (msg.length == 1 + 1 + 1) {
+            String rank = msg[1];
+            String user = msg[2];
+            Trade exists = null;
+            try {
+                exists = DB.getInstance().getTrade(rank, user);
+                if (exists == null) {
+                    exists = DB.getInstance().getTrade(user, rank);
+                    if (exists != null) {
+                        // switch rank/user to correct position.
+                        exists = new Trade(exists.getUser(), exists.getRank(),
+                                           exists.getProfile(), exists.getAmount());
+                    }
+                }
+            } catch (Exception e) {
+                EventLog.log(e, "Escrow", "confirm");
+            }
+            
+            if (exists == null) {
+                String out = NO_TRADE.replaceAll("%user", user)
+                                     .replaceAll("%rank", sender.getNick());
+                bot.sendIRCMessage(chan, out);
+            } else {
+                DB db = DB.getInstance();
+                try {
+                    db.tradeCancel(exists);
+                } catch (Exception e) {
+                    EventLog.log(e, "Escrow", "cancelTrade");
+                }
+
+                double amnt = exists.getAmount();
+                ProfileType profile = exists.getProfile();
+                
+                String out = TRADE_CXL.replaceAll("%chips", Utils.chipsToString(amnt));
+                out = out.replaceAll("%user", user);
+                out = out.replaceAll("%rank", sender.getNick());
+                out = out.replaceAll("%profile", profile.toString());
+                
+                bot.sendIRCMessage(chan, out);
+            }
+        } else {
+            bot.invalidArguments(sender, MGRTRADECXLFMT);
+        }
+    }
+    
+    /**
+     * This method handles the confirm command.
+     * 
+     * @param event the Message event
+     */
     public final void agree(final Message event) {
         IrcBot bot = event.getBot();
         String message = event.getMessage();
@@ -592,8 +679,20 @@ public class Escrow extends Event {
                     EventLog.log(e, "Escrow", "swapChips");
                 }
                 
+                double percdiff = (wamount - amount) / amount;
+                double percdiff2 = (amount - wamount) / amount;
+                double maxdiff = MAXCONVDEFAULT;
+                if (MAXCONV != null) {
+                    maxdiff = MAXCONV;
+                }
+                
                 if (swapcount == 2) {
                     bot.sendIRCMessage(chan, TOOMANYSWAPS.replaceAll("%user", sender));
+                } else if (percdiff > maxdiff || percdiff2 > maxdiff) {
+                    String out = TRADEDENY.replaceAll("%user", sender);
+                    out = out.replaceAll("%percent", Utils.chipsToString(PERCENT * maxdiff));
+                    
+                    bot.sendIRCMessage(chan, out);
                 } else if (!bot.manualStatusRequest(sender)) {
                     String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", sender);
                     
@@ -692,7 +791,8 @@ public class Escrow extends Event {
             } else if (exists == null) {
                 String out = NO_SWAP.replaceAll("%id", Integer.toString(id));
                 bot.sendIRCMessage(chan, out);
-            } else if (!exists.getUser().equalsIgnoreCase(sender)) {
+            } else if (!chan.getName().equals(managerChan)
+                       && !exists.getUser().equalsIgnoreCase(sender)) {
                 String out = NO_CXL_SWAP.replaceAll("%who", exists.getUser())
                                         .replaceAll("%id", Integer.toString(exists.getId()));
                 bot.sendIRCMessage(chan, out);
@@ -765,7 +865,7 @@ public class Escrow extends Event {
                 
                 for (Swap swp: openSwaps) {
                     if (swapcount == 0) {
-                        swapstr += OPEN_SWAPS;
+                        swapstr += OPEN_SWAPS + OPEN_SWAP;
                     } else if (swapcount < SWAP_PER_LINE) {
                         swapstr += OPEN_SWAP;
                     }

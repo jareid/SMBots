@@ -31,6 +31,9 @@ public final class UsersTable {
 	/** Column for the number of wins. */
 	public static final String COL_STATS = "public_stats";
 	
+    /** Column for the number of wins. */
+    public static final String COL_SUPERROLL = "superroll";
+	
 	/** Column for the active profile. */
 	public static final String COL_ACTIVEPROFILE = "active_profile";
 }

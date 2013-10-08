@@ -3093,6 +3093,43 @@ public final class DB {
     }
     
     /**
+     * Gives a number of super rolls to a user.
+     * 
+     * @param user  The user.
+     * @param supers The number of super rolls.
+     * @throws SQLException 
+     */
+    public void giveSuperRolls(final String user,
+                               final int supers) throws SQLException {
+        String sql = "UPDATE " + UsersTable.NAME 
+                   + " SET " + UsersTable.COL_SUPERROLL
+                             + " = (" + UsersTable.COL_SUPERROLL + " + "
+                                      + Integer.toString(supers) + ")"
+                   + " WHERE " + UsersTable.COL_USERNAME + " = '" + user + "'";
+        runBasicQuery(sql);
+    }
+    
+    /**
+     * Checks if a user has a super roll.
+     * 
+     * @param user  The user.
+     * @return true if the user has atleast one 
+     * @throws SQLException 
+     */
+    public boolean hasSuperRolls(final String user) throws SQLException {
+        String sql = "SELECT " + UsersTable.COL_SUPERROLL + " FROM " + UsersTable.NAME
+                   + " WHERE " + UsersTable.COL_USERNAME + " = '" + user + "'";
+        
+        int count = runGetIntQuery(sql);
+        boolean ret = false;
+        if (count > 1) {
+            ret = true;
+        }
+        
+        return ret;
+    }
+    
+    /**
      * Adds a new transaction to the transaction table.
      * 
      * @param username The username

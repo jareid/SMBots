@@ -11,7 +11,9 @@ package org.smokinmils.games;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.pircbotx.Channel;
 import org.smokinmils.bot.IrcBot;
+import org.smokinmils.bot.Random;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -24,6 +26,10 @@ import org.smokinmils.database.types.TransactionType;
  * @author Jamie
  */
 public class Bet {
+    /** Message when someone wins some super rolls.. */
+    private static final String  SUPERROLLWIN = "%b%c04%username%c12: Congratulations you have won "
+                                              + "%c04%rolls%c12 super rolls!";
+    
     /** The user who placed this bet. */
 	private final String user;
 	
@@ -54,6 +60,15 @@ public class Bet {
      * @see GamesType
      */
     private final GamesType game;
+    
+    /** Number of super rolls that can be won per chip. */
+    private static double superRolls = 0.0;
+    
+    /** Chance of winning a super roll per chip. */
+    private static double superRollChance = 0.0;
+    
+    /** Chance of winning a super roll per chip. */
+    private static double superRollMaxChance = 0.0;
 	
 	/**
 	 * Constructor. 
@@ -82,6 +97,21 @@ public class Bet {
         DB db = DB.getInstance();
         db.adjustChips(user, -amount, profile, game, TransactionType.BET);
         db.addBet(user, "", amount, profile, game);
+	}
+	
+	/**
+	 * Initialises the super roll info.
+	 * 
+	 * @param number the number per chip.
+	 * @param chance the chance per chip.
+     * @param maxchance the maximum chance.
+	 * @return 
+	 */
+	public static void init(final double number, final double chance,
+	                        final double maxchance) {
+	    superRolls = number;
+	    superRollChance = chance;
+	    superRollMaxChance = maxchance;
 	}
 	
 	/**
@@ -193,7 +223,7 @@ public class Bet {
         DB db = DB.getInstance();
         db.adjustChips(user, win, profile, game, TransactionType.WIN);
     }
-
+    
     /** 
      * This bet was lost by the better.
      * 
@@ -204,12 +234,82 @@ public class Bet {
      * @throws SQLException When the database failed
      */
     public final void lose(final String caller,
-                     final ProfileType cprof,
-                     final double win) throws SQLException {
+                           final ProfileType cprof,
+                           final double win) throws SQLException {
+        lose(caller, cprof, win, null, null);
+    }
+    
+    /** 
+     * This bet was lost by the better.
+     * Also does super rolls, if the details are provided.
+     * 
+     * @param caller  The caller's username.
+     * @param cprof   The caller's profile.
+     * @param win     The amount won.
+     * @param bot     The bot to announce with.
+     * @param chan    The channel to announce to.
+     * 
+     * @throws SQLException When the database failed
+     */
+    public final void lose(final String caller,
+                           final ProfileType cprof,
+                           final double win,
+                           final IrcBot bot,
+                           final Channel chan) throws SQLException {
         DB db = DB.getInstance();
-        db.adjustChips(caller, win, cprof, game, TransactionType.WIN);        
+        db.adjustChips(caller, win, cprof, game, TransactionType.WIN);
+        
+        // Award super rolls.
+        if (bot != null && chan != null) {
+            awardSuperRolls(getUser(), caller, getAmount(), bot, chan);
+        }
     }
 
+    /**
+     * Awards a number of super rolls.
+     * 
+     * @param user1 The first user.
+     * @param user2 The second user.
+     * @param amnt  The bet amount.
+     * @param bot   The bot to announce with.
+     * @param chan  The channel to announce to.
+     * 
+     * @throws SQLException when db has an error
+     */
+    public static void awardSuperRolls(final String user1,
+                                       final String user2,
+                                       final double amnt,
+                                       final IrcBot bot,
+                                       final Channel chan) throws SQLException {
+        // Award super rolls.
+        int supers = (int) Math.round(superRolls * amnt);
+        if (supers == 0) {
+            supers = 1;
+        }
+        
+        double chance = superRollChance * amnt;
+        if (chance > superRollMaxChance) {
+            chance = superRollMaxChance;
+        }
+        
+        // first user.
+        if (Random.nextDouble() < chance) {
+            DB.getInstance().giveSuperRolls(user1, supers);
+            String out = SUPERROLLWIN.replaceAll("%username", user1);
+            out = out.replaceAll("%rolls", Integer.toString(supers));
+            bot.sendIRCMessage(chan, out);
+            
+        }
+        
+        // second user.
+        if (!user2.equals("") && Random.nextDouble() < chance) {
+            DB.getInstance().giveSuperRolls(user2, supers);
+            String out = SUPERROLLWIN.replaceAll("%username", user2);
+            out = out.replaceAll("%rolls", Integer.toString(supers));
+            bot.sendIRCMessage(chan, out);
+        }
+    }
+    
     /**
      * Closes the bet in the database.
      * @throws SQLException when the database failed.

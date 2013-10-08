@@ -17,6 +17,7 @@ import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.games.casino.cards.Card;
 import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
@@ -28,8 +29,7 @@ import org.smokinmils.settings.Variables;
  * @author cjc
  */
 @SuppressWarnings("deprecation")
-public class BJGame extends Event {
-    
+public class BJGame extends Event {    
     /** The stand command. */
     public static final String BJ_CMD = "!deal";
     
@@ -620,8 +620,12 @@ public class BJGame extends Event {
             win = amount * multiplier;
         }
         
-       
         Rake.getRake(winner, amount, wprof);
+        try {
+            Bet.awardSuperRolls(winner, "", usergame.getAmount(), bot, chan);
+        } catch (SQLException e) {
+            EventLog.log(e, "BJGame", "playerWin");
+        }
 
         try {
             usergame.win(win);
@@ -654,11 +658,9 @@ public class BJGame extends Event {
            
             out = WINNINGS.replaceAll("%chips", Utils.chipsToString(win));
             out = out.replaceAll("%who", winner);
-            bot.sendIRCNotice(winner, out);
-            
+            bot.sendIRCNotice(winner, out);            
         } catch (Exception e) {
-            EventLog.log(e, 
-                    "BJGame", "playerWin");
+            EventLog.log(e, "BJGame", "playerWin");
         }
 
         // jackpot stuff only one person, so no need for losers!
@@ -689,6 +691,11 @@ public class BJGame extends Event {
         ArrayList<Card> dhand = usergame.getDealerHand();
         
         Rake.getRake(sender, usergame.getAmount(), usergame.getProfile());
+        try {
+            Bet.awardSuperRolls(sender, "", usergame.getAmount(), bot, chan);
+        } catch (SQLException e) {
+            EventLog.log(e, "BJGame", "playerWin");
+        }
         
         String out = OUTCOME.replaceAll("%who", sender);
         

@@ -92,11 +92,11 @@ public class RPSGame extends Event {
                    + "this wager type %c04" + CALL_CMD + " %who";
     
     /** Message when user hasn't got enough chips. */
-    private static final String NOchips        = "%b%c12Sorry, you do not have "
+    private static final String NOCHIPS        = "%b%c12Sorry, you do not have "
            + "%c04%chips%c12 chips available for the %c04%profile%c12 profile.";
     
     /** Message for mixed profile bets. */
-    private static final String REALchipsONLY  = "%b%c04%who%c12: : you need "
+    private static final String REALCHIPSONLY  = "%b%c04%who%c12: : you need "
         + "to use %c04%profile%c12 chips to call a %c04%profile%c12 chips rps!";
     
     /** Message when someone wins. */
@@ -264,11 +264,11 @@ public class RPSGame extends Event {
                             amount = found.getAmount();
         
                             if (callerprof != betterprof) {
-                                String out = REALchipsONLY.replaceAll("%who", caller.getNick());
+                                String out = REALCHIPSONLY.replaceAll("%who", caller.getNick());
                                 out = out.replaceAll("%profile", betterprof.toString());
                                 bot.sendIRCMessage(chan, out);
                             } else if (db.checkCredits(caller.getNick()) < amount) {
-                                String out = NOchips.replaceAll("%chips",
+                                String out = NOCHIPS.replaceAll("%chips",
                                                                 Utils.chipsToString(amount));
                                 out = out.replaceAll("%profile", callerprof.toString());
                                 bot.sendIRCMessage(chan, out);
@@ -362,7 +362,7 @@ public class RPSGame extends Event {
                                 pendingBets.add(sender.getNick());
                                 // Add a lock to a temp bet list
                             } else {
-                                String out = NOchips.replaceAll("%chips", 
+                                String out = NOCHIPS.replaceAll("%chips", 
                                                                 Utils.chipsToString(amount));
                                 out = out.replaceAll("%profile", profile.toString());
                                 bot.sendIRCMessage(chan, out);
@@ -505,6 +505,8 @@ public class RPSGame extends Event {
         try {
             db.adjustChips(winner, win, wprof, GamesType.ROCKPAPERSCISSORS,
                            TransactionType.WIN);
+            
+            Bet.awardSuperRolls(winner, loser, amount, bot, chan);
 
             // Announce winner and give chips
             String out = WIN.replaceAll("%winstring", winstring);

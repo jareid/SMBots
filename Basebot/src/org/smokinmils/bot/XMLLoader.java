@@ -28,6 +28,7 @@ import org.smokinmils.cashier.tasks.Competition;
 import org.smokinmils.cashier.tasks.JackpotAnnounce;
 import org.smokinmils.cashier.tasks.ManagerAnnounce;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.games.Bet;
 import org.smokinmils.games.Invite;
 import org.smokinmils.games.casino.DiceDuel;
 import org.smokinmils.games.casino.OverUnder;
@@ -133,7 +134,7 @@ public final class XMLLoader {
 
             loadTimers(serveraddr, bot);  
             
-           
+            initSuperRoll();            
             
             initSpamEncorcer();
             
@@ -302,9 +303,10 @@ public final class XMLLoader {
                         basebot.addListener(server,
                                 ct, chanarr);
                     } else if (type.equals("trade")) {
-                        String d = options.get("delay");
-                        int delay = Integer.parseInt(d);
-                        basebot.addListener(server, new Escrow(bot, chanarr[0], delay), chanarr);
+                        int delay = Integer.parseInt(options.get("delay"));
+                        String mgrchan = "#" + options.get("managerchan");
+                        basebot.addListener(server, new Escrow(bot, chanarr[0], mgrchan, delay),
+                                            chanarr);
                     } else if (type.equals("diceduel")) {
                       basebot.addListener(server, new DiceDuel(bot, chanarr[0]), chanarr);
                     } else if (type.equals("managersystem")) {
@@ -410,9 +412,10 @@ public final class XMLLoader {
                         TimedRollComp trcevent = new TimedRollComp(bot,
                                 chanarr[0], ProfileType.EOC,
                                 Integer.parseInt(options.get("prize")), 
+                                Integer.parseInt(options.get("superprize")), 
                                 Integer.parseInt(options.get("mins")), 
                                 Integer.parseInt(options.get("rounds")), 
-                                null, true);
+                                null, true, true);
                     } else if (type.equals("managerannounce")) {
                         String file = options.get("file");
                         ManagerAnnounce mgrano = new ManagerAnnounce(
@@ -542,6 +545,49 @@ public final class XMLLoader {
                     }
                 }
             }
+        } catch (Exception e) {
+            EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Initialises The spam enforcer.
+     */
+    private void initSuperRoll() {
+        try {
+            XPath xPath =  XPathFactory.newInstance().newXPath();
+            
+            String expression = "/bot/superroll/*";
+            //read a nodelist using xpath
+            NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                        XPathConstants.NODESET);
+            
+            Double number = 0.0;
+            Double chance = 0.0;
+            Double maxchance = 0.0;
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element el = (Element) nodeList.item(i);
+                String n = el.getNodeName();
+                String content = el.getTextContent();
+                if (n.equals("number")) {
+                    number = Utils.tryParseDbl(content);
+                    if (number == null) {
+                        number = 0.0;
+                    }
+                } else if (n.equals("chance")) {
+                    chance = Utils.tryParseDbl(content);
+                    if (chance == null) {
+                        chance = 0.0;
+                    }
+                } else if (n.equals("maxchance")) {
+                    maxchance = Utils.tryParseDbl(content);
+                    if (maxchance == null) {
+                        maxchance = 0.0;
+                    }
+                }
+            }
+            Bet.init(number.doubleValue(), chance.doubleValue(), maxchance.doubleValue());
         } catch (Exception e) {
             EventLog.fatal(e, "XMLLoader", "initSpamEnforcer");
             e.printStackTrace();

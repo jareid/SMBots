@@ -268,8 +268,7 @@ public class Roulette extends Event {
                     bot.sendIRCNotice(user, NO_CHIPS);
                 } else {
                     // user has enough chips, and all choices in the CSV are valid
-                    for (String value : splitChoice) {
-                        
+                    for (String value : splitChoice) {                        
                             Bet bet = new Bet(user.getNick(), profile, GamesType.ROULETTE, betsize, 
                                     value);
                         allBets.add(bet);
@@ -489,6 +488,7 @@ public class Roulette extends Event {
             }
             bet.getRake();
             bet.checkJackpot(ib);
+            Bet.awardSuperRolls(username, "", bet.getAmount(), ib, chan);
             bet.close();
         }
 
