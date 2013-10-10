@@ -225,6 +225,44 @@ public class Bet {
     }
     
     /** 
+     * This bet was drew.
+     * 
+     * @param caller  The caller's username.
+     * @param cprof   The caller's profile.
+     * 
+     * @throws SQLException When the database failed
+     */
+    public final void draw(final String caller,
+                           final ProfileType cprof) throws SQLException {
+        draw(caller, cprof, null, null);
+    }
+    
+    /** 
+     * This bet was drew.
+     * Also does super rolls, if the details are provided.
+     * 
+     * @param caller  The caller's username.
+     * @param cprof   The caller's profile.
+     * @param bot     The bot to announce with.
+     * @param chan    The channel to announce to.
+     * 
+     * @throws SQLException When the database failed
+     */
+    public final void draw(final String caller,
+                           final ProfileType cprof,
+                           final IrcBot bot,
+                           final Channel chan) throws SQLException {
+        DB db = DB.getInstance();
+        db.adjustChips(caller, getAmount(), cprof, game, TransactionType.WIN);
+        db.adjustChips(getUser(), getAmount(), getProfile(), game, TransactionType.WIN);
+        
+        // Award super rolls.
+        if (bot != null && chan != null) {
+            awardSuperRolls(getUser(), caller, getProfile(), cprof, getAmount(), bot, chan);
+        }
+    }
+
+    /** 
      * This bet was lost by the better.
      * 
      * @param caller  The caller's username.

@@ -24,7 +24,7 @@ public class NewDuelState {
     private static final int OVER_9000 = 9001;
     
     /** Player one. */
-    private User p1;
+    private final User p1;
     /** Player two. */
     private User p2;
     
@@ -40,10 +40,10 @@ public class NewDuelState {
     private Bet bet;
     
     /** The amount wagered. */
-    private double amount;
+    private final double amount;
     
     /** The profile this duel is for. */
-    private ProfileType prof;
+    private final ProfileType prof;
     
     /** The round number. */
     private int round = 1;
@@ -107,7 +107,7 @@ public class NewDuelState {
             Double win = amount; // eh?
             if (p1hp <= 0 && p2hp <= 0) {
                 retVal = 0; // draw
-                // when drawing!?
+                bet.draw(p2.getNick(), prof);
             } else if (p1hp <= 0 && p2hp > 0) {
                 retVal = 2; // p2win
                 bet.lose(p2.getNick(), prof, win);

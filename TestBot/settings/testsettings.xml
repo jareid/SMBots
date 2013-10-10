@@ -41,13 +41,6 @@
 	<listener type="invite">
 		<channel>testeroo3</channel>
 	</listener>
-	<listener type="trade">
-        <option type="delay">3</option>        
-        <option type="managerchan">testeroo3</option>
-        <option type="announcechan">testeroo3</option>
-        <option type="announcedelay">10</option>
-        <channel>testeroo2</channel>
-    </listener>
 	<listener type="referrals">
 		<channel>testeroo3</channel>
         <option type="managementchan">testeroo3</option>

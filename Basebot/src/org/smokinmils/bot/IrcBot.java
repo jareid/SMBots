@@ -305,7 +305,7 @@ public class IrcBot extends PircBotX {
 	 * @return	true if the user is identified, false otherwise.
 	 */
 	public final boolean userIsIdentified(final User user) {
-		return identifiedUsers.contains(user.getNick().toLowerCase());
+		return userIsIdentified(user.getNick());
 	}
 	
 	/**
@@ -315,7 +315,11 @@ public class IrcBot extends PircBotX {
      * @return  true if the user is identified, false otherwise.
      */
     public final boolean userIsIdentified(final String nick) {
-        return identifiedUsers.contains(nick.toLowerCase());
+        boolean ret = identifiedUsers.contains(nick.toLowerCase());
+        if (!ret) {
+            manualStatusRequest(nick.toLowerCase());
+        }
+        return ret;
     }
 	
 	/**
