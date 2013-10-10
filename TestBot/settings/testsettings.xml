@@ -7,6 +7,7 @@
 	<ip>127.0.0.1</ip>
 	<rake>testeroo3</rake>
     <mainchan>testeroo3</mainchan>
+    <refund>false</refund>
 	
 	<db type="server">66.147.239.95</db>
 	<db type="port">3306</db>
@@ -43,6 +44,8 @@
 	<listener type="trade">
         <option type="delay">3</option>        
         <option type="managerchan">testeroo3</option>
+        <option type="announcechan">testeroo3</option>
+        <option type="announcedelay">10</option>
         <channel>testeroo2</channel>
     </listener>
 	<listener type="referrals">

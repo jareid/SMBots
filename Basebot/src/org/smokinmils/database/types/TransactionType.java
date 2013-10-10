@@ -31,6 +31,9 @@ public enum TransactionType {
 
     /** escrow transaction.*/
     ESCROW("escrow"),
+
+    /** escrow transaction.*/
+    ESCROWCXL("escrowcxl"),
 	
     /** cancel transactions. */
 	CANCEL("cancel"),
@@ -70,6 +73,9 @@ public enum TransactionType {
 	
     /** swap transactions. */
     SWAP("swap"),
+    
+    /** swap cancel transactions. */
+    SWAPCXL("swapcancel"),
 	
     /** transfer transactions. */
 	TRANSFER("transfer"),

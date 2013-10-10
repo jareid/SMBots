@@ -506,7 +506,7 @@ public class RPSGame extends Event {
             db.adjustChips(winner, win, wprof, GamesType.ROCKPAPERSCISSORS,
                            TransactionType.WIN);
             
-            Bet.awardSuperRolls(winner, loser, amount, bot, chan);
+            Bet.awardSuperRolls(winner, loser, wprof, lprof, amount, bot, chan);
 
             // Announce winner and give chips
             String out = WIN.replaceAll("%winstring", winstring);

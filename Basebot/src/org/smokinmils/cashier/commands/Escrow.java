@@ -101,7 +101,7 @@ public class Escrow extends Event {
     
    /** The message to the channel on trade start. */
    private static final String OPEN_SWAP = "%c04%wamount %wprofile%c12 for %c04%amount %profile%c12"
-                                         + " type %c04 " + AGREECMD + " %id %c12|";
+                                         + " type %c04" + AGREECMD + " %id %c12| ";
    
    /** number of swaps per line. */
    private static final int SWAP_PER_LINE = 5;
@@ -175,6 +175,10 @@ public class Escrow extends Event {
     public static final String  NOPLAYMSG    = "%b%c04%user%c12: Sorry, %c04play%c12 chips are not"
                                               + " valid in a swap or trade.";
     
+    /** Message when the user doesn't have enough chips. */
+    public static final String  NOSAMEPROF   = "%b%c04%user%c12: Sorry, you can only trade between"
+                                             + "different profiles!";
+    
     /** Message when the user trys to open too many swaps. */
     public static final String  TOOMANYSWAPS    = "%b%c04%user%c12: Sorry, You can only have"
                                               + " %c04two%c12 open swaps at a time.";
@@ -206,17 +210,26 @@ public class Escrow extends Event {
      * 
      * @param bot    The irc bot.
      * @param channel The channel the game will run on
+     * @param anochan The channel the announce will run on
+     * @param anodelay the number of minutes between announcements.
      * @param mgrchan The channel the managers can cancel in
      * @param delay the number of minutes between announcements.
      */
-    public Escrow(final IrcBot bot, final String channel, 
+    public Escrow(final IrcBot bot, final String channel,
+                  final String anochan, final int anodelay,
                   final String mgrchan, final int delay) {
        announceDelay = delay;
        managerChan = mgrchan;
        Timer announce = new Timer(true);
-       announce.scheduleAtFixedRate(new Announce(bot, channel),
-                                    announceDelay * Utils.MS_IN_MIN,
+       announce.scheduleAtFixedRate(new Announce(bot, channel, "", ""),
+                                    Utils.MS_IN_MIN,
                                     announceDelay * Utils.MS_IN_MIN);
+       Timer announce2 = new Timer(true);
+       announce2.scheduleAtFixedRate(new Announce(bot, anochan,
+                                           "To make any of these swaps please join %c04" + channel,
+                                           "type %c04 " + AGREECMD + " %id %c12|"),
+                                     Utils.MS_IN_MIN,
+                                     anodelay * Utils.MS_IN_MIN);
     }
     
     /**
@@ -711,6 +724,9 @@ public class Escrow extends Event {
                 } else if (wprofile == ProfileType.PLAY) {
                     String out = NOPLAYMSG.replaceAll("%user", sender);
                     bot.sendIRCMessage(chan, out);
+                } else if (profile == wprofile) {
+                    String out = NOSAMEPROF.replaceAll("%user", sender);
+                    bot.sendIRCMessage(chan, out);
                 } else if (amount < 0) {
                     String out = NONEGATIVES.replaceAll("%user", sender);
                     bot.sendIRCMessage(chan, out);
@@ -823,15 +839,25 @@ public class Escrow extends Event {
         
         /** The IRC channel. */
         private final String channel;
+        
+        /** Extra message. */
+        private final String extra;
+        
+        /** Remove message. */
+        private final String remove;
 
         /**
          * Constructor.
          * @param ib   The irc bot/server.
          * @param chan The channel.
+         * @param ext  Extra text to add.
+         * @param rem Text to remove.
          */
-        public Announce(final IrcBot ib, final String chan) {
+        public Announce(final IrcBot ib, final String chan, final String ext, final String rem) {
             irc = ib;
             channel = chan;
+            extra = ext;
+            remove = rem;
         }
 
         @Override
@@ -869,7 +895,7 @@ public class Escrow extends Event {
                     } else if (swapcount < SWAP_PER_LINE) {
                         swapstr += OPEN_SWAP;
                     }
-                    
+                                        
                     swapstr = swapstr.replaceAll("%id", Integer.toString(swp.getId()));
                     swapstr = swapstr.replaceAll("%user", swp.getUser());
                     swapstr = swapstr.replaceAll("%amount", Utils.chipsToString(swp.getAmount()));
@@ -880,7 +906,10 @@ public class Escrow extends Event {
 
                     swapcount++;
                     if (swapcount == SWAP_PER_LINE) {
-                        swapstr += "\n";
+                        swapstr = swapstr + extra + "\n";
+                        if (!remove.equals("")) {
+                            swapstr = swapstr.replaceAll(remove, "");
+                        }
                         swapcount = 0;
                     }
                 }

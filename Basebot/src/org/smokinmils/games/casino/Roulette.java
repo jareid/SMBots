@@ -488,7 +488,7 @@ public class Roulette extends Event {
             }
             bet.getRake();
             bet.checkJackpot(ib);
-            Bet.awardSuperRolls(username, "", bet.getAmount(), ib, chan);
+            Bet.awardSuperRolls(username, "", bet.getProfile(), null, bet.getAmount(), ib, chan);
             bet.close();
         }
 

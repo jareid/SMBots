@@ -8,11 +8,14 @@
  */ 
 package org.smokinmils.bot;
 
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
@@ -21,7 +24,11 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.smokinmils.BaseBot;
+import org.smokinmils.bot.events.Join;
+import org.smokinmils.cashier.rake.Rake;
+import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
+import org.smokinmils.logging.EventLog;
 import org.smokinmils.settings.Variables;
 
 /**
@@ -66,6 +73,9 @@ public class IrcBot extends PircBotX {
 
     /** A queue of events this room needs to process. */
     private static Deque<Pair>  msgQueue;
+    
+    /** Map holding timings for various user checks. */
+    private final Map<String, Long> timeMap;
 	
 	/**
 	 * Constructor.
@@ -83,6 +93,8 @@ public class IrcBot extends PircBotX {
         msgQueue = new ArrayDeque<Pair>();
     	JoinMsgQueue refq = new JoinMsgQueue();
         refq.start();
+        
+        timeMap = new HashMap<String, Long>();
 	}
 	
 	/**
@@ -462,6 +474,52 @@ public class IrcBot extends PircBotX {
      */
     public final void setListenerManager(final ListenerManager<IrcBot> listman) {
         listenerManager = listman;
+    }
+    
+
+    /**
+     * Sends a welcome message.
+     * 
+     * @param event the join event details.
+     */
+    public final synchronized void sendWelcomeMessage(final Join event) {
+        String nick = event.getUser().getNick();
+        if (!nick.equalsIgnoreCase(getNick())
+                && event.getChannel().getName().equalsIgnoreCase(Rake.getJackpotChannel())) {
+            Long time = timeMap.get(nick);
+            Long now = System.currentTimeMillis();
+            if (time == null) {
+                time = now - Utils.MS_IN_MIN;
+            }
+            Long diff = now - time;
+            if (diff >= Utils.MS_IN_MIN) {
+                // Existing user, announce better tier
+                double bet = 0.0;
+                try {
+                    bet = DB.getInstance().getAllTimeTotal(nick);
+                } catch (SQLException e) {
+                    EventLog.log(e, "CheckIdentified", "join");
+                }
+                String tier = CheckIdentified.OTHERSTR;
+            
+                if (bet >= CheckIdentified.ELITE) {
+                    tier = CheckIdentified.ELITESTR;
+                } else if (bet >= CheckIdentified.PLATINUM) {
+                    tier = CheckIdentified.PLATINUMSTR;
+                } else if (bet >= CheckIdentified.GOLD) {
+                    tier = CheckIdentified.GOLDSTR;
+                } else if (bet >= CheckIdentified.SILVER) {
+                    tier = CheckIdentified.SILVERSTR;
+                } else if (bet >= CheckIdentified.BRONZE) {
+                    tier = CheckIdentified.BRONZESTR;
+                }
+                
+                String out = CheckIdentified.JOIN_MSG.replaceAll("%user", event.getUser().getNick())
+                                                     .replaceAll("%tier", tier);
+                event.getBot().addJoinMsg(new Pair(event.getChannel(), out));
+                timeMap.put(nick, now);
+            }
+        }
     }
     
     /**

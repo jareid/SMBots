@@ -22,7 +22,7 @@
     %b%c041)%c01 Chips can only be bought and sold with ranks in this channel\n
     %b%c042)%c01 Before you ever trade in-game a trade will be set up here and the chips will be locked until confirmation is received\n
     %b%c043)%c01 BEWARE OF IMPOSTERS - ranks will NEVER contact you first; you must always contact them first\n
-    %b%c01To swap one type of chips for another type %c04%swpformat%c01 (for example !swap 100 eoc 100 07). Someone else can then accept your offer and the trade will be complete.</trade>
+    %b%c01To swap one type of chips for another type %c04%swpformat%c01 (for example !swap 100 eoc 100 07 to swap 100 eoc for 100 07). Someone else can then accept your offer and the trade will be complete.</trade>
     <trade type="maxconv">0.3</trade>
     
     <tier type="bronze">500</tier>
@@ -36,8 +36,8 @@
     </spam>
     
     <superroll>
-        <chance>0.1</chance>
-        <maxchance>0.6</maxchance>
+        <chance>0.01</chance>
+        <maxchance>0.1</maxchance>
         <number>0.1</number>
     </superroll>
     
@@ -47,14 +47,15 @@
     <listener type="trade">
         <option type="delay">3</option>
         <option type="managerchan">managers</option>
+        <option type="announcechan">SMGamer</option>
+        <option type="announcedelay">10</option>
         <channel>SMExchange</channel>
     </listener>
     <listener type="referrals">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
-        <channel>sm_overunder</channel>
-        <channel>sm_roulette</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <channel>managers</channel>
         <channel>SM_Ranks</channel>
             <option type="managementchan">managers</option>
@@ -65,11 +66,11 @@
         <option type="time">10</option>
     </listener>
     <listener type="roulette" id="2">
-        <channel>sm_roulette</channel>
-        <option type="time">1</option>
+        <channel>smgamer2</channel>
+        <option type="time">5</option>
     </listener>
     <listener type="roulette" id="3">
-        <channel>sm_express</channel>
+        <channel>smgamer3</channel>
         <option type="time">1</option>
     </listener>
     <listener type="roulette" id="5">
@@ -77,19 +78,21 @@
         <option type="time">3</option>
     </listener>
     <listener type="overunder">
-        <channel>sm_overunder</channel>
+        <channel>smgamer</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
     </listener>
     <listener type="diceduel">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
     </listener>
     <listener type="createtournament">
-		<channel>managers</channel>
-		<channel>SM_ranks</channel>
-	</listener>
+        <channel>managers</channel>
+        <channel>SM_ranks</channel>
+    </listener>
     <listener type="dm">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
@@ -97,27 +100,25 @@
     <listener type="usercommands">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
-        <channel>sm_overunder</channel>
-        <channel>sm_roulette</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <channel>managers</channel>
         <channel>SM_Ranks</channel>
+        <channel>SMExchange</channel>
     </listener>
     <listener type="help">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
-        <channel>sm_overunder</channel>
-        <channel>sm_roulette</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <channel>managers</channel>
         <channel>SM_Ranks</channel>
     </listener>
     <listener type="managersystem">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
-        <channel>sm_overunder</channel>
-        <channel>sm_roulette</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <channel>managers</channel>
         <channel>SM_Ranks</channel>
         <option type="managementchan">managers</option>
@@ -127,9 +128,8 @@
     <listener type="coins">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
-        <channel>sm_overunder</channel>
-        <channel>sm_roulette</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <channel>managers</channel>
         <channel>SM_Ranks</channel>
     </listener>
@@ -137,14 +137,14 @@
     <listener type="blackjack">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
     </listener>
     <listener type="rps">
         <channel>SMGamer</channel>
         <channel>sm_vip</channel>
-        <channel>sm_express</channel>
-        <channel>sm_overunder</channel>
-        <channel>sm_roulette</channel>
+        <channel>smgamer2</channel>
+        <channel>smgamer3</channel>
         <option type="announce">SMGamer</option>
     </listener>
     <listener type="poker">

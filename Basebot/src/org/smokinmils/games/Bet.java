@@ -131,10 +131,10 @@ public class Bet {
      * 
      * @deprecated
      */
-	@Deprecated
+    @Deprecated
     public final void reset() {
-		this.valid = true;
-	}
+    	this.valid = true;
+    }
 	
 	/**
 	 * Returns this bet's user.
@@ -261,7 +261,7 @@ public class Bet {
         
         // Award super rolls.
         if (bot != null && chan != null) {
-            awardSuperRolls(getUser(), caller, getAmount(), bot, chan);
+            awardSuperRolls(getUser(), caller, getProfile(), cprof, getAmount(), bot, chan);
         }
     }
 
@@ -270,6 +270,8 @@ public class Bet {
      * 
      * @param user1 The first user.
      * @param user2 The second user.
+     * @param u1prof The first user's profile.
+     * @param u2prof The second user's profile.
      * @param amnt  The bet amount.
      * @param bot   The bot to announce with.
      * @param chan  The channel to announce to.
@@ -278,6 +280,8 @@ public class Bet {
      */
     public static void awardSuperRolls(final String user1,
                                        final String user2,
+                                       final ProfileType u1prof,
+                                       final ProfileType u2prof,
                                        final double amnt,
                                        final IrcBot bot,
                                        final Channel chan) throws SQLException {
@@ -287,13 +291,14 @@ public class Bet {
             supers = 1;
         }
         
-        double chance = superRollChance * amnt;
+        double chance = (superRollChance * amnt);
         if (chance > superRollMaxChance) {
             chance = superRollMaxChance;
         }
         
         // first user.
-        if (Random.nextDouble() < chance) {
+        double random = Random.nextDouble();
+        if (u1prof != ProfileType.PLAY &&  random < chance) {
             DB.getInstance().giveSuperRolls(user1, supers);
             String out = SUPERROLLWIN.replaceAll("%username", user1);
             out = out.replaceAll("%rolls", Integer.toString(supers));
@@ -302,7 +307,8 @@ public class Bet {
         }
         
         // second user.
-        if (!user2.equals("") && Random.nextDouble() < chance) {
+        random = Random.nextDouble();
+        if (!user2.equals("") && u2prof != ProfileType.PLAY && random < chance) {
             DB.getInstance().giveSuperRolls(user2, supers);
             String out = SUPERROLLWIN.replaceAll("%username", user2);
             out = out.replaceAll("%rolls", Integer.toString(supers));

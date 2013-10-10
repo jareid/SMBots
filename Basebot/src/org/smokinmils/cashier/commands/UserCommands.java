@@ -8,8 +8,6 @@
  */
 package org.smokinmils.cashier.commands;
 
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -19,7 +17,6 @@ import org.smokinmils.BaseBot;
 import org.smokinmils.bot.CheckIdentified;
 import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
-import org.smokinmils.bot.Pair;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
 import org.smokinmils.bot.events.Join;
@@ -184,44 +181,9 @@ public class UserCommands extends Event {
     private static final String       NOCOMPETITION     = "%b%c04%sender:%c12 "
            + "There is no competition running for the %c04%profile%c12 profile";
     
-    /** Map holding timings for various user checks. */
-    private static Map<String, Long> timeMap = new HashMap<String, Long>();
-
     @Override
     public final void join(final Join event) {
-        String nick = event.getUser().getNick();
-        if (!nick.equalsIgnoreCase(event.getBot().getNick())
-                && event.getChannel().getName().equalsIgnoreCase(Rake.getJackpotChannel())) {
-            Long time = timeMap.get(nick);
-            Long now = System.currentTimeMillis();
-            Long diff = now - time;
-            if (diff < Utils.MS_IN_MIN) {
-                // Existing user, announce better tier
-                double bet = 0.0;
-                try {
-                    bet = DB.getInstance().getAllTimeTotal(nick);
-                } catch (SQLException e) {
-                    EventLog.log(e, "CheckIdentified", "join");
-                }
-                String tier = CheckIdentified.OTHERSTR;
-            
-                if (bet >= CheckIdentified.ELITE) {
-                    tier = CheckIdentified.ELITESTR;
-                } else if (bet >= CheckIdentified.PLATINUM) {
-                    tier = CheckIdentified.PLATINUMSTR;
-                } else if (bet >= CheckIdentified.GOLD) {
-                    tier = CheckIdentified.GOLDSTR;
-                } else if (bet >= CheckIdentified.SILVER) {
-                    tier = CheckIdentified.SILVERSTR;
-                } else if (bet >= CheckIdentified.BRONZE) {
-                    tier = CheckIdentified.BRONZESTR;
-                }
-                
-                String out = CheckIdentified.JOIN_MSG.replaceAll("%user", event.getUser().getNick())
-                                                     .replaceAll("%tier", tier);
-                event.getBot().addJoinMsg(new Pair(event.getChannel(), out));
-            }
-        }
+        event.getBot().sendWelcomeMessage(event);
     }
     
     /**
@@ -300,7 +262,7 @@ public class UserCommands extends Event {
                     try {
                         active = DB.getInstance().getActiveProfile(user);
                     } catch (Exception e) {
-                        EventLog.log(e, "CheckChips", "message");
+                        EventLog.log(e, "CheckChips", "checkChips");
                     }
 
                     credstr = CHECKCREDITSMSG;
@@ -323,6 +285,15 @@ public class UserCommands extends Event {
                                         Utils.chipsToString(cred.getValue()));
                                 credstr += othercred + " ";
                             }
+                        }
+                        try {
+                            int count = DB.getInstance().getSuperRolls(user);
+
+                            String othercred = OTHERPROFILES.replaceAll("%name", "super roll");
+                            othercred = othercred.replaceAll("%amount", Integer.toString(count));
+                            credstr += othercred + " ";
+                        } catch (Exception e) {
+                            EventLog.log(e, "CheckChips", "checkChips");
                         }
                     }
                 } else {
@@ -659,36 +630,34 @@ public class UserCommands extends Event {
                     bot.sendIRCMessage(chan, out);
     
                     DB db = DB.getInstance();
-                    for (ProfileType prof : ProfileType.values()) {
-                        if (profile.hasComps()) {
-                            try {
-                                BetterInfo highbet = db.getHighestBet(prof, who);
-                                BetterInfo topbet = db.getTopBetter(prof, who);
-    
-                                if (highbet.getUser() == null || topbet.getUser() == null) {
-                                    out = LAST30DAYS_NODATA;
-                                    out = out.replaceAll("%who", who);
-                                } else {
-                                    out = LAST30DAYS.replaceAll("%hb_game",
-                                            highbet.getGame().toString());
-                                    out = out.replaceAll("%hb_chips",
-                                            Long.toString(highbet.getAmount()));
-                                    out = out.replaceAll("%hbt_chips",
-                                            Long.toString(topbet.getAmount()));
-                                    out = out.replaceAll("%who", highbet.getUser());
-                                }
-                                out = out.replaceAll("%profile",  prof.toString());
-    
-                                bot.sendIRCNotice(senderu, out);
-                            } catch (Exception e) {
-                                EventLog.log(e, "BetDetails", "run");
+                    if (profile.hasComps()) {
+                        try {
+                            BetterInfo highbet = db.getHighestBet(profile, who);
+                            BetterInfo topbet = db.getTopBetter(profile, who);
+
+                            if (highbet.getUser() == null || topbet.getUser() == null) {
+                                out = LAST30DAYS_NODATA;
+                                out = out.replaceAll("%who", who);
+                            } else {
+                                out = LAST30DAYS.replaceAll("%hb_game", 
+                                                            highbet.getGame().toString());
+                                out = out.replaceAll("%hb_chips",
+                                                     Long.toString(highbet.getAmount()));
+                                out = out.replaceAll("%hbt_chips",
+                                                     Long.toString(topbet.getAmount()));
+                                out = out.replaceAll("%who", highbet.getUser());
                             }
+                            out = out.replaceAll("%profile",  profile.toString());
+
+                            bot.sendIRCNotice(senderu, out);
+                        } catch (Exception e) {
+                            EventLog.log(e, "BetDetails", "run");
                         }
-                        
-                    }  
+                    }
                 }
             }
         } else {
+            
             bot.invalidArguments(senderu, POSFMT);
         }
     }

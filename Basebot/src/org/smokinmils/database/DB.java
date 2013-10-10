@@ -2869,7 +2869,8 @@ public final class DB {
             amount = -amount;
         }
         
-        adjustChips(fromuser, amount, exists.getProfile(), GamesType.ADMIN, TransactionType.CANCEL);
+        adjustChips(fromuser, amount, exists.getProfile(),
+                    GamesType.ADMIN, TransactionType.ESCROWCXL);
         addChipTransaction(fromuser, DB.HOUSE_USER, amount,
                            TransactionType.CANCEL, exists.getProfile());
         runBasicQuery(del + cond1);
@@ -3027,7 +3028,7 @@ public final class DB {
         adjustChips(trade.getUser(), trade.getAmount(), trade.getProfile(),
                     GamesType.ADMIN, TransactionType.CANCEL);    
         
-        addChipTransaction(user, trade.getUser(), trade.getAmount(), TransactionType.CANCEL,
+        addChipTransaction(user, trade.getUser(), trade.getAmount(), TransactionType.SWAPCXL,
                             trade.getProfile());
         
         runBasicQuery(sql);
@@ -3127,6 +3128,22 @@ public final class DB {
         }
         
         return ret;
+    }
+    
+    /**
+     * Checks if a user has a super roll.
+     * 
+     * @param user  The user.
+     * @return true if the user has atleast one 
+     * @throws SQLException 
+     */
+    public int getSuperRolls(final String user) throws SQLException {
+        String sql = "SELECT " + UsersTable.COL_SUPERROLL + " FROM " + UsersTable.NAME
+                   + " WHERE " + UsersTable.COL_USERNAME + " = '" + user + "'";
+        
+        int count = runGetIntQuery(sql);
+        
+        return count;
     }
     
     /**

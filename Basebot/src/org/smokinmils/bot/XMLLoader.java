@@ -305,7 +305,11 @@ public final class XMLLoader {
                     } else if (type.equals("trade")) {
                         int delay = Integer.parseInt(options.get("delay"));
                         String mgrchan = "#" + options.get("managerchan");
-                        basebot.addListener(server, new Escrow(bot, chanarr[0], mgrchan, delay),
+                        String anochan = "#" + options.get("announcechan");
+                        int anodelay = Integer.parseInt(options.get("announcedelay"));
+                        basebot.addListener(server, new Escrow(bot, chanarr[0], 
+                                                               anochan, anodelay,
+                                                               mgrchan, delay),
                                             chanarr);
                     } else if (type.equals("diceduel")) {
                       basebot.addListener(server, new DiceDuel(bot, chanarr[0]), chanarr);
@@ -465,6 +469,7 @@ public final class XMLLoader {
         InetAddress ip = null;
         boolean autoident = true;
         String mainchan = null;
+        boolean refund = true;
         
         int port = 0;        
        
@@ -495,6 +500,8 @@ public final class XMLLoader {
                     ip = InetAddress.getByName(content);
                 } else if (n.equals("identon")) {
                     autoident = Boolean.parseBoolean(content);
+                } else if (n.equals("refund")) {
+                    refund = Boolean.parseBoolean(content);
                 } else if (n.equals("mainchan")) {
                     mainchan = content;
                 } else if (n.equals("rake")) {
@@ -504,7 +511,7 @@ public final class XMLLoader {
             }
             if (nick != null && botname != null && pass != null 
                     && server != null && port != 0) {
-                basebot.initialise(nick, pass, botname, true, true,  false);
+                basebot.initialise(nick, pass, botname, true, refund,  false);
                 basebot.addServer(server, server, port, ip, autoident, mainchan);
             } else {
                 EventLog.fatal(null, "XMLLoader", "initBaseBot");

@@ -352,6 +352,7 @@ public class NewDuel extends Event {
                    }
                    bot.sendIRCMessage(chan, out);
                    Bet.awardSuperRolls(theGame.getP1().getNick(), theGame.getP2().getNick(),
+                                       theGame.getProfile(), theGame.getProfile(),
                                        theGame.getAmount(), bot, chan);
                    games.remove(theGame);
                 }   

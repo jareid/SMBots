@@ -49,7 +49,7 @@ public class Admin extends Event {
     public static final String  GIVECMD     = "!chips";
     
     /** The give command. */
-    public static final String  GIVECMD2     = "!chips";
+    public static final String  GIVECMD2     = "!coins";
 
     /** The give command format. */
     public static final String  GIVEFMT      = "%b%c12" + GIVECMD + " <user> <amount> <profile>";

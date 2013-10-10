@@ -51,7 +51,7 @@ public class TimedRollComp extends Event {
     
     /** The message when there is one winner. */
     public static final String               SINGLEWINNER    = "%b%c04%winner"
-          + "%c01 has won this round with a %super roll of %c04%roll%c01 and has been "
+          + "%c01 has won this round with a roll of %c04%roll%c01 and has been "
           + "awarded %c04%chips %profile%c01 chips.";
     
     /** The message when there is one winner. */

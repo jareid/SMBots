@@ -622,7 +622,8 @@ public class BJGame extends Event {
         
         Rake.getRake(winner, amount, wprof);
         try {
-            Bet.awardSuperRolls(winner, "", usergame.getAmount(), bot, chan);
+            Bet.awardSuperRolls(winner, "", usergame.getProfile(), null,
+                                usergame.getAmount(), bot, chan);
         } catch (SQLException e) {
             EventLog.log(e, "BJGame", "playerWin");
         }
@@ -692,7 +693,8 @@ public class BJGame extends Event {
         
         Rake.getRake(sender, usergame.getAmount(), usergame.getProfile());
         try {
-            Bet.awardSuperRolls(sender, "", usergame.getAmount(), bot, chan);
+            Bet.awardSuperRolls(sender, "", usergame.getProfile(), null,
+                                usergame.getAmount(), bot, chan);
         } catch (SQLException e) {
             EventLog.log(e, "BJGame", "playerWin");
         }

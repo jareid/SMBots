@@ -281,7 +281,8 @@ public class OverUnder extends Event {
                 // Generate "rake"
                 bet.getRake();
                 
-                Bet.awardSuperRolls(username, "", bet.getAmount(), bot, channel);
+                Bet.awardSuperRolls(username, "", bet.getProfile(), null,
+                                    bet.getAmount(), bot, channel);
 
                 // check if jackpot won
                 if (Rake.checkJackpot(bet.getAmount())) {
