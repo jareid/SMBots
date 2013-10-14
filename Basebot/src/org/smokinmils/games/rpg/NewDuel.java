@@ -33,6 +33,7 @@ import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
@@ -136,16 +137,19 @@ public class NewDuel extends Event {
                                                + " %profile%c12)";
 
     /** Number of minutes for open bet announce. */
-    private static final int    ANNOUNCE_MINS   = 3;
+    private static final int    ANNOUNCE_MINS   = Integer.parseInt(XMLLoader.getInstance()
+                                                .getGameSetting("duel.announce.mins"));
 
     /** Number of seconds for a user to choose an option. */
-    private static final int    CHOICE_SECS    = 25;
+    private static final int    CHOICE_SECS    = Integer.parseInt(XMLLoader.getInstance()
+                                                .getGameSetting("duel.choice.secs"));
 
     /** The list of pending bets containing users who are waiting to start a duel. */
     private final List<NewDuelState>  games;
 
     /** The fast channel for the game. */
-    private static final String FAST_CHAN = "#SM_Express";
+    private static final String FAST_CHAN = XMLLoader.getInstance()
+                                                     .getGameSetting("duel.fasterchan");
     
     /** Temp var that represents damage. */
     private static final int DAMAGE = 40;
@@ -153,19 +157,28 @@ public class NewDuel extends Event {
     // def is the inverse ie 1.0 is 100% damage taken, 0.0  is 100% def
     
     /** The damage dealt by a jab attack. */
-    private static final double JAB_DMG = 0.5;
+    private static final double JAB_DMG = Double.parseDouble(XMLLoader.getInstance()
+                                          .getGameSetting("duel.jab.atk"));
+    
     /** The damage taken by a jab attack. */
-    private static final double JAB_DEF = 0.8;
+    private static final double JAB_DEF = Double.parseDouble(XMLLoader.getInstance()
+                                          .getGameSetting("duel.jab.def"));
     
     /** The damage done by an uppercut attack. */
-    private static final double UPC_DMG = 1.0;
+    private static final double UPC_DMG = Double.parseDouble(XMLLoader.getInstance()
+                                          .getGameSetting("duel.upc.atk"));
+    
     /** The damage taken with a uppercut attack. */
-    private static final double UPC_DEF = 1.0;
+    private static final double UPC_DEF = Double.parseDouble(XMLLoader.getInstance()
+                                          .getGameSetting("duel.upc.def"));
     
     /** The damage dealt with a block attack. */
-    private static final double BLK_DMG = 0.0;
+    private static final double BLK_DMG = Double.parseDouble(XMLLoader.getInstance()
+                                          .getGameSetting("duel.jab.atk"));
+    
     /** The damage taken with a block attack. */
-    private static final double BLK_DEF = 0.2;
+    private static final double BLK_DEF = Double.parseDouble(XMLLoader.getInstance()
+                                          .getGameSetting("duel.blk.def"));
     
     /** Mapping of GameLogic to damage. */
     private final EnumMap<GameLogic, Double> damage;

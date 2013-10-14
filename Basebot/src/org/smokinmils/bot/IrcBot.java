@@ -315,11 +315,7 @@ public class IrcBot extends PircBotX {
      * @return  true if the user is identified, false otherwise.
      */
     public final boolean userIsIdentified(final String nick) {
-        boolean ret = identifiedUsers.contains(nick.toLowerCase());
-        if (!ret) {
-            manualStatusRequest(nick.toLowerCase());
-        }
-        return ret;
+        return identifiedUsers.contains(nick.toLowerCase());
     }
 	
 	/**

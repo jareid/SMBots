@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.ProfileType;
 import org.smokinmils.database.types.ReferalUser;
-import org.smokinmils.database.types.ReferrerType;
 import org.smokinmils.logging.EventLog;
 
 /**
@@ -31,7 +30,7 @@ import org.smokinmils.logging.EventLog;
  */
 public final class Referal {
     /** The percentage of the rake provided that goes to jackpot. */
-    private static final double  JACKPOT_PERCENT = 0.10;
+    private static final double  JACKPOT_PERCENT = 0.50;
 
     /** The percentage of the rake provided that goes to group referral fees. */
     private static final double  GROUP_PERCENT   = 0.20;
@@ -103,7 +102,7 @@ public final class Referal {
         try {
             db.checkDBUsersExist();
             
-            ReferrerType reftype = db.getRefererType(event.getUser());
+            /*ReferrerType reftype = db.getRefererType(event.getUser());
 
             double housepercent = 1.0;
             if (Rake.JACKPOTENABLED) {
@@ -121,7 +120,7 @@ public final class Referal {
             double housefee = event.getAmount() * housepercent;
             Map<String, Double> fees = new HashMap<String, Double>();
             fees.put(DB.HOUSE_USER, housefee);
-            db.giveReferalFees(event.getUser(), fees, event.getProfile());
+            db.giveReferalFees(event.getUser(), fees, event.getProfile());*/
 
             if (Rake.JACKPOTENABLED) {
                 updateJackpot(event.getAmount(), event.getProfile());

@@ -24,6 +24,7 @@ import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -69,7 +70,8 @@ public class TimedRollComp extends Event {
                                  + "round has begun, use %c04%cmd%c12 to roll.";
 
     /** The highest possible roll number. */
-    public static final int                  MAXROLL         = 1000;
+    public static final int                  MAXROLL  = Integer.parseInt(XMLLoader.getInstance()
+                                                            .getGameSetting("roll.maxroll"));
 
     /** The channel this game is for. */
     private String                           validChan;

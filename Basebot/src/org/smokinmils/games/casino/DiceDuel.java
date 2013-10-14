@@ -14,6 +14,7 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
@@ -104,16 +105,22 @@ public class DiceDuel extends Event {
                                           + "call once your dice duel has been open for 5 minutes!";
 
     /** The number of millisecond before a house call can be used. */
-    private static final int HOUSECALLTIME = 5 * 60 * 1000;
+    private static final boolean HOUSECALLON = Boolean.parseBoolean(XMLLoader.getInstance()
+                                                      .getGameSetting("dd.housecall.on"));
+    
+    /** The number of millisecond before a house call can be used. */
+    private static final int HOUSECALLTIME = Integer.parseInt(XMLLoader.getInstance()
+                                                  .getGameSetting("dd.housecall.mins"));
     
     /** Minutes between announcements. */
-    private static final int     ANNOUNCEDELAY   = 3;
+    private static final int     ANNOUNCEDELAY   =  Integer.parseInt(XMLLoader.getInstance()
+                                                   .getGameSetting("dd.announce.mins"));
 
     /** Random number. */
     private static final int    RANDOM = 6;
     
     /** The fast channel for the game. */
-    private static final String FAST_CHAN = "#SM_Express";
+    private static final String FAST_CHAN = XMLLoader.getInstance().getGameSetting("dd.fasterchan");
     
     /** All the open bets. */
     private final ArrayList<Bet> openBets;
@@ -128,9 +135,9 @@ public class DiceDuel extends Event {
         openBets = new ArrayList<Bet>();
 
         Timer announce = new Timer(true);
-        announce.scheduleAtFixedRate(
-                new Announce(bot, channel), ANNOUNCEDELAY * Utils.MS_IN_MIN,
-                ANNOUNCEDELAY * Utils.MS_IN_MIN);
+        announce.scheduleAtFixedRate(new Announce(bot, channel),
+                                     ANNOUNCEDELAY * Utils.MS_IN_MIN,
+                                     ANNOUNCEDELAY * Utils.MS_IN_MIN);
     }
 
     /**
@@ -476,11 +483,12 @@ public class DiceDuel extends Event {
                     wagers = wagers.replaceAll("%username", bet.getUser());
                     wagers = wagers.replaceAll("%amount",
                                         Utils.chipsToString(bet.getAmount()));
-                    
-                    long now = System.currentTimeMillis();
-                    long diff = now - bet.getTime();
-                    if (diff >= HOUSECALLTIME) {
-                        housecalls.add(bet.getUser());
+                    if (HOUSECALLON) {
+                        long now = System.currentTimeMillis();
+                        long diff = now - bet.getTime();
+                        if (diff >= HOUSECALLTIME) {
+                            housecalls.add(bet.getUser());
+                        }
                     }
                 }             
                 

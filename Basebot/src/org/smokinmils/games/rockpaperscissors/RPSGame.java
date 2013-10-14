@@ -31,6 +31,7 @@ import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
@@ -144,10 +145,12 @@ public class RPSGame extends Event {
                                                + " %profile%c12)";
 
     /** Number of minutes for open bet announce. */
-    private static final int    ANNOUNCE_MINS   = 3;
+    private static final int    ANNOUNCE_MINS   = Integer.parseInt(XMLLoader.getInstance()
+                                                .getGameSetting("rps.announce.mins"));
 
     /** Number of seconds for a user to choose an option. */
-    private static final int    CHOICE_SECS    = 25;
+    private static final int    CHOICE_SECS    = Integer.parseInt(XMLLoader.getInstance()
+                                                .getGameSetting("rps.choice.secs"));
 
     /** The list of open bets. */
     private final List<Bet>     openBets;
@@ -156,7 +159,8 @@ public class RPSGame extends Event {
     private final List<String>  pendingBets;
 
     /** The fast channel for the game. */
-    private static final String FAST_CHAN = "#SM_Express";
+    private static final String FAST_CHAN = XMLLoader.getInstance()
+                                            .getGameSetting("rps.fasterchan");
     
     /**
      * Constructor.

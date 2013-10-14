@@ -307,14 +307,19 @@ public class Referrals extends Event {
         try {
             if (bot.userIsIdentified(sender)) {
                 String cname = chan.getName();
-                if (isValidChannel(cname) && Utils.startsWith(message, REF_CMD)) {
+                /*
+                 * if (isValidChannel(cname) && Utils.startsWith(message, REF_CMD)) {
                     refer(event);
-                } else if (isRankValidChannel(cname)) {
+                } else 
+                 */
+                if (isRankValidChannel(cname)) {
+                    /*
                     if (Utils.startsWith(message, GREF_CMD)) {
                         groupRefer(event);
                     } else if (Utils.startsWith(message, CHK_CMD)) {
                         referCheck(event);
-                    } else if (Utils.startsWith(message, MYPOINTS_CMD)) {
+                    } else */
+                    if (Utils.startsWith(message, MYPOINTS_CMD)) {
                         checkPoints(event);
                     }
                 }

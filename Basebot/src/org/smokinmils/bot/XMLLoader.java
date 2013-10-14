@@ -721,7 +721,7 @@ public final class XMLLoader {
                 }
             }            
         } catch (Exception e) {
-            EventLog.log(e, "XMLLoader", "getTierSetting");
+            EventLog.log(e, "XMLLoader", "getTradeSetting");
         }
         if (ret == null) {
             ret = "";
@@ -756,14 +756,50 @@ public final class XMLLoader {
                  }
              }             
          } catch (Exception e) {
-             EventLog.log(e, "XMLLoader", "getHTTPSetting");
+             EventLog.log(e, "XMLLoader", "getTierSetting");
          }
          
          if (ret == null) {
              ret = 0;
-             EventLog.log("Error in XML, trade setting empty", "XMLLoader", "getTradeSetting");
+             EventLog.log("Error in XML, tier setting empty", "XMLLoader", "getTierSetting");
          }
          return ret;
      }
+     
+      /**
+       * Gets a game setting.
+       * @param setting the setting we want
+       * @return the value of the setting
+       */
+       public String getGameSetting(final String setting) {
+          String ret = null;
+          try {
+              XPath xPath =  XPathFactory.newInstance().newXPath();
+   
+              String expression = "/bot/*";
+              //read a nodelist using xpath
+              NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(xmlDocument, 
+                                                          XPathConstants.NODESET);
+                
+              for (int i = 0; i < nodeList.getLength(); i++) {
+                  String n = nodeList.item(i).getNodeName();
+                  Element el = (Element) nodeList.item(i); 
+                  if (n.equals("game")) {
+                      if (el.getAttribute("type").equals(setting)) {
+                          ret = el.getTextContent();
+                          break;
+                      }
+                  }
+              }             
+          } catch (Exception e) {
+              EventLog.log(e, "XMLLoader", "getGameSetting");
+          }
+          
+          if (ret == null) {
+              ret = "";
+              EventLog.log("Error in XML, game setting empty", "XMLLoader", "getGameSetting");
+          }
+          return ret;
+      }
 }
 

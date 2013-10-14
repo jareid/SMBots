@@ -49,7 +49,7 @@ public final class Rake {
     private static final int    JACKPOTCHANCE  = 500000;
     
     /** Amount of rake taken/generated from bets. */
-    private static final double RAKE           = 0.05;
+    private static final double RAKE           = 0.01;
     
     /** Denotes if the jackpot is enabled of not. */
     public static final boolean JACKPOTENABLED = true;

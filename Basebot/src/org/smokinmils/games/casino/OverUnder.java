@@ -11,6 +11,7 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
@@ -84,25 +85,29 @@ public class OverUnder extends Event {
     private static final int    NUMBER = 7;
     
     /** Standard odds. */
-    private static final int    ODDS_EVEN = 2;
+    private static final int    ODDS_EVEN = Integer.parseInt(XMLLoader.getInstance()
+                                            .getGameSetting("ou.odds.even"));
     
     /** Better odds. */
-    private static final int    ODDS_NUMB = 5;
+    private static final int    ODDS_NUMB = Integer.parseInt(XMLLoader.getInstance()
+                                            .getGameSetting("ou.odds.number"));
 
     /** Random number. */
     private static final int    RANDOM = 6;
     
     /** Bonus chance. */
-    private static final double BONUS_EVEN = 0.76;
+    private static final double BONUS_EVEN = Double.parseDouble(XMLLoader.getInstance()
+                                            .getGameSetting("ou.bonus.even"));
     
     /** Bonus chance. */
-    private static final double BONUS_NUMB = 0.86;
+    private static final double BONUS_NUMB = Double.parseDouble(XMLLoader.getInstance()
+                                             .getGameSetting("ou.bonus.even"));
 
     /** All open bets for OU. */
     private final ArrayList<Bet> openBets;
 
     /** The fast channel for the game. */
-    private static final String FAST_CHAN = "#SM_overunder";
+    private static final String FAST_CHAN = XMLLoader.getInstance().getGameSetting("ou.fasterchan");
     
     /**
      * Constructor.

@@ -710,7 +710,7 @@ public class Escrow extends Event {
                     String out = CheckIdentified.NOT_IDENTIFIED.replaceAll("%user", sender);
                     
                     bot.sendIRCMessage(senderu, out);
-                } else if (profile == null) {
+                } else if (profile == null || wprofile == null) {
                     bot.sendIRCMessage(chan, IrcBot.VALID_PROFILES);
                 } else if (chips < amount) {
                     String out = NOCHIPSMSG.replaceAll("%chips", Utils.chipsToString(amount));
@@ -895,6 +895,9 @@ public class Escrow extends Event {
                     } else if (swapcount < SWAP_PER_LINE) {
                         swapstr += OPEN_SWAP;
                     }
+                    if (!remove.equals("")) {
+                        swapstr = swapstr.replaceAll(remove, "");
+                    }
                                         
                     swapstr = swapstr.replaceAll("%id", Integer.toString(swp.getId()));
                     swapstr = swapstr.replaceAll("%user", swp.getUser());
@@ -907,9 +910,6 @@ public class Escrow extends Event {
                     swapcount++;
                     if (swapcount == SWAP_PER_LINE) {
                         swapstr = swapstr + extra + "\n";
-                        if (!remove.equals("")) {
-                            swapstr = swapstr.replaceAll(remove, "");
-                        }
                         swapcount = 0;
                     }
                 }

@@ -804,11 +804,9 @@ public final class DB {
             }
 
             while (rs.next()) {
-                String updsqlinst = updsql.replaceAll(
-                        "%amount",
+                String updsqlinst = updsql.replaceAll("%amount",
                         Integer.toString(rs.getInt(PokerBetsTable.COL_AMOUNT)));
-                updsqlinst = updsqlinst.replaceAll(
-                        "%user_id",
+                updsqlinst = updsqlinst.replaceAll("%user_id",
                         Integer.toString(rs.getInt(PokerBetsTable.COL_USERID)));
                 updsqlinst = updsqlinst.replaceAll("%type_id", Integer
                         .toString(rs.getInt(PokerBetsTable.COL_PROFILEID)));
@@ -2883,7 +2881,7 @@ public final class DB {
      * @param sender    The person starting the swap.
      * @param amount    The amount of the swap.
      * @param profile   The profile of the swap.
-     * @param wamount   The rquested amount.
+     * @param wamount   The requested amount.
      * @param wprofile  The requested profile.
      * 
      * @return  The ID of the new swap.
@@ -2891,10 +2889,10 @@ public final class DB {
      * @throws SQLException if a db error occurs.
      */
     public int addSwap(final String sender,
-                        final Double amount,
-                        final ProfileType profile,
-                        final Double wamount,
-                        final ProfileType wprofile) throws SQLException {
+                       final Double amount,
+                       final ProfileType profile,
+                       final Double wamount,
+                       final ProfileType wprofile) throws SQLException {
         String sql = "INSERT INTO " + TradeTable.NAME + "(" + TradeTable.COL_USER + ", "
                                                             + TradeTable.COL_AMOUNT + ", "
                                                             + TradeTable.COL_PROFILE + ", "
@@ -3123,7 +3121,7 @@ public final class DB {
         
         int count = runGetIntQuery(sql);
         boolean ret = false;
-        if (count > 1) {
+        if (count > 0) {
             ret = true;
         }
         

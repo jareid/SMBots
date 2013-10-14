@@ -15,6 +15,7 @@ import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.Random;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.database.DB;
 import org.smokinmils.database.types.GamesType;
@@ -101,7 +102,7 @@ public class Roulette extends Event {
     private static final int NUMBER             = 36;
     
     /** Random generated to. */
-    private static final int RANDGENNUM         = 39;
+    private static final int RANDGENNUM         = 38;
     
     /** The odds for evens bets. */
     private static final int ODDS_EVENS          = 2;
@@ -131,7 +132,7 @@ public class Roulette extends Event {
                                                      1, 27, 10, 25, 29, 12, 8);
    
    /** Board output line two. */
-   private static final String BOARDL2 = "%c0,3 00 %c0,4 15 %c0,1 03 %c0,4 24 "
+   private static final String BOARDL2 = "%c0,0 -- %c0,4 15 %c0,1 03 %c0,4 24 "
                                        + "%c0,1 36 %c0,4 13 %c0,1 01 %c0,4 27 "
                                        + "%c0,1 10 %c0,4 25 %c0,1 29 %c0,4 12 "
                                        + "%c0,1 08 %c0,1";
@@ -175,13 +176,15 @@ public class Roulette extends Event {
     private int                   state;
 
     /** The fast channel for the game. */
-    private static final String FAST_CHAN = "#SM_roulette";
+    private static final String FAST_CHAN = XMLLoader.getInstance()
+                                            .getGameSetting("roulette.fasterchan");
     
     /** Arraylist containing the winning history. */
     private final ArrayList<Integer> history;
     
     /** Number of rolls to keep. */
-    private static final int HISTORY_LENGTH = 20;
+    private static final int HISTORY_LENGTH = Integer.parseInt(XMLLoader.getInstance()
+                                            .getGameSetting("roulette.history.length"));
     
     /**
      * Constructor.

@@ -12,6 +12,7 @@ import org.smokinmils.bot.Event;
 import org.smokinmils.bot.IrcBot;
 import org.smokinmils.bot.SpamEnforcer;
 import org.smokinmils.bot.Utils;
+import org.smokinmils.bot.XMLLoader;
 import org.smokinmils.bot.events.Message;
 import org.smokinmils.cashier.rake.Rake;
 import org.smokinmils.database.DB;
@@ -49,19 +50,24 @@ public class BJGame extends Event {
     private static final String CARDS_CMD = "!cards";
     
     /** Time in minutes for the warning notice to be sent. */
-    private static final int WARNING_TIME = 4 * Utils.MS_IN_MIN;
+    private static final int WARNING_TIME = Integer.parseInt(XMLLoader.getInstance()
+                                              .getGameSetting("bj.warning.mins")) * Utils.MS_IN_MIN;
     
     /** Time in minutes for the game to be auto standed. */
-    private static final int AUTO_STAND_TIME = 5 * Utils.MS_IN_MIN;
+    private static final int AUTO_STAND_TIME = Integer.parseInt(XMLLoader.getInstance()
+                                            .getGameSetting("bj.autostand.mins")) * Utils.MS_IN_MIN;
     
     /** Winning x for a push. */
-    private static final double PUSH_WIN = 0.7; 
-    
+    private static final double PUSH_WIN = Double.parseDouble(XMLLoader.getInstance()
+                                                                    .getGameSetting("bj.win.push"));
+   
     /** Winning x for normal win. */
-    private static final double NORMAL_WIN = 2;
+    private static final double NORMAL_WIN = Double.parseDouble(XMLLoader.getInstance()
+                                                                         .getGameSetting("bj.win"));
     
     /** Winning x for BJ win. */
-    private static final double BJ_WIN = 2.5;
+    private static final double BJ_WIN = Double.parseDouble(XMLLoader.getInstance()
+                                                                     .getGameSetting("bj.win.bj"));
     
     /** Max points before bust. */ 
     public static final int MAX_POINTS = 21;
@@ -79,7 +85,8 @@ public class BJGame extends Event {
     public static final int ACE_DIFFERENCE = 10;
     
     /** The value that the house will stick at. */
-    public static final int HOUSE_STICK_VALUE = 17;
+    public static final int HOUSE_STICK_VALUE = Integer.parseInt(XMLLoader.getInstance()
+                                                                  .getGameSetting("bj.housestick"));
 
     /** 10 for checking for doubling. */
     private static final int VALID_10 = 10;
@@ -186,7 +193,7 @@ public class BJGame extends Event {
     private final ArrayList<BJBet> openGames;
    
     /** The fast channel for the game. */
-    private static final String FAST_CHAN = "#SM_Express";
+    private static final String FAST_CHAN = XMLLoader.getInstance().getGameSetting("bj.fasterchan");
     
     /**
      * Constructor.
@@ -272,7 +279,6 @@ public class BJGame extends Event {
                 bot.sendIRCNotice(sender, out);
             }
         }
-        
     }
 
     /**

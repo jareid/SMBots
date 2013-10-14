@@ -336,7 +336,9 @@ public class Bet {
         
         // first user.
         double random = Random.nextDouble();
+        int wonsupers = 0;
         if (u1prof != ProfileType.PLAY &&  random < chance) {
+            wonsupers = Random.nextInt(supers) + 1;
             DB.getInstance().giveSuperRolls(user1, supers);
             String out = SUPERROLLWIN.replaceAll("%username", user1);
             out = out.replaceAll("%rolls", Integer.toString(supers));
@@ -347,6 +349,7 @@ public class Bet {
         // second user.
         random = Random.nextDouble();
         if (!user2.equals("") && u2prof != ProfileType.PLAY && random < chance) {
+            wonsupers = Random.nextInt(supers) + 1;
             DB.getInstance().giveSuperRolls(user2, supers);
             String out = SUPERROLLWIN.replaceAll("%username", user2);
             out = out.replaceAll("%rolls", Integer.toString(supers));
